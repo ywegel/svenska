@@ -1,0 +1,114 @@
+package de.ywegel.svenska.ui.search
+
+import androidx.lifecycle.SavedStateHandle
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
+import dagger.hilt.android.lifecycle.HiltViewModel
+import de.ywegel.svenska.data.SortOrder
+import de.ywegel.svenska.data.VocabularyRepository
+import de.ywegel.svenska.data.preferences.UserPreferencesManager
+import de.ywegel.svenska.di.IoDispatcher
+import de.ywegel.svenska.ui.navArgs
+import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.flatMapLatest
+import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.launch
+import java.util.LinkedList
+import java.util.Queue
+import javax.inject.Inject
+
+@HiltViewModel
+class SearchViewModel @Inject constructor(
+    private val savedStateHandle: SavedStateHandle,
+    private val repository: VocabularyRepository,
+    private val userPreferencesManager: UserPreferencesManager,
+    @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
+) : ViewModel() {
+
+    private val _uiState = MutableStateFlow(SearchUiState())
+    val uiState = _uiState.asStateFlow()
+
+    private val containerId: Int? = savedStateHandle.navArgs<SearchScreenNavArgs?>()?.containerId
+
+    private val _searchQuery = MutableStateFlow("")
+    val searchQuery = _searchQuery.asStateFlow()
+
+    private val userPreferencesFlow = userPreferencesManager.preferencesOverviewFlow
+
+    @OptIn(ExperimentalCoroutinesApi::class)
+    val vocabularyFlow = combine(
+        userPreferencesFlow,
+        _searchQuery,
+    ) { preferences, query ->
+        Pair(preferences, query)
+    }.flatMapLatest { (preferences, searchQuery) ->
+        repository.getVocabularies(
+            query = searchQuery,
+            containerId = containerId,
+            sortOrder = SortOrder.Created,
+            reverse = false,
+        )
+    }
+
+    init {
+        observePreferences()
+    }
+
+    /**
+     * Invoked, everytime the users input changes in the search field
+     **/
+    fun updateSearchQuery(query: String) {
+        _searchQuery.update {
+            query
+        }
+    }
+
+    /**
+     * Invoked, when the user clicks the submit button in the search field or on the keyboard
+     **/
+    fun onSearch(query: String) {
+        _searchQuery.update {
+            query
+        }
+        _uiState.update {
+            val updated = it.lastSearchedItems
+            if (updated.size == MAX_LAST_SEARCH_COUNT) {
+                updated.poll()
+            }
+            updated.add(query)
+            it.copy(lastSearchedItems = updated)
+        }
+        viewModelScope.launch(ioDispatcher) {
+            userPreferencesManager.updateOverviewLastSearchedItems(
+                (_uiState.value.lastSearchedItems as LinkedList<String>),
+            )
+        }
+    }
+
+    private fun observePreferences() = viewModelScope.launch(ioDispatcher) {
+        launch {
+            userPreferencesFlow.collectLatest { preferences ->
+                _uiState.update {
+                    it.copy(
+                        lastSearchedItems = preferences.lastSearchedItems,
+                    )
+                }
+            }
+        }
+    }
+}
+
+data class SearchUiState(
+    val lastSearchedItems: Queue<String> = LinkedList(),
+    // val isLoading: Boolean = true,
+    // val sortOrder: SortOrder = SortOrder.default,
+    // val isReverseSort: Boolean = false,
+    // val showSortDialog: Boolean = false,
+)
+
+private const val MAX_LAST_SEARCH_COUNT = 5

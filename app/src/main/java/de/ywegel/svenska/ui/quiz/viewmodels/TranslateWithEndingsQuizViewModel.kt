@@ -1,0 +1,45 @@
+package de.ywegel.svenska.ui.quiz.viewmodels
+
+import dagger.assisted.Assisted
+import dagger.assisted.AssistedFactory
+import dagger.assisted.AssistedInject
+import dagger.hilt.android.lifecycle.HiltViewModel
+import de.ywegel.svenska.data.VocabularyRepository
+import de.ywegel.svenska.di.IoDispatcher
+import de.ywegel.svenska.domain.quiz.model.TranslateMode
+import de.ywegel.svenska.domain.quiz.model.UserAnswer
+import de.ywegel.svenska.domain.quiz.strategies.TranslationWithEndingsQuizStrategy
+import de.ywegel.svenska.ui.quiz.BaseQuizViewModel
+import de.ywegel.svenska.ui.quiz.controller.TranslateWithEndingsActions
+import de.ywegel.svenska.ui.quiz.controller.TranslateWithEndingsController
+import de.ywegel.svenska.ui.quiz.controller.TranslateWithEndingsResult
+import de.ywegel.svenska.ui.quiz.controller.TranslateWithEndingsState
+import de.ywegel.svenska.ui.quiz.renderers.TranslateWithEndingsRenderer
+import kotlinx.coroutines.CoroutineDispatcher
+
+@HiltViewModel(assistedFactory = TranslateWithEndingsQuizViewModel.Factory::class)
+class TranslateWithEndingsQuizViewModel @AssistedInject constructor(
+    repository: VocabularyRepository,
+    @IoDispatcher ioDispatcher: CoroutineDispatcher,
+    @Assisted private val translateMode: TranslateMode,
+    @Assisted containerId: Int?,
+) : BaseQuizViewModel<
+    UserAnswer.TranslateWithEndingsAnswer,
+    TranslateWithEndingsState,
+    TranslateWithEndingsActions,
+    TranslateWithEndingsResult,
+    >(
+    repository,
+    ioDispatcher,
+    TranslationWithEndingsQuizStrategy(translateMode),
+    { TranslateWithEndingsController() },
+    containerId,
+) {
+
+    override val renderer = TranslateWithEndingsRenderer()
+
+    @AssistedFactory
+    interface Factory {
+        fun create(translateMode: TranslateMode, containerId: Int?): TranslateWithEndingsQuizViewModel
+    }
+}

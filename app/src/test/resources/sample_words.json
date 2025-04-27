@@ -1,0 +1,27 @@
+[
+  {
+    "chapter": "Kapitel 1",
+    "words": [
+      [
+        "nounGroupOr Ultra (-n, -or, -orna)",
+        "translation1"
+      ],
+      [
+        "verbGroup1 a (-r, -de, -t)",
+        "translation2"
+      ],
+      [
+        "nounGroup5 Neutra (-et, -, -en)",
+        "translation3"
+      ],
+      [
+        "adjective (-t, -a)",
+        "translation4"
+      ],
+      [
+        "verb a (-er, -te, -t)",
+        "translation5"
+      ]
+    ]
+  }
+]

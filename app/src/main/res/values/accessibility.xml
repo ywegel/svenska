@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- General -->
+
+    <string name="accessibility_toolbar_navigate_up">Navigate up</string>
+
+    <!-- # Quiz # -->
+    <string name="accessibility_toolbar_actions_favorite">Favorite this word</string>
+    <string name="accessibility_toolbar_actions_word_group_info">Navigate to WordGroups screen</string>
+
+</resources>

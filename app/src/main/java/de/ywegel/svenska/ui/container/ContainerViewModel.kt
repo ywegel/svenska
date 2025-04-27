@@ -1,0 +1,58 @@
+package de.ywegel.svenska.ui.container
+
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
+import dagger.hilt.android.lifecycle.HiltViewModel
+import de.ywegel.svenska.data.VocabularyRepository
+import de.ywegel.svenska.data.model.VocabularyContainer
+import de.ywegel.svenska.di.IoDispatcher
+import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.launch
+import javax.inject.Inject
+
+@HiltViewModel
+class ContainerViewModel @Inject constructor(
+    private val repository: VocabularyRepository,
+    @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
+) : ViewModel() {
+
+    private val _uiState = MutableStateFlow(ContainerUiState())
+    val uiState = _uiState.asStateFlow()
+
+    init {
+        observerContainers()
+    }
+
+    private fun observerContainers() = viewModelScope.launch(ioDispatcher) {
+        repository.getAllContainers().collectLatest { containers ->
+            _uiState.update {
+                it.copy(containers = containers)
+            }
+        }
+    }
+
+    fun updateIsEditMode(isEnabled: Boolean) {
+        _uiState.update {
+            it.copy(isEditModeMode = isEnabled)
+        }
+    }
+
+    fun deleteContainer(container: VocabularyContainer) = viewModelScope.launch(ioDispatcher) {
+        repository.deleteContainerWithAllVocabulary(container)
+    }
+
+    fun addContainer(containerName: String) {
+        viewModelScope.launch(ioDispatcher) {
+            repository.upsertContainer(VocabularyContainer(name = containerName))
+        }
+    }
+}
+
+data class ContainerUiState(
+    val containers: List<VocabularyContainer> = emptyList(),
+    val isEditModeMode: Boolean = false,
+)

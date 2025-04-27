@@ -1,0 +1,202 @@
+<resources>
+    <string name="app_name">Svensk ordbok</string>
+
+    <!-- # General # -->
+
+    <string name="general_ok">OK</string>
+    <string name="general_yes">Yes</string>
+    <string name="general_no">No</string>
+    <string name="general_cancel">Cancel</string>
+    <string name="general_next">Next</string>
+    <string name="general_continue">Continue</string>
+    <string name="general_retry">Retry</string>
+
+    <!-- Language technical terms -->
+    <string name="lang_common">en</string>
+    <string name="lang_neuter">ett</string>
+
+    <string name="lang_numbers_zero">n*o*ll</string>
+    <string name="lang_numbers_one_extended">e*n*/e*tt*</string>
+    <string name="lang_numbers_one">e*tt*</string>
+    <string name="lang_numbers_two">tv*å*</string>
+    <string name="lang_numbers_three">tr*e*</string>
+    <string name="lang_numbers_four">f*y*ra</string>
+    <string name="lang_numbers_five">fe*m*</string>
+    <string name="lang_numbers_six">se*x*</string>
+    <string name="lang_numbers_seven">sj*u*</string>
+    <string name="lang_numbers_eight">å*tt*a</string>
+    <string name="lang_numbers_nine">n*i*o</string>
+    <string name="lang_numbers_ten">t*i*o</string>
+    <string name="lang_numbers_eleven">e*l*va</string>
+    <string name="lang_numbers_twelve">tol*v*</string>
+    <string name="lang_numbers_thirteen">tre*tt*on</string>
+    <string name="lang_numbers_fourteen">fj*o*rton</string>
+    <string name="lang_numbers_fifteen">fe*m*ton</string>
+    <string name="lang_numbers_sixteen">se*x*ton</string>
+    <string name="lang_numbers_seventeen">sju*tt*on</string>
+    <string name="lang_numbers_eighteen">*a*rton</string>
+    <string name="lang_numbers_nineteen">ni*tt*on</string>
+    <string name="lang_numbers_twenty">tj*u*go</string>
+    <string name="lang_numbers_thirty">tre*tt*io</string>
+    <string name="lang_numbers_forty">fy*rt*io</string>
+    <string name="lang_numbers_fifty">fe*m*tio</string>
+    <string name="lang_numbers_sixty">se*x*tio</string>
+    <string name="lang_numbers_seventy">sju*tt*io</string>
+    <string name="lang_numbers_eighty">å*tt*io</string>
+    <string name="lang_numbers_ninety">ni*tt*io</string>
+    <string name="lang_numbers_hundred">(ett) hu*nd*ra</string>
+    <string name="lang_numbers_thousand">(ett) t*u*sen</string>
+    <string name="lang_numbers_million">en milj*o*n</string>
+
+    <string name="lang_noun">Noun</string>
+    <string name="lang_verb">Verb</string>
+    <string name="lang_adjective">Adjective</string>
+    <string name="lang_other">Other</string>
+
+    <string name="lang_noun_abbreviation">N</string>
+    <string name="lang_noun_abbreviation_or">Or</string>
+    <string name="lang_noun_abbreviation_ar">Ar</string>
+    <string name="lang_noun_abbreviation_er">Er</string>
+    <string name="lang_noun_abbreviation_r">R</string>
+    <string name="lang_noun_abbreviation_n">N</string>
+    <string name="lang_noun_abbreviation_unchanged">-</string>
+    <string name="lang_noun_abbreviation_special">S</string>
+    <string name="lang_noun_abbreviation_undefined">\?</string>
+
+    <string name="lang_verb_abbreviation">V</string>
+    <string name="lang_verb_abbreviation_1">1</string>
+    <string name="lang_verb_abbreviation_2a">2a</string>
+    <string name="lang_verb_abbreviation_2b">2b</string>
+    <string name="lang_verb_abbreviation_3">3</string>
+    <string name="lang_verb_abbreviation_special">S</string>
+    <string name="lang_verb_abbreviation_undefined">\?</string>
+
+
+    <string name="lang_adjective_abbreviation">A</string>
+    <string name="lang_other_abbreviation">O</string>
+
+    <!-- # Containers # -->
+    <string name="containers_add_confirmation">Add</string>
+    <string name="container_title_edit_mode">Edit containers</string>
+
+    <string name="containers_bonus_numbers">Numbers</string>
+    <string name="containers_bonus_favorites">Favorites</string>
+    <string name="containers_bonus_special_pronunciation">Pronunciation</string>
+    <string name="containers_bonus_quiz">Quiz</string>
+    <string name="containers_bonus_word_groups">Word Groups</string>
+
+    <!-- # Overview # -->
+    <string name="overview_search">Search…</string> <!-- TODO: remove -->
+    <string name="overview_search_no_searches">No searches yet</string>
+
+
+    <!-- # Search # -->
+    <string name="search_search_label">Search</string>
+
+    <!-- # AddEdit # -->
+    <string name="addEdit_title_new">Creating a new vocabulary</string>
+    <string name="addEdit_title_existing">Editing %1$s</string>
+
+    <string name="addEdit_label_word">Word with * annotation</string>
+    <string name="addEdit_label_translation">Translation</string>
+    <string name="addEdit_label_endings">Endings</string>
+    <string name="addEdit_label_notes">Notes</string>
+    <string name="addEdit_label_irregular_pronunciation">Irregular pronunciation</string>
+
+    <string name="addEdit_confirm_delete_title">Delete Word</string>
+    <string name="addEdit_confirm_delete_body">Are you sure that you want to delete %1$s? This will be permanent</string>
+
+    <!-- # Quiz # -->
+    <string name="quiz_title">Quiz</string>
+
+    <string name="quiz_mode_random">Random</string>
+    <string name="quiz_mode_swedish">Swedish</string>
+    <string name="quiz_mode_native">Native</string>
+
+    <string name="quiz_translate">Translate:</string>
+    <string name="quiz_next">Next word</string>
+    <string name="quiz_check">Check</string>
+
+    <string name="quiz_result_correct">Correct!</string>
+    <string name="quiz_result_wrong">Wrong! The correct answer was: </string>
+    <string name="quiz_result_wrong_user_answer">Your answer was: </string>
+
+    <string name="quiz_result_with_endings_all_correct">Correct!</string>
+    <string name="quiz_result_with_endings_wrong_translation">Wrong translation! The correct answer was: </string>
+    <string name="quiz_result_with_endings_wrong_endings">Wrong endings! The correct answer was: </string>
+    <string name="quiz_result_with_endings_wrong_both">Wrong endings and translation! The correct answer was: </string>
+
+    <string name="quiz_finished_title">🎉 Congratulations! 🎉</string>
+    <string name="quiz_finished_start_new_quiz">Start New Quiz</string>
+    <string name="quiz_finished_back_to_overview">Back</string>
+    <string name="quiz_finished_correct_answers_label">%1$d out of %2$d correct</string>
+    <string name="quiz_finished_score_label">Score: %1$d%%</string>
+
+    <string name="quiz_finished_motivation_awesome">Fantastic! You\'re almost fluent 🎉</string>
+    <string name="quiz_finished_motivation_good_job">Well done! Keep it up 💪</string>
+    <string name="quiz_finished_motivation_keep_going">You\'re on the right track 👣</string>
+    <string name="quiz_finished_motivation_dont_give_up">Don’t give up – practice makes perfect 🔁</string>
+
+    <string name="quiz_error_title">😵 Oops!</string>
+    <string name="quiz_error_error_message">Something went wrong. Please try again.</string>
+    <string name="quiz_error_back_to_overview">Back</string>
+
+    <!-- # Numbers # -->
+    <string name="numbers_title">Swedish Numbers</string>
+
+    <string name="numbers_tab_small_numbers">Numbers 1–23</string>
+    <string name="numbers_tab_base_ten_numbers">Tens Numbers (Base-10)</string>
+
+    <!-- # WordGroups # -->
+    <string name="word_groups_title">Word groups</string>
+
+    <!-- ## Verbs ## -->
+    <string name="verbs_tab">Verbs</string>
+    <string name="verbs_title">Swedish Verbs</string>
+    <string name="group_1">Group 1</string>
+    <string name="group_1_rule">Ends with *-a* in infinitive, present tense *-ar*, past tense *-ade*</string>
+    <string name="group_1_example">tala → talar (present), talade (past)</string>
+    <string name="group_2a">Group 2a</string>
+    <string name="group_2a_rule">Imperative ends with voiced consonant, past tense *-de*</string>
+    <string name="group_2a_example">bygga → bygger (present), byggde (past)</string>
+    <string name="group_2b">Group 2b</string>
+    <string name="group_2b_rule">Imperative ends with voiceless consonant, past tense *-te*</string>
+    <string name="group_2b_example">köpa → köper (present), köpte (past)</string>
+    <string name="group_3">Group 3</string>
+    <string name="group_3_rule">Imperative and infinitive end with long stressed vowel, past tense *-dde*</string>
+    <string name="group_3_example">bo → bor (present), bodde (past)</string>
+    <string name="group_4">Group 4 (Irregular)</string>
+    <string name="group_4_rule">Often with stem change, no fixed rule</string>
+    <string name="group_4_example">skriva → skriver (present), skrev (past)</string>
+
+    <!-- ## Nouns ## -->
+    <string name="nouns_tab">Nouns</string>
+    <string name="nouns_title">Swedish Nouns</string>
+    <string name="group_or">Group 1 (-or)</string>
+    <string name="group_or_rule">En-words that end with *-a*</string>
+    <string name="group_or_example">en flicka → flickor</string>
+    <string name="group_ar">Group 2 (-ar)</string>
+    <string name="group_ar_rule">En-words with unstressed *-e*, *-el*, *-er* or certain consonants</string>
+    <string name="group_ar_example">en cykel → cyklar</string>
+    <string name="group_er">Group 3 (-er)</string>
+    <string name="group_er_rule">En-words with stress on the last syllable or certain endings</string>
+    <string name="group_er_example">en station → stationer</string>
+    <string name="group_r">Group 4 (-r)</string>
+    <string name="group_r_rule">One-syllable en-words that end with a stressed vowel</string>
+    <string name="group_r_example">en sko → skor</string>
+    <string name="group_n">Group 5 (-n)</string>
+    <string name="group_n_rule">Ett-words that end with a vowel</string>
+    <string name="group_n_example">ett kvitto → kvitton</string>
+    <string name="group_unchanged">Group 6 (-)</string>
+    <string name="group_unchanged_rule">Ett-words that end with a consonant, or certain en-words</string>
+    <string name="group_unchanged_example">ett hus → hus, en lärare → lärare</string>
+
+    <string name="example_format">Example: %s</string>
+
+    <!-- # Settings # -->
+    <string name="settings_title">Settings</string>
+
+    <string name="settings_compact_vocabulary_item">Show compact Vocabulary Item</string>
+    <string name="settings_naviagate_word_importer_screen">Show word importer</string>
+
+</resources>
