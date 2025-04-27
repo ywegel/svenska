@@ -1,0 +1,25 @@
+# https://editorconfig.org
+
+root = true
+
+[*.{kt,kts}]
+ktlint_code_style = android_studio
+ktlint_standard_annotation = disabled
+ktlint_function_naming_ignore_when_annotated_with = Composable
+ktlint_standard_trailing_comma_on_declaration_site = enabled
+ktlint_standard_trailing_comma_on_call_site = enabled
+ij_kotlin_allow_trailing_comma_on_call_site = true
+ij_kotlin_allow_trailing_comma = true
+ktlint_standard_function-expression-body = false
+# ktlint_experimental = enabled
+max_line_length = 120
+ij_kotlin_imports_layout = *, java.**, javax.**, kotlin.**, ^
+ktlint_class_signature_rule_force_multiline_when_parameter_count_greater_or_equal_than = 3
+ktlint_function_signature_wrapping_rule_always_with_minimum_parameters = 3
+
+# Prevent the detekt baseline from being formatted, as that breaks detekt
+[config/detekt/detekt-baseline.xml]
+indent_style = unset
+insert_final_newline = unset
+trim_trailing_whitespace = unset
+max_line_length = off
