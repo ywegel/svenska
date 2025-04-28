@@ -21,7 +21,7 @@ class QuizManager<A : UserAnswer, AnswerResult : Any>(
         currentIndex = 0
     }
 
-    fun hasMoreQuestions(): Boolean = currentIndex < vocabularyList.size
+    fun hasMoreQuestions(): Boolean = currentIndex < vocabularyList.size - 1
 
     fun hasPreviousQuestion(): Boolean = currentIndex > 0
 

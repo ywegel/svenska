@@ -366,6 +366,38 @@ class BaseQuizViewModelTest {
         }
     }
 
+    @Test
+    fun `Finish state is reached after all entries`() = runTest(testDispatcher) {
+        val repository = VocabularyRepositoryFake(initialVocabulary = vocabularies().take(2))
+
+        viewModel = TestViewModel(
+            repository = repository,
+            ioDispatcher = testDispatcher,
+            strategy = strategy,
+            userInputControllerFactory = controllerFactory,
+            containerId = null,
+            renderer = renderer,
+        )
+
+        advanceUntilIdle()
+
+        viewModel.uiState.test {
+            val entry1 = awaitItem()
+
+            expectThat(entry1).isA<QuizUiState.Active<*, *>>()
+
+            viewModel.nextWord()
+
+            val entry2 = awaitItem()
+            expectThat(entry2).isA<QuizUiState.Active<*, *>>()
+
+            viewModel.nextWord()
+
+            val finishState = awaitItem()
+            expectThat(finishState).isA<QuizUiState.Finished<*, *>>()
+        }
+    }
+
     @Nested
     @DisplayName("Error Handling")
     inner class ErrorHandling {
@@ -473,7 +505,5 @@ private class QuizStrategyFake(
     override fun validateAnswer(
         question: QuizQuestion<UserAnswer.TranslateWithoutEndingsAnswer>,
         userAnswer: UserAnswer.TranslateWithoutEndingsAnswer,
-    ): Boolean {
-        return isValid
-    }
+    ): Boolean = isValid
 }
