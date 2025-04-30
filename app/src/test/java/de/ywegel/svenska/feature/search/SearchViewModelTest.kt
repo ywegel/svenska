@@ -3,7 +3,6 @@ package de.ywegel.svenska.feature.search
 import androidx.lifecycle.SavedStateHandle
 import app.cash.turbine.test
 import assertk.all
-import assertk.assertAll
 import assertk.assertThat
 import assertk.assertions.containsExactlyInAnyOrder
 import assertk.assertions.hasSize
@@ -12,12 +11,20 @@ import de.ywegel.svenska.data.model.Vocabulary
 import de.ywegel.svenska.fakes.UserPreferencesManagerFake
 import de.ywegel.svenska.fakes.VocabularyRepositoryFake
 import de.ywegel.svenska.ui.search.SearchViewModel
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.StandardTestDispatcher
 import kotlinx.coroutines.test.advanceUntilIdle
+import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runTest
+import kotlinx.coroutines.test.setMain
+import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
+import strikt.api.expectThat
+import strikt.assertions.first
+import strikt.assertions.hasSize
+import strikt.assertions.isEqualTo
 import java.util.LinkedList
 
 @OptIn(ExperimentalCoroutinesApi::class)
@@ -30,6 +37,7 @@ class SearchViewModelTest {
 
     @BeforeEach
     fun setup() {
+        Dispatchers.setMain(testDispatcher)
         fakeRepo = VocabularyRepositoryFake()
         fakePrefs = UserPreferencesManagerFake()
         viewModel = SearchViewModel(
@@ -38,6 +46,11 @@ class SearchViewModelTest {
             userPreferencesManager = fakePrefs,
             ioDispatcher = testDispatcher,
         )
+    }
+
+    @AfterEach
+    fun cleanUp() {
+        Dispatchers.resetMain()
     }
 
     @Test
@@ -67,7 +80,7 @@ class SearchViewModelTest {
     fun `onSearch saves last searched items in preferences`() = runTest(testDispatcher) {
         val testQuery = "katt"
 
-        fakePrefs.preferencesOverviewFlow.test {
+        fakePrefs.preferencesSearchFlow.test {
             skipItems(1) // initial state
 
             viewModel.onSearch(testQuery)
@@ -89,18 +102,16 @@ class SearchViewModelTest {
             ),
         )
 
-        viewModel.vocabularyFlow.test {
-            // When
-            viewModel.updateSearchQuery("hund")
-            advanceUntilIdle()
+        // When
+        viewModel.updateSearchQuery("hund")
+        advanceUntilIdle()
 
-            // Then
+        // Then
+        viewModel.vocabularyFlow.test {
             val result = awaitItem()
 
-            assertAll {
-                assertThat(result).hasSize(1)
-                assertThat(result.first().word).isEqualTo("hund")
-            }
+            expectThat(result).hasSize(1)
+            expectThat(result.first().word).isEqualTo("hund")
 
             cancelAndIgnoreRemainingEvents()
         }

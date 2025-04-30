@@ -71,10 +71,10 @@ interface VocabularyDao {
     @Query("UPDATE vocabulary SET isFavorite = :isFavorite WHERE id = :id ")
     suspend fun toggleVocabularyFavorite(id: Int, isFavorite: Boolean)
 
-    @Query("SELECT * FROM vocabulary WHERE containerId = :containerId AND word LIKE '%' || :searchQuery || '%' OR translation LIKE '%' || :searchQuery || '%'")
+    @Query("SELECT * FROM vocabulary WHERE containerId = :containerId AND (word LIKE '%' || :searchQuery || '%' OR translation LIKE '%' || :searchQuery || '%')")
     fun searchVocabulariesById(containerId: Int, searchQuery: String): Flow<List<Vocabulary>>
 
-    @Query("SELECT * FROM vocabulary WHERE word LIKE word LIKE '%' || :searchQuery || '%' OR translation LIKE '%' || :searchQuery || '%'")
+    @Query("SELECT * FROM vocabulary WHERE (word LIKE '%' || :searchQuery || '%' OR translation LIKE '%' || :searchQuery || '%')")
     fun searchAllVocabularies(searchQuery: String): Flow<List<Vocabulary>>
 
     // Combined operations

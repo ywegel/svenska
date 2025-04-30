@@ -93,6 +93,8 @@
     <!-- # Search # -->
     <string name="search_search_label">Search</string>
 
+    <string name="search_uri_parsing_error">URL could not be handled by the system</string>
+
     <!-- # AddEdit # -->
     <string name="addEdit_title_new">Creating a new vocabulary</string>
     <string name="addEdit_title_existing">Editing %1$s</string>

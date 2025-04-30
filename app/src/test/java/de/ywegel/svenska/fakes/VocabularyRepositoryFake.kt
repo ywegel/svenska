@@ -57,7 +57,7 @@ class VocabularyRepositoryFake(
         }
 
         return if (query.isNotBlank()) {
-            flow.filter { it.equals(query) }
+            flow.map { item -> item.filter { it.word.equals(query) } }
         } else {
             flow
         }
