@@ -1,12 +1,13 @@
 package de.ywegel.svenska.ui.wordImporter
 
+import android.app.Activity
+import android.content.Intent
 import android.net.Uri
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -17,22 +18,39 @@ import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.ReadOnlyComposable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.ramcosta.composedestinations.annotation.DeepLink
 import com.ramcosta.composedestinations.annotation.Destination
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
 import de.ywegel.svenska.ui.common.VerticalSpacerM
 
-@Destination
+@Destination(
+    deepLinks = [
+        DeepLink(
+            action = Intent.ACTION_VIEW,
+            mimeType = "application/json",
+        ),
+    ],
+)
 @Composable
 fun WordImporterScreen(navigator: DestinationsNavigator) {
     val viewModel: WordImporterViewModel = hiltViewModel()
     val importerState by viewModel.importerState.collectAsStateWithLifecycle()
     val loading by viewModel.isLoading.collectAsStateWithLifecycle()
+
+    HandleJsonImportFromIntent { uri ->
+        viewModel.onFilePicked(uri)
+    }
 
     WordImporterScreen(
         importerState = importerState,
@@ -53,10 +71,9 @@ private fun WordImporterScreen(
     saveWords: () -> Unit,
     onRestartClicked: () -> Unit,
 ) {
-    val filePickerLauncher =
-        rememberLauncherForActivityResult(ActivityResultContracts.GetContent()) { uri ->
-            uri?.let { onFilePicked(it) }
-        }
+    val filePickerLauncher = rememberLauncherForActivityResult(ActivityResultContracts.GetContent()) { uri ->
+        uri?.let { onFilePicked(it) }
+    }
 
     Scaffold { padding ->
         Box(Modifier.padding(padding)) {
@@ -86,7 +103,7 @@ private fun WordImporterScreen(
 }
 
 @Composable
-private fun ColumnScope.IdleScreen(launchFilePicker: () -> Unit) {
+private fun IdleScreen(launchFilePicker: () -> Unit) {
     Text("Import Words from a File")
     VerticalSpacerM()
     Button(onClick = launchFilePicker) {
@@ -95,7 +112,7 @@ private fun ColumnScope.IdleScreen(launchFilePicker: () -> Unit) {
 }
 
 @Composable
-private fun ColumnScope.ParsedScreen(state: ImporterState.Parsed, onProceed: () -> Unit) {
+private fun ParsedScreen(state: ImporterState.Parsed, onProceed: () -> Unit) {
     Text("Found ${state.words} words in ${state.chapters} chapters.")
     VerticalSpacerM()
     Button(onClick = onProceed) {
@@ -104,7 +121,7 @@ private fun ColumnScope.ParsedScreen(state: ImporterState.Parsed, onProceed: () 
 }
 
 @Composable
-fun ColumnScope.ImportingScreen(state: ImporterState.Importing) {
+fun ImportingScreen(state: ImporterState.Importing) {
     LinearProgressIndicator(
         progress = { state.progress },
         modifier = Modifier.fillMaxWidth(),
@@ -114,7 +131,7 @@ fun ColumnScope.ImportingScreen(state: ImporterState.Importing) {
 }
 
 @Composable
-fun ColumnScope.FinishedScreen(state: ImporterState.Finished, onRestartClicked: () -> Unit, onNavigateUp: () -> Unit) {
+fun FinishedScreen(state: ImporterState.Finished, onRestartClicked: () -> Unit, onNavigateUp: () -> Unit) {
     state.error?.let {
         Text("An error occurred: $it")
     } ?: Text("${state.wordCount} words imported!")
@@ -132,5 +149,20 @@ private fun ImporterState.loadingText(): String? {
     return when (this) {
         ImporterState.Idle -> "Parsing file..."
         else -> null
+    }
+}
+
+@Composable
+fun HandleJsonImportFromIntent(onJsonFileUriReceived: (Uri) -> Unit) {
+    val context = LocalContext.current
+    val activity = context as? Activity
+    val uri = remember { activity?.intent?.data }
+    val alreadyHandled = rememberSaveable { mutableStateOf(false) }
+
+    LaunchedEffect(uri) {
+        if (!alreadyHandled.value && uri != null) {
+            alreadyHandled.value = true
+            onJsonFileUriReceived(uri)
+        }
     }
 }
