@@ -5,6 +5,7 @@ import app.cash.turbine.test
 import de.ywegel.svenska.data.VocabularyRepository
 import de.ywegel.svenska.data.model.Vocabulary
 import de.ywegel.svenska.data.vocabularies
+import de.ywegel.svenska.data.vocabulary
 import de.ywegel.svenska.domain.quiz.QuizStrategy
 import de.ywegel.svenska.domain.quiz.model.QuizQuestion
 import de.ywegel.svenska.domain.quiz.model.TranslateMode
@@ -390,6 +391,33 @@ class BaseQuizViewModelTest {
 
             val entry2 = awaitItem()
             expectThat(entry2).isA<QuizUiState.Active<*, *>>()
+
+            viewModel.nextWord()
+
+            val finishState = awaitItem()
+            expectThat(finishState).isA<QuizUiState.Finished<*, *>>()
+        }
+    }
+
+    @Test
+    fun `Finish state is reached if only one entry exists`() = runTest(testDispatcher) {
+        val repository = VocabularyRepositoryFake(listOf(vocabulary()))
+
+        viewModel = TestViewModel(
+            repository = repository,
+            ioDispatcher = testDispatcher,
+            strategy = strategy,
+            userInputControllerFactory = controllerFactory,
+            containerId = null,
+            renderer = renderer,
+        )
+
+        advanceUntilIdle()
+
+        viewModel.uiState.test {
+            val entry1 = awaitItem()
+
+            expectThat(entry1).isA<QuizUiState.Active<*, *>>()
 
             viewModel.nextWord()
 

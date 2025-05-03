@@ -26,6 +26,8 @@ class QuizManager<A : UserAnswer, AnswerResult : Any>(
     fun hasPreviousQuestion(): Boolean = currentIndex > 0
 
     fun getCurrentQuestion(): QuizQuestion<A> {
+        // TODO: Do a index check here. The vocabularyList could be empty
+        // TODO: Write tests for QuizManager
         return strategy.generateQuestion(vocabularyList[currentIndex])
     }
 
