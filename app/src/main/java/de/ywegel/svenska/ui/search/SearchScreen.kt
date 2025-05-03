@@ -30,7 +30,6 @@ import androidx.compose.material3.TextField
 import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
-import androidx.compose.material3.TopAppBarScrollBehavior
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
@@ -53,7 +52,6 @@ import de.ywegel.svenska.data.model.Vocabulary
 import de.ywegel.svenska.ui.common.HorizontalSpacerM
 import de.ywegel.svenska.ui.common.IconButton
 import de.ywegel.svenska.ui.common.NavigationIconButton
-import de.ywegel.svenska.ui.destinations.VocabularyItemPopUpDestination
 import de.ywegel.svenska.ui.overview.VocabularyItemCompact
 import de.ywegel.svenska.ui.theme.Spacings
 import de.ywegel.svenska.ui.theme.SvenskaIcons
@@ -79,7 +77,6 @@ fun SearchScreen(navigator: DestinationsNavigator) {
         onSearchChanged = viewModel::updateSearchQuery,
         onSearch = viewModel::onSearch,
         navigateUp = navigator::navigateUp,
-        navigateToPopUp = { navigator.navigate(VocabularyItemPopUpDestination(it)) },
     )
 }
 
@@ -95,7 +92,6 @@ private fun SearchScreen(
     onSearchChanged: (String) -> Unit,
     onSearch: (String) -> Unit,
     navigateUp: () -> Unit,
-    navigateToPopUp: (Vocabulary) -> Unit,
 ) {
     val snackBarHostState = remember { SnackbarHostState() }
     val uriHandle = LocalUriHandler.current
@@ -117,13 +113,11 @@ private fun SearchScreen(
             outerPadding = contentPadding,
             vocabulary = vocabulary,
             searchQuery = currentSearchQuery,
-            onItemClicked = navigateToPopUp,
+            // onItemClicked = navigateToPopUp, TODO: Show a pop up view of the Item, if clicked
             uiState = uiState,
-            onOnlineRedirectClicked = {
+            onOnlineRedirectClicked = { baseUrl, query ->
                 try {
-                    // TODO: Set custom url in settings
-                    val uri = "https://ensv.dict.cc/?s=$it"
-                    uriHandle.openUri(uri)
+                    uriHandle.openUri(baseUrl + query)
                 } catch (e: IllegalArgumentException) {
                     Log.w(TAG, "SearchScreen: onOnlineRedirectClicked", e)
                     coroutineScope.launch {
@@ -143,7 +137,7 @@ private fun ItemList(
     searchQuery: String,
     onItemClicked: (Vocabulary) -> Unit = {},
     onRecentSearchedClicked: (String) -> Unit = {},
-    onOnlineRedirectClicked: (query: String) -> Unit,
+    onOnlineRedirectClicked: (baseUrl: String, query: String) -> Unit,
 ) {
     if (searchQuery.isBlank()) {
         Column(modifier = Modifier.padding(outerPadding)) {
@@ -162,10 +156,10 @@ private fun ItemList(
         }
     } else {
         LazyColumn(contentPadding = outerPadding) {
-            if (uiState.showOnlineRedirectFirst) {
+            if (uiState.showOnlineRedirectFirst && uiState.onlineRedirectUrl != null) {
                 item {
                     OnlineRedirectItem {
-                        onOnlineRedirectClicked(searchQuery)
+                        onOnlineRedirectClicked(uiState.onlineRedirectUrl, searchQuery)
                     }
                 }
             }
@@ -174,10 +168,10 @@ private fun ItemList(
                     onItemClicked(it)
                 }
             }
-            if (!uiState.showOnlineRedirectFirst) {
+            if (!uiState.showOnlineRedirectFirst && uiState.onlineRedirectUrl != null) {
                 item {
                     OnlineRedirectItem {
-                        onOnlineRedirectClicked(searchQuery)
+                        onOnlineRedirectClicked(uiState.onlineRedirectUrl, searchQuery)
                     }
                 }
             }
@@ -310,7 +304,6 @@ private fun SearchScreenPreviewEmpty() {
             onSearchChanged = {},
             onSearch = {},
             navigateUp = {},
-            navigateToPopUp = {},
         )
     }
 }
@@ -328,7 +321,6 @@ private fun SearchScreenPreviewFilled() {
             onSearchChanged = {},
             onSearch = {},
             navigateUp = {},
-            navigateToPopUp = {},
         )
     }
 }

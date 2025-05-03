@@ -93,6 +93,7 @@ class SearchViewModel @Inject constructor(
                 _uiState.update {
                     it.copy(
                         lastSearchedItems = preferences.lastSearchedItems,
+                        onlineRedirectUrl = preferences.onlineRedirectType.toUrl(),
                     )
                 }
             }
@@ -104,6 +105,7 @@ data class SearchUiState(
     val lastSearchedItems: Queue<String> = LinkedList(),
     val showCompactVocabularyItem: Boolean = false,
     val showOnlineRedirectFirst: Boolean = false,
+    val onlineRedirectUrl: String? = null,
 )
 
 private const val MAX_LAST_SEARCH_COUNT = 5

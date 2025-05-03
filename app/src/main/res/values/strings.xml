@@ -94,6 +94,11 @@
     <string name="search_search_label">Search</string>
 
     <string name="search_uri_parsing_error">URL could not be handled by the system</string>
+    <string name="search_base_url_dict_cc">DictCC</string>
+    <string name="search_base_url_pons">PONS</string>
+    <string name="search_base_url_deepl">DeepL</string>
+    <string name="search_base_url_google_translate">Google Translate</string>
+    <string name="search_base_url_custom">Custom</string>
 
     <!-- # AddEdit # -->
     <string name="addEdit_title_new">Creating a new vocabulary</string>
@@ -198,7 +203,11 @@
     <!-- # Settings # -->
     <string name="settings_title">Settings</string>
 
-    <string name="settings_compact_vocabulary_item">Show compact Vocabulary Item</string>
-    <string name="settings_naviagate_word_importer_screen">Show word importer</string>
+    <string name="settings_overview_compact_vocabulary_item_title">Compact Item - Containers</string>
+    <string name="settings_overview_compact_vocabulary_item_description">Show compact Vocabulary Item for containers</string>
+    <string name="settings_search_compact_vocabulary_item_title">Compact Item - Search</string>
+    <string name="settings_search_compact_vocabulary_item_description">Show compact Vocabulary Item for the search</string>
+    <string name="settings_naviagate_word_importer_screen_title">Show word importer</string>
+    <string name="settings_naviagate_word_importer_screen_description">Import words from a file</string>
 
 </resources>
