@@ -75,7 +75,6 @@ private fun <A : UserAnswer, S : QuizInputState<A>, AC : Any, AR : Any> QuizScre
         checkAnswer = viewModel::checkAnswer,
         nextWord = viewModel::nextWord,
         navigateToWordGroupsScreen = { navigator.navigate(WordGroupsScreenDestination) },
-        navigateUp = navigator::navigateUp,
         navigateToOverview = {
             navigator.popBackStack(
                 route = QuizConfigurationScreenDestination,
@@ -99,7 +98,6 @@ private fun <A : UserAnswer, State : QuizInputState<A>, Actions : Any, AnswerRes
     returnToPreviousQuestion: () -> Unit,
     toggleFavorite: (Boolean) -> Unit,
     navigateToWordGroupsScreen: () -> Unit,
-    navigateUp: () -> Unit,
     navigateToOverview: () -> Unit,
     onStartNewQuiz: () -> Unit,
 ) {
@@ -107,7 +105,7 @@ private fun <A : UserAnswer, State : QuizInputState<A>, Actions : Any, AnswerRes
         topBar = {
             QuizToolbar(
                 uiState = uiState,
-                navigateUp = navigateUp,
+                navigateUp = navigateToOverview,
                 isFavorite = (uiState as? QuizUiState.Active<*, *>)?.vocabularyIsFavorite,
                 toggleFavorite = toggleFavorite,
                 navigateToWordGroupsScreen = navigateToWordGroupsScreen,
