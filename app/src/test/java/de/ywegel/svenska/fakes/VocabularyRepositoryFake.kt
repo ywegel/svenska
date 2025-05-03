@@ -57,7 +57,7 @@ class VocabularyRepositoryFake(
         }
 
         return if (query.isNotBlank()) {
-            flow.map { item -> item.filter { it.word.equals(query) } }
+            flow.map { item -> item.filter { it.word.toLowerCase().contains(query.toLowerCase()) } }
         } else {
             flow
         }
