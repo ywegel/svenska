@@ -4,6 +4,7 @@ import de.ywegel.svenska.data.SortOrder
 import de.ywegel.svenska.data.preferences.OverviewPreferences
 import de.ywegel.svenska.data.preferences.SearchPreferences
 import de.ywegel.svenska.data.preferences.UserPreferencesManager
+import de.ywegel.svenska.domain.search.OnlineSearchType
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -48,6 +49,7 @@ class UserPreferencesManagerFake(
         lastSearchedItems = LinkedList(),
         showOnlineRedirectFirst = false,
         showCompactVocabularyItem = false,
+        onlineRedirectType = OnlineSearchType.DictCC,
     )
 
     private val _preferencesSearchFlow = MutableStateFlow(currentSearchPreferences)
@@ -69,6 +71,12 @@ class UserPreferencesManagerFake(
     override suspend fun updateOnlineRedirectPosition(first: Boolean) {
         _preferencesSearchFlow.update {
             it.copy(showOnlineRedirectFirst = first)
+        }
+    }
+
+    override suspend fun updateOnlineRedirectType(type: OnlineSearchType) {
+        _preferencesSearchFlow.update {
+            it.copy(onlineRedirectType = type)
         }
     }
 }
