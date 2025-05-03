@@ -43,9 +43,7 @@ import de.ywegel.svenska.ui.common.VerticalSpacerM
     ],
 )
 @Composable
-fun WordImporterScreen(
-    navigator: DestinationsNavigator,
-) {
+fun WordImporterScreen(navigator: DestinationsNavigator) {
     val viewModel: WordImporterViewModel = hiltViewModel()
     val importerState by viewModel.importerState.collectAsStateWithLifecycle()
     val loading by viewModel.isLoading.collectAsStateWithLifecycle()
@@ -155,9 +153,7 @@ private fun ImporterState.loadingText(): String? {
 }
 
 @Composable
-fun HandleJsonImportFromIntent(
-    onJsonFileUriReceived: (Uri) -> Unit
-) {
+fun HandleJsonImportFromIntent(onJsonFileUriReceived: (Uri) -> Unit) {
     val context = LocalContext.current
     val activity = context as? Activity
     val uri = remember { activity?.intent?.data }
@@ -170,4 +166,3 @@ fun HandleJsonImportFromIntent(
         }
     }
 }
-
