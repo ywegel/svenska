@@ -4,6 +4,7 @@ import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.IntrinsicSize
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
@@ -11,12 +12,14 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.FilledTonalButton
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -24,7 +27,7 @@ import com.ramcosta.composedestinations.annotation.Destination
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
 import de.ywegel.svenska.R
 import de.ywegel.svenska.domain.quiz.model.TranslateMode
-import de.ywegel.svenska.ui.common.SwitchWithText
+import de.ywegel.svenska.ui.common.HorizontalSpacerS
 import de.ywegel.svenska.ui.common.TopAppTextBar
 import de.ywegel.svenska.ui.common.VerticalSpacerM
 import de.ywegel.svenska.ui.destinations.QuizScreenDestination
@@ -86,6 +89,7 @@ private fun QuizConfigurationScreen(
 
                 Column(Modifier.padding(Spacings.xl)) {
                     // TODO: Add explanations to both switches. Either by description text or an info icon with popup bubble
+                    // TODO: Additionally rework the switches. Maybe use the same ones, as for the Settings ans explain these switches in the description?
                     SwitchWithText(
                         text = "Additionally test endings",
                         fillTextWidth = false,
@@ -149,6 +153,25 @@ fun TranslateMode.userFacingString(): String {
         TranslateMode.Random -> stringResource(R.string.quiz_mode_random)
         TranslateMode.Swedish -> stringResource(R.string.quiz_mode_swedish)
         TranslateMode.Native -> stringResource(R.string.quiz_mode_native)
+    }
+}
+
+@Composable
+private fun SwitchWithText(
+    text: String,
+    switchChecked: Boolean,
+    fillTextWidth: Boolean = true,
+    onSwitchChanged: (Boolean) -> Unit,
+) {
+    Row(verticalAlignment = Alignment.CenterVertically) {
+        Switch(switchChecked, onSwitchChanged)
+        HorizontalSpacerS()
+        Text(
+            modifier = if (fillTextWidth) Modifier.weight(1f) else Modifier,
+            text = text,
+            maxLines = 1,
+            overflow = TextOverflow.Ellipsis,
+        )
     }
 }
 

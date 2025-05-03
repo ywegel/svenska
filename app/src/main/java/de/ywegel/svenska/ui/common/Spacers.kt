@@ -19,6 +19,11 @@ private fun VerticalSpacer(spacing: Dp) {
 }
 
 @Composable
+fun VerticalSpacerXXXS() {
+    VerticalSpacer(spacing = Spacings.xxxs)
+}
+
+@Composable
 fun VerticalSpacerXXS() {
     VerticalSpacer(spacing = Spacings.xxs)
 }

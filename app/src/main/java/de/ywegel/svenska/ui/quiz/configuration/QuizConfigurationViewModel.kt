@@ -12,7 +12,9 @@ class QuizConfigurationViewModel(initialUiState: ConfigurationState = Configurat
     val configurationState = _configurationState.asStateFlow()
 
     fun quizModeChanged(mode: TranslateMode) {
-        _configurationState.value = ConfigurationState(mode)
+        _configurationState.update {
+            it.copy(selectedType = mode)
+        }
     }
 
     fun withEndingsChanged(withEndings: Boolean) {
@@ -23,7 +25,7 @@ class QuizConfigurationViewModel(initialUiState: ConfigurationState = Configurat
 
     fun onlyEndingsChanged(onlyEndings: Boolean) {
         _configurationState.update {
-            it.copy(onlyEndings = onlyEndings)
+            it.copy(onlyEndings = onlyEndings, selectedType = TranslateMode.Native) // Only Native mode is supported
         }
     }
 

@@ -2,6 +2,7 @@
 
 package de.ywegel.svenska.ui.search
 
+import android.util.Log
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
@@ -15,20 +16,29 @@ import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.outlined.ArrowOutward
 import androidx.compose.material.icons.outlined.Close
 import androidx.compose.material.icons.outlined.History
+import androidx.compose.material3.Card
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.material3.TopAppBar
+import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalFocusManager
+import androidx.compose.ui.platform.LocalUriHandler
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.style.TextAlign
@@ -46,8 +56,11 @@ import de.ywegel.svenska.ui.overview.VocabularyItemCompact
 import de.ywegel.svenska.ui.theme.Spacings
 import de.ywegel.svenska.ui.theme.SvenskaIcons
 import de.ywegel.svenska.ui.theme.SvenskaTheme
+import kotlinx.coroutines.launch
 import java.util.LinkedList
 import java.util.Queue
+
+private const val TAG = "SearchScreen"
 
 @Destination(navArgsDelegate = SearchScreenNavArgs::class)
 @Composable
@@ -80,6 +93,11 @@ private fun SearchScreen(
     onSearch: (String) -> Unit,
     navigateUp: () -> Unit,
 ) {
+    val snackBarHostState = remember { SnackbarHostState() }
+    val uriHandle = LocalUriHandler.current
+    val coroutineScope = rememberCoroutineScope()
+    val context = LocalContext.current
+
     Scaffold(
         topBar = {
             SearchToolbar(
@@ -89,12 +107,24 @@ private fun SearchScreen(
                 navigateUp = navigateUp,
             )
         },
+        snackbarHost = { SnackbarHost(snackBarHostState) },
     ) { contentPadding ->
         ItemList(
             outerPadding = contentPadding,
             vocabulary = vocabulary,
-            lastSearchedItems = uiState.lastSearchedItems,
             searchQuery = currentSearchQuery,
+            // onItemClicked = navigateToPopUp, TODO: Show a pop up view of the Item, if clicked
+            uiState = uiState,
+            onOnlineRedirectClicked = { baseUrl, query ->
+                try {
+                    uriHandle.openUri(baseUrl + query)
+                } catch (e: IllegalArgumentException) {
+                    Log.w(TAG, "SearchScreen: onOnlineRedirectClicked", e)
+                    coroutineScope.launch {
+                        snackBarHostState.showSnackbar(context.getString(R.string.search_uri_parsing_error))
+                    }
+                }
+            },
         )
     }
 }
@@ -103,18 +133,19 @@ private fun SearchScreen(
 private fun ItemList(
     outerPadding: PaddingValues,
     vocabulary: List<Vocabulary>,
-    lastSearchedItems: Queue<String>,
+    uiState: SearchUiState,
     searchQuery: String,
     onItemClicked: (Vocabulary) -> Unit = {},
     onRecentSearchedClicked: (String) -> Unit = {},
+    onOnlineRedirectClicked: (baseUrl: String, query: String) -> Unit,
 ) {
     if (searchQuery.isBlank()) {
         Column(modifier = Modifier.padding(outerPadding)) {
-            lastSearchedItems.forEach { lastSearch ->
+            uiState.lastSearchedItems.forEach { lastSearch ->
                 LastSearchedItem(lastSearch, onRecentSearchedClicked)
             }
         }
-        if (lastSearchedItems.isEmpty()) {
+        if (uiState.lastSearchedItems.isEmpty()) {
             Text(
                 text = stringResource(R.string.overview_search_no_searches),
                 textAlign = TextAlign.Center,
@@ -125,13 +156,24 @@ private fun ItemList(
         }
     } else {
         LazyColumn(contentPadding = outerPadding) {
+            if (uiState.showOnlineRedirectFirst && uiState.onlineRedirectUrl != null) {
+                item {
+                    OnlineRedirectItem {
+                        onOnlineRedirectClicked(uiState.onlineRedirectUrl, searchQuery)
+                    }
+                }
+            }
             items(vocabulary, key = { it.id }) { item ->
                 VocabularyItemCompact(vocabulary = item, modifier = Modifier.animateItem()) {
                     onItemClicked(it)
                 }
             }
-            item {
-                // TODO: Search on dict.cc
+            if (!uiState.showOnlineRedirectFirst && uiState.onlineRedirectUrl != null) {
+                item {
+                    OnlineRedirectItem {
+                        onOnlineRedirectClicked(uiState.onlineRedirectUrl, searchQuery)
+                    }
+                }
             }
         }
     }
@@ -152,6 +194,20 @@ private fun LastSearchedItem(query: String, onItemClick: (String) -> Unit) {
 }
 
 @Composable
+private fun OnlineRedirectItem(onClick: () -> Unit) {
+    Card(onClick = onClick, modifier = Modifier.padding(Spacings.xs)) {
+        Row(
+            Modifier
+                .fillMaxWidth()
+                .padding(Spacings.m),
+        ) {
+            Text("Search online", Modifier.weight(1f))
+            Icon(SvenskaIcons.ArrowOutward, null)
+        }
+    }
+}
+
+@Composable
 private fun SearchToolbar(
     currentSearchQuery: String,
     onSearchChanged: (String) -> Unit,
@@ -167,6 +223,7 @@ private fun SearchToolbar(
     }
 
     TopAppBar(
+        colors = TopAppBarDefaults.topAppBarColors(containerColor = SvenskaTheme.colors.surfaceContainer),
         title = {
             // TODO: Style
             // TODO: search icon
@@ -265,5 +322,13 @@ private fun SearchScreenPreviewFilled() {
             onSearch = {},
             navigateUp = {},
         )
+    }
+}
+
+@Preview
+@Composable
+private fun OnlineRedirectItemPreview() {
+    SvenskaTheme {
+        OnlineRedirectItem {}
     }
 }

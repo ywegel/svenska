@@ -12,10 +12,11 @@ import de.ywegel.svenska.ui.navArgs
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.collectLatest
-import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.flatMapLatest
+import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import java.util.LinkedList
@@ -38,22 +39,21 @@ class SearchViewModel @Inject constructor(
     private val _searchQuery = MutableStateFlow("")
     val searchQuery = _searchQuery.asStateFlow()
 
-    private val userPreferencesFlow = userPreferencesManager.preferencesOverviewFlow
+    private val preferencesSearchFlow = userPreferencesManager.preferencesSearchFlow
 
     @OptIn(ExperimentalCoroutinesApi::class)
-    val vocabularyFlow = combine(
-        userPreferencesFlow,
-        _searchQuery,
-    ) { preferences, query ->
-        Pair(preferences, query)
-    }.flatMapLatest { (preferences, searchQuery) ->
+    val vocabularyFlow = _searchQuery.flatMapLatest {
         repository.getVocabularies(
-            query = searchQuery,
+            query = it,
             containerId = containerId,
             sortOrder = SortOrder.Created,
             reverse = false,
         )
-    }
+    }.stateIn(
+        scope = viewModelScope,
+        started = SharingStarted.Eagerly,
+        initialValue = emptyList(),
+    )
 
     init {
         observePreferences()
@@ -63,18 +63,15 @@ class SearchViewModel @Inject constructor(
      * Invoked, everytime the users input changes in the search field
      **/
     fun updateSearchQuery(query: String) {
-        _searchQuery.update {
-            query
-        }
+        _searchQuery.value = query
     }
 
     /**
      * Invoked, when the user clicks the submit button in the search field or on the keyboard
      **/
     fun onSearch(query: String) {
-        _searchQuery.update {
-            query
-        }
+        _searchQuery.value = query
+
         _uiState.update {
             val updated = it.lastSearchedItems
             if (updated.size == MAX_LAST_SEARCH_COUNT) {
@@ -92,10 +89,11 @@ class SearchViewModel @Inject constructor(
 
     private fun observePreferences() = viewModelScope.launch(ioDispatcher) {
         launch {
-            userPreferencesFlow.collectLatest { preferences ->
+            preferencesSearchFlow.collectLatest { preferences ->
                 _uiState.update {
                     it.copy(
                         lastSearchedItems = preferences.lastSearchedItems,
+                        onlineRedirectUrl = preferences.onlineRedirectType.toUrl(),
                     )
                 }
             }
@@ -105,10 +103,9 @@ class SearchViewModel @Inject constructor(
 
 data class SearchUiState(
     val lastSearchedItems: Queue<String> = LinkedList(),
-    // val isLoading: Boolean = true,
-    // val sortOrder: SortOrder = SortOrder.default,
-    // val isReverseSort: Boolean = false,
-    // val showSortDialog: Boolean = false,
+    val showCompactVocabularyItem: Boolean = false,
+    val showOnlineRedirectFirst: Boolean = false,
+    val onlineRedirectUrl: String? = null,
 )
 
 private const val MAX_LAST_SEARCH_COUNT = 5

@@ -11,11 +11,13 @@ import androidx.datastore.preferences.core.stringPreferencesKey
 import androidx.datastore.preferences.preferencesDataStore
 import dagger.hilt.android.qualifiers.ApplicationContext
 import de.ywegel.svenska.data.SortOrder
+import de.ywegel.svenska.domain.search.OnlineSearchType
 import de.ywegel.svenska.jsonConfig
 import de.ywegel.svenska.serializers.QueueSerializer
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.map
+import kotlinx.serialization.encodeToString
 import java.io.IOException
 import java.util.LinkedList
 import java.util.Queue
@@ -24,26 +26,41 @@ import javax.inject.Singleton
 
 private const val TAG = "UserPreferencesManager"
 
+// TODO: Maybe have everything in one file? Or split it up?
 const val OVERVIEW_PREFERENCES_NAME = "user-preferences_overview"
 val Context.dataStoreOverview: DataStore<Preferences> by preferencesDataStore(name = OVERVIEW_PREFERENCES_NAME)
 
 data class OverviewPreferences(
     val sortOrder: SortOrder,
     val revert: Boolean,
+    val showCompactVocabularyItem: Boolean,
+)
+
+data class SearchPreferences(
     val lastSearchedItems: Queue<String>,
     val showCompactVocabularyItem: Boolean,
+    val showOnlineRedirectFirst: Boolean,
+    val onlineRedirectType: OnlineSearchType,
 )
 
 interface UserPreferencesManager {
     val preferencesOverviewFlow: Flow<OverviewPreferences>
 
+    val preferencesSearchFlow: Flow<SearchPreferences>
+
     suspend fun updateOverviewSortOrder(sortOrder: SortOrder)
 
     suspend fun updateOverviewSortOrderRevert(revert: Boolean)
 
+    suspend fun showCompactVocabularyItem(showCompactVocabularyItem: Boolean)
+
     suspend fun updateOverviewLastSearchedItems(queue: Queue<String>)
 
-    suspend fun showCompactVocabularyItem(showCompactVocabularyItem: Boolean)
+    suspend fun showCompactVocabularyItemInSearch(show: Boolean)
+
+    suspend fun updateOnlineRedirectPosition(first: Boolean)
+
+    suspend fun updateOnlineRedirectType(type: OnlineSearchType)
 }
 
 @Singleton
@@ -57,13 +74,9 @@ class UserPreferencesManagerImpl @Inject constructor(@ApplicationContext val con
                 preferences[PreferencesKeys.OVERVIEW_SORT_ORDER] ?: SortOrder.default.name,
             )
             val revert = preferences[PreferencesKeys.OVERVIEW_SORT_ORDER_REVERT] ?: false
-            val lastSearchedItems: Queue<String> =
-                preferences[PreferencesKeys.OVERVIEW_SORT_LAST_SEARCHED_ITEMS]?.let {
-                    jsonConfig.decodeFromString(QueueSerializer, it)
-                } ?: LinkedList()
             val showCompactVocabularyItem: Boolean =
                 preferences[PreferencesKeys.OVERVIEW_SHOW_COMPACT_VOCABULARY_ITEM] ?: false
-            OverviewPreferences(sortOrder, revert, lastSearchedItems, showCompactVocabularyItem)
+            OverviewPreferences(sortOrder, revert, showCompactVocabularyItem)
         }
 
     override suspend fun updateOverviewSortOrder(sortOrder: SortOrder) {
@@ -78,24 +91,63 @@ class UserPreferencesManagerImpl @Inject constructor(@ApplicationContext val con
         }
     }
 
-    override suspend fun updateOverviewLastSearchedItems(queue: Queue<String>) {
-        context.dataStoreOverview.edit { preferences ->
-            preferences[PreferencesKeys.OVERVIEW_SORT_LAST_SEARCHED_ITEMS] =
-                jsonConfig.encodeToString(QueueSerializer, queue)
-        }
-    }
-
     override suspend fun showCompactVocabularyItem(showCompactVocabularyItem: Boolean) {
         context.dataStoreOverview.edit { preferences ->
             preferences[PreferencesKeys.OVERVIEW_SHOW_COMPACT_VOCABULARY_ITEM] = showCompactVocabularyItem
         }
     }
 
+    override val preferencesSearchFlow: Flow<SearchPreferences> = context.dataStoreOverview.data
+        .fallbackToDefaultOnError()
+        .map { preferences ->
+            val lastSearchedItems: Queue<String> =
+                preferences[PreferencesKeys.SEARCH_SORT_LAST_SEARCHED_ITEMS]?.let {
+                    jsonConfig.decodeFromString(QueueSerializer, it)
+                } ?: LinkedList()
+
+            val showCompactVocabularyItem = preferences[PreferencesKeys.SEARCH_SHOW_COMPACT_VOCABULARY_ITEM] ?: false
+            val showOnlineRedirectFirst = preferences[PreferencesKeys.SEARCH_ONLINE_REDIRECT_POSITION] ?: false
+            val onlineRedirectUrl = preferences[PreferencesKeys.SEARCH_ONLINE_REDIRECT_TYPE]?.let {
+                jsonConfig.decodeFromString<OnlineSearchType>(it)
+            } ?: OnlineSearchType.DictCC
+
+            SearchPreferences(lastSearchedItems, showCompactVocabularyItem, showOnlineRedirectFirst, onlineRedirectUrl)
+        }
+
+    override suspend fun updateOverviewLastSearchedItems(queue: Queue<String>) {
+        context.dataStoreOverview.edit { preferences ->
+            preferences[PreferencesKeys.SEARCH_SORT_LAST_SEARCHED_ITEMS] =
+                jsonConfig.encodeToString(QueueSerializer, queue)
+        }
+    }
+
+    override suspend fun showCompactVocabularyItemInSearch(show: Boolean) {
+        context.dataStoreOverview.edit { preferences ->
+            preferences[PreferencesKeys.SEARCH_SHOW_COMPACT_VOCABULARY_ITEM] = show
+        }
+    }
+
+    override suspend fun updateOnlineRedirectPosition(first: Boolean) {
+        context.dataStoreOverview.edit { preferences ->
+            preferences[PreferencesKeys.SEARCH_ONLINE_REDIRECT_POSITION] = first
+        }
+    }
+
+    override suspend fun updateOnlineRedirectType(type: OnlineSearchType) {
+        context.dataStoreOverview.edit { preferences ->
+            preferences[PreferencesKeys.SEARCH_ONLINE_REDIRECT_TYPE] = jsonConfig.encodeToString(type)
+        }
+    }
+
     private object PreferencesKeys {
         val OVERVIEW_SORT_ORDER = stringPreferencesKey("overview_sort_order")
         val OVERVIEW_SORT_ORDER_REVERT = booleanPreferencesKey("overview_sort_order_revert")
-        val OVERVIEW_SORT_LAST_SEARCHED_ITEMS = stringPreferencesKey("overview_sort_last_searched_items")
         val OVERVIEW_SHOW_COMPACT_VOCABULARY_ITEM = booleanPreferencesKey("overview_show_compact_vocabulary_item")
+
+        val SEARCH_SORT_LAST_SEARCHED_ITEMS = stringPreferencesKey("search_sort_last_searched_items")
+        val SEARCH_SHOW_COMPACT_VOCABULARY_ITEM = booleanPreferencesKey("search_show_compact_vocabulary_item")
+        val SEARCH_ONLINE_REDIRECT_POSITION = booleanPreferencesKey("search_online_redirect_position")
+        val SEARCH_ONLINE_REDIRECT_TYPE = stringPreferencesKey("search_online_redirect_type")
     }
 }
 

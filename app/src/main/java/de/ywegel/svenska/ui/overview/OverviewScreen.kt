@@ -41,13 +41,14 @@ import de.ywegel.svenska.ui.theme.SvenskaTheme
 
 @Destination(navArgsDelegate = OverviewNavArgs::class)
 @Composable
-fun OverviewScreen(navigator: DestinationsNavigator) {
+fun OverviewScreen(navigator: DestinationsNavigator, navArgs: OverviewNavArgs) {
     val viewModel: OverviewViewModel = hiltViewModel()
 
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
 
     OverviewScreen(
         uiState = uiState,
+        containerName = navArgs.containerName,
         navigateToAdd = { navigator.navigate(AddEditScreenDestination(viewModel.containerId)) },
         onQuizClick = { navigator.navigate(QuizConfigurationScreenDestination(viewModel.containerId)) },
         navigateToEdit = { item ->
@@ -66,6 +67,7 @@ fun OverviewScreen(navigator: DestinationsNavigator) {
 @Composable
 private fun OverviewScreen(
     uiState: OverviewUiState,
+    containerName: String,
     navigateToAdd: () -> Unit = {},
     onQuizClick: () -> Unit = {},
     navigateToEdit: (vocabulary: Vocabulary) -> Unit = {},
@@ -75,6 +77,7 @@ private fun OverviewScreen(
     Scaffold(
         topBar = {
             OverviewTopBar(
+                containerName = containerName,
                 navigateUp = navigateUp,
                 navigateToSearch = navigateToSearch,
             )
@@ -112,9 +115,9 @@ private fun OverviewScreen(
 }
 
 @Composable
-private fun OverviewTopBar(navigateUp: () -> Unit, navigateToSearch: () -> Unit) {
+private fun OverviewTopBar(containerName: String, navigateUp: () -> Unit, navigateToSearch: () -> Unit) {
     TopAppBar(
-        title = { Text("Container name placeholder") },
+        title = { Text(text = containerName) },
         navigationIcon = {
             NavigationIconButton(
                 onNavigateUp = navigateUp,
@@ -133,6 +136,7 @@ private fun OverviewTopBar(navigateUp: () -> Unit, navigateToSearch: () -> Unit)
 
 data class OverviewNavArgs(
     val containerId: Int,
+    val containerName: String,
 )
 
 @Composable
@@ -152,6 +156,6 @@ private fun OverviewFab(onClick: () -> Unit, onQuizClick: () -> Unit) {
 @Composable
 private fun OverviewPreview() {
     SvenskaTheme {
-        OverviewScreen(OverviewUiState(vocabulary = vocabularies()))
+        OverviewScreen(OverviewUiState(vocabulary = vocabularies()), containerName = "Test container")
     }
 }
