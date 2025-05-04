@@ -3,13 +3,13 @@ package de.ywegel.svenska.ui.overview
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.ramcosta.composedestinations.generated.navArgs
 import dagger.hilt.android.lifecycle.HiltViewModel
 import de.ywegel.svenska.data.SortOrder
 import de.ywegel.svenska.data.VocabularyRepository
 import de.ywegel.svenska.data.model.Vocabulary
 import de.ywegel.svenska.data.preferences.UserPreferencesManager
 import de.ywegel.svenska.di.IoDispatcher
-import de.ywegel.svenska.ui.navArgs
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableStateFlow

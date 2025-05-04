@@ -49,7 +49,14 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.ramcosta.composedestinations.annotation.Destination
-import com.ramcosta.composedestinations.annotation.RootNavGraph
+import com.ramcosta.composedestinations.annotation.RootGraph
+import com.ramcosta.composedestinations.generated.destinations.FavoritesAndPronunciationScreenDestination
+import com.ramcosta.composedestinations.generated.destinations.OverviewScreenDestination
+import com.ramcosta.composedestinations.generated.destinations.QuizConfigurationScreenDestination
+import com.ramcosta.composedestinations.generated.destinations.SearchScreenDestination
+import com.ramcosta.composedestinations.generated.destinations.SettingsScreenDestination
+import com.ramcosta.composedestinations.generated.destinations.SwedishNumbersScreenDestination
+import com.ramcosta.composedestinations.generated.destinations.WordGroupsScreenDestination
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
 import de.ywegel.svenska.R
 import de.ywegel.svenska.data.GeneratorConstants
@@ -63,19 +70,12 @@ import de.ywegel.svenska.ui.common.HorizontalSpacerM
 import de.ywegel.svenska.ui.common.IconButton
 import de.ywegel.svenska.ui.common.VerticalSpacerXS
 import de.ywegel.svenska.ui.common.VerticalSpacerXXS
-import de.ywegel.svenska.ui.destinations.FavoritesAndPronunciationScreenDestination
-import de.ywegel.svenska.ui.destinations.OverviewScreenDestination
-import de.ywegel.svenska.ui.destinations.QuizConfigurationScreenDestination
-import de.ywegel.svenska.ui.destinations.SearchScreenDestination
-import de.ywegel.svenska.ui.destinations.SettingsScreenDestination
-import de.ywegel.svenska.ui.destinations.SwedishNumbersScreenDestination
-import de.ywegel.svenska.ui.destinations.WordGroupsScreenDestination
 import de.ywegel.svenska.ui.theme.Spacings
 import de.ywegel.svenska.ui.theme.SvenskaIcons
 import de.ywegel.svenska.ui.theme.SvenskaTheme
 
-@RootNavGraph(start = true)
-@Destination
+
+@Destination<RootGraph>(start = true)
 @Composable
 fun ContainerScreen(navigator: DestinationsNavigator) {
     val viewModel: ContainerViewModel = hiltViewModel()

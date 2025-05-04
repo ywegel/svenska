@@ -2,6 +2,8 @@
 .gradle/
 build/
 app/release/
+# Kotlin 2.0
+.kotlin/
 
 # Scripts
 /scripts

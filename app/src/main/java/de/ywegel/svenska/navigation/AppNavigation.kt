@@ -4,7 +4,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import com.ramcosta.composedestinations.DestinationsNavHost
-import de.ywegel.svenska.ui.NavGraphs
+import com.ramcosta.composedestinations.generated.NavGraphs
 
 @Composable
 fun AppNavigation() {

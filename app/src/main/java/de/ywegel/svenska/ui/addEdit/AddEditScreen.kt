@@ -54,6 +54,7 @@ import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.ramcosta.composedestinations.annotation.Destination
+import com.ramcosta.composedestinations.annotation.RootGraph
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
 import de.ywegel.svenska.R
 import de.ywegel.svenska.data.model.Gender
@@ -67,7 +68,7 @@ import de.ywegel.svenska.ui.theme.Spacings
 import de.ywegel.svenska.ui.theme.SvenskaIcons
 import de.ywegel.svenska.ui.theme.SvenskaTheme
 
-@Destination(navArgsDelegate = AddEditNavArgs::class)
+@Destination<RootGraph>(navArgs = AddEditNavArgs::class)
 @Composable
 fun AddEditScreen(navigator: DestinationsNavigator) {
     val viewModel: AddEditViewModel = hiltViewModel()

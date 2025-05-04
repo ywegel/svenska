@@ -1,12 +1,10 @@
 package de.ywegel.svenska.navigation
 
 import com.ramcosta.composedestinations.annotation.NavGraph
-import com.ramcosta.composedestinations.annotation.RootNavGraph
+import com.ramcosta.composedestinations.annotation.RootGraph
+import com.ramcosta.composedestinations.annotation.parameters.CodeGenVisibility
 
-@RootNavGraph
-@NavGraph
-annotation class SettingsNavGraph(
-    // Mandatory: https://composedestinations.rafaelcosta.xyz/defining-navgraphs#through-navgraph-annotations
-    @Suppress("unused")
-    val start: Boolean = false,
+@NavGraph<RootGraph>(
+    visibility = CodeGenVisibility.INTERNAL,
 )
+annotation class SettingsNavGraph

@@ -107,7 +107,6 @@ fun VocabularyListItem(vocabulary: Vocabulary, modifier: Modifier = Modifier, on
                                 // TODO: String ressources
                                 Gender.Ultra -> "U"
                                 Gender.Neutra -> "N"
-                                else -> ""
                             },
                             style = SvenskaTheme.typography.labelMedium,
                             color = SvenskaTheme.colors.primary,

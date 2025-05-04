@@ -46,6 +46,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.ramcosta.composedestinations.annotation.Destination
+import com.ramcosta.composedestinations.annotation.RootGraph
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
 import de.ywegel.svenska.R
 import de.ywegel.svenska.data.model.Vocabulary
@@ -62,7 +63,7 @@ import java.util.Queue
 
 private const val TAG = "SearchScreen"
 
-@Destination(navArgsDelegate = SearchScreenNavArgs::class)
+@Destination<RootGraph>(navArgs = SearchScreenNavArgs::class)
 @Composable
 fun SearchScreen(navigator: DestinationsNavigator) {
     val viewModel = hiltViewModel<SearchViewModel>()

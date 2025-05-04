@@ -24,17 +24,18 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.ramcosta.composedestinations.annotation.Destination
+import com.ramcosta.composedestinations.annotation.RootGraph
+import com.ramcosta.composedestinations.generated.destinations.QuizScreenDestination
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
 import de.ywegel.svenska.R
 import de.ywegel.svenska.domain.quiz.model.TranslateMode
 import de.ywegel.svenska.ui.common.HorizontalSpacerS
 import de.ywegel.svenska.ui.common.TopAppTextBar
 import de.ywegel.svenska.ui.common.VerticalSpacerM
-import de.ywegel.svenska.ui.destinations.QuizScreenDestination
 import de.ywegel.svenska.ui.theme.Spacings
 import de.ywegel.svenska.ui.theme.SvenskaTheme
 
-@Destination
+@Destination<RootGraph>
 @Composable
 fun QuizConfigurationScreen(navigator: DestinationsNavigator, containerId: Int?) {
     val viewModel = viewModel<QuizConfigurationViewModel>()

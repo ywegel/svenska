@@ -46,7 +46,6 @@ class SvenskaModule {
     @Provides
     fun provideVocabularyDatabase(app: Application, dbCallback: VocabularyDatabase.Callback) =
         Room.databaseBuilder(app, VocabularyDatabase::class.java, "vocabulary")
-            .fallbackToDestructiveMigration()
             .addCallback(dbCallback)
             .build()
 
