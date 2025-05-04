@@ -12,6 +12,7 @@ plugins {
     alias(libs.plugins.junit5)
     alias(libs.plugins.ktlint)
     alias(libs.plugins.detekt)
+    alias(libs.plugins.room)
     id("kotlin-parcelize")
     id("kotlin-kapt")
 }
@@ -139,6 +140,10 @@ kapt {
 
 ksp {
     arg("room.generateKotlin", "true")
+}
+
+room {
+    schemaDirectory("$projectDir/schemas")
 }
 
 hilt {

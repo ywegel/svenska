@@ -80,5 +80,6 @@ about-libraries = "com.mikepenz.aboutlibraries.plugin:10.10.0"
 junit5 = "de.mannodermaus.android-junit5:1.11.2.0"
 ktlint = "org.jlleitschuh.gradle.ktlint:12.2.0"
 detekt = "io.gitlab.arturbosch.detekt:1.23.8"
+room = { id = "androidx.room", version.ref = "room-version" }
 
 [bundles]

@@ -6,7 +6,6 @@ import de.ywegel.svenska.data.model.Vocabulary
 import de.ywegel.svenska.data.model.VocabularyContainer
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.runBlocking
 
@@ -57,7 +56,7 @@ class VocabularyRepositoryFake(
         }
 
         return if (query.isNotBlank()) {
-            flow.map { item -> item.filter { it.word.toLowerCase().contains(query.toLowerCase()) } }
+            flow.map { item -> item.filter { it.word.lowercase().contains(query.lowercase()) } }
         } else {
             flow
         }
