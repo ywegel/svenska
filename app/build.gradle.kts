@@ -33,10 +33,6 @@ android {
         }
     }
 
-    android.sourceSets.all {
-        kotlin.srcDir("src/$name/kotlin")
-    }
-
     buildTypes {
         debug {
             applicationIdSuffix = ".debug"
