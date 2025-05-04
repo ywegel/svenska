@@ -3,14 +3,16 @@ import org.jlleitschuh.gradle.ktlint.reporter.ReporterType
 
 plugins {
     alias(libs.plugins.com.android.application)
-    alias(libs.plugins.org.jetbrains.kotlin.android)
+    alias(libs.plugins.kotlin.android)
+    alias(libs.plugins.kotlinx.serialization)
+    alias(libs.plugins.kotlin.compose.compiler)
     alias(libs.plugins.dagger.hilt.android)
     alias(libs.plugins.google.ksp)
     alias(libs.plugins.about.libraries)
     alias(libs.plugins.junit5)
-    alias(libs.plugins.kotlinx.serialization)
     alias(libs.plugins.ktlint)
     alias(libs.plugins.detekt)
+    alias(libs.plugins.room)
     id("kotlin-parcelize")
     id("kotlin-kapt")
 }
@@ -30,16 +32,6 @@ android {
         vectorDrawables {
             useSupportLibrary = true
         }
-    }
-
-    applicationVariants.all {
-        addJavaSourceFoldersToModel(
-            File(buildDir, "generated/ksp/$name/kotlin"),
-        )
-    }
-
-    android.sourceSets.all {
-        kotlin.srcDir("src/$name/kotlin")
     }
 
     buildTypes {
@@ -77,9 +69,6 @@ android {
     }
     buildFeatures {
         compose = true
-    }
-    composeOptions {
-        kotlinCompilerExtensionVersion = libs.versions.compose.compiler.get()
     }
     packaging {
         resources {
@@ -147,6 +136,14 @@ dependencies {
 
 kapt {
     correctErrorTypes = true
+}
+
+ksp {
+    arg("room.generateKotlin", "true")
+}
+
+room {
+    schemaDirectory("$projectDir/schemas")
 }
 
 hilt {
