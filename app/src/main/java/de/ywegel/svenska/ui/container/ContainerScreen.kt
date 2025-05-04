@@ -74,7 +74,6 @@ import de.ywegel.svenska.ui.theme.Spacings
 import de.ywegel.svenska.ui.theme.SvenskaIcons
 import de.ywegel.svenska.ui.theme.SvenskaTheme
 
-
 @Destination<RootGraph>(start = true)
 @Composable
 fun ContainerScreen(navigator: DestinationsNavigator) {
