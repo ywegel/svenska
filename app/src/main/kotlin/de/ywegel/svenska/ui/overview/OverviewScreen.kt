@@ -26,8 +26,10 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.ramcosta.composedestinations.annotation.Destination
-import com.ramcosta.composedestinations.generated.destinations.AddEditScreenDestination
-import com.ramcosta.composedestinations.generated.destinations.QuizConfigurationScreenDestination
+import com.ramcosta.composedestinations.generated.NavGraphs
+import com.ramcosta.composedestinations.generated.destinations.AddVocabularyScreenDestination
+import com.ramcosta.composedestinations.generated.destinations.EditVocabularyScreenDestination
+import com.ramcosta.composedestinations.generated.destinations.QuizConfigurationScreenDestinationNavArgs
 import com.ramcosta.composedestinations.generated.destinations.SearchScreenDestination
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
 import de.ywegel.svenska.data.model.Vocabulary
@@ -50,11 +52,15 @@ fun OverviewScreen(navigator: DestinationsNavigator, navArgs: OverviewNavArgs) {
     OverviewScreen(
         uiState = uiState,
         containerName = navArgs.containerName,
-        navigateToAdd = { navigator.navigate(AddEditScreenDestination(viewModel.containerId)) },
-        onQuizClick = { navigator.navigate(QuizConfigurationScreenDestination(viewModel.containerId)) },
+        navigateToAdd = { navigator.navigate(AddVocabularyScreenDestination(viewModel.containerId)) },
+        onQuizClick = {
+            navigator.navigate(
+                NavGraphs.quiz(QuizConfigurationScreenDestinationNavArgs(containerId = viewModel.containerId)),
+            )
+        },
         navigateToEdit = { item ->
             navigator.navigate(
-                AddEditScreenDestination(
+                EditVocabularyScreenDestination(
                     viewModel.containerId,
                     item,
                 ),

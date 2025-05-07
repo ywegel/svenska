@@ -18,13 +18,13 @@ import androidx.compose.ui.text.font.FontWeight
 import com.ramcosta.composedestinations.annotation.Destination
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
 import de.ywegel.svenska.R
-import de.ywegel.svenska.navigation.SvenskaGraph
+import de.ywegel.svenska.navigation.BonusGraph
 import de.ywegel.svenska.ui.common.NavigationBarSpacer
 import de.ywegel.svenska.ui.common.TabsScaffold
 import de.ywegel.svenska.ui.theme.Spacings
 import de.ywegel.svenska.ui.theme.SvenskaTheme
 
-@Destination<SvenskaGraph>
+@Destination<BonusGraph>(start = true)
 @Composable
 fun WordGroupsScreen(navigator: DestinationsNavigator) {
     WordGroupsScreen(onNavigateUp = navigator::navigateUp)

@@ -60,6 +60,8 @@ import de.ywegel.svenska.data.model.Gender
 import de.ywegel.svenska.data.model.Vocabulary
 import de.ywegel.svenska.data.model.WordGroup
 import de.ywegel.svenska.navigation.SvenskaGraph
+import de.ywegel.svenska.navigation.transitions.LateralTransition
+import de.ywegel.svenska.navigation.transitions.TemporaryHierarchicalTransitionStyle
 import de.ywegel.svenska.ui.common.ConfirmableComponent
 import de.ywegel.svenska.ui.common.HorizontalSpacerXS
 import de.ywegel.svenska.ui.common.VerticalSpacerM
@@ -68,9 +70,26 @@ import de.ywegel.svenska.ui.theme.Spacings
 import de.ywegel.svenska.ui.theme.SvenskaIcons
 import de.ywegel.svenska.ui.theme.SvenskaTheme
 
-@Destination<SvenskaGraph>(navArgs = AddEditNavArgs::class)
+@Destination<SvenskaGraph>(
+    navArgs = AddEditNavArgs::class,
+    style = TemporaryHierarchicalTransitionStyle::class,
+)
 @Composable
-fun AddEditScreen(navigator: DestinationsNavigator) {
+fun EditVocabularyScreen(navigator: DestinationsNavigator) {
+    AddEditScreen(navigator)
+}
+
+@Destination<SvenskaGraph>(
+    navArgs = AddEditNavArgs::class,
+    style = LateralTransition::class,
+)
+@Composable
+fun AddVocabularyScreen(navigator: DestinationsNavigator) {
+    AddEditScreen(navigator)
+}
+
+@Composable
+private fun AddEditScreen(navigator: DestinationsNavigator) {
     val viewModel: AddEditViewModel = hiltViewModel()
 
     val uiState by viewModel.uiState.collectAsState()
@@ -293,31 +312,31 @@ private fun GenderDropDown(selectedGender: Gender, onGenderSelected: (Gender) ->
                 readOnly = true,
                 modifier = Modifier.width(IntrinsicSize.Min),
                 decorationBox =
-                @Composable { innerTextField ->
-                    OutlinedTextFieldDefaults.DecorationBox(
-                        value = value,
-                        innerTextField = innerTextField,
-                        enabled = true,
-                        singleLine = true,
-                        visualTransformation = VisualTransformation.None,
-                        interactionSource = interactionSource,
-                        container = {
-                            OutlinedTextFieldDefaults.Container(
-                                enabled = true,
-                                isError = false,
-                                interactionSource = interactionSource,
-                                colors = OutlinedTextFieldDefaults.colors(),
-                                shape = OutlinedTextFieldDefaults.shape,
-                            )
-                        },
-                        trailingIcon = {
-                            ExposedDropdownMenuDefaults.TrailingIcon(
-                                expanded = expanded,
-                                modifier = Modifier.menuAnchor(MenuAnchorType.SecondaryEditable),
-                            )
-                        },
-                    )
-                },
+                    @Composable { innerTextField ->
+                        OutlinedTextFieldDefaults.DecorationBox(
+                            value = value,
+                            innerTextField = innerTextField,
+                            enabled = true,
+                            singleLine = true,
+                            visualTransformation = VisualTransformation.None,
+                            interactionSource = interactionSource,
+                            container = {
+                                OutlinedTextFieldDefaults.Container(
+                                    enabled = true,
+                                    isError = false,
+                                    interactionSource = interactionSource,
+                                    colors = OutlinedTextFieldDefaults.colors(),
+                                    shape = OutlinedTextFieldDefaults.shape,
+                                )
+                            },
+                            trailingIcon = {
+                                ExposedDropdownMenuDefaults.TrailingIcon(
+                                    expanded = expanded,
+                                    modifier = Modifier.menuAnchor(MenuAnchorType.SecondaryEditable),
+                                )
+                            },
+                        )
+                    },
             )
         }
         ExposedDropdownMenu(expanded = expanded, onDismissRequest = { expanded = false }) {

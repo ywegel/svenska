@@ -27,13 +27,13 @@ import com.ramcosta.composedestinations.annotation.Destination
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
 import de.ywegel.svenska.data.model.Vocabulary
 import de.ywegel.svenska.data.model.VocabularyContainer
-import de.ywegel.svenska.navigation.SvenskaGraph
+import de.ywegel.svenska.navigation.BonusGraph
 import de.ywegel.svenska.ui.common.TopAppTextBar
 import de.ywegel.svenska.ui.container.BonusScreen
 import de.ywegel.svenska.ui.overview.VocabularyItemCompact
 import de.ywegel.svenska.ui.theme.SvenskaIcons
 
-@Destination<SvenskaGraph>(navArgs = FavoritesAndPronunciationScreenNavArgs::class)
+@Destination<BonusGraph>(navArgs = FavoritesAndPronunciationScreenNavArgs::class)
 @Composable
 fun FavoritesAndPronunciationScreen(
     navigator: DestinationsNavigator,

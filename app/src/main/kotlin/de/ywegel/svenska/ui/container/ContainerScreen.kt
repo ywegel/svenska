@@ -49,9 +49,10 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.ramcosta.composedestinations.annotation.Destination
+import com.ramcosta.composedestinations.generated.NavGraphs
 import com.ramcosta.composedestinations.generated.destinations.FavoritesAndPronunciationScreenDestination
 import com.ramcosta.composedestinations.generated.destinations.OverviewScreenDestination
-import com.ramcosta.composedestinations.generated.destinations.QuizConfigurationScreenDestination
+import com.ramcosta.composedestinations.generated.destinations.QuizConfigurationScreenDestinationNavArgs
 import com.ramcosta.composedestinations.generated.destinations.SearchScreenDestination
 import com.ramcosta.composedestinations.generated.destinations.SettingsScreenDestination
 import com.ramcosta.composedestinations.generated.destinations.SwedishNumbersScreenDestination
@@ -100,7 +101,7 @@ fun ContainerScreen(navigator: DestinationsNavigator) {
                 )
 
                 BonusScreen.Quiz ->
-                    navigator.navigate(QuizConfigurationScreenDestination(containerId = null))
+                    navigator.navigate(NavGraphs.quiz(QuizConfigurationScreenDestinationNavArgs(containerId = null)))
 
                 BonusScreen.WordGroups ->
                     navigator.navigate(WordGroupsScreenDestination)
@@ -301,6 +302,11 @@ private fun AddContainerButtonWithTextDialog(
     var inputText by remember { mutableStateOf(initialInput) }
 
     component { showDialog = true }
+
+    BackHandler(showDialog) {
+        showDialog = false
+        inputText = ""
+    }
 
     if (showDialog) {
         AlertDialog(

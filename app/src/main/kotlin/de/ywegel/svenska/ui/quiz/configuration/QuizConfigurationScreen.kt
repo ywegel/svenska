@@ -28,14 +28,15 @@ import com.ramcosta.composedestinations.generated.destinations.QuizScreenDestina
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
 import de.ywegel.svenska.R
 import de.ywegel.svenska.domain.quiz.model.TranslateMode
-import de.ywegel.svenska.navigation.SvenskaGraph
+import de.ywegel.svenska.navigation.QuizGraph
+import de.ywegel.svenska.navigation.transitions.LateralTransition
 import de.ywegel.svenska.ui.common.HorizontalSpacerS
 import de.ywegel.svenska.ui.common.TopAppTextBar
 import de.ywegel.svenska.ui.common.VerticalSpacerM
 import de.ywegel.svenska.ui.theme.Spacings
 import de.ywegel.svenska.ui.theme.SvenskaTheme
 
-@Destination<SvenskaGraph>
+@Destination<QuizGraph>(style = LateralTransition::class, start = true)
 @Composable
 fun QuizConfigurationScreen(navigator: DestinationsNavigator, containerId: Int?) {
     val viewModel = viewModel<QuizConfigurationViewModel>()
