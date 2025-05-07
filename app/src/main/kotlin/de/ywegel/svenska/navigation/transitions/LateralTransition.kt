@@ -21,6 +21,7 @@ import de.ywegel.svenska.navigation.transitions.TransitionDefaults.DEFAULT_TRANS
 private object LateralTransitionAnimations {
     private const val DEFAULT_INITIAL_FADE_IN_ALPHA = 0.95f
     private const val DEFAULT_EXIT_TRANSITION_DURATION = 220
+    private const val DEFAULT_INITIAL_SCALE_SIZE = 0.90f
 
     // Entry animation: Slide up, Fade in, Scale in
     val enterTransition: EnterTransition =
@@ -37,7 +38,7 @@ private object LateralTransitionAnimations {
             ),
             initialAlpha = DEFAULT_INITIAL_FADE_IN_ALPHA,
         ) + scaleIn(
-            initialScale = 0.90f,
+            initialScale = DEFAULT_INITIAL_SCALE_SIZE,
             animationSpec = tween(DEFAULT_TRANSITION_DURATION),
         )
 
