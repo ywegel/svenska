@@ -86,7 +86,6 @@
     <string name="containers_bonus_word_groups">Word Groups</string>
 
     <!-- # Overview # -->
-    <string name="overview_search">Search…</string> <!-- TODO: remove -->
     <string name="overview_search_no_searches">No searches yet</string>
 
 

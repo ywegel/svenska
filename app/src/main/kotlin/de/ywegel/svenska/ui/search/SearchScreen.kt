@@ -12,6 +12,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
@@ -26,16 +27,17 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextField
-import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.focus.FocusManager
+import androidx.compose.ui.focus.FocusRequester
+import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.platform.LocalUriHandler
@@ -43,6 +45,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.tooling.preview.PreviewLightDark
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.ramcosta.composedestinations.annotation.Destination
@@ -226,28 +229,11 @@ private fun SearchToolbar(
     TopAppBar(
         colors = TopAppBarDefaults.topAppBarColors(containerColor = SvenskaTheme.colors.surfaceContainer),
         title = {
-            // TODO: Style
-            // TODO: search icon
-            TextField(
-                value = currentSearchQuery,
-                onValueChange = onSearchChanged,
-                label = { Text(stringResource(R.string.search_search_label)) },
-                colors = TextFieldDefaults.colors(
-                    focusedContainerColor = Color.Transparent,
-                    unfocusedContainerColor = Color.Transparent,
-                    disabledContainerColor = Color.Transparent,
-                    errorContainerColor = Color.Transparent,
-                ),
-                singleLine = true,
-                keyboardOptions = KeyboardOptions(
-                    imeAction = ImeAction.Search,
-                ),
-                keyboardActions = KeyboardActions(
-                    onSearch = {
-                        focusManager.clearFocus()
-                        onSearch(currentSearchQuery)
-                    },
-                ),
+            SearchTextField(
+                currentSearchQuery = currentSearchQuery,
+                focusManager = focusManager,
+                onSearchChanged = onSearchChanged,
+                onSearch = onSearch,
             )
         },
         navigationIcon = {
@@ -272,11 +258,53 @@ private fun SearchToolbar(
     )
 }
 
+@Composable
+private fun SearchTextField(
+    currentSearchQuery: String,
+    focusManager: FocusManager,
+    onSearchChanged: (String) -> Unit,
+    onSearch: (String) -> Unit,
+) {
+    val focusRequester = remember { FocusRequester() }
+
+    LaunchedEffect(Unit) {
+        focusRequester.requestFocus()
+    }
+
+    BasicTextField(
+        value = currentSearchQuery,
+        onValueChange = onSearchChanged,
+        modifier = Modifier.focusRequester(focusRequester),
+        textStyle = SvenskaTheme.typography.bodyLarge,
+        decorationBox = { innerTextField ->
+            if (currentSearchQuery.isEmpty()) {
+                Text(
+                    text = stringResource(R.string.search_search_label),
+                    style = SvenskaTheme.typography.bodyLarge.copy(
+                        color = SvenskaTheme.colors.onSurfaceVariant,
+                    ),
+                )
+            }
+            innerTextField()
+        },
+        singleLine = true,
+        keyboardOptions = KeyboardOptions(
+            imeAction = ImeAction.Search,
+        ),
+        keyboardActions = KeyboardActions(
+            onSearch = {
+                focusManager.clearFocus()
+                onSearch(currentSearchQuery)
+            },
+        ),
+    )
+}
+
 data class SearchScreenNavArgs(
     val containerId: Int? = null,
 )
 
-@Preview
+@PreviewLightDark
 @Composable
 private fun ToolbarPreviewEmpty() {
     SvenskaTheme {
