@@ -311,32 +311,31 @@ private fun GenderDropDown(selectedGender: Gender, onGenderSelected: (Gender) ->
                 onValueChange = {},
                 readOnly = true,
                 modifier = Modifier.width(IntrinsicSize.Min),
-                decorationBox =
-                    @Composable { innerTextField ->
-                        OutlinedTextFieldDefaults.DecorationBox(
-                            value = value,
-                            innerTextField = innerTextField,
-                            enabled = true,
-                            singleLine = true,
-                            visualTransformation = VisualTransformation.None,
-                            interactionSource = interactionSource,
-                            container = {
-                                OutlinedTextFieldDefaults.Container(
-                                    enabled = true,
-                                    isError = false,
-                                    interactionSource = interactionSource,
-                                    colors = OutlinedTextFieldDefaults.colors(),
-                                    shape = OutlinedTextFieldDefaults.shape,
-                                )
-                            },
-                            trailingIcon = {
-                                ExposedDropdownMenuDefaults.TrailingIcon(
-                                    expanded = expanded,
-                                    modifier = Modifier.menuAnchor(MenuAnchorType.SecondaryEditable),
-                                )
-                            },
-                        )
-                    },
+                decorationBox = @Composable { innerTextField ->
+                    OutlinedTextFieldDefaults.DecorationBox(
+                        value = value,
+                        innerTextField = innerTextField,
+                        enabled = true,
+                        singleLine = true,
+                        visualTransformation = VisualTransformation.None,
+                        interactionSource = interactionSource,
+                        container = {
+                            OutlinedTextFieldDefaults.Container(
+                                enabled = true,
+                                isError = false,
+                                interactionSource = interactionSource,
+                                colors = OutlinedTextFieldDefaults.colors(),
+                                shape = OutlinedTextFieldDefaults.shape,
+                            )
+                        },
+                        trailingIcon = {
+                            ExposedDropdownMenuDefaults.TrailingIcon(
+                                expanded = expanded,
+                                modifier = Modifier.menuAnchor(MenuAnchorType.SecondaryEditable),
+                            )
+                        },
+                    )
+                },
             )
         }
         ExposedDropdownMenu(expanded = expanded, onDismissRequest = { expanded = false }) {

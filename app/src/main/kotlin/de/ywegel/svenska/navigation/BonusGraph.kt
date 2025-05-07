@@ -10,4 +10,3 @@ import de.ywegel.svenska.navigation.transitions.LateralTransition
     defaultTransitions = LateralTransition::class,
 )
 annotation class BonusGraph
-
