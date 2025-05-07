@@ -21,16 +21,16 @@ import androidx.compose.ui.tooling.preview.PreviewLightDark
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.ramcosta.composedestinations.annotation.Destination
-import com.ramcosta.composedestinations.annotation.RootGraph
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
 import de.ywegel.svenska.R
+import de.ywegel.svenska.navigation.SvenskaGraph
 import de.ywegel.svenska.ui.common.NavigationBarSpacer
 import de.ywegel.svenska.ui.common.TabsScaffold
 import de.ywegel.svenska.ui.common.VerticalSpacerXXS
 import de.ywegel.svenska.ui.theme.Spacings
 import de.ywegel.svenska.ui.theme.SvenskaTheme
 
-@Destination<RootGraph>
+@Destination<SvenskaGraph>
 @Composable
 fun SwedishNumbersScreen(navigator: DestinationsNavigator, viewModel: SwedishNumbersViewModel = hiltViewModel()) {
     val uiState by viewModel.uiState.collectAsState()

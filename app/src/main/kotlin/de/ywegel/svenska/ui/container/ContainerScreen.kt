@@ -49,7 +49,6 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.ramcosta.composedestinations.annotation.Destination
-import com.ramcosta.composedestinations.annotation.RootGraph
 import com.ramcosta.composedestinations.generated.destinations.FavoritesAndPronunciationScreenDestination
 import com.ramcosta.composedestinations.generated.destinations.OverviewScreenDestination
 import com.ramcosta.composedestinations.generated.destinations.QuizConfigurationScreenDestination
@@ -63,6 +62,7 @@ import de.ywegel.svenska.data.GeneratorConstants
 import de.ywegel.svenska.data.container
 import de.ywegel.svenska.data.containers
 import de.ywegel.svenska.data.model.VocabularyContainer
+import de.ywegel.svenska.navigation.SvenskaGraph
 import de.ywegel.svenska.ui.common.ConfirmButton
 import de.ywegel.svenska.ui.common.ConfirmableComponent
 import de.ywegel.svenska.ui.common.DismissButton
@@ -74,7 +74,7 @@ import de.ywegel.svenska.ui.theme.Spacings
 import de.ywegel.svenska.ui.theme.SvenskaIcons
 import de.ywegel.svenska.ui.theme.SvenskaTheme
 
-@Destination<RootGraph>(start = true)
+@Destination<SvenskaGraph>(start = true)
 @Composable
 fun ContainerScreen(navigator: DestinationsNavigator) {
     val viewModel: ContainerViewModel = hiltViewModel()

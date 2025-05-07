@@ -17,20 +17,20 @@ import androidx.compose.ui.res.stringResource
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.ramcosta.composedestinations.annotation.Destination
-import com.ramcosta.composedestinations.annotation.RootGraph
 import com.ramcosta.composedestinations.generated.destinations.QuizConfigurationScreenDestination
 import com.ramcosta.composedestinations.generated.destinations.WordGroupsScreenDestination
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
 import de.ywegel.svenska.R
 import de.ywegel.svenska.domain.quiz.model.QuizMode
 import de.ywegel.svenska.domain.quiz.model.UserAnswer
+import de.ywegel.svenska.navigation.SvenskaGraph
 import de.ywegel.svenska.ui.common.IconButton
 import de.ywegel.svenska.ui.common.NavigationIconButton
 import de.ywegel.svenska.ui.quiz.viewmodels.TranslateQuizViewModel
 import de.ywegel.svenska.ui.quiz.viewmodels.TranslateWithEndingsQuizViewModel
 import de.ywegel.svenska.ui.theme.SvenskaIcons
 
-@Destination<RootGraph>(navArgs = QuizNavArgs::class)
+@Destination<SvenskaGraph>(navArgs = QuizNavArgs::class)
 @Composable
 fun QuizScreen(navArgs: QuizNavArgs, navigator: DestinationsNavigator) {
     when (val quizMode = navArgs.quizMode) {

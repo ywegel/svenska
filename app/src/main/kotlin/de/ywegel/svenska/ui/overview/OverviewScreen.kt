@@ -26,13 +26,13 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.ramcosta.composedestinations.annotation.Destination
-import com.ramcosta.composedestinations.annotation.RootGraph
 import com.ramcosta.composedestinations.generated.destinations.AddEditScreenDestination
 import com.ramcosta.composedestinations.generated.destinations.QuizConfigurationScreenDestination
 import com.ramcosta.composedestinations.generated.destinations.SearchScreenDestination
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
 import de.ywegel.svenska.data.model.Vocabulary
 import de.ywegel.svenska.data.vocabularies
+import de.ywegel.svenska.navigation.SvenskaGraph
 import de.ywegel.svenska.ui.common.IconButton
 import de.ywegel.svenska.ui.common.NavigationIconButton
 import de.ywegel.svenska.ui.common.VerticalSpacerM
@@ -40,7 +40,7 @@ import de.ywegel.svenska.ui.theme.Spacings
 import de.ywegel.svenska.ui.theme.SvenskaIcons
 import de.ywegel.svenska.ui.theme.SvenskaTheme
 
-@Destination<RootGraph>(navArgs = OverviewNavArgs::class)
+@Destination<SvenskaGraph>(navArgs = OverviewNavArgs::class)
 @Composable
 fun OverviewScreen(navigator: DestinationsNavigator, navArgs: OverviewNavArgs) {
     val viewModel: OverviewViewModel = hiltViewModel()
