@@ -4,6 +4,7 @@ import androidx.compose.animation.AnimatedContentTransitionScope
 import androidx.compose.animation.EnterTransition
 import androidx.compose.animation.ExitTransition
 import androidx.compose.animation.core.EaseIn
+import androidx.compose.animation.core.EaseInOut
 import androidx.compose.animation.core.EaseOut
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.fadeIn
@@ -19,7 +20,7 @@ import de.ywegel.svenska.navigation.transitions.TransitionDefaults.DEFAULT_TRANS
 
 private object LateralTransitionAnimations {
     private const val DEFAULT_INITIAL_FADE_IN_ALPHA = 0.95f
-    private const val DEFAULT_INITIAL_FADE_OUT_ALPHA = 0.55f
+    private const val DEFAULT_EXIT_TRANSITION_DURATION = 220
 
     // Entry animation: Slide up, Fade in, Scale in
     val enterTransition: EnterTransition =
@@ -49,14 +50,16 @@ private object LateralTransitionAnimations {
     // Pop Exit animation: Slide down, Fade out
     val popExitTransition: ExitTransition =
         slideOutVertically(
-            targetOffsetY = { fullHeight -> fullHeight * 4 / 5 },
+            targetOffsetY = { fullHeight -> fullHeight * 1 / 5 },
             animationSpec = tween(
-                durationMillis = DEFAULT_TRANSITION_DURATION,
+                durationMillis = DEFAULT_EXIT_TRANSITION_DURATION,
                 easing = EaseIn,
             ),
         ) + fadeOut(
-            animationSpec = tween(DEFAULT_TRANSITION_DURATION),
-            targetAlpha = DEFAULT_INITIAL_FADE_OUT_ALPHA,
+            animationSpec = tween(
+                durationMillis = DEFAULT_EXIT_TRANSITION_DURATION,
+                easing = EaseInOut,
+            ),
         )
 }
 
