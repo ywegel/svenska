@@ -31,6 +31,7 @@ import com.ramcosta.composedestinations.navigation.DestinationsNavigator
 import de.ywegel.svenska.R
 import de.ywegel.svenska.domain.search.OnlineSearchType
 import de.ywegel.svenska.navigation.SettingsNavGraph
+import de.ywegel.svenska.navigation.transitions.LateralTransition
 import de.ywegel.svenska.ui.common.ClickableText
 import de.ywegel.svenska.ui.common.HorizontalSpacerM
 import de.ywegel.svenska.ui.common.SwitchWithText
@@ -40,7 +41,7 @@ import de.ywegel.svenska.ui.search.userFacingTitle
 import de.ywegel.svenska.ui.theme.Spacings
 import de.ywegel.svenska.ui.theme.SvenskaTheme
 
-@Destination<SettingsNavGraph>(start = true)
+@Destination<SettingsNavGraph>(start = true, style = LateralTransition::class)
 @Composable
 fun SettingsScreen(navigator: DestinationsNavigator, viewModel: SettingsViewModel = hiltViewModel()) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()

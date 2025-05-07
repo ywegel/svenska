@@ -1,9 +1,9 @@
 package de.ywegel.svenska.navigation
 
 import com.ramcosta.composedestinations.annotation.NavHostGraph
-import com.ramcosta.composedestinations.annotation.parameters.CodeGenVisibility
+import de.ywegel.svenska.navigation.transitions.TemporaryHierarchicalTransitionStyle
 
 @NavHostGraph(
-    visibility = CodeGenVisibility.INTERNAL,
+    defaultTransitions = TemporaryHierarchicalTransitionStyle::class,
 )
 annotation class SvenskaGraph

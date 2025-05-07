@@ -50,6 +50,7 @@ import com.ramcosta.composedestinations.navigation.DestinationsNavigator
 import de.ywegel.svenska.R
 import de.ywegel.svenska.data.model.Vocabulary
 import de.ywegel.svenska.navigation.SvenskaGraph
+import de.ywegel.svenska.navigation.transitions.LateralTransition
 import de.ywegel.svenska.ui.common.HorizontalSpacerM
 import de.ywegel.svenska.ui.common.IconButton
 import de.ywegel.svenska.ui.common.NavigationIconButton
@@ -63,7 +64,7 @@ import java.util.Queue
 
 private const val TAG = "SearchScreen"
 
-@Destination<SvenskaGraph>(navArgs = SearchScreenNavArgs::class)
+@Destination<SvenskaGraph>(navArgs = SearchScreenNavArgs::class, style = LateralTransition::class)
 @Composable
 fun SearchScreen(navigator: DestinationsNavigator) {
     val viewModel = hiltViewModel<SearchViewModel>()
