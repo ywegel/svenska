@@ -43,9 +43,13 @@ private object LateralTransitionAnimations {
         )
 
     // Exit animation: None
+    // Do not use exitTransition and popEnterTransition. Otherwise, if we switch from a HierarchicalTransition to a Lateral
+    // one, the animations get mixed
     val exitTransition: ExitTransition = ExitTransition.None
 
     // Pop Enter animation: Simple Fade In
+    // Do not use exitTransition and popEnterTransition. Otherwise, if we switch from a HierarchicalTransition to a Lateral
+    // one, the animations get mixed
     val popEnterTransition: EnterTransition = EnterTransition.None
 
     // Pop Exit animation: Slide down, Fade out
