@@ -15,7 +15,6 @@ import androidx.compose.animation.slideOutVertically
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.navigation.NavBackStackEntry
-import com.ramcosta.composedestinations.animations.NavHostAnimatedDestinationStyle
 import de.ywegel.svenska.navigation.transitions.TransitionDefaults.DEFAULT_TRANSITION_DURATION
 
 private object LateralTransitionAnimations {
@@ -42,16 +41,6 @@ private object LateralTransitionAnimations {
             animationSpec = tween(DEFAULT_TRANSITION_DURATION),
         )
 
-    // Exit animation: None
-    // Do not use exitTransition and popEnterTransition. Otherwise, if we switch from a HierarchicalTransition to a Lateral
-    // one, the animations get mixed
-    val exitTransition: ExitTransition = ExitTransition.None
-
-    // Pop Enter animation: Simple Fade In
-    // Do not use exitTransition and popEnterTransition. Otherwise, if we switch from a HierarchicalTransition to a Lateral
-    // one, the animations get mixed
-    val popEnterTransition: EnterTransition = EnterTransition.None
-
     // Pop Exit animation: Slide down, Fade out
     val popExitTransition: ExitTransition =
         slideOutVertically(
@@ -68,17 +57,9 @@ private object LateralTransitionAnimations {
         )
 }
 
-object LateralTransition : NavHostAnimatedDestinationStyle() {
+object LateralTransition : SvenskaAnimatedDestinationStyle() {
     override val enterTransition: AnimatedContentTransitionScope<NavBackStackEntry>.() -> EnterTransition = {
         LateralTransitionAnimations.enterTransition
-    }
-
-    override val exitTransition: AnimatedContentTransitionScope<NavBackStackEntry>.() -> ExitTransition = {
-        LateralTransitionAnimations.exitTransition
-    }
-
-    override val popEnterTransition: AnimatedContentTransitionScope<NavBackStackEntry>.() -> EnterTransition = {
-        LateralTransitionAnimations.popEnterTransition
     }
 
     override val popExitTransition: AnimatedContentTransitionScope<NavBackStackEntry>.() -> ExitTransition = {

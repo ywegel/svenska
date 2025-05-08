@@ -11,7 +11,6 @@ import androidx.compose.animation.slideOutHorizontally
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.navigation.NavBackStackEntry
-import com.ramcosta.composedestinations.animations.NavHostAnimatedDestinationStyle
 import de.ywegel.svenska.navigation.transitions.TransitionDefaults.DEFAULT_TRANSITION_DURATION
 
 private object TemporaryHierarchicalTransitionAnimations {
@@ -27,16 +26,6 @@ private object TemporaryHierarchicalTransitionAnimations {
             ),
         )
 
-    // Exit animation: None
-    // Do not use exitTransition and popEnterTransition. Otherwise, if we switch from a HierarchicalTransition to a Lateral
-    // one, the animations get mixed
-    val exitTransition: ExitTransition = ExitTransition.None
-
-    // Pop Enter animation: None
-    // Do not use exitTransition and popEnterTransition. Otherwise, if we switch from a HierarchicalTransition to a Lateral
-    // one, the animations get mixed
-    val popEnterTransition: EnterTransition = EnterTransition.None
-
     // Pop Exit animation: Slide out horizontally to the right
     val popExitTransition: ExitTransition =
         slideOutHorizontally(
@@ -48,17 +37,9 @@ private object TemporaryHierarchicalTransitionAnimations {
         )
 }
 
-object TemporaryHierarchicalTransitionStyle : NavHostAnimatedDestinationStyle() {
+object TemporaryHierarchicalTransitionStyle : SvenskaAnimatedDestinationStyle() {
     override val enterTransition: AnimatedContentTransitionScope<NavBackStackEntry>.() -> EnterTransition = {
         TemporaryHierarchicalTransitionAnimations.enterTransition
-    }
-
-    override val exitTransition: AnimatedContentTransitionScope<NavBackStackEntry>.() -> ExitTransition = {
-        TemporaryHierarchicalTransitionAnimations.exitTransition
-    }
-
-    override val popEnterTransition: AnimatedContentTransitionScope<NavBackStackEntry>.() -> EnterTransition = {
-        TemporaryHierarchicalTransitionAnimations.popEnterTransition
     }
 
     override val popExitTransition: AnimatedContentTransitionScope<NavBackStackEntry>.() -> ExitTransition = {
