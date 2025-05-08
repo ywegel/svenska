@@ -10,6 +10,6 @@ import com.ramcosta.composedestinations.generated.NavGraphs
 fun AppNavigation() {
     DestinationsNavHost(
         modifier = Modifier.fillMaxSize(),
-        navGraph = NavGraphs.root,
+        navGraph = NavGraphs.svenska,
     )
 }
