@@ -30,12 +30,12 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.ramcosta.composedestinations.annotation.Destination
-import com.ramcosta.composedestinations.annotation.RootGraph
 import com.ramcosta.composedestinations.annotation.parameters.DeepLink
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
+import de.ywegel.svenska.navigation.SettingsNavGraph
 import de.ywegel.svenska.ui.common.VerticalSpacerM
 
-@Destination<RootGraph>(
+@Destination<SettingsNavGraph>(
     deepLinks = [
         DeepLink(
             action = Intent.ACTION_VIEW,

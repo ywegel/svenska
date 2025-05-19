@@ -1,9 +1,9 @@
 package de.ywegel.svenska.navigation
 
-import com.ramcosta.composedestinations.annotation.NavGraph
+import com.ramcosta.composedestinations.annotation.NavHostGraph
 import de.ywegel.svenska.navigation.transitions.TemporaryHierarchicalTransitionStyle
 
-@NavGraph<SvenskaGraph>(
+@NavHostGraph(
     defaultTransitions = TemporaryHierarchicalTransitionStyle::class,
 )
-annotation class SettingsNavGraph
+annotation class SvenskaGraph

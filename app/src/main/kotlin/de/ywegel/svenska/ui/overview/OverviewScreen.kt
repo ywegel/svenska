@@ -26,13 +26,15 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.ramcosta.composedestinations.annotation.Destination
-import com.ramcosta.composedestinations.annotation.RootGraph
-import com.ramcosta.composedestinations.generated.destinations.AddEditScreenDestination
-import com.ramcosta.composedestinations.generated.destinations.QuizConfigurationScreenDestination
+import com.ramcosta.composedestinations.generated.NavGraphs
+import com.ramcosta.composedestinations.generated.destinations.AddVocabularyScreenDestination
+import com.ramcosta.composedestinations.generated.destinations.EditVocabularyScreenDestination
+import com.ramcosta.composedestinations.generated.destinations.QuizConfigurationScreenDestinationNavArgs
 import com.ramcosta.composedestinations.generated.destinations.SearchScreenDestination
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
 import de.ywegel.svenska.data.model.Vocabulary
 import de.ywegel.svenska.data.vocabularies
+import de.ywegel.svenska.navigation.SvenskaGraph
 import de.ywegel.svenska.ui.common.IconButton
 import de.ywegel.svenska.ui.common.NavigationIconButton
 import de.ywegel.svenska.ui.common.VerticalSpacerM
@@ -40,7 +42,7 @@ import de.ywegel.svenska.ui.theme.Spacings
 import de.ywegel.svenska.ui.theme.SvenskaIcons
 import de.ywegel.svenska.ui.theme.SvenskaTheme
 
-@Destination<RootGraph>(navArgs = OverviewNavArgs::class)
+@Destination<SvenskaGraph>(navArgs = OverviewNavArgs::class)
 @Composable
 fun OverviewScreen(navigator: DestinationsNavigator, navArgs: OverviewNavArgs) {
     val viewModel: OverviewViewModel = hiltViewModel()
@@ -50,11 +52,15 @@ fun OverviewScreen(navigator: DestinationsNavigator, navArgs: OverviewNavArgs) {
     OverviewScreen(
         uiState = uiState,
         containerName = navArgs.containerName,
-        navigateToAdd = { navigator.navigate(AddEditScreenDestination(viewModel.containerId)) },
-        onQuizClick = { navigator.navigate(QuizConfigurationScreenDestination(viewModel.containerId)) },
+        navigateToAdd = { navigator.navigate(AddVocabularyScreenDestination(viewModel.containerId)) },
+        onQuizClick = {
+            navigator.navigate(
+                NavGraphs.quiz(QuizConfigurationScreenDestinationNavArgs(containerId = viewModel.containerId)),
+            )
+        },
         navigateToEdit = { item ->
             navigator.navigate(
-                AddEditScreenDestination(
+                EditVocabularyScreenDestination(
                     viewModel.containerId,
                     item,
                 ),

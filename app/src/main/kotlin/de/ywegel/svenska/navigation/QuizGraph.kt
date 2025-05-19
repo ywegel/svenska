@@ -6,4 +6,4 @@ import de.ywegel.svenska.navigation.transitions.TemporaryHierarchicalTransitionS
 @NavGraph<SvenskaGraph>(
     defaultTransitions = TemporaryHierarchicalTransitionStyle::class,
 )
-annotation class SettingsNavGraph
+annotation class QuizGraph
