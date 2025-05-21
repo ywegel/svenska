@@ -116,6 +116,10 @@ dependencies {
     // Datastore
     implementation(libs.androidx.datastore)
 
+    // About libraries
+    implementation(libs.about.libraries.core)
+    implementation(libs.about.libraries.compose.m3)
+
     // testing
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.test.ext.junit)

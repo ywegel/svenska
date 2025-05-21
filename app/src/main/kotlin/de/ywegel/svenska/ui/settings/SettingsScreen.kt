@@ -1,3 +1,5 @@
+@file:OptIn(ExperimentalMaterial3Api::class)
+
 package de.ywegel.svenska.ui.settings
 
 import androidx.compose.foundation.layout.Column
@@ -7,6 +9,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.selection.selectable
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.RadioButton
 import androidx.compose.material3.Scaffold
@@ -26,6 +29,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.ramcosta.composedestinations.annotation.Destination
+import com.ramcosta.composedestinations.generated.destinations.AboutLibrariesScreenDestination
 import com.ramcosta.composedestinations.generated.destinations.WordImporterScreenDestination
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
 import de.ywegel.svenska.R
@@ -53,6 +57,7 @@ fun SettingsScreen(navigator: DestinationsNavigator, viewModel: SettingsViewMode
         onOnlineSearchTypeSelected = viewModel::onOnlineSearchTypeSelected,
         navigateUp = navigator::navigateUp,
         navigateToWordImporter = { navigator.navigate(WordImporterScreenDestination) },
+        navigateToAboutLibraries = { navigator.navigate(AboutLibrariesScreenDestination) },
     )
 }
 
@@ -64,6 +69,7 @@ private fun SettingsScreen(
     onOnlineSearchTypeSelected: (OnlineSearchType) -> Unit,
     navigateUp: () -> Unit,
     navigateToWordImporter: () -> Unit,
+    navigateToAboutLibraries: () -> Unit,
 ) {
     Scaffold(
         topBar = {
@@ -95,6 +101,13 @@ private fun SettingsScreen(
                 title = stringResource(R.string.settings_naviagate_word_importer_screen_title),
                 description = stringResource(R.string.settings_naviagate_word_importer_screen_description),
                 onClick = navigateToWordImporter,
+            )
+
+            VerticalSpacerM()
+
+            ClickableText(
+                title = stringResource(R.string.settings_naviagate_about_libraries_screen_title),
+                onClick = navigateToAboutLibraries,
             )
 
             VerticalSpacerM()
@@ -196,6 +209,7 @@ private fun SettingsScreenPreview() {
             onOnlineSearchTypeSelected = {},
             navigateUp = {},
             navigateToWordImporter = {},
+            navigateToAboutLibraries = {},
         )
     }
 }
