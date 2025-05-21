@@ -94,6 +94,7 @@ class SearchViewModel @Inject constructor(
                     it.copy(
                         lastSearchedItems = preferences.lastSearchedItems,
                         onlineRedirectUrl = preferences.onlineRedirectType.toUrl(),
+                        showCompactVocabularyItem = preferences.showCompactVocabularyItem,
                     )
                 }
             }
