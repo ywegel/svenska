@@ -755,7 +755,7 @@ style:
   UnusedPrivateMember:
     active: true
     allowedNames: ''
-    ignoreAnnotated: [ 'Preview', 'JvmStatic' ]
+    ignoreAnnotated: [ 'Preview', 'JvmStatic', 'PreviewLightDark' ]
   UnusedPrivateProperty:
     active: true
     allowedNames: '_|ignored|expected|serialVersionUID'
