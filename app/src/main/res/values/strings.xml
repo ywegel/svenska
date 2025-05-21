@@ -209,5 +209,9 @@
     <string name="settings_search_compact_vocabulary_item_description">Show compact Vocabulary Item for the search</string>
     <string name="settings_naviagate_word_importer_screen_title">Show word importer</string>
     <string name="settings_naviagate_word_importer_screen_description">Import words from a file</string>
+    <string name="settings_naviagate_about_libraries_screen_title">Licenses</string>
+
+    <!-- ## About libraries ## -->
+    <string name="settings_about_libraries_title">Licenses</string>
 
 </resources>
