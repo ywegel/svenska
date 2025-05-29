@@ -11,9 +11,11 @@ import org.junit.jupiter.api.Test
 import strikt.api.expectThat
 import strikt.assertions.isEqualTo
 import strikt.assertions.isGreaterThan
-import strikt.assertions.isNotEqualTo
 import strikt.assertions.isNotNull
 import strikt.assertions.isNull
+import kotlin.time.Clock
+import kotlin.time.Duration.Companion.days
+import kotlin.time.ExperimentalTime
 
 @ExperimentalCoroutinesApi
 class MapUiStateToVocabularyUseCaseTest {
@@ -72,9 +74,14 @@ class MapUiStateToVocabularyUseCaseTest {
         expectThat(result.lastEdited).isGreaterThan(0)
     }
 
+    @OptIn(ExperimentalTime::class)
     @Test
     fun `Preserves created value and updates everything else when editing existing vocabulary`() {
-        val initial = vocabulary()
+        val initialCreationTime = Clock.System.now().minus(30.days)
+        val initial = vocabulary().copy(
+            created = initialCreationTime.toEpochMilliseconds(),
+            lastEdited = initialCreationTime.toEpochMilliseconds(),
+        )
         val uiState = UiState.fromExistingVocabulary(initial)
 
         val result = useCase(
@@ -85,7 +92,9 @@ class MapUiStateToVocabularyUseCaseTest {
 
         expectThat(result).isNotNull()
         expectThat(result!!.created).isEqualTo(initial.created)
-        expectThat(result.lastEdited).isNotEqualTo(initial.lastEdited)
+        expectThat(result.created).isEqualTo(initialCreationTime.toEpochMilliseconds())
+        expectThat(result.lastEdited).isGreaterThan(initial.lastEdited)
+        expectThat(result.lastEdited).isGreaterThan(initialCreationTime.toEpochMilliseconds())
     }
 
     @Test
