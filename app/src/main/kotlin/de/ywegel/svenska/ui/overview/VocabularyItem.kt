@@ -1,19 +1,15 @@
 package de.ywegel.svenska.ui.overview
 
-import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Surface
@@ -23,7 +19,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -34,6 +29,9 @@ import de.ywegel.svenska.data.model.WordGroup
 import de.ywegel.svenska.data.vocabularies
 import de.ywegel.svenska.data.vocabulary
 import de.ywegel.svenska.ui.common.HorizontalSpacerXS
+import de.ywegel.svenska.ui.common.vocabulary.WordGroupBadgeExtended
+import de.ywegel.svenska.ui.common.vocabulary.mainGroupAbbreviation
+import de.ywegel.svenska.ui.common.vocabulary.subGroupAbbreviation
 import de.ywegel.svenska.ui.theme.Spacings
 import de.ywegel.svenska.ui.theme.SvenskaTheme
 
@@ -44,14 +42,6 @@ fun VocabularyListItem(vocabulary: Vocabulary, modifier: Modifier = Modifier, on
     val annotatedWord = vocabulary.annotatedWord
     val showEnding = vocabulary.ending.isNotBlank()
     val showGender = vocabulary.wordGroup is WordGroup.Noun && vocabulary.gender != null
-
-    val wordGroupTag = when (vocabulary.wordGroup) {
-        // TODO: Use string ressources
-        is WordGroup.Noun -> "N"
-        is WordGroup.Verb -> "V"
-        WordGroup.Adjective -> "A"
-        WordGroup.Other -> "•"
-    }
 
     Surface(
         modifier = modifier
@@ -68,22 +58,10 @@ fun VocabularyListItem(vocabulary: Vocabulary, modifier: Modifier = Modifier, on
             verticalAlignment = Alignment.CenterVertically,
         ) {
             // WordGroup-Badge
-            Box(
-                modifier = Modifier
-                    .size(22.dp)
-                    .background(
-                        color = SvenskaTheme.colors.primary.copy(alpha = 0.2f),
-                        shape = CircleShape,
-                    ),
-                contentAlignment = Alignment.Center,
-            ) {
-                Text(
-                    text = wordGroupTag,
-                    style = SvenskaTheme.typography.labelSmall,
-                    fontWeight = FontWeight.Bold,
-                    color = SvenskaTheme.colors.primary,
-                )
-            }
+            WordGroupBadgeExtended(
+                mainWordGroup = vocabulary.wordGroup.mainGroupAbbreviation(),
+                subWordGroup = vocabulary.wordGroup.subGroupAbbreviation(),
+            )
 
             HorizontalSpacerXS()
 
@@ -258,46 +236,5 @@ fun Gender.userFacingString(): Int {
     return when (this) {
         Gender.Ultra -> R.string.lang_common
         Gender.Neutra -> R.string.lang_neuter
-    }
-}
-
-fun WordGroup.userFacingString(): Int {
-    return when (this) {
-        is WordGroup.Noun -> R.string.lang_noun
-        is WordGroup.Verb -> R.string.lang_verb
-        WordGroup.Adjective -> R.string.lang_adjective
-        WordGroup.Other -> R.string.lang_other
-    }
-}
-
-// TODO: Use these for extended bubbles
-@Suppress("detekt:CyclomaticComplexMethod")
-fun WordGroup.abbreviation(): Int {
-    return when (this) {
-        is WordGroup.Noun -> when (this.subgroup) {
-            WordGroup.NounSubgroup.OR -> R.string.lang_noun_abbreviation_or
-            WordGroup.NounSubgroup.AR -> R.string.lang_noun_abbreviation_ar
-            WordGroup.NounSubgroup.ER -> R.string.lang_noun_abbreviation_er
-            WordGroup.NounSubgroup.R -> R.string.lang_noun_abbreviation_r
-            WordGroup.NounSubgroup.N -> R.string.lang_noun_abbreviation_n
-            WordGroup.NounSubgroup.UNCHANGED_ETT,
-            WordGroup.NounSubgroup.UNCHANGED_EN,
-            -> R.string.lang_noun_abbreviation_unchanged
-
-            WordGroup.NounSubgroup.SPECIAL -> R.string.lang_noun_abbreviation_special
-            WordGroup.NounSubgroup.UNDEFINED -> R.string.lang_noun_abbreviation_undefined
-        }
-
-        is WordGroup.Verb -> when (this.subgroup) {
-            WordGroup.VerbSubgroup.GROUP_1 -> R.string.lang_verb_abbreviation_1
-            WordGroup.VerbSubgroup.GROUP_2A -> R.string.lang_verb_abbreviation_2a
-            WordGroup.VerbSubgroup.GROUP_2B -> R.string.lang_verb_abbreviation_2b
-            WordGroup.VerbSubgroup.GROUP_3 -> R.string.lang_verb_abbreviation_3
-            WordGroup.VerbSubgroup.GROUP_4_SPECIAL -> R.string.lang_verb_abbreviation_special
-            WordGroup.VerbSubgroup.UNDEFINED -> R.string.lang_verb_abbreviation_undefined
-        }
-
-        WordGroup.Adjective -> R.string.lang_adjective_abbreviation
-        WordGroup.Other -> R.string.lang_other_abbreviation
     }
 }

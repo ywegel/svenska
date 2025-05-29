@@ -5,7 +5,7 @@ import androidx.compose.ui.text.AnnotatedString
 import androidx.lifecycle.ViewModel
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
-import de.ywegel.svenska.ui.common.stringWithHighlightSeparators
+import de.ywegel.svenska.ui.common.vocabulary.stringWithHighlightSeparators
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow

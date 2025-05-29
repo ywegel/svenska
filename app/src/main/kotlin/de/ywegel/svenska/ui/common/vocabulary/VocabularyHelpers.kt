@@ -1,4 +1,4 @@
-package de.ywegel.svenska.ui.common
+package de.ywegel.svenska.ui.common.vocabulary
 
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.SpanStyle

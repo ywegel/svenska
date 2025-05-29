@@ -7,7 +7,7 @@ import androidx.room.PrimaryKey
 import androidx.room.TypeConverters
 import de.ywegel.svenska.data.db.HighlightConverter
 import de.ywegel.svenska.data.db.WordGroupConverter
-import de.ywegel.svenska.ui.common.annotatedStringFromHighlights
+import de.ywegel.svenska.ui.common.vocabulary.annotatedStringFromHighlights
 import kotlinx.parcelize.IgnoredOnParcel
 import kotlinx.parcelize.Parcelize
 import java.text.DateFormat

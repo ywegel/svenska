@@ -59,7 +59,7 @@
     <string name="lang_noun_abbreviation_er">Er</string>
     <string name="lang_noun_abbreviation_r">R</string>
     <string name="lang_noun_abbreviation_n">N</string>
-    <string name="lang_noun_abbreviation_unchanged">-</string>
+    <string name="lang_noun_abbreviation_unchanged">U</string>
     <string name="lang_noun_abbreviation_special">S</string>
     <string name="lang_noun_abbreviation_undefined">\?</string>
 
@@ -73,7 +73,7 @@
 
 
     <string name="lang_adjective_abbreviation">A</string>
-    <string name="lang_other_abbreviation">O</string>
+    <string name="lang_other_abbreviation">•</string>
 
     <!-- # Containers # -->
     <string name="containers_add_confirmation">Add</string>
@@ -111,6 +111,14 @@
 
     <string name="addEdit_confirm_delete_title">Delete Word</string>
     <string name="addEdit_confirm_delete_body">Are you sure that you want to delete %1$s? This will be permanent</string>
+
+    <string name="addEdit_group_selector_noun_title_unchanged_en">Unchanged en</string>
+    <string name="addEdit_group_selector_noun_title_unchanged_ett">Unchanged ett</string>
+    <string name="addEdit_group_selector_noun_title_special">Special</string>
+    <string name="addEdit_group_selector_noun_title_undefined">Undefined</string>
+
+    <string name="addEdit_group_selector_verb_title_special">Special</string>
+    <string name="addEdit_group_selector_verb_title_undefined">Undefined</string>
 
     <!-- # Quiz # -->
     <string name="quiz_title">Quiz</string>
