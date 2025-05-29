@@ -32,9 +32,6 @@ import androidx.compose.material3.MenuAnchorType
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Scaffold
-import androidx.compose.material3.SegmentedButton
-import androidx.compose.material3.SegmentedButtonDefaults
-import androidx.compose.material3.SingleChoiceSegmentedButtonRow
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
@@ -58,10 +55,10 @@ import com.ramcosta.composedestinations.navigation.DestinationsNavigator
 import de.ywegel.svenska.R
 import de.ywegel.svenska.data.model.Gender
 import de.ywegel.svenska.data.model.Vocabulary
-import de.ywegel.svenska.data.model.WordGroup
 import de.ywegel.svenska.navigation.SvenskaGraph
 import de.ywegel.svenska.navigation.transitions.LateralTransition
 import de.ywegel.svenska.navigation.transitions.TemporaryHierarchicalTransitionStyle
+import de.ywegel.svenska.ui.addEdit.models.ViewWordGroup
 import de.ywegel.svenska.ui.common.ConfirmableComponent
 import de.ywegel.svenska.ui.common.HorizontalSpacerXS
 import de.ywegel.svenska.ui.common.VerticalSpacerM
@@ -96,35 +93,14 @@ private fun AddEditScreen(navigator: DestinationsNavigator) {
 
     AddEditScreen(
         uiState = uiState,
-        updateSelectedWordGroup = viewModel::updateSelectedWordGroup,
-        updateGender = viewModel::updateGender,
-        updateWordWithAnnotation = viewModel::updateWordWithAnnotation,
-        updateTranslation = viewModel::updateTranslation,
-        updateEnding = viewModel::updateEnding,
-        updateNotes = viewModel::updateNotes,
-        discardAndNavigateUp = navigator::navigateUp,
-        saveAndNavigateUp = { viewModel.saveAndGoBack(navigator::navigateUp) },
-        updateIsFavorite = viewModel::updateIsFavorite,
-        updateIrregularPronunciation = viewModel::updateIsIrregularPronunciation,
-        deleteItem = { viewModel.deleteVocabulary(navigator::navigateUp) },
+        callbacks = viewModel,
+        navigateUp = navigator::navigateUp,
     )
 }
 
+@Suppress("LongMethod")
 @Composable
-private fun AddEditScreen(
-    uiState: UiState,
-    updateSelectedWordGroup: (WordGroup) -> Unit = {},
-    updateGender: (Gender) -> Unit = {},
-    updateWordWithAnnotation: (String) -> Unit = {},
-    updateTranslation: (String) -> Unit = {},
-    updateEnding: (String) -> Unit = {},
-    updateNotes: (String) -> Unit = {},
-    discardAndNavigateUp: () -> Unit = {},
-    saveAndNavigateUp: () -> Unit = {},
-    updateIsFavorite: (Boolean) -> Unit = {},
-    updateIrregularPronunciation: (Boolean) -> Unit = {},
-    deleteItem: () -> Unit = {},
-) {
+private fun AddEditScreen(uiState: UiState, callbacks: AddEditVocabularyCallbacks, navigateUp: () -> Unit) {
     val scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior()
 
     Scaffold(
@@ -135,13 +111,13 @@ private fun AddEditScreen(
                 editingExisting = uiState.editingExistingVocabulary,
                 isFavorite = uiState.isFavorite,
                 scrollBehavior = scrollBehavior,
-                navigateUp = discardAndNavigateUp,
-                updateIsFavorite = updateIsFavorite,
-                deleteItem = deleteItem,
+                navigateUp = navigateUp,
+                updateIsFavorite = callbacks::updateIsFavorite,
+                deleteItem = { callbacks.deleteVocabulary(navigateUp) },
             )
         },
         floatingActionButton = {
-            FloatingActionButton(saveAndNavigateUp) {
+            FloatingActionButton({ callbacks.saveAndNavigateUp(navigateUp) }) {
                 Icon(imageVector = SvenskaIcons.Done, contentDescription = null)
             }
         },
@@ -153,16 +129,23 @@ private fun AddEditScreen(
                 .fillMaxWidth()
                 .scrollable(rememberScrollState(), Orientation.Vertical),
         ) {
+            // TODO: Show info icon, to let the user navigate to the word group definitions screen
+            // TODO: Show a preview of the vocabulary badge
+            // TODO: If the user selects something and has no ending set, we want to show a button which lets him apply the default endings for the wordgroup
             WordGroupSelection(
-                uiState.selectedWordGroup,
-                onSelectionChanged = updateSelectedWordGroup,
+                // Change word group type in viewmodel and map it when creating or saving the vocabulary
+                selectedGroup = uiState.selectedWordGroup,
+                selectedSubgroup = uiState.selectedSubGroup,
+                onGroupSelected = callbacks::updateSelectedWordGroup,
+                onSubgroupSelected = callbacks::updateSelectedSubWordGroup,
             )
+
             VerticalSpacerM()
             Row {
-                if (uiState.selectedWordGroup is WordGroup.Noun) {
+                if (uiState.selectedWordGroup == ViewWordGroup.Noun) {
                     GenderDropDown(
                         selectedGender = uiState.gender ?: Gender.defaultIfEmpty,
-                        onGenderSelected = updateGender,
+                        onGenderSelected = callbacks::updateGender,
                     )
                     HorizontalSpacerXS()
                 }
@@ -171,7 +154,7 @@ private fun AddEditScreen(
                         .fillMaxWidth()
                         .weight(1f),
                     value = uiState.wordWithAnnotation,
-                    onValueChange = updateWordWithAnnotation,
+                    onValueChange = callbacks::updateWordWithAnnotation,
                     label = { Text(stringResource(R.string.addEdit_label_word)) },
                 )
             }
@@ -179,21 +162,22 @@ private fun AddEditScreen(
             OutlinedTextField(
                 modifier = Modifier.fillMaxWidth(),
                 value = uiState.translation,
-                onValueChange = updateTranslation,
+                onValueChange = callbacks::updateTranslation,
                 label = { Text(stringResource(R.string.addEdit_label_translation)) },
             )
             VerticalSpacerM()
             OutlinedTextField(
                 modifier = Modifier.fillMaxWidth(),
                 value = uiState.ending,
-                onValueChange = updateEnding,
+                onValueChange = callbacks::updateEnding,
                 label = { Text(stringResource(R.string.addEdit_label_endings)) },
             )
+            // TODO: After the user entered his endings, we want to suggest a word sub-group, which the user can apply by clicking a button
             VerticalSpacerM()
             OutlinedTextField(
                 modifier = Modifier.fillMaxWidth(),
                 value = uiState.notes,
-                onValueChange = updateNotes,
+                onValueChange = callbacks::updateNotes,
                 minLines = 2,
                 label = { Text(stringResource(R.string.addEdit_label_notes)) },
             )
@@ -201,13 +185,13 @@ private fun AddEditScreen(
             Row(verticalAlignment = Alignment.CenterVertically) {
                 Checkbox(
                     uiState.isIrregularPronunciation,
-                    onCheckedChange = updateIrregularPronunciation,
+                    onCheckedChange = callbacks::updateIsIrregularPronunciation,
                 )
                 OutlinedTextField(
                     modifier = Modifier.fillMaxWidth(),
                     value = uiState.irregularPronunciation.orEmpty(),
                     enabled = uiState.isIrregularPronunciation,
-                    onValueChange = updateNotes,
+                    onValueChange = callbacks::updateIrregularPronunciation,
                     label = { Text(stringResource(R.string.addEdit_label_irregular_pronunciation)) },
                 )
             }
@@ -253,24 +237,6 @@ private fun TopBar(
             }
         },
     )
-}
-
-@Composable
-private fun WordGroupSelection(selected: WordGroup, onSelectionChanged: (WordGroup) -> Unit) {
-    SingleChoiceSegmentedButtonRow {
-        WordGroup.abstractWordGroups.forEachIndexed { index, group ->
-            SegmentedButton(
-                selected = selected == group,
-                shape = SegmentedButtonDefaults.itemShape(
-                    index = index,
-                    count = WordGroup.abstractWordGroups.size,
-                ),
-                onClick = { onSelectionChanged(group) },
-            ) {
-                Text(text = stringResource(group.userFacingString()))
-            }
-        }
-    }
 }
 
 @Composable
@@ -362,6 +328,6 @@ data class AddEditNavArgs(
 @Composable
 private fun AddEditScreenPreview() {
     SvenskaTheme {
-        AddEditScreen(uiState = UiState())
+        AddEditScreen(uiState = UiState(), callbacks = AddEditVocabularyCallbacksFake, navigateUp = {})
     }
 }

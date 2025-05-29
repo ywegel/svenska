@@ -21,7 +21,7 @@ class FileRepositoryFake : FileRepository {
         return parseResult
     }
 
-    override fun parseAndSaveEntriesToDbWithProgress(entries: List<ImporterChapter>, _containerId: Int?): Flow<Int> {
+    override fun parseAndSaveEntriesToDbWithProgress(entries: List<ImporterChapter>, ignore: Int?): Flow<Int> {
         return flow {
             entries.forEachIndexed { index, _ ->
                 emit(index + 1)
