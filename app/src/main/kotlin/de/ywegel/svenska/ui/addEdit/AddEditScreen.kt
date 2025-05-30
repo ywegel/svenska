@@ -55,10 +55,12 @@ import com.ramcosta.composedestinations.navigation.DestinationsNavigator
 import de.ywegel.svenska.R
 import de.ywegel.svenska.data.model.Gender
 import de.ywegel.svenska.data.model.Vocabulary
+import de.ywegel.svenska.data.model.WordGroup
 import de.ywegel.svenska.navigation.SvenskaGraph
 import de.ywegel.svenska.navigation.transitions.LateralTransition
 import de.ywegel.svenska.navigation.transitions.TemporaryHierarchicalTransitionStyle
 import de.ywegel.svenska.ui.addEdit.models.ViewWordGroup
+import de.ywegel.svenska.ui.addEdit.models.ViewWordSubGroup
 import de.ywegel.svenska.ui.common.ConfirmableComponent
 import de.ywegel.svenska.ui.common.HorizontalSpacerXS
 import de.ywegel.svenska.ui.common.VerticalSpacerM
@@ -98,7 +100,6 @@ private fun AddEditScreen(navigator: DestinationsNavigator) {
     )
 }
 
-@Suppress("LongMethod")
 @Composable
 private fun AddEditScreen(uiState: UiState, callbacks: AddEditVocabularyCallbacks, navigateUp: () -> Unit) {
     val scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior()
@@ -125,8 +126,6 @@ private fun AddEditScreen(uiState: UiState, callbacks: AddEditVocabularyCallback
         Column(
             Modifier
                 .padding(contentPadding)
-                .padding(horizontal = Spacings.m)
-                .fillMaxWidth()
                 .scrollable(rememberScrollState(), Orientation.Vertical),
         ) {
             // TODO: Show info icon, to let the user navigate to the word group definitions screen
@@ -141,60 +140,73 @@ private fun AddEditScreen(uiState: UiState, callbacks: AddEditVocabularyCallback
             )
 
             VerticalSpacerM()
-            Row {
-                if (uiState.selectedWordGroup == ViewWordGroup.Noun) {
-                    GenderDropDown(
-                        selectedGender = uiState.gender ?: Gender.defaultIfEmpty,
-                        onGenderSelected = callbacks::updateGender,
-                    )
-                    HorizontalSpacerXS()
-                }
-                OutlinedTextField(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .weight(1f),
-                    value = uiState.wordWithAnnotation,
-                    onValueChange = callbacks::updateWordWithAnnotation,
-                    label = { Text(stringResource(R.string.addEdit_label_word)) },
+
+            AddEditInputSection(uiState = uiState, callbacks = callbacks)
+        }
+    }
+}
+
+@Suppress("LongMethod")
+@Composable
+private fun AddEditInputSection(uiState: UiState, callbacks: AddEditVocabularyCallbacks) {
+    Column(
+        modifier = Modifier
+            .padding(horizontal = Spacings.m)
+            .fillMaxWidth(),
+    ) {
+        Row(verticalAlignment = Alignment.Bottom) {
+            if (uiState.selectedWordGroup == ViewWordGroup.Noun) {
+                GenderDropDown(
+                    selectedGender = uiState.gender ?: Gender.defaultIfEmpty,
+                    onGenderSelected = callbacks::updateGender,
                 )
+                HorizontalSpacerXS()
             }
-            VerticalSpacerM()
+            OutlinedTextField(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .weight(1f),
+                value = uiState.wordWithAnnotation,
+                onValueChange = callbacks::updateWordWithAnnotation,
+                label = { Text(stringResource(R.string.addEdit_label_word)) },
+            )
+        }
+        VerticalSpacerM()
+        OutlinedTextField(
+            modifier = Modifier.fillMaxWidth(),
+            value = uiState.translation,
+            onValueChange = callbacks::updateTranslation,
+            label = { Text(stringResource(R.string.addEdit_label_translation)) },
+        )
+        VerticalSpacerM()
+        OutlinedTextField(
+            modifier = Modifier.fillMaxWidth(),
+            value = uiState.ending,
+            onValueChange = callbacks::updateEnding,
+            label = { Text(stringResource(R.string.addEdit_label_endings)) },
+        )
+        // TODO: After the user entered his endings, we want to suggest a word sub-group, which the user can apply by clicking a button
+        VerticalSpacerM()
+        OutlinedTextField(
+            modifier = Modifier.fillMaxWidth(),
+            value = uiState.notes,
+            onValueChange = callbacks::updateNotes,
+            minLines = 2,
+            label = { Text(stringResource(R.string.addEdit_label_notes)) },
+        )
+        VerticalSpacerM()
+        Row(verticalAlignment = Alignment.CenterVertically) {
+            Checkbox(
+                uiState.isIrregularPronunciation,
+                onCheckedChange = callbacks::updateIsIrregularPronunciation,
+            )
             OutlinedTextField(
                 modifier = Modifier.fillMaxWidth(),
-                value = uiState.translation,
-                onValueChange = callbacks::updateTranslation,
-                label = { Text(stringResource(R.string.addEdit_label_translation)) },
+                value = uiState.irregularPronunciation.orEmpty(),
+                enabled = uiState.isIrregularPronunciation,
+                onValueChange = callbacks::updateIrregularPronunciation,
+                label = { Text(stringResource(R.string.addEdit_label_irregular_pronunciation)) },
             )
-            VerticalSpacerM()
-            OutlinedTextField(
-                modifier = Modifier.fillMaxWidth(),
-                value = uiState.ending,
-                onValueChange = callbacks::updateEnding,
-                label = { Text(stringResource(R.string.addEdit_label_endings)) },
-            )
-            // TODO: After the user entered his endings, we want to suggest a word sub-group, which the user can apply by clicking a button
-            VerticalSpacerM()
-            OutlinedTextField(
-                modifier = Modifier.fillMaxWidth(),
-                value = uiState.notes,
-                onValueChange = callbacks::updateNotes,
-                minLines = 2,
-                label = { Text(stringResource(R.string.addEdit_label_notes)) },
-            )
-            VerticalSpacerM()
-            Row(verticalAlignment = Alignment.CenterVertically) {
-                Checkbox(
-                    uiState.isIrregularPronunciation,
-                    onCheckedChange = callbacks::updateIsIrregularPronunciation,
-                )
-                OutlinedTextField(
-                    modifier = Modifier.fillMaxWidth(),
-                    value = uiState.irregularPronunciation.orEmpty(),
-                    enabled = uiState.isIrregularPronunciation,
-                    onValueChange = callbacks::updateIrregularPronunciation,
-                    label = { Text(stringResource(R.string.addEdit_label_irregular_pronunciation)) },
-                )
-            }
         }
     }
 }
@@ -239,6 +251,7 @@ private fun TopBar(
     )
 }
 
+@Suppress("LongMethod")
 @Composable
 private fun GenderDropDown(selectedGender: Gender, onGenderSelected: (Gender) -> Unit, modifier: Modifier = Modifier) {
     var expanded by remember { mutableStateOf(false) }
@@ -266,7 +279,6 @@ private fun GenderDropDown(selectedGender: Gender, onGenderSelected: (Gender) ->
          */
 
         // Equivalent to the upper OutlinedTextField. Needed, as OutlinedTextField has a default width, that you can not remove.
-        // TODO: Replace with a working OutlinedTextField, that has no fixed min width
         val value = stringResource(selectedGender.userFacingString())
         val interactionSource = remember { MutableInteractionSource() }
         CompositionLocalProvider(
@@ -275,6 +287,7 @@ private fun GenderDropDown(selectedGender: Gender, onGenderSelected: (Gender) ->
             BasicTextField(
                 value = value,
                 onValueChange = {},
+                textStyle = SvenskaTheme.typography.bodyLarge,
                 readOnly = true,
                 modifier = Modifier.width(IntrinsicSize.Min),
                 decorationBox = @Composable { innerTextField ->
@@ -307,7 +320,12 @@ private fun GenderDropDown(selectedGender: Gender, onGenderSelected: (Gender) ->
         ExposedDropdownMenu(expanded = expanded, onDismissRequest = { expanded = false }) {
             Gender.entries.forEach {
                 DropdownMenuItem(
-                    text = { Text(stringResource(it.userFacingString())) },
+                    text = {
+                        Text(
+                            text = stringResource(it.userFacingString()),
+                            style = SvenskaTheme.typography.bodyLarge,
+                        )
+                    },
                     onClick = {
                         onGenderSelected(it)
                         expanded = false
@@ -329,5 +347,20 @@ data class AddEditNavArgs(
 private fun AddEditScreenPreview() {
     SvenskaTheme {
         AddEditScreen(uiState = UiState(), callbacks = AddEditVocabularyCallbacksFake, navigateUp = {})
+    }
+}
+
+@Preview
+@Composable
+private fun AddEditScreenSelectionExpandedPreview() {
+    SvenskaTheme {
+        AddEditScreen(
+            uiState = UiState(
+                selectedWordGroup = ViewWordGroup.Noun,
+                selectedSubGroup = ViewWordSubGroup.Noun(WordGroup.NounSubgroup.OR),
+            ),
+            callbacks = AddEditVocabularyCallbacksFake,
+            navigateUp = {},
+        )
     }
 }
