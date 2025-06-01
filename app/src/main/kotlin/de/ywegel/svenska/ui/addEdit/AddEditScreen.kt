@@ -3,19 +3,20 @@
 package de.ywegel.svenska.ui.addEdit
 
 import androidx.compose.animation.Crossfade
-import androidx.compose.foundation.gestures.Orientation
-import androidx.compose.foundation.gestures.scrollable
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.text.selection.LocalTextSelectionColors
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.outlined.Close
 import androidx.compose.material.icons.outlined.Delete
 import androidx.compose.material.icons.outlined.Done
@@ -119,7 +120,6 @@ private fun AddEditScreen(
     val scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior()
 
     Scaffold(
-        modifier = Modifier.nestedScroll(scrollBehavior.nestedScrollConnection),
         topBar = {
             TopBar(
                 translation = uiState.translation,
@@ -139,8 +139,11 @@ private fun AddEditScreen(
     ) { contentPadding ->
         Column(
             Modifier
+                .nestedScroll(scrollBehavior.nestedScrollConnection)
+                .fillMaxSize()
                 .padding(contentPadding)
-                .scrollable(rememberScrollState(), Orientation.Vertical),
+                .imePadding()
+                .verticalScroll(rememberScrollState()),
         ) {
             WordGroupSection(
                 uiState = uiState,
