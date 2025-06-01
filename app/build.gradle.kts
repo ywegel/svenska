@@ -13,6 +13,7 @@ plugins {
     alias(libs.plugins.ktlint)
     alias(libs.plugins.detekt)
     alias(libs.plugins.room)
+    alias(libs.plugins.kotlinx.kover)
     id("kotlin-parcelize")
     id("kotlin-kapt")
 }

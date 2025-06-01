@@ -26,7 +26,7 @@ jobs:
           cache: gradle
 
       - name: Run ktlint
-        run: ./gradlew ktlintCheck --no-daemon --max-workers=2
+        run: ./gradlew ktlintCheck --build-cache --parallel --max-workers=2
 
       - name: Cache build results
         uses: actions/cache@v4
@@ -56,7 +56,7 @@ jobs:
           cache: gradle
 
       - name: Run detekt
-        run: ./gradlew detekt --no-daemon --max-workers=2
+        run: ./gradlew detekt --build-cache --parallel --max-workers=2
 
       - name: Cache build results
         uses: actions/cache@v4
@@ -92,13 +92,12 @@ jobs:
             ~/.gradle/caches
             ~/.gradle/wrapper
             .gradle
-            build
           key: ${{ runner.os }}-gradle-${{ github.sha }}
           restore-keys: |
             ${{ runner.os }}-gradle-
 
       - name: Run Android Lint
-        run: ./gradlew lint --no-daemon --max-workers=2
+        run: ./gradlew lint --build-cache --parallel --max-workers=2
 
       - name: Upload lint results
         uses: actions/upload-artifact@v4
@@ -111,6 +110,8 @@ jobs:
     name: Unit Tests
     needs: [ ktlint, detekt ]
     runs-on: ubuntu-latest
+    permissions:
+      pull-requests: write
     steps:
       - uses: actions/checkout@v4
 
@@ -128,13 +129,12 @@ jobs:
             ~/.gradle/caches
             ~/.gradle/wrapper
             .gradle
-            build
           key: ${{ runner.os }}-gradle-${{ github.sha }}
           restore-keys: |
             ${{ runner.os }}-gradle-
 
       - name: Run unit tests
-        run: ./gradlew test --no-daemon --max-workers=2
+        run: ./gradlew test --build-cache --parallel --max-workers=2
 
       - name: Upload test results
         uses: actions/upload-artifact@v4
@@ -142,6 +142,18 @@ jobs:
         with:
           name: test-report
           path: '**/build/reports/tests/'
+
+      - name: Generate Coverage Report
+        run: ./gradlew koverXmlReport
+
+      - name: Post coverage comment
+        uses: mi-kas/kover-report@v1
+        if: github.event_name == 'pull_request'
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          path: app/build/reports/kover/report.xml
+          title: Code Coverage Report
+          coverage-counter-type: BRANCH
 
   assemble:
     name: Assemble App
@@ -164,10 +176,9 @@ jobs:
             ~/.gradle/caches
             ~/.gradle/wrapper
             .gradle
-            build
           key: ${{ runner.os }}-gradle-${{ github.sha }}
           restore-keys: |
             ${{ runner.os }}-gradle-
 
       - name: Assemble Debug APK
-        run: ./gradlew assembleDebug --no-daemon --max-workers=2
+        run: ./gradlew assembleDebug --build-cache --parallel --max-workers=2
