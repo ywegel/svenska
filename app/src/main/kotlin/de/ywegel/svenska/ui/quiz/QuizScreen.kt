@@ -178,12 +178,12 @@ private fun QuizToolbar(
             )
             IconButton(
                 icon = SvenskaIcons.Info,
-                contentDescription = stringResource(R.string.accessibility_toolbar_actions_word_group_info),
+                contentDescription = stringResource(R.string.accessibility_quiz_toolbar_actions_word_group_info),
                 onClick = navigateToWordGroupsScreen,
             )
             IconButton(
                 icon = if (isFavorite == true) SvenskaIcons.Favorite else SvenskaIcons.FavoriteBorder,
-                contentDescription = stringResource(R.string.accessibility_toolbar_actions_favorite),
+                contentDescription = stringResource(R.string.accessibility_quiz_toolbar_actions_favorite),
                 onClick = { isFavorite?.let { toggleFavorite(!isFavorite) } },
                 enabled = uiState is QuizUiState.Active && isFavorite != null,
             )

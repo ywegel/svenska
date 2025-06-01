@@ -120,6 +120,8 @@
     <string name="addEdit_group_selector_verb_title_special">Special</string>
     <string name="addEdit_group_selector_verb_title_undefined">Undefined</string>
 
+    <string name="addEdit_group_selector_invalid_configuration">You have either not selected a group or subgroup</string>
+
     <!-- # Quiz # -->
     <string name="quiz_title">Quiz</string>
 

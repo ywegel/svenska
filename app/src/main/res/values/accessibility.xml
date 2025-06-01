@@ -4,8 +4,11 @@
 
     <string name="accessibility_toolbar_navigate_up">Navigate up</string>
 
+    <!-- # AddEdit # -->
+    <string name="accessibility_addEdit_navigate_word_group_info_screen">Navigate to WordGroups screen</string>
+
     <!-- # Quiz # -->
-    <string name="accessibility_toolbar_actions_favorite">Favorite this word</string>
-    <string name="accessibility_toolbar_actions_word_group_info">Navigate to WordGroups screen</string>
+    <string name="accessibility_quiz_toolbar_actions_favorite">Favorite this word</string>
+    <string name="accessibility_quiz_toolbar_actions_word_group_info">Navigate to WordGroups screen</string>
 
 </resources>

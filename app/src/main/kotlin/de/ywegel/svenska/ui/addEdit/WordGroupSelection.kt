@@ -1,17 +1,29 @@
 package de.ywegel.svenska.ui.addEdit
 
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.ExitTransition
+import androidx.compose.animation.expandHorizontally
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.shrinkHorizontally
+import androidx.compose.animation.slideInHorizontally
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.lazy.LazyRow
-import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.material.icons.outlined.Done
 import androidx.compose.material3.FilterChip
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.ReadOnlyComposable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
@@ -20,11 +32,11 @@ import de.ywegel.svenska.data.model.WordGroup
 import de.ywegel.svenska.ui.addEdit.models.ViewWordGroup
 import de.ywegel.svenska.ui.addEdit.models.ViewWordSubGroup
 import de.ywegel.svenska.ui.addEdit.models.userFacingString
-import de.ywegel.svenska.ui.common.VerticalSpacerXS
 import de.ywegel.svenska.ui.common.vocabulary.abbreviation
 import de.ywegel.svenska.ui.theme.Spacings
 import de.ywegel.svenska.ui.theme.SvenskaIcons
 import de.ywegel.svenska.ui.theme.SvenskaTheme
+import kotlinx.coroutines.delay
 
 @Composable
 fun WordGroupSelection(
@@ -35,7 +47,6 @@ fun WordGroupSelection(
     modifier: Modifier = Modifier,
 ) {
     Column(modifier = modifier) {
-        // TODO: Animate chips
         ChipRow(
             items = ViewWordGroup.entries,
             selectedItem = selectedGroup,
@@ -43,24 +54,45 @@ fun WordGroupSelection(
             labelProvider = { it.userFacingString() },
         )
 
-        VerticalSpacerXS()
-
-        when (selectedGroup) {
-            ViewWordGroup.Noun -> ChipRow(
-                items = WordGroup.NounSubgroup.entries,
-                selectedItem = (selectedSubgroup as? ViewWordSubGroup.Noun)?.type,
-                onItemSelected = { onSubgroupSelected(ViewWordSubGroup.Noun(it)) },
-                labelProvider = { it.selectorAbbreviation() },
+        // We store the last valid group (NOUN or VERB) to ensure content is still available during the exit animation.
+        // This avoids breaking the animation when selectedGroup becomes something else (e.g. OTHER).
+        var lastValidGroup by remember {
+            mutableStateOf(
+                if (selectedGroup == ViewWordGroup.Noun || selectedGroup == ViewWordGroup.Verb) selectedGroup else null,
             )
+        }
 
-            ViewWordGroup.Verb -> ChipRow(
-                items = WordGroup.VerbSubgroup.entries,
-                selectedItem = (selectedSubgroup as? ViewWordSubGroup.Verb)?.type,
-                onItemSelected = { onSubgroupSelected(ViewWordSubGroup.Verb(it)) },
-                labelProvider = { it.selectorAbbreviation() },
-            )
+        LaunchedEffect(selectedGroup) {
+            if (selectedGroup == ViewWordGroup.Noun || selectedGroup == ViewWordGroup.Verb) {
+                lastValidGroup = selectedGroup
+            }
+        }
 
-            else -> {}
+        // AnimatedVisibility only runs when a valid group is selected AND lastValidGroup is not null.
+        // This prevents visual glitches by ensuring a stable layout exists during both enter and exit animations.
+        AnimatedVisibility(
+            visible = lastValidGroup != null &&
+                (selectedGroup == ViewWordGroup.Noun || selectedGroup == ViewWordGroup.Verb),
+        ) {
+            when (lastValidGroup) {
+                ViewWordGroup.Noun -> ChipRow(
+                    items = WordGroup.NounSubgroup.entries,
+                    selectedItem = (selectedSubgroup as? ViewWordSubGroup.Noun)?.type,
+                    onItemSelected = { onSubgroupSelected(ViewWordSubGroup.Noun(it)) },
+                    labelProvider = { it.selectorAbbreviation() },
+                    animate = false,
+                )
+
+                ViewWordGroup.Verb -> ChipRow(
+                    items = WordGroup.VerbSubgroup.entries,
+                    selectedItem = (selectedSubgroup as? ViewWordSubGroup.Verb)?.type,
+                    onItemSelected = { onSubgroupSelected(ViewWordSubGroup.Verb(it)) },
+                    labelProvider = { it.selectorAbbreviation() },
+                    animate = false,
+                )
+
+                else -> {}
+            }
         }
     }
 }
@@ -71,29 +103,64 @@ private fun <T> ChipRow(
     selectedItem: T?,
     onItemSelected: (T) -> Unit,
     labelProvider: @Composable (T) -> String,
+    animate: Boolean = true,
 ) {
     LazyRow(
         modifier = Modifier.fillMaxWidth(),
         horizontalArrangement = Arrangement.spacedBy(Spacings.xs),
-        contentPadding = PaddingValues(horizontal = Spacings.xxs),
+        contentPadding = PaddingValues(horizontal = Spacings.m),
     ) {
-        items(items) { item ->
-            // TODO: Animate chip entry
-            val isSelected = selectedItem == item
-            FilterChip(
-                selected = isSelected,
-                onClick = { onItemSelected(item) },
-                label = { Text(labelProvider(item)) },
-                leadingIcon = {
-                    if (isSelected) {
-                        Icon(
-                            imageVector = SvenskaIcons.Done,
-                            contentDescription = null,
-                        )
-                    }
-                },
-            )
+        itemsIndexed(items) { index, group ->
+            val isSelected = selectedItem == group
+            AnimatedChipEntry(index = index, animate = animate) {
+                FilterChip(
+                    selected = isSelected,
+                    onClick = { onItemSelected(group) },
+                    label = { Text(labelProvider(group)) },
+                    leadingIcon = {
+                        AnimatedVisibility(
+                            visible = isSelected,
+                            enter = fadeIn() + expandHorizontally(),
+                            exit = fadeOut() + shrinkHorizontally(),
+                        ) {
+                            Icon(
+                                imageVector = SvenskaIcons.Done,
+                                contentDescription = null,
+                            )
+                        }
+                    },
+                )
+            }
         }
+    }
+}
+
+@Composable
+private fun AnimatedChipEntry(
+    index: Int,
+    animate: Boolean = true,
+    delayPerItem: Int = 40,
+    content: @Composable () -> Unit,
+) {
+    if (!animate) {
+        content()
+        return
+    }
+    val visible = remember { mutableStateOf(false) }
+
+    LaunchedEffect(Unit) {
+        delay(index * delayPerItem.toLong())
+        visible.value = true
+    }
+
+    AnimatedVisibility(
+        visible = visible.value,
+        enter = slideInHorizontally(
+            initialOffsetX = { fullWidth -> -fullWidth / 2 + index * 10 },
+        ) + fadeIn(),
+        exit = ExitTransition.None,
+    ) {
+        content()
     }
 }
 

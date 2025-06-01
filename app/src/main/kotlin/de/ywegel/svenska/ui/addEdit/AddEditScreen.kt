@@ -2,10 +2,12 @@
 
 package de.ywegel.svenska.ui.addEdit
 
+import androidx.compose.animation.Crossfade
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.imePadding
@@ -20,6 +22,7 @@ import androidx.compose.material.icons.outlined.Delete
 import androidx.compose.material.icons.outlined.Done
 import androidx.compose.material.icons.outlined.Favorite
 import androidx.compose.material.icons.outlined.FavoriteBorder
+import androidx.compose.material.icons.outlined.Info
 import androidx.compose.material3.Checkbox
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -27,18 +30,20 @@ import androidx.compose.material3.ExposedDropdownMenuBox
 import androidx.compose.material3.ExposedDropdownMenuDefaults
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.IconToggleButton
 import androidx.compose.material3.MenuAnchorType
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.TopAppBarScrollBehavior
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -47,26 +52,39 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.nestedscroll.nestedScroll
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.compose.LocalLifecycleOwner
+import androidx.lifecycle.repeatOnLifecycle
 import com.ramcosta.composedestinations.annotation.Destination
+import com.ramcosta.composedestinations.generated.destinations.WordGroupsScreenDestination
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
 import de.ywegel.svenska.R
 import de.ywegel.svenska.data.model.Gender
 import de.ywegel.svenska.data.model.Vocabulary
+import de.ywegel.svenska.data.model.WordGroup
 import de.ywegel.svenska.navigation.SvenskaGraph
 import de.ywegel.svenska.navigation.transitions.LateralTransition
 import de.ywegel.svenska.navigation.transitions.TemporaryHierarchicalTransitionStyle
 import de.ywegel.svenska.ui.addEdit.models.ViewWordGroup
+import de.ywegel.svenska.ui.addEdit.models.ViewWordSubGroup
+import de.ywegel.svenska.ui.addEdit.models.mainGroupAbbreviation
+import de.ywegel.svenska.ui.addEdit.models.subGroupAbbreviation
 import de.ywegel.svenska.ui.common.ConfirmableComponent
 import de.ywegel.svenska.ui.common.HorizontalSpacerXS
+import de.ywegel.svenska.ui.common.IconButton
 import de.ywegel.svenska.ui.common.VerticalSpacerM
+import de.ywegel.svenska.ui.common.vocabulary.EmptyWordGroupBadge
+import de.ywegel.svenska.ui.common.vocabulary.WordGroupBadgeExtended
 import de.ywegel.svenska.ui.overview.userFacingString
 import de.ywegel.svenska.ui.theme.Spacings
 import de.ywegel.svenska.ui.theme.SvenskaIcons
 import de.ywegel.svenska.ui.theme.SvenskaTheme
+import kotlinx.coroutines.flow.collectLatest
 
 @Destination<SvenskaGraph>(
     navArgs = AddEditNavArgs::class,
@@ -92,16 +110,41 @@ private fun AddEditScreen(navigator: DestinationsNavigator) {
 
     val uiState by viewModel.uiState.collectAsState()
 
+    val context = LocalContext.current
+    val snackbarHostState = remember { SnackbarHostState() }
+    val lifecycleOwner = LocalLifecycleOwner.current
+    LaunchedEffect(lifecycleOwner.lifecycle) {
+        lifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
+            viewModel.uiEvents.collectLatest { event ->
+                when (event) {
+                    AddEditViewModel.UiEvent.NavigateUp -> navigator.navigateUp()
+                    AddEditViewModel.UiEvent.InvalidWordGroupConfiguration -> {
+                        snackbarHostState.showSnackbar(
+                            message = context.getString(R.string.addEdit_group_selector_invalid_configuration),
+                        )
+                    }
+                }
+            }
+        }
+    }
+
     AddEditScreen(
         uiState = uiState,
+        snackbarHostState = snackbarHostState,
         callbacks = viewModel,
         navigateUp = navigator::navigateUp,
+        navigateToWordGroupsScreen = { navigator.navigate(WordGroupsScreenDestination) },
     )
 }
 
-@Suppress("LongMethod")
 @Composable
-private fun AddEditScreen(uiState: UiState, callbacks: AddEditVocabularyCallbacks, navigateUp: () -> Unit) {
+private fun AddEditScreen(
+    uiState: AddEditUiState,
+    snackbarHostState: SnackbarHostState = remember { SnackbarHostState() },
+    callbacks: AddEditVocabularyCallbacks,
+    navigateUp: () -> Unit,
+    navigateToWordGroupsScreen: () -> Unit,
+) {
     val scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior()
 
     Scaffold(
@@ -113,11 +156,14 @@ private fun AddEditScreen(uiState: UiState, callbacks: AddEditVocabularyCallback
                 scrollBehavior = scrollBehavior,
                 navigateUp = navigateUp,
                 updateIsFavorite = callbacks::updateIsFavorite,
-                deleteItem = { callbacks.deleteVocabulary(navigateUp) },
+                deleteItem = { callbacks.deleteVocabulary() },
             )
         },
+        snackbarHost = {
+            SnackbarHost(hostState = snackbarHostState)
+        },
         floatingActionButton = {
-            FloatingActionButton({ callbacks.saveAndNavigateUp(navigateUp) }) {
+            FloatingActionButton({ callbacks.saveAndNavigateUp() }) {
                 Icon(imageVector = SvenskaIcons.Done, contentDescription = null)
             }
         },
@@ -128,75 +174,118 @@ private fun AddEditScreen(uiState: UiState, callbacks: AddEditVocabularyCallback
                 .fillMaxSize()
                 .padding(contentPadding)
                 .imePadding()
-                .verticalScroll(rememberScrollState())
-                .padding(horizontal = Spacings.m),
+                .verticalScroll(rememberScrollState()),
         ) {
-            // TODO: Show info icon, to let the user navigate to the word group definitions screen
-            // TODO: Show a preview of the vocabulary badge
-            // TODO: If the user selects something and has no ending set, we want to show a button which lets him apply the default endings for the wordgroup
-            WordGroupSelection(
-                // Change word group type in viewmodel and map it when creating or saving the vocabulary
-                selectedGroup = uiState.selectedWordGroup,
-                selectedSubgroup = uiState.selectedSubGroup,
-                onGroupSelected = callbacks::updateSelectedWordGroup,
-                onSubgroupSelected = callbacks::updateSelectedSubWordGroup,
+            WordGroupSection(
+                uiState = uiState,
+                callbacks = callbacks,
+                navigateToWordGroupsScreen = navigateToWordGroupsScreen,
             )
 
             VerticalSpacerM()
-            Row {
-                if (uiState.selectedWordGroup == ViewWordGroup.Noun) {
-                    GenderDropDown(
-                        selectedGender = uiState.gender ?: Gender.defaultIfEmpty,
-                        onGenderSelected = callbacks::updateGender,
-                    )
-                    HorizontalSpacerXS()
-                }
-                OutlinedTextField(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .weight(1f),
-                    value = uiState.wordWithAnnotation,
-                    onValueChange = callbacks::updateWordWithAnnotation,
-                    label = { Text(stringResource(R.string.addEdit_label_word)) },
+
+            AddEditInputSection(uiState = uiState, callbacks = callbacks)
+        }
+    }
+}
+
+@Composable
+private fun WordGroupSection(
+    uiState: AddEditUiState,
+    callbacks: AddEditVocabularyCallbacks,
+    navigateToWordGroupsScreen: () -> Unit,
+) {
+    // TODO: If the user selects something and has no ending set, we want to show a button which lets him apply the default endings for the wordgroup
+    WordGroupSelection(
+        selectedGroup = uiState.selectedWordGroup,
+        selectedSubgroup = uiState.selectedSubGroup,
+        onGroupSelected = callbacks::updateSelectedWordGroup,
+        onSubgroupSelected = callbacks::updateSelectedSubWordGroup,
+    )
+
+    Row(Modifier.padding(horizontal = Spacings.m), verticalAlignment = Alignment.CenterVertically) {
+        Text("Selected word group:")
+        HorizontalSpacerXS()
+        Crossfade(Pair(uiState.selectedWordGroup, uiState.selectedSubGroup)) { (mainGroup, subGroup) ->
+            if (mainGroup != null) {
+                WordGroupBadgeExtended(
+                    mainWordGroup = mainGroup.mainGroupAbbreviation(),
+                    subWordGroup = mainGroup.subGroupAbbreviation(subGroup),
                 )
+            } else {
+                EmptyWordGroupBadge()
             }
-            VerticalSpacerM()
-            OutlinedTextField(
-                modifier = Modifier.fillMaxWidth(),
-                value = uiState.translation,
-                onValueChange = callbacks::updateTranslation,
-                label = { Text(stringResource(R.string.addEdit_label_translation)) },
-            )
-            VerticalSpacerM()
-            OutlinedTextField(
-                modifier = Modifier.fillMaxWidth(),
-                value = uiState.ending,
-                onValueChange = callbacks::updateEnding,
-                label = { Text(stringResource(R.string.addEdit_label_endings)) },
-            )
-            // TODO: After the user entered his endings, we want to suggest a word sub-group, which the user can apply by clicking a button
-            VerticalSpacerM()
-            OutlinedTextField(
-                modifier = Modifier.fillMaxWidth(),
-                value = uiState.notes,
-                onValueChange = callbacks::updateNotes,
-                minLines = 2,
-                label = { Text(stringResource(R.string.addEdit_label_notes)) },
-            )
-            VerticalSpacerM()
-            Row(verticalAlignment = Alignment.CenterVertically) {
-                Checkbox(
-                    uiState.isIrregularPronunciation,
-                    onCheckedChange = callbacks::updateIsIrregularPronunciation,
+        }
+        Spacer(Modifier.weight(1f))
+        IconButton(
+            icon = SvenskaIcons.Info,
+            contentDescription = stringResource(R.string.accessibility_addEdit_navigate_word_group_info_screen),
+            onClick = navigateToWordGroupsScreen,
+        )
+    }
+}
+
+@Suppress("LongMethod")
+@Composable
+private fun AddEditInputSection(uiState: AddEditUiState, callbacks: AddEditVocabularyCallbacks) {
+    Column(
+        modifier = Modifier
+            .padding(horizontal = Spacings.m)
+            .fillMaxWidth(),
+    ) {
+        Row(verticalAlignment = Alignment.Bottom) {
+            if (uiState.selectedWordGroup == ViewWordGroup.Noun) {
+                GenderDropDown(
+                    selectedGender = uiState.gender ?: Gender.defaultIfEmpty,
+                    onGenderSelected = callbacks::updateGender,
                 )
-                OutlinedTextField(
-                    modifier = Modifier.fillMaxWidth(),
-                    value = uiState.irregularPronunciation.orEmpty(),
-                    enabled = uiState.isIrregularPronunciation,
-                    onValueChange = callbacks::updateIrregularPronunciation,
-                    label = { Text(stringResource(R.string.addEdit_label_irregular_pronunciation)) },
-                )
+                HorizontalSpacerXS()
             }
+            OutlinedTextField(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .weight(1f),
+                value = uiState.wordWithAnnotation,
+                onValueChange = callbacks::updateWordWithAnnotation,
+                label = { Text(stringResource(R.string.addEdit_label_word)) },
+            )
+        }
+        VerticalSpacerM()
+        OutlinedTextField(
+            modifier = Modifier.fillMaxWidth(),
+            value = uiState.translation,
+            onValueChange = callbacks::updateTranslation,
+            label = { Text(stringResource(R.string.addEdit_label_translation)) },
+        )
+        VerticalSpacerM()
+        OutlinedTextField(
+            modifier = Modifier.fillMaxWidth(),
+            value = uiState.ending,
+            onValueChange = callbacks::updateEnding,
+            label = { Text(stringResource(R.string.addEdit_label_endings)) },
+        )
+        // TODO: After the user entered his endings, we want to suggest a word sub-group, which the user can apply by clicking a button
+        VerticalSpacerM()
+        OutlinedTextField(
+            modifier = Modifier.fillMaxWidth(),
+            value = uiState.notes,
+            onValueChange = callbacks::updateNotes,
+            minLines = 2,
+            label = { Text(stringResource(R.string.addEdit_label_notes)) },
+        )
+        VerticalSpacerM()
+        Row(verticalAlignment = Alignment.CenterVertically) {
+            Checkbox(
+                uiState.isIrregularPronunciation,
+                onCheckedChange = callbacks::updateIsIrregularPronunciation,
+            )
+            OutlinedTextField(
+                modifier = Modifier.fillMaxWidth(),
+                value = uiState.irregularPronunciation.orEmpty(),
+                enabled = uiState.isIrregularPronunciation,
+                onValueChange = callbacks::updateIrregularPronunciation,
+                label = { Text(stringResource(R.string.addEdit_label_irregular_pronunciation)) },
+            )
         }
     }
 }
@@ -218,9 +307,7 @@ private fun TopBar(
         title = { Text(text = title) },
         scrollBehavior = scrollBehavior,
         navigationIcon = {
-            IconButton(onClick = navigateUp) {
-                Icon(imageVector = SvenskaIcons.Close, contentDescription = null)
-            }
+            IconButton(icon = SvenskaIcons.Close, contentDescription = null, onClick = navigateUp)
         },
         actions = {
             IconToggleButton(checked = isFavorite, onCheckedChange = updateIsFavorite) {
@@ -232,15 +319,18 @@ private fun TopBar(
                     dialogText = stringResource(R.string.addEdit_confirm_delete_body, translation),
                     onConfirm = deleteItem,
                 ) { onClick ->
-                    IconButton(onClick = onClick) {
-                        Icon(SvenskaIcons.Delete, null)
-                    }
+                    IconButton(
+                        icon = SvenskaIcons.Delete,
+                        contentDescription = null,
+                        onClick = onClick,
+                    )
                 }
             }
         },
     )
 }
 
+@Suppress("LongMethod")
 @Composable
 private fun GenderDropDown(selectedGender: Gender, onGenderSelected: (Gender) -> Unit, modifier: Modifier = Modifier) {
     var expanded by remember { mutableStateOf(false) }
@@ -268,7 +358,6 @@ private fun GenderDropDown(selectedGender: Gender, onGenderSelected: (Gender) ->
          */
 
         // Equivalent to the upper OutlinedTextField. Needed, as OutlinedTextField has a default width, that you can not remove.
-        // TODO: Replace with a working OutlinedTextField, that has no fixed min width
         val value = stringResource(selectedGender.userFacingString())
         val interactionSource = remember { MutableInteractionSource() }
         CompositionLocalProvider(
@@ -277,6 +366,7 @@ private fun GenderDropDown(selectedGender: Gender, onGenderSelected: (Gender) ->
             BasicTextField(
                 value = value,
                 onValueChange = {},
+                textStyle = SvenskaTheme.typography.bodyLarge,
                 readOnly = true,
                 modifier = Modifier.width(IntrinsicSize.Min),
                 decorationBox = @Composable { innerTextField ->
@@ -309,7 +399,12 @@ private fun GenderDropDown(selectedGender: Gender, onGenderSelected: (Gender) ->
         ExposedDropdownMenu(expanded = expanded, onDismissRequest = { expanded = false }) {
             Gender.entries.forEach {
                 DropdownMenuItem(
-                    text = { Text(stringResource(it.userFacingString())) },
+                    text = {
+                        Text(
+                            text = stringResource(it.userFacingString()),
+                            style = SvenskaTheme.typography.bodyLarge,
+                        )
+                    },
                     onClick = {
                         onGenderSelected(it)
                         expanded = false
@@ -330,6 +425,27 @@ data class AddEditNavArgs(
 @Composable
 private fun AddEditScreenPreview() {
     SvenskaTheme {
-        AddEditScreen(uiState = UiState(), callbacks = AddEditVocabularyCallbacksFake, navigateUp = {})
+        AddEditScreen(
+            uiState = AddEditUiState(),
+            callbacks = AddEditVocabularyCallbacksFake,
+            navigateUp = {},
+            navigateToWordGroupsScreen = {},
+        )
+    }
+}
+
+@Preview
+@Composable
+private fun AddEditScreenSelectionExpandedPreview() {
+    SvenskaTheme {
+        AddEditScreen(
+            uiState = AddEditUiState(
+                selectedWordGroup = ViewWordGroup.Noun,
+                selectedSubGroup = ViewWordSubGroup.Noun(WordGroup.NounSubgroup.OR),
+            ),
+            callbacks = AddEditVocabularyCallbacksFake,
+            navigateUp = {},
+            navigateToWordGroupsScreen = {},
+        )
     }
 }
