@@ -17,6 +17,6 @@ object AddEditVocabularyCallbacksFake : AddEditVocabularyCallbacks {
     override fun updateIsFavorite(isFavorite: Boolean) {}
     override fun updateIsIrregularPronunciation(isIrregular: Boolean) {}
     override fun updateIrregularPronunciation(pronunciation: String) {}
-    override fun deleteVocabulary(navigateUp: () -> Unit) {}
-    override fun saveAndNavigateUp(navigateUp: () -> Unit) {}
+    override fun deleteVocabulary() {}
+    override fun saveAndNavigateUp() {}
 }

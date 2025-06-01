@@ -3,7 +3,7 @@ package de.ywegel.svenska.domain.addEdit
 import de.ywegel.svenska.data.model.Gender
 import de.ywegel.svenska.data.model.WordGroup
 import de.ywegel.svenska.data.vocabulary
-import de.ywegel.svenska.ui.addEdit.UiState
+import de.ywegel.svenska.ui.addEdit.AddEditUiState
 import de.ywegel.svenska.ui.addEdit.models.ViewWordGroup
 import de.ywegel.svenska.ui.addEdit.models.ViewWordSubGroup
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -25,7 +25,7 @@ class MapUiStateToVocabularyUseCaseTest {
 
     @Test
     fun `Returns null when selectedWordGroup is null`() {
-        val uiState = UiState(selectedWordGroup = null)
+        val uiState = AddEditUiState(selectedWordGroup = null)
         val result = useCase(
             snapshot = uiState,
             initialVocabulary = null,
@@ -36,7 +36,7 @@ class MapUiStateToVocabularyUseCaseTest {
 
     @Test
     fun `Returns null when toWordGroup mapping fails`() {
-        val uiState = UiState(
+        val uiState = AddEditUiState(
             selectedWordGroup = ViewWordGroup.Noun,
             selectedSubGroup = ViewWordSubGroup.None,
             wordWithAnnotation = "penna",
@@ -50,7 +50,7 @@ class MapUiStateToVocabularyUseCaseTest {
 
     @Test
     fun `Creates new vocabulary when initialVocabulary is null`() {
-        val uiState = UiState(
+        val uiState = AddEditUiState(
             selectedWordGroup = ViewWordGroup.Noun,
             selectedSubGroup = ViewWordSubGroup.Noun(WordGroup.NounSubgroup.OR),
             wordWithAnnotation = "penna",
@@ -82,7 +82,7 @@ class MapUiStateToVocabularyUseCaseTest {
             created = initialCreationTime.toEpochMilliseconds(),
             lastEdited = initialCreationTime.toEpochMilliseconds(),
         )
-        val uiState = UiState.fromExistingVocabulary(initial)
+        val uiState = AddEditUiState.fromExistingVocabulary(initial)
 
         val result = useCase(
             snapshot = uiState,
@@ -99,7 +99,7 @@ class MapUiStateToVocabularyUseCaseTest {
 
     @Test
     fun `Uses default gender if null and word group is noun`() {
-        val uiState = UiState(
+        val uiState = AddEditUiState(
             selectedWordGroup = ViewWordGroup.Noun,
             selectedSubGroup = ViewWordSubGroup.Noun(WordGroup.NounSubgroup.OR),
             gender = null,
@@ -119,7 +119,7 @@ class MapUiStateToVocabularyUseCaseTest {
 
     @Test
     fun `IrregularPronunciation is null when isIrregularPronunciation is false`() {
-        val uiState = UiState(
+        val uiState = AddEditUiState(
             selectedWordGroup = ViewWordGroup.Verb,
             selectedSubGroup = ViewWordSubGroup.Verb(WordGroup.VerbSubgroup.GROUP_1),
             isIrregularPronunciation = false,
@@ -140,7 +140,7 @@ class MapUiStateToVocabularyUseCaseTest {
 
     @Test
     fun `IrregularPronunciation is kept when isIrregularPronunciation is true`() {
-        val uiState = UiState(
+        val uiState = AddEditUiState(
             selectedWordGroup = ViewWordGroup.Verb,
             selectedSubGroup = ViewWordSubGroup.Verb(WordGroup.VerbSubgroup.GROUP_1),
             isIrregularPronunciation = true,
@@ -161,7 +161,7 @@ class MapUiStateToVocabularyUseCaseTest {
 
     @Test
     fun `Word highlights and cleaned string are extracted from annotated input`() {
-        val uiState = UiState(
+        val uiState = AddEditUiState(
             selectedWordGroup = ViewWordGroup.Noun,
             selectedSubGroup = ViewWordSubGroup.Noun(WordGroup.NounSubgroup.OR),
             wordWithAnnotation = "*p*enna",

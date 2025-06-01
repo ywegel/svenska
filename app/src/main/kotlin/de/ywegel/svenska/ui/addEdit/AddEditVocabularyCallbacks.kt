@@ -19,6 +19,6 @@ interface AddEditVocabularyCallbacks {
     fun updateIsFavorite(isFavorite: Boolean)
     fun updateIsIrregularPronunciation(isIrregular: Boolean)
     fun updateIrregularPronunciation(pronunciation: String)
-    fun deleteVocabulary(navigateUp: () -> Unit)
-    fun saveAndNavigateUp(navigateUp: () -> Unit)
+    fun deleteVocabulary()
+    fun saveAndNavigateUp()
 }

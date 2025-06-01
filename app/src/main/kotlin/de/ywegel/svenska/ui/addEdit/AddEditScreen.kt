@@ -35,12 +35,15 @@ import androidx.compose.material3.MenuAnchorType
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.TopAppBarScrollBehavior
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -49,10 +52,14 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.nestedscroll.nestedScroll
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.compose.LocalLifecycleOwner
+import androidx.lifecycle.repeatOnLifecycle
 import com.ramcosta.composedestinations.annotation.Destination
 import com.ramcosta.composedestinations.generated.destinations.WordGroupsScreenDestination
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
@@ -77,6 +84,7 @@ import de.ywegel.svenska.ui.overview.userFacingString
 import de.ywegel.svenska.ui.theme.Spacings
 import de.ywegel.svenska.ui.theme.SvenskaIcons
 import de.ywegel.svenska.ui.theme.SvenskaTheme
+import kotlinx.coroutines.flow.collectLatest
 
 @Destination<SvenskaGraph>(
     navArgs = AddEditNavArgs::class,
@@ -102,8 +110,27 @@ private fun AddEditScreen(navigator: DestinationsNavigator) {
 
     val uiState by viewModel.uiState.collectAsState()
 
+    val context = LocalContext.current
+    val snackbarHostState = remember { SnackbarHostState() }
+    val lifecycleOwner = LocalLifecycleOwner.current
+    LaunchedEffect(lifecycleOwner.lifecycle) {
+        lifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
+            viewModel.uiEvents.collectLatest { event ->
+                when (event) {
+                    AddEditViewModel.UiEvent.NavigateUp -> navigator.navigateUp()
+                    AddEditViewModel.UiEvent.InvalidWordGroupConfiguration -> {
+                        snackbarHostState.showSnackbar(
+                            message = context.getString(R.string.addEdit_group_selector_invalid_configuration),
+                        )
+                    }
+                }
+            }
+        }
+    }
+
     AddEditScreen(
         uiState = uiState,
+        snackbarHostState = snackbarHostState,
         callbacks = viewModel,
         navigateUp = navigator::navigateUp,
         navigateToWordGroupsScreen = { navigator.navigate(WordGroupsScreenDestination) },
@@ -112,7 +139,8 @@ private fun AddEditScreen(navigator: DestinationsNavigator) {
 
 @Composable
 private fun AddEditScreen(
-    uiState: UiState,
+    uiState: AddEditUiState,
+    snackbarHostState: SnackbarHostState = remember { SnackbarHostState() },
     callbacks: AddEditVocabularyCallbacks,
     navigateUp: () -> Unit,
     navigateToWordGroupsScreen: () -> Unit,
@@ -128,11 +156,14 @@ private fun AddEditScreen(
                 scrollBehavior = scrollBehavior,
                 navigateUp = navigateUp,
                 updateIsFavorite = callbacks::updateIsFavorite,
-                deleteItem = { callbacks.deleteVocabulary(navigateUp) },
+                deleteItem = { callbacks.deleteVocabulary() },
             )
         },
+        snackbarHost = {
+            SnackbarHost(hostState = snackbarHostState)
+        },
         floatingActionButton = {
-            FloatingActionButton({ callbacks.saveAndNavigateUp(navigateUp) }) {
+            FloatingActionButton({ callbacks.saveAndNavigateUp() }) {
                 Icon(imageVector = SvenskaIcons.Done, contentDescription = null)
             }
         },
@@ -160,7 +191,7 @@ private fun AddEditScreen(
 
 @Composable
 private fun WordGroupSection(
-    uiState: UiState,
+    uiState: AddEditUiState,
     callbacks: AddEditVocabularyCallbacks,
     navigateToWordGroupsScreen: () -> Unit,
 ) {
@@ -196,7 +227,7 @@ private fun WordGroupSection(
 
 @Suppress("LongMethod")
 @Composable
-private fun AddEditInputSection(uiState: UiState, callbacks: AddEditVocabularyCallbacks) {
+private fun AddEditInputSection(uiState: AddEditUiState, callbacks: AddEditVocabularyCallbacks) {
     Column(
         modifier = Modifier
             .padding(horizontal = Spacings.m)
@@ -395,7 +426,7 @@ data class AddEditNavArgs(
 private fun AddEditScreenPreview() {
     SvenskaTheme {
         AddEditScreen(
-            uiState = UiState(),
+            uiState = AddEditUiState(),
             callbacks = AddEditVocabularyCallbacksFake,
             navigateUp = {},
             navigateToWordGroupsScreen = {},
@@ -408,7 +439,7 @@ private fun AddEditScreenPreview() {
 private fun AddEditScreenSelectionExpandedPreview() {
     SvenskaTheme {
         AddEditScreen(
-            uiState = UiState(
+            uiState = AddEditUiState(
                 selectedWordGroup = ViewWordGroup.Noun,
                 selectedSubGroup = ViewWordSubGroup.Noun(WordGroup.NounSubgroup.OR),
             ),

@@ -3,11 +3,11 @@ package de.ywegel.svenska.domain.addEdit
 import de.ywegel.svenska.data.model.Gender
 import de.ywegel.svenska.data.model.Vocabulary
 import de.ywegel.svenska.data.model.extractAnnotations
-import de.ywegel.svenska.ui.addEdit.UiState
+import de.ywegel.svenska.ui.addEdit.AddEditUiState
 import de.ywegel.svenska.ui.addEdit.models.ViewWordGroup
 
 /**
- * Maps a [UiState] and optional [initialVocabulary] into a [Vocabulary] object.
+ * Maps a [AddEditUiState] and optional [initialVocabulary] into a [Vocabulary] object.
  *
  * This use case is used in Add/Edit screens where vocabulary entries are either created from scratch
  * or updated based on user input.
@@ -32,7 +32,7 @@ import de.ywegel.svenska.ui.addEdit.models.ViewWordGroup
 
 class MapUiStateToVocabularyUseCase {
 
-    operator fun invoke(snapshot: UiState, initialVocabulary: Vocabulary?, containerId: Int): Vocabulary? {
+    operator fun invoke(snapshot: AddEditUiState, initialVocabulary: Vocabulary?, containerId: Int): Vocabulary? {
         val viewWordGroup = snapshot.selectedWordGroup ?: return null
         val wordGroup = viewWordGroup.toWordGroup(snapshot.selectedSubGroup) ?: return null
 

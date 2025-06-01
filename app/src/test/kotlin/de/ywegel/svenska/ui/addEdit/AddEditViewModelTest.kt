@@ -47,7 +47,7 @@ class AddEditViewModelTest {
     fun `ViewModel is initialised with default data, if no initial Vocabulary is passed`() = runTest(testDispatcher) {
         val viewModel = setupViewModel()
 
-        val expected = UiState(
+        val expected = AddEditUiState(
             selectedWordGroup = null,
             selectedSubGroup = ViewWordSubGroup.None,
             gender = null,
@@ -71,7 +71,7 @@ class AddEditViewModelTest {
 
     @Test
     fun `ViewModel is initialised with navigation data, if a initial Vocabulary is passed`() = runTest(testDispatcher) {
-        val expected = UiState(
+        val expected = AddEditUiState(
             selectedWordGroup = ViewWordGroup.Verb,
             selectedSubGroup = ViewWordSubGroup.Verb(WordGroup.VerbSubgroup.GROUP_2A),
             gender = null,
@@ -131,6 +131,7 @@ class AddEditViewModelTest {
             savedStateHandle = savedState,
             repository = repository,
             ioDispatcher = dispatcher,
+            immediateDispatcher = dispatcher,
             mapUiStateToVocabularyUseCase = mapUiStateToVocabularyUseCase,
         )
     }
