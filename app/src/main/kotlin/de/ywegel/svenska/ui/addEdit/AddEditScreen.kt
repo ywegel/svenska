@@ -2,12 +2,14 @@
 
 package de.ywegel.svenska.ui.addEdit
 
+import androidx.compose.animation.Crossfade
 import androidx.compose.foundation.gestures.Orientation
 import androidx.compose.foundation.gestures.scrollable
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
@@ -19,6 +21,7 @@ import androidx.compose.material.icons.outlined.Delete
 import androidx.compose.material.icons.outlined.Done
 import androidx.compose.material.icons.outlined.Favorite
 import androidx.compose.material.icons.outlined.FavoriteBorder
+import androidx.compose.material.icons.outlined.Info
 import androidx.compose.material3.Checkbox
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -26,7 +29,6 @@ import androidx.compose.material3.ExposedDropdownMenuBox
 import androidx.compose.material3.ExposedDropdownMenuDefaults
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.IconToggleButton
 import androidx.compose.material3.MenuAnchorType
 import androidx.compose.material3.OutlinedTextField
@@ -51,6 +53,7 @@ import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.ramcosta.composedestinations.annotation.Destination
+import com.ramcosta.composedestinations.generated.destinations.WordGroupsScreenDestination
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
 import de.ywegel.svenska.R
 import de.ywegel.svenska.data.model.Gender
@@ -61,9 +64,14 @@ import de.ywegel.svenska.navigation.transitions.LateralTransition
 import de.ywegel.svenska.navigation.transitions.TemporaryHierarchicalTransitionStyle
 import de.ywegel.svenska.ui.addEdit.models.ViewWordGroup
 import de.ywegel.svenska.ui.addEdit.models.ViewWordSubGroup
+import de.ywegel.svenska.ui.addEdit.models.mainGroupAbbreviation
+import de.ywegel.svenska.ui.addEdit.models.subGroupAbbreviation
 import de.ywegel.svenska.ui.common.ConfirmableComponent
 import de.ywegel.svenska.ui.common.HorizontalSpacerXS
+import de.ywegel.svenska.ui.common.IconButton
 import de.ywegel.svenska.ui.common.VerticalSpacerM
+import de.ywegel.svenska.ui.common.vocabulary.EmptyWordGroupBadge
+import de.ywegel.svenska.ui.common.vocabulary.WordGroupBadgeExtended
 import de.ywegel.svenska.ui.overview.userFacingString
 import de.ywegel.svenska.ui.theme.Spacings
 import de.ywegel.svenska.ui.theme.SvenskaIcons
@@ -97,11 +105,17 @@ private fun AddEditScreen(navigator: DestinationsNavigator) {
         uiState = uiState,
         callbacks = viewModel,
         navigateUp = navigator::navigateUp,
+        navigateToWordGroupsScreen = { navigator.navigate(WordGroupsScreenDestination) },
     )
 }
 
 @Composable
-private fun AddEditScreen(uiState: UiState, callbacks: AddEditVocabularyCallbacks, navigateUp: () -> Unit) {
+private fun AddEditScreen(
+    uiState: UiState,
+    callbacks: AddEditVocabularyCallbacks,
+    navigateUp: () -> Unit,
+    navigateToWordGroupsScreen: () -> Unit,
+) {
     val scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior()
 
     Scaffold(
@@ -128,21 +142,52 @@ private fun AddEditScreen(uiState: UiState, callbacks: AddEditVocabularyCallback
                 .padding(contentPadding)
                 .scrollable(rememberScrollState(), Orientation.Vertical),
         ) {
-            // TODO: Show info icon, to let the user navigate to the word group definitions screen
-            // TODO: Show a preview of the vocabulary badge
-            // TODO: If the user selects something and has no ending set, we want to show a button which lets him apply the default endings for the wordgroup
-            WordGroupSelection(
-                // Change word group type in viewmodel and map it when creating or saving the vocabulary
-                selectedGroup = uiState.selectedWordGroup,
-                selectedSubgroup = uiState.selectedSubGroup,
-                onGroupSelected = callbacks::updateSelectedWordGroup,
-                onSubgroupSelected = callbacks::updateSelectedSubWordGroup,
+            WordGroupSection(
+                uiState = uiState,
+                callbacks = callbacks,
+                navigateToWordGroupsScreen = navigateToWordGroupsScreen,
             )
 
             VerticalSpacerM()
 
             AddEditInputSection(uiState = uiState, callbacks = callbacks)
         }
+    }
+}
+
+@Composable
+private fun WordGroupSection(
+    uiState: UiState,
+    callbacks: AddEditVocabularyCallbacks,
+    navigateToWordGroupsScreen: () -> Unit,
+) {
+    // TODO: If the user selects something and has no ending set, we want to show a button which lets him apply the default endings for the wordgroup
+    WordGroupSelection(
+        selectedGroup = uiState.selectedWordGroup,
+        selectedSubgroup = uiState.selectedSubGroup,
+        onGroupSelected = callbacks::updateSelectedWordGroup,
+        onSubgroupSelected = callbacks::updateSelectedSubWordGroup,
+    )
+
+    Row(Modifier.padding(horizontal = Spacings.m), verticalAlignment = Alignment.CenterVertically) {
+        Text("Selected word group:")
+        HorizontalSpacerXS()
+        Crossfade(Pair(uiState.selectedWordGroup, uiState.selectedSubGroup)) { (mainGroup, subGroup) ->
+            if (mainGroup != null) {
+                WordGroupBadgeExtended(
+                    mainWordGroup = mainGroup.mainGroupAbbreviation(),
+                    subWordGroup = mainGroup.subGroupAbbreviation(subGroup),
+                )
+            } else {
+                EmptyWordGroupBadge()
+            }
+        }
+        Spacer(Modifier.weight(1f))
+        IconButton(
+            icon = SvenskaIcons.Info,
+            contentDescription = stringResource(R.string.accessibility_addEdit_navigate_word_group_info_screen),
+            onClick = navigateToWordGroupsScreen,
+        )
     }
 }
 
@@ -228,9 +273,7 @@ private fun TopBar(
         title = { Text(text = title) },
         scrollBehavior = scrollBehavior,
         navigationIcon = {
-            IconButton(onClick = navigateUp) {
-                Icon(imageVector = SvenskaIcons.Close, contentDescription = null)
-            }
+            IconButton(icon = SvenskaIcons.Close, contentDescription = null, onClick = navigateUp)
         },
         actions = {
             IconToggleButton(checked = isFavorite, onCheckedChange = updateIsFavorite) {
@@ -242,9 +285,11 @@ private fun TopBar(
                     dialogText = stringResource(R.string.addEdit_confirm_delete_body, translation),
                     onConfirm = deleteItem,
                 ) { onClick ->
-                    IconButton(onClick = onClick) {
-                        Icon(SvenskaIcons.Delete, null)
-                    }
+                    IconButton(
+                        icon = SvenskaIcons.Delete,
+                        contentDescription = null,
+                        onClick = onClick,
+                    )
                 }
             }
         },
@@ -346,7 +391,12 @@ data class AddEditNavArgs(
 @Composable
 private fun AddEditScreenPreview() {
     SvenskaTheme {
-        AddEditScreen(uiState = UiState(), callbacks = AddEditVocabularyCallbacksFake, navigateUp = {})
+        AddEditScreen(
+            uiState = UiState(),
+            callbacks = AddEditVocabularyCallbacksFake,
+            navigateUp = {},
+            navigateToWordGroupsScreen = {},
+        )
     }
 }
 
@@ -361,6 +411,7 @@ private fun AddEditScreenSelectionExpandedPreview() {
             ),
             callbacks = AddEditVocabularyCallbacksFake,
             navigateUp = {},
+            navigateToWordGroupsScreen = {},
         )
     }
 }

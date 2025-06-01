@@ -21,7 +21,7 @@ import javax.inject.Inject
 
 @HiltViewModel
 class AddEditViewModel @Inject constructor(
-    private val savedStateHandle: SavedStateHandle,
+    savedStateHandle: SavedStateHandle,
     private val repository: VocabularyRepository,
     private val mapUiStateToVocabularyUseCase: MapUiStateToVocabularyUseCase,
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
@@ -35,7 +35,11 @@ class AddEditViewModel @Inject constructor(
 
     override fun updateSelectedWordGroup(group: ViewWordGroup) {
         _uiState.update {
-            it.copy(selectedWordGroup = group)
+            if(it.selectedWordGroup != group) {
+                it.copy(selectedWordGroup = group, selectedSubGroup = ViewWordSubGroup.None)
+            } else {
+                it.copy(selectedWordGroup = group)
+            }
         }
     }
 

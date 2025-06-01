@@ -32,7 +32,6 @@ import de.ywegel.svenska.data.model.WordGroup
 import de.ywegel.svenska.ui.addEdit.models.ViewWordGroup
 import de.ywegel.svenska.ui.addEdit.models.ViewWordSubGroup
 import de.ywegel.svenska.ui.addEdit.models.userFacingString
-import de.ywegel.svenska.ui.common.VerticalSpacerXXS
 import de.ywegel.svenska.ui.common.vocabulary.abbreviation
 import de.ywegel.svenska.ui.theme.Spacings
 import de.ywegel.svenska.ui.theme.SvenskaIcons
@@ -75,8 +74,6 @@ fun WordGroupSelection(
             visible = lastValidGroup != null &&
                 (selectedGroup == ViewWordGroup.Noun || selectedGroup == ViewWordGroup.Verb),
         ) {
-            VerticalSpacerXXS()
-
             when (lastValidGroup) {
                 ViewWordGroup.Noun -> ChipRow(
                     items = WordGroup.NounSubgroup.entries,

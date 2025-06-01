@@ -1,6 +1,7 @@
 package de.ywegel.svenska.ui.common.vocabulary
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -16,6 +17,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import de.ywegel.svenska.ui.theme.Spacings
 import de.ywegel.svenska.ui.theme.SvenskaTheme
@@ -83,6 +85,24 @@ private fun WordGroupBadgeExtended(
     }
 }
 
+@Composable
+fun EmptyWordGroupBadge() {
+    Box(
+        modifier = Modifier
+            .size(22.dp)
+            .border(
+                width = Dp.Hairline,
+                color = SvenskaTheme.colors.onSurface,
+                shape = CircleShape,
+            )
+            .background(
+                color = Color.Transparent,
+                shape = CircleShape,
+            ),
+        contentAlignment = Alignment.Center,
+    ) { }
+}
+
 @Preview
 @Composable
 private fun BadgePreview() {
@@ -109,6 +129,16 @@ private fun ExtendedBadgeIncompletePreview() {
     SvenskaTheme {
         Row(Modifier.padding(Spacings.m, Spacings.xs)) {
             WordGroupBadgeExtended("N", null)
+        }
+    }
+}
+
+@Preview
+@Composable
+private fun EmptyWordGroupBadgePreview() {
+    SvenskaTheme {
+        Row(Modifier.padding(Spacings.m, Spacings.xs)) {
+            EmptyWordGroupBadge()
         }
     }
 }
