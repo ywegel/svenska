@@ -120,6 +120,9 @@ dependencies {
     implementation(libs.about.libraries.core)
     implementation(libs.about.libraries.compose.m3)
 
+    // Splash screen
+    implementation(libs.splish.splash.screen)
+
     // testing
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.test.ext.junit)
