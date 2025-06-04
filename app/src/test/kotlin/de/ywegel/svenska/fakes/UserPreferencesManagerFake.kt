@@ -1,6 +1,7 @@
 package de.ywegel.svenska.fakes
 
 import de.ywegel.svenska.data.SortOrder
+import de.ywegel.svenska.data.preferences.AppPreferences
 import de.ywegel.svenska.data.preferences.OverviewPreferences
 import de.ywegel.svenska.data.preferences.SearchPreferences
 import de.ywegel.svenska.data.preferences.UserPreferencesManager
@@ -9,12 +10,12 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
-import java.util.LinkedList
-import java.util.Queue
+import java.util.*
 
 class UserPreferencesManagerFake(
     initialSortOrder: SortOrder = SortOrder.default,
     initialRevert: Boolean = false,
+    initialHasCompletedOnboarding: Boolean = false,
 ) : UserPreferencesManager {
 
     private var currentOverviewPreferences = OverviewPreferences(
@@ -77,6 +78,20 @@ class UserPreferencesManagerFake(
     override suspend fun updateOnlineRedirectType(type: OnlineSearchType) {
         _preferencesSearchFlow.update {
             it.copy(onlineRedirectType = type)
+        }
+    }
+
+    private val currentAppPreferences = AppPreferences(
+        hasCompletedOnboarding = initialHasCompletedOnboarding,
+    )
+
+    private val _preferencesAppFlow = MutableStateFlow(currentAppPreferences)
+
+    override val preferencesAppFlow: Flow<AppPreferences> = _preferencesAppFlow.asStateFlow()
+
+    override suspend fun updateHasCompletedOnboarding(hasCompleted: Boolean) {
+        _preferencesAppFlow.update {
+            it.copy(hasCompletedOnboarding = hasCompleted)
         }
     }
 }

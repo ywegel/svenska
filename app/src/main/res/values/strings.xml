@@ -221,4 +221,23 @@
     <!-- ## About libraries ## -->
     <string name="settings_about_libraries_title">Licenses</string>
 
+    <!-- # Onboarding # -->
+    <string name="onboarding_title">Onboarding</string>
+    <string name="onboarding_button_next">Next</string>
+    <string name="onboarding_button_skip">Skip</string>
+    <string name="onboarding_button_start">Let\'s go!</string>
+    <string name="onboarding_page_indicator">%1$d / %2$d</string>
+
+    <string name="onboarding_page_1_title">Word Groups</string>
+    <string name="onboarding_page_1_content">There are WordGroups which are assigned to words. These include nouns, verbs, adjectives — and nouns/verbs also have subgroups.</string>
+
+    <string name="onboarding_page_2_title">Bonus Material</string>
+    <string name="onboarding_page_2_content">There is bonus material, such as numbers and the word groups.</string>
+
+    <string name="onboarding_page_3_title">Quiz</string>
+    <string name="onboarding_page_3_content">There is a quiz that helps you learn vocabulary in several different ways.</string>
+
+    <string name="onboarding_page_4_title">Vocabulary Importer</string>
+    <string name="onboarding_page_4_content">There is a vocabulary importer that accepts .json files in a specific format.</string>
+
 </resources>

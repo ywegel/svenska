@@ -17,10 +17,8 @@ import de.ywegel.svenska.serializers.QueueSerializer
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.map
-import kotlinx.serialization.encodeToString
 import java.io.IOException
-import java.util.LinkedList
-import java.util.Queue
+import java.util.*
 import javax.inject.Inject
 import javax.inject.Singleton
 
@@ -43,10 +41,16 @@ data class SearchPreferences(
     val onlineRedirectType: OnlineSearchType,
 )
 
+data class AppPreferences(
+    val hasCompletedOnboarding: Boolean,
+)
+
 interface UserPreferencesManager {
     val preferencesOverviewFlow: Flow<OverviewPreferences>
 
     val preferencesSearchFlow: Flow<SearchPreferences>
+
+    val preferencesAppFlow: Flow<AppPreferences>
 
     suspend fun updateOverviewSortOrder(sortOrder: SortOrder)
 
@@ -61,11 +65,20 @@ interface UserPreferencesManager {
     suspend fun updateOnlineRedirectPosition(first: Boolean)
 
     suspend fun updateOnlineRedirectType(type: OnlineSearchType)
+
+    suspend fun updateHasCompletedOnboarding(hasCompleted: Boolean)
 }
 
 @Singleton
 class UserPreferencesManagerImpl @Inject constructor(@ApplicationContext val context: Context) :
     UserPreferencesManager {
+
+    override val preferencesAppFlow = context.dataStoreOverview.data
+        .fallbackToDefaultOnError()
+        .map { preferences ->
+            val hasCompletedOnboarding = preferences[PreferencesKeys.APP_HAS_COMPLETED_ONBOARDING] ?: false
+            AppPreferences(hasCompletedOnboarding)
+        }
 
     override val preferencesOverviewFlow = context.dataStoreOverview.data
         .fallbackToDefaultOnError()
@@ -139,6 +152,12 @@ class UserPreferencesManagerImpl @Inject constructor(@ApplicationContext val con
         }
     }
 
+    override suspend fun updateHasCompletedOnboarding(hasCompleted: Boolean) {
+        context.dataStoreOverview.edit { preferences ->
+            preferences[PreferencesKeys.APP_HAS_COMPLETED_ONBOARDING] = hasCompleted
+        }
+    }
+
     private object PreferencesKeys {
         val OVERVIEW_SORT_ORDER = stringPreferencesKey("overview_sort_order")
         val OVERVIEW_SORT_ORDER_REVERT = booleanPreferencesKey("overview_sort_order_revert")
@@ -148,6 +167,8 @@ class UserPreferencesManagerImpl @Inject constructor(@ApplicationContext val con
         val SEARCH_SHOW_COMPACT_VOCABULARY_ITEM = booleanPreferencesKey("search_show_compact_vocabulary_item")
         val SEARCH_ONLINE_REDIRECT_POSITION = booleanPreferencesKey("search_online_redirect_position")
         val SEARCH_ONLINE_REDIRECT_TYPE = stringPreferencesKey("search_online_redirect_type")
+
+        val APP_HAS_COMPLETED_ONBOARDING = booleanPreferencesKey("app_has_completed_onboarding")
     }
 }
 
