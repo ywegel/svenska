@@ -30,6 +30,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.ramcosta.composedestinations.annotation.Destination
 import com.ramcosta.composedestinations.generated.destinations.AboutLibrariesScreenDestination
+import com.ramcosta.composedestinations.generated.destinations.OnboardingScreenDestination
 import com.ramcosta.composedestinations.generated.destinations.WordImporterScreenDestination
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
 import de.ywegel.svenska.R
@@ -58,6 +59,7 @@ fun SettingsScreen(navigator: DestinationsNavigator, viewModel: SettingsViewMode
         navigateUp = navigator::navigateUp,
         navigateToWordImporter = { navigator.navigate(WordImporterScreenDestination) },
         navigateToAboutLibraries = { navigator.navigate(AboutLibrariesScreenDestination) },
+        navigateToOnboarding = { navigator.navigate(OnboardingScreenDestination) },
     )
 }
 
@@ -70,6 +72,7 @@ private fun SettingsScreen(
     navigateUp: () -> Unit,
     navigateToWordImporter: () -> Unit,
     navigateToAboutLibraries: () -> Unit,
+    navigateToOnboarding: () -> Unit,
 ) {
     Scaffold(
         topBar = {
@@ -108,6 +111,14 @@ private fun SettingsScreen(
             ClickableText(
                 title = stringResource(R.string.settings_naviagate_about_libraries_screen_title),
                 onClick = navigateToAboutLibraries,
+            )
+
+            VerticalSpacerM()
+
+            ClickableText(
+                title = stringResource(R.string.settings_show_onboarding_title),
+                description = stringResource(R.string.settings_show_onboarding_description),
+                onClick = navigateToOnboarding,
             )
 
             VerticalSpacerM()
@@ -210,6 +221,7 @@ private fun SettingsScreenPreview() {
             navigateUp = {},
             navigateToWordImporter = {},
             navigateToAboutLibraries = {},
+            navigateToOnboarding = {},
         )
     }
 }

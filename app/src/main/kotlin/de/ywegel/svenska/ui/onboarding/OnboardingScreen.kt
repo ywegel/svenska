@@ -8,10 +8,11 @@ import com.ramcosta.composedestinations.generated.NavGraphs
 import com.ramcosta.composedestinations.generated.destinations.ContainerScreenDestination
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
 import de.ywegel.svenska.navigation.SvenskaGraph
+import de.ywegel.svenska.navigation.transitions.LateralTransition
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 
-@Destination<SvenskaGraph>
+@Destination<SvenskaGraph>(style = LateralTransition::class)
 @Composable
 fun OnboardingScreen(navigator: DestinationsNavigator) {
     val viewModel = hiltViewModel<OnboardingViewModel>()
