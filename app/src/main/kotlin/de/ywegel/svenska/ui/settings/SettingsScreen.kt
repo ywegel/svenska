@@ -53,9 +53,7 @@ fun SettingsScreen(navigator: DestinationsNavigator, viewModel: SettingsViewMode
 
     SettingsScreen(
         uiState = uiState,
-        onOverviewShowCompactVocabularyItemChanged = viewModel::toggleOverviewShowCompactVocabularyItem,
-        onSearchShowCompactVocabularyItemChanged = viewModel::toggleSearchShowCompactVocabularyItem,
-        onOnlineSearchTypeSelected = viewModel::onOnlineSearchTypeSelected,
+        callbacks = viewModel,
         navigateUp = navigator::navigateUp,
         navigateToWordImporter = { navigator.navigate(WordImporterScreenDestination) },
         navigateToAboutLibraries = { navigator.navigate(AboutLibrariesScreenDestination) },
@@ -66,9 +64,7 @@ fun SettingsScreen(navigator: DestinationsNavigator, viewModel: SettingsViewMode
 @Composable
 private fun SettingsScreen(
     uiState: SettingsUiState,
-    onOverviewShowCompactVocabularyItemChanged: (Boolean) -> Unit,
-    onSearchShowCompactVocabularyItemChanged: (Boolean) -> Unit,
-    onOnlineSearchTypeSelected: (OnlineSearchType) -> Unit,
+    callbacks: SettingsCallbacks,
     navigateUp: () -> Unit,
     navigateToWordImporter: () -> Unit,
     navigateToAboutLibraries: () -> Unit,
@@ -88,14 +84,14 @@ private fun SettingsScreen(
                 title = stringResource(R.string.settings_overview_compact_vocabulary_item_title),
                 description = stringResource(R.string.settings_overview_compact_vocabulary_item_description),
                 checked = uiState.overviewShowCompactVocabularyItem,
-                onCheckedChange = onOverviewShowCompactVocabularyItemChanged,
+                onCheckedChange = callbacks::toggleOverviewShowCompactVocabularyItem,
             )
 
             SwitchWithText(
                 title = stringResource(R.string.settings_search_compact_vocabulary_item_title),
                 description = stringResource(R.string.settings_search_compact_vocabulary_item_description),
                 checked = uiState.searchShowCompactVocabularyItem,
-                onCheckedChange = onSearchShowCompactVocabularyItemChanged,
+                onCheckedChange = callbacks::toggleSearchShowCompactVocabularyItem,
             )
 
             VerticalSpacerM()
@@ -124,7 +120,7 @@ private fun SettingsScreen(
             VerticalSpacerM()
 
             Column(Modifier.padding(horizontal = Spacings.m)) {
-                OnlineRedirectSelector(uiState, onOnlineSearchTypeSelected)
+                OnlineRedirectSelector(uiState, callbacks::onOnlineSearchTypeSelected)
             }
         }
     }
@@ -209,15 +205,19 @@ private val onlineSearchTypes = listOf(
     OnlineSearchType.GoogleTranslate,
 )
 
+private object SettingsCallbacksFake : SettingsCallbacks {
+    override fun toggleOverviewShowCompactVocabularyItem(showCompactVocabularyItem: Boolean) {}
+    override fun toggleSearchShowCompactVocabularyItem(showCompactVocabularyItem: Boolean) {}
+    override fun onOnlineSearchTypeSelected(onlineSearchType: OnlineSearchType) {}
+}
+
 @Preview
 @Composable
 private fun SettingsScreenPreview() {
     SvenskaTheme {
         SettingsScreen(
             uiState = SettingsUiState(true, true, OnlineSearchType.Pons),
-            onOverviewShowCompactVocabularyItemChanged = {},
-            onSearchShowCompactVocabularyItemChanged = {},
-            onOnlineSearchTypeSelected = {},
+            callbacks = SettingsCallbacksFake,
             navigateUp = {},
             navigateToWordImporter = {},
             navigateToAboutLibraries = {},

@@ -18,7 +18,7 @@ import javax.inject.Inject
 class SettingsViewModel @Inject constructor(
     private val preferencesManager: UserPreferencesManager,
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
-) : ViewModel() {
+) : ViewModel(), SettingsCallbacks {
     private val _uiState = MutableStateFlow(SettingsUiState())
     val uiState = _uiState.asStateFlow()
 
@@ -29,18 +29,22 @@ class SettingsViewModel @Inject constructor(
         observerPreferencesState()
     }
 
-    fun toggleOverviewShowCompactVocabularyItem(showCompactVocabularyItem: Boolean) =
+    override fun toggleOverviewShowCompactVocabularyItem(showCompactVocabularyItem: Boolean) {
         viewModelScope.launch(ioDispatcher) {
             preferencesManager.showCompactVocabularyItem(showCompactVocabularyItem)
         }
+    }
 
-    fun toggleSearchShowCompactVocabularyItem(showCompactVocabularyItem: Boolean) =
+    override fun toggleSearchShowCompactVocabularyItem(showCompactVocabularyItem: Boolean) {
         viewModelScope.launch(ioDispatcher) {
             preferencesManager.showCompactVocabularyItemInSearch(showCompactVocabularyItem)
         }
+    }
 
-    fun onOnlineSearchTypeSelected(onlineSearchType: OnlineSearchType) = viewModelScope.launch(ioDispatcher) {
-        preferencesManager.updateOnlineRedirectType(onlineSearchType)
+    override fun onOnlineSearchTypeSelected(onlineSearchType: OnlineSearchType) {
+        viewModelScope.launch(ioDispatcher) {
+            preferencesManager.updateOnlineRedirectType(onlineSearchType)
+        }
     }
 
     private fun observerPreferencesState() = viewModelScope.launch {

@@ -1,0 +1,12 @@
+package de.ywegel.svenska.ui.settings
+
+import de.ywegel.svenska.domain.search.OnlineSearchType
+
+/**
+ * A callback interface to shorten the SettingsScreen parameter list
+ */
+interface SettingsCallbacks {
+    fun toggleOverviewShowCompactVocabularyItem(showCompactVocabularyItem: Boolean)
+    fun toggleSearchShowCompactVocabularyItem(showCompactVocabularyItem: Boolean)
+    fun onOnlineSearchTypeSelected(onlineSearchType: OnlineSearchType)
+}
