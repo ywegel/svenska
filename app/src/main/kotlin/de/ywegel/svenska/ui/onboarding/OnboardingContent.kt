@@ -14,7 +14,6 @@ import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.material3.Button
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.OutlinedButton
-import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.rememberCoroutineScope
@@ -22,28 +21,10 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import de.ywegel.svenska.R
-import de.ywegel.svenska.ui.common.TopAppTextBar
 import de.ywegel.svenska.ui.common.VerticalSpacerM
 import de.ywegel.svenska.ui.common.VerticalSpacerS
 import de.ywegel.svenska.ui.theme.Spacings
 import kotlinx.coroutines.launch
-
-@Composable
-internal fun OnboardingScreen(onOnboardingComplete: () -> Unit) {
-    Scaffold(
-        topBar = {
-            TopAppTextBar(
-                title = stringResource(R.string.onboarding_title),
-                onNavigateUp = onOnboardingComplete,
-            )
-        },
-    ) { innerPadding ->
-        OnboardingContent(
-            innerPadding = innerPadding,
-            onOnboardingComplete = onOnboardingComplete,
-        )
-    }
-}
 
 @Composable
 internal fun OnboardingContent(innerPadding: PaddingValues, onOnboardingComplete: () -> Unit) {

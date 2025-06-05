@@ -10,7 +10,8 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
-import java.util.*
+import java.util.LinkedList
+import java.util.Queue
 
 class UserPreferencesManagerFake(
     initialSortOrder: SortOrder = SortOrder.default,
