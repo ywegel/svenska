@@ -57,6 +57,10 @@ androidx-datastore = "androidx.datastore:datastore-preferences:1.1.1"
 about-libraries-core = { module = "com.mikepenz:aboutlibraries-core", version.ref = "about-libraries" }
 about-libraries-compose-m3 = { module = "com.mikepenz:aboutlibraries-compose-m3", version.ref = "about-libraries" }
 
+# splash screen
+splish-splash-screen = "androidx.core:core-splashscreen:1.0.1"
+
+
 # testing
 junit = { group = "junit", name = "junit", version.ref = "junit" }
 androidx-test-ext-junit = { group = "androidx.test.ext", name = "junit", version.ref = "androidx-test-ext-junit" }
