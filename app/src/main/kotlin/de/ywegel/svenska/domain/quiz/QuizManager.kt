@@ -54,4 +54,6 @@ class QuizManager<A : UserAnswer, AnswerResult : Any>(
     fun getQuizStatistics(): Pair<Int, Int> {
         return Pair(1, 1)
     }
+
+    fun currentVocabularyIsFavorite(): Boolean? = vocabularyList.getOrNull(currentIndex)?.isFavorite
 }
