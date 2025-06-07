@@ -7,6 +7,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -30,7 +31,8 @@ import de.ywegel.svenska.navigation.transitions.LateralTransition
 import de.ywegel.svenska.ui.common.ClickableText
 import de.ywegel.svenska.ui.common.SwitchWithText
 import de.ywegel.svenska.ui.common.TopAppTextBar
-import de.ywegel.svenska.ui.common.VerticalSpacerM
+import de.ywegel.svenska.ui.common.VerticalSpacerXS
+import de.ywegel.svenska.ui.common.VerticalSpacerXXS
 import de.ywegel.svenska.ui.theme.Spacings
 import de.ywegel.svenska.ui.theme.SvenskaTheme
 
@@ -77,7 +79,7 @@ private fun SettingsScreen(
                 onCheckedChange = callbacks::toggleOverviewShowCompactVocabularyItem,
             )
 
-            VerticalSpacerM()
+            VerticalSpacerXS()
 
             ClickableText(
                 title = stringResource(R.string.settings_search_settings_title),
@@ -85,7 +87,7 @@ private fun SettingsScreen(
                 onClick = navigateToSearchSettings,
             )
 
-            VerticalSpacerM()
+            VerticalSpacerXS()
 
             ClickableText(
                 title = stringResource(R.string.settings_naviagate_word_importer_screen_title),
@@ -93,8 +95,7 @@ private fun SettingsScreen(
                 onClick = navigateToWordImporter,
             )
 
-            VerticalSpacerM()
-
+            VerticalSpacerXS()
 
             ClickableText(
                 title = stringResource(R.string.settings_show_onboarding_title),
@@ -102,7 +103,9 @@ private fun SettingsScreen(
                 onClick = navigateToOnboarding,
             )
 
-            VerticalSpacerM()
+            VerticalSpacerXXS()
+            HorizontalDivider()
+            VerticalSpacerXXS()
 
             AppInformationSection(navigateToAboutLibraries = navigateToAboutLibraries)
         }

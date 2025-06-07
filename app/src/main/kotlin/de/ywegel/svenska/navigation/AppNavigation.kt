@@ -24,7 +24,7 @@ fun AppNavigation(startRoute: Direction? = ContainerScreenDestination) {
             // making it available to all screens that belong to it
             navGraph(NavGraphs.settings) {
                 val parentEntry = remember(navBackStackEntry) {
-                    navController.getBackStackEntry(NavGraphs.settings)
+                    navController.getBackStackEntry(NavGraphs.settings.route)
                 }
                 dependency(hiltViewModel<SettingsViewModel>(parentEntry))
             }
