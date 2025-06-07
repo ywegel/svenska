@@ -20,7 +20,7 @@ abstract class BaseQuizViewModel<A : UserAnswer, S : QuizInputState<A>, AC : Any
     strategy: QuizStrategy<A, AR>,
     userInputControllerFactory: () -> QuizUserInputController<S, AC>,
     protected val containerId: Int?,
-) : ViewModel() {
+) : ViewModel(), QuizCallbacks<A> {
 
     private val manager = QuizManager(strategy, repository, containerId)
 
@@ -40,7 +40,7 @@ abstract class BaseQuizViewModel<A : UserAnswer, S : QuizInputState<A>, AC : Any
         }
     }
 
-    fun nextWord() {
+    override fun nextWord() {
         launchSafely {
             val nextQuestionAvailable = manager.goToNextQuestion()
             inputController.resetState()
@@ -65,12 +65,12 @@ abstract class BaseQuizViewModel<A : UserAnswer, S : QuizInputState<A>, AC : Any
             QuizUiState.Active(
                 quizQuestion = question,
                 canReturnToPreviousQuestion = manager.hasPreviousQuestion(),
-                vocabularyIsFavorite = (currentState as? QuizUiState.Active)?.vocabularyIsFavorite ?: false,
+                vocabularyIsFavorite = manager.currentVocabularyIsFavorite(),
             )
         }
     }
 
-    fun checkAnswer(input: A) {
+    override fun checkAnswer(input: A) {
         val currentState = _uiState.value as? QuizUiState.Active ?: return
 
         launchSafely {
@@ -82,13 +82,13 @@ abstract class BaseQuizViewModel<A : UserAnswer, S : QuizInputState<A>, AC : Any
         }
     }
 
-    fun returnToPreviousQuestion() {
+    override fun returnToPreviousQuestion() {
         inputController.resetState()
         manager.goToPreviousQuestion()
         setupQuestion(manager.getCurrentQuestion())
     }
 
-    fun toggleFavorite(isFavorite: Boolean) {
+    override fun toggleFavorite(isFavorite: Boolean) {
         val currentState = _uiState.value as? QuizUiState.Active ?: return
 
         launchSafely {
@@ -127,7 +127,7 @@ sealed interface QuizUiState<A : UserAnswer, AR : Any> {
 
     data class Active<A : UserAnswer, AR : Any>(
         val quizQuestion: QuizQuestion<A>,
-        val vocabularyIsFavorite: Boolean = false,
+        val vocabularyIsFavorite: Boolean? = false,
         val canReturnToPreviousQuestion: Boolean = false,
         val userAnswer: A? = null,
         val userAnswerResult: AR? = null,
