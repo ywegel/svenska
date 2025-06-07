@@ -3,52 +3,42 @@
 package de.ywegel.svenska.ui.settings
 
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.selection.selectable
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.OutlinedTextField
-import androidx.compose.material3.RadioButton
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.focus.onFocusEvent
+import androidx.compose.ui.platform.LocalUriHandler
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.semantics.Role
-import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.ramcosta.composedestinations.annotation.Destination
 import com.ramcosta.composedestinations.generated.destinations.AboutLibrariesScreenDestination
 import com.ramcosta.composedestinations.generated.destinations.OnboardingScreenDestination
+import com.ramcosta.composedestinations.generated.destinations.SearchSettingsScreenDestination
 import com.ramcosta.composedestinations.generated.destinations.WordImporterScreenDestination
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
+import de.ywegel.svenska.BuildConfig
 import de.ywegel.svenska.R
 import de.ywegel.svenska.domain.search.OnlineSearchType
 import de.ywegel.svenska.navigation.SettingsNavGraph
 import de.ywegel.svenska.navigation.transitions.LateralTransition
 import de.ywegel.svenska.ui.common.ClickableText
-import de.ywegel.svenska.ui.common.HorizontalSpacerM
 import de.ywegel.svenska.ui.common.SwitchWithText
 import de.ywegel.svenska.ui.common.TopAppTextBar
-import de.ywegel.svenska.ui.common.VerticalSpacerM
-import de.ywegel.svenska.ui.search.userFacingTitle
+import de.ywegel.svenska.ui.common.VerticalSpacerXS
+import de.ywegel.svenska.ui.common.VerticalSpacerXXS
 import de.ywegel.svenska.ui.theme.Spacings
 import de.ywegel.svenska.ui.theme.SvenskaTheme
 
 @Destination<SettingsNavGraph>(start = true, style = LateralTransition::class)
 @Composable
-fun SettingsScreen(navigator: DestinationsNavigator, viewModel: SettingsViewModel = hiltViewModel()) {
+fun SettingsScreen(navigator: DestinationsNavigator, viewModel: SettingsViewModel) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
 
     SettingsScreen(
@@ -58,6 +48,7 @@ fun SettingsScreen(navigator: DestinationsNavigator, viewModel: SettingsViewMode
         navigateToWordImporter = { navigator.navigate(WordImporterScreenDestination) },
         navigateToAboutLibraries = { navigator.navigate(AboutLibrariesScreenDestination) },
         navigateToOnboarding = { navigator.navigate(OnboardingScreenDestination) },
+        navigateToSearchSettings = { navigator.navigate(SearchSettingsScreenDestination) },
     )
 }
 
@@ -69,6 +60,7 @@ private fun SettingsScreen(
     navigateToWordImporter: () -> Unit,
     navigateToAboutLibraries: () -> Unit,
     navigateToOnboarding: () -> Unit,
+    navigateToSearchSettings: () -> Unit,
 ) {
     Scaffold(
         topBar = {
@@ -87,14 +79,15 @@ private fun SettingsScreen(
                 onCheckedChange = callbacks::toggleOverviewShowCompactVocabularyItem,
             )
 
-            SwitchWithText(
-                title = stringResource(R.string.settings_search_compact_vocabulary_item_title),
-                description = stringResource(R.string.settings_search_compact_vocabulary_item_description),
-                checked = uiState.searchShowCompactVocabularyItem,
-                onCheckedChange = callbacks::toggleSearchShowCompactVocabularyItem,
+            VerticalSpacerXS()
+
+            ClickableText(
+                title = stringResource(R.string.settings_search_settings_title),
+                description = stringResource(R.string.settings_search_settings_description),
+                onClick = navigateToSearchSettings,
             )
 
-            VerticalSpacerM()
+            VerticalSpacerXS()
 
             ClickableText(
                 title = stringResource(R.string.settings_naviagate_word_importer_screen_title),
@@ -102,14 +95,7 @@ private fun SettingsScreen(
                 onClick = navigateToWordImporter,
             )
 
-            VerticalSpacerM()
-
-            ClickableText(
-                title = stringResource(R.string.settings_naviagate_about_libraries_screen_title),
-                onClick = navigateToAboutLibraries,
-            )
-
-            VerticalSpacerM()
+            VerticalSpacerXS()
 
             ClickableText(
                 title = stringResource(R.string.settings_show_onboarding_title),
@@ -117,98 +103,37 @@ private fun SettingsScreen(
                 onClick = navigateToOnboarding,
             )
 
-            VerticalSpacerM()
+            VerticalSpacerXXS()
+            HorizontalDivider()
+            VerticalSpacerXXS()
 
-            Column(Modifier.padding(horizontal = Spacings.m)) {
-                OnlineRedirectSelector(uiState, callbacks::onOnlineSearchTypeSelected)
-            }
+            AppInformationSection(navigateToAboutLibraries = navigateToAboutLibraries)
         }
     }
 }
 
 @Composable
-private fun OnlineRedirectSelector(uiState: SettingsUiState, onOnlineSearchTypeSelected: (OnlineSearchType) -> Unit) {
-    onlineSearchTypes.forEach { entry ->
-        OnlineRedirectSelectorButton(
-            type = entry,
-            selected = entry == uiState.selectedOnlineSearchType,
-            onTypeSelected = { onOnlineSearchTypeSelected(it) },
-        ) {
-            Text(
-                text = entry.userFacingTitle(),
-                style = SvenskaTheme.typography.bodyLarge,
-                maxLines = 1,
-                overflow = TextOverflow.Ellipsis,
-            )
-        }
-    }
-    OnlineRedirectSelectorButton(
-        type = uiState.selectedOnlineSearchType ?: OnlineSearchType.Custom(""),
-        selected = uiState.selectedOnlineSearchType is OnlineSearchType.Custom,
-        onTypeSelected = { onOnlineSearchTypeSelected(it) },
-    ) {
-        var inputUrl by remember { mutableStateOf("") }
+private fun AppInformationSection(navigateToAboutLibraries: () -> Unit) {
+    val uriHandler = LocalUriHandler.current
+    val githubRepoUrl = stringResource(R.string.settings_github_repository_url)
 
-        OutlinedTextField(
-            modifier = Modifier
-                .fillMaxWidth()
-                .onFocusEvent {
-                    if (it.hasFocus || it.isFocused) {
-                        onOnlineSearchTypeSelected(
-                            OnlineSearchType.Custom(""),
-                        )
-                    }
-                },
-            value = inputUrl,
-            onValueChange = {
-                inputUrl = it
-                onOnlineSearchTypeSelected(OnlineSearchType.Custom(inputUrl))
-            },
-            label = { Text(stringResource(R.string.search_base_url_custom)) },
-        )
-    }
-}
+    ClickableText(
+        title = stringResource(R.string.settings_naviagate_about_libraries_screen_title),
+        onClick = navigateToAboutLibraries,
+    )
 
-@Composable
-private fun OnlineRedirectSelectorButton(
-    type: OnlineSearchType,
-    selected: Boolean,
-    onTypeSelected: (OnlineSearchType) -> Unit,
-    content: @Composable () -> Unit,
-) {
-    Row(
-        Modifier
-            .selectable(
-                selected = selected,
-                onClick = { onTypeSelected(type) },
-                role = Role.RadioButton,
-            )
-            .fillMaxWidth()
-            .padding(Spacings.xxs),
-        verticalAlignment = Alignment.CenterVertically,
-    ) {
-        RadioButton(
-            selected = selected,
-            onClick = null, // null recommended for accessibility with screenreaders
-        )
+    ClickableText(
+        title = stringResource(R.string.settings_github_repository),
+        onClick = {
+            uriHandler.openUri(githubRepoUrl)
+        },
+    )
 
-        HorizontalSpacerM()
-
-        content()
-    }
-}
-
-private val onlineSearchTypes = listOf(
-    OnlineSearchType.DictCC,
-    OnlineSearchType.Pons,
-    OnlineSearchType.DeepL,
-    OnlineSearchType.GoogleTranslate,
-)
-
-private object SettingsCallbacksFake : SettingsCallbacks {
-    override fun toggleOverviewShowCompactVocabularyItem(showCompactVocabularyItem: Boolean) {}
-    override fun toggleSearchShowCompactVocabularyItem(showCompactVocabularyItem: Boolean) {}
-    override fun onOnlineSearchTypeSelected(onlineSearchType: OnlineSearchType) {}
+    Text(
+        text = stringResource(R.string.settings_app_version, BuildConfig.VERSION_NAME),
+        style = SvenskaTheme.typography.bodyMedium,
+        modifier = Modifier.padding(horizontal = Spacings.m, vertical = Spacings.s),
+    )
 }
 
 @Preview
@@ -222,6 +147,7 @@ private fun SettingsScreenPreview() {
             navigateToWordImporter = {},
             navigateToAboutLibraries = {},
             navigateToOnboarding = {},
+            navigateToSearchSettings = {},
         )
     }
 }

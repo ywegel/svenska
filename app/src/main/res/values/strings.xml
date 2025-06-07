@@ -214,17 +214,25 @@
 
     <string name="settings_overview_compact_vocabulary_item_title">Compact Item - Containers</string>
     <string name="settings_overview_compact_vocabulary_item_description">Show compact Vocabulary Item for containers</string>
+    <string name="settings_search_settings_title">Configure the search</string>
+    <string name="settings_search_settings_description">Configure the search behaviour and appearance</string>
     <string name="settings_search_compact_vocabulary_item_title">Compact Item - Search</string>
     <string name="settings_search_compact_vocabulary_item_description">Show compact Vocabulary Item for the search</string>
     <string name="settings_naviagate_word_importer_screen_title">Show word importer</string>
     <string name="settings_naviagate_word_importer_screen_description">Import words from a file</string>
     <string name="settings_naviagate_about_libraries_screen_title">Licenses</string>
+    <string name="settings_app_version">App Version: %1$s</string>
+    <string name="settings_github_repository">Open Source on GitHub</string>
+    <string name="settings_github_repository_url">https://github.com/ywegel/svenska</string>
 
     <string name="settings_show_onboarding_title">Show onboarding</string>
     <string name="settings_show_onboarding_description">Show the onboarding screens again</string>
 
     <!-- ## About libraries ## -->
     <string name="settings_about_libraries_title">Licenses</string>
+
+    <!-- ##  ## -->
+    <string name="settings_search_online_redirect_title">Configure the url for the online search</string>
 
     <!-- # Onboarding # -->
     <string name="onboarding_title">Onboarding</string>
