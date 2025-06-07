@@ -26,7 +26,7 @@ object GeneratorConstants {
 }
 
 @VisibleForTesting
-fun vocabulary(id: Int = 1, containerId: Int = 1): Vocabulary = Vocabulary(
+fun vocabulary(id: Int = 1, containerId: Int = 1, isFavorite: Boolean = false): Vocabulary = Vocabulary(
     word = "lampa",
     wordHighlights = listOf(1, 2),
     translation = "lamp",
@@ -36,6 +36,7 @@ fun vocabulary(id: Int = 1, containerId: Int = 1): Vocabulary = Vocabulary(
     ending = "n or orna",
     containerId = containerId,
     id = id,
+    isFavorite = isFavorite,
 )
 
 @VisibleForTesting

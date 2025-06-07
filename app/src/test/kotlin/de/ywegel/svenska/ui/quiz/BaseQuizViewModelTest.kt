@@ -36,6 +36,8 @@ import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
 import strikt.api.expect
 import strikt.api.expectThat
+import strikt.assertions.containsExactlyInAnyOrder
+import strikt.assertions.hasSize
 import strikt.assertions.isA
 import strikt.assertions.isEqualTo
 import strikt.assertions.isNotEqualTo
@@ -304,29 +306,6 @@ class BaseQuizViewModelTest {
 
             verify { strategy.validateAnswer(any(), userAnswer) }
         }
-
-//        @Test
-//        fun `should not update state if not in Active state`() = runTest(testDispatcher) {
-//            // Given
-//            val userAnswer = UserAnswer.TranslateWithoutEndingsAnswer("dog")
-//
-//            // Force the state to Finished
-//            coEvery { strategy.generateQuestion(any()) } returns null
-//            viewModel.nextWord()
-//
-//            advanceUntilIdle()
-//
-//            // When
-//            viewModel.checkAnswer(userAnswer)
-//
-//            // Then
-//            viewModel.uiState.test() {
-//                val state = awaitItem()
-//                expectThat(state).isA<QuizUiState.Finished<*, *>>()
-//            }
-//
-//            verify(exactly = 0) { strategy.validateAnswer(any(), any()) }
-//        }
     }
 
     @Test
@@ -424,6 +403,118 @@ class BaseQuizViewModelTest {
             val finishState = awaitItem()
             expectThat(finishState).isA<QuizUiState.Finished<*, *>>()
         }
+    }
+
+    @Nested
+    @DisplayName("Favorites")
+    inner class Favorites {
+
+        @Test
+        fun `should update UI state and repository when toggling favorite with no initial favorites`() =
+            runTest(testDispatcher) {
+                // Given
+                // Create a list of vocabularies with no favorites
+                val nonFavoriteVocabulary = vocabulary(isFavorite = false)
+                val repository = spyk(VocabularyRepositoryFake(listOf(nonFavoriteVocabulary)))
+                val question = nonFavoriteVocabulary.toQuizQuestion()
+                val strategy = QuizStrategyFake(isValid = true, question)
+
+                viewModel = TestViewModel(
+                    repository = repository,
+                    ioDispatcher = testDispatcher,
+                    strategy = strategy,
+                    userInputControllerFactory = controllerFactory,
+                    containerId = null,
+                    renderer = renderer,
+                )
+
+                advanceUntilIdle()
+
+                // When
+                viewModel.toggleFavorite(true)
+
+                advanceUntilIdle()
+
+                // Then
+                // Verify UI state is updated
+                viewModel.uiState.test {
+                    val state = awaitItem()
+                    expectThat(state)
+                        .isA<QuizUiState.Active<UserAnswer.TranslateWithoutEndingsAnswer, Boolean>>()
+                        .and {
+                            get { quizQuestion.vocabularyId }.isEqualTo(nonFavoriteVocabulary.id)
+                            get { vocabularyIsFavorite }.isTrue()
+                        }
+                }
+
+                // Verify repository is updated
+                coVerify { repository.toggleVocabularyFavorite(nonFavoriteVocabulary.id, true) }
+
+                // Verify repository state
+                val favorites = repository.getFavorites(null)
+                expectThat(favorites).hasSize(1)
+                expectThat(favorites.first().id).isEqualTo(nonFavoriteVocabulary.id)
+            }
+
+        @Test
+        fun `should update UI state and repository when toggling favorite with existing favorites`() =
+            runTest(testDispatcher) {
+                // Given
+                // Create a list of vocabularies with 1 existing favorite and 2 non-favorites
+                val vocabulariesWithOneFavorite = vocabularies().take(3).mapIndexed { index, vocabulary ->
+                    vocabulary.copy(isFavorite = index == 0) // Only the first one is a favorite
+                }
+                val repositoryFake = VocabularyRepositoryFake(vocabulariesWithOneFavorite)
+                val repository = spyk(repositoryFake)
+                val question = vocabulariesWithOneFavorite[1].toQuizQuestion() // Second vocabulary (not a favorite)
+                val strategy = QuizStrategyFake(isValid = true, question)
+
+                // Sanity check: We should only have 3 vocabularies in the repository, and one of them is a favorite
+                expectThat(repositoryFake.getFavorites(null).size).isEqualTo(1)
+                expectThat(repositoryFake.getAllVocabulariesSnapshot(null).size).isEqualTo(3)
+
+                viewModel = TestViewModel(
+                    repository = repository,
+                    ioDispatcher = testDispatcher,
+                    strategy = strategy,
+                    userInputControllerFactory = controllerFactory,
+                    containerId = null,
+                    renderer = renderer,
+                )
+
+                advanceUntilIdle()
+
+                // When
+                viewModel.toggleFavorite(true)
+
+                advanceUntilIdle()
+
+                // Then
+                // Verify UI state is updated
+                viewModel.uiState.test {
+                    val state = awaitItem()
+                    expectThat(state)
+                        .isA<QuizUiState.Active<UserAnswer.TranslateWithoutEndingsAnswer, Boolean>>()
+                        .and {
+                            get { quizQuestion.vocabularyId }.isEqualTo(vocabulariesWithOneFavorite[1].id)
+                            get { vocabularyIsFavorite }.isTrue()
+                        }
+                }
+
+                // Verify the repository is updated - now we should have 2 favorites and 1 non-favorite
+                coVerify { repository.toggleVocabularyFavorite(vocabulariesWithOneFavorite[1].id, true) }
+
+                // Verify the repository contains 2 favorite vocabularies and 1 non-favorite vocabulary
+                val favorites = repositoryFake.getFavorites(null)
+                val allVocabularies = repositoryFake.getAllVocabulariesSnapshot(null)
+                val nonFavorites = allVocabularies.filter { !it.isFavorite }
+
+                expectThat(favorites.size).isEqualTo(2)
+                expectThat(nonFavorites.size).isEqualTo(1)
+                expectThat(allVocabularies)
+                    .hasSize(3)
+                    .containsExactlyInAnyOrder(favorites + nonFavorites)
+            }
     }
 
     @Nested
