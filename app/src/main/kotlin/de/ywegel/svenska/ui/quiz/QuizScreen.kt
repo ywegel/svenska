@@ -2,8 +2,6 @@
 
 package de.ywegel.svenska.ui.quiz
 
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.outlined.Undo
 import androidx.compose.material.icons.outlined.Favorite
 import androidx.compose.material.icons.outlined.FavoriteBorder
 import androidx.compose.material.icons.outlined.Info
@@ -71,10 +69,7 @@ private fun <A : UserAnswer, S : QuizInputState<A>, AC : Any, AR : Any> QuizScre
         renderer = viewModel.renderer,
         state = inputState,
         actions = viewModel.actions,
-        returnToPreviousQuestion = viewModel::returnToPreviousQuestion,
-        toggleFavorite = viewModel::toggleFavorite,
-        checkAnswer = viewModel::checkAnswer,
-        nextWord = viewModel::nextWord,
+        callbacks = viewModel,
         navigateToWordGroupsScreen = { navigator.navigate(WordGroupsScreenDestination) },
         navigateToOverview = {
             navigator.popBackStack(
@@ -94,10 +89,7 @@ private fun <A : UserAnswer, State : QuizInputState<A>, Actions : Any, AnswerRes
     renderer: QuizRenderer<A, State, Actions, AnswerResult>,
     state: State,
     actions: Actions,
-    checkAnswer: (A) -> Unit,
-    nextWord: () -> Unit,
-    returnToPreviousQuestion: () -> Unit,
-    toggleFavorite: (Boolean) -> Unit,
+    callbacks: QuizCallbacks<A>,
     navigateToWordGroupsScreen: () -> Unit,
     navigateToOverview: () -> Unit,
     onStartNewQuiz: () -> Unit,
@@ -108,9 +100,8 @@ private fun <A : UserAnswer, State : QuizInputState<A>, Actions : Any, AnswerRes
                 uiState = uiState,
                 navigateUp = navigateToOverview,
                 isFavorite = (uiState as? QuizUiState.Active<*, *>)?.vocabularyIsFavorite,
-                toggleFavorite = toggleFavorite,
+                callbacks = callbacks,
                 navigateToWordGroupsScreen = navigateToWordGroupsScreen,
-                returnToLastWord = returnToPreviousQuestion,
             )
         },
     ) { innerPadding ->
@@ -137,8 +128,7 @@ private fun <A : UserAnswer, State : QuizInputState<A>, Actions : Any, AnswerRes
                     actions = actions,
                     userAnswer = uiState.userAnswer,
                     userAnswerCorrect = uiState.userAnswerResult,
-                    checkAnswer = checkAnswer,
-                    nextWord = nextWord,
+                    callbacks = callbacks,
                 )
             }
 
@@ -158,24 +148,24 @@ private fun <A : UserAnswer, State : QuizInputState<A>, Actions : Any, AnswerRes
 }
 
 @Composable
-private fun QuizToolbar(
+private fun <A : UserAnswer> QuizToolbar(
     uiState: QuizUiState<*, *>,
     isFavorite: Boolean?,
     navigateUp: () -> Unit,
-    toggleFavorite: (Boolean) -> Unit,
+    callbacks: QuizCallbacks<A>,
     navigateToWordGroupsScreen: () -> Unit,
-    returnToLastWord: () -> Unit,
 ) {
     TopAppBar(
         title = { Text(stringResource(R.string.quiz_title)) },
         navigationIcon = { NavigationIconButton(onNavigateUp = navigateUp) },
         actions = {
-            IconButton(
+            // TODO: Rethink the "undo" action. Maybe it makes more sense, to have the option to see the quiz history instead. This would break the favorites and the stats
+            /* IconButton(
                 icon = Icons.AutoMirrored.Outlined.Undo,
                 contentDescription = null,
-                onClick = returnToLastWord,
+                onClick = callbacks::returnToPreviousQuestion,
                 enabled = uiState is QuizUiState.Active && uiState.canReturnToPreviousQuestion,
-            )
+            ) */
             IconButton(
                 icon = SvenskaIcons.Info,
                 contentDescription = stringResource(R.string.accessibility_quiz_toolbar_actions_word_group_info),
@@ -184,7 +174,7 @@ private fun QuizToolbar(
             IconButton(
                 icon = if (isFavorite == true) SvenskaIcons.Favorite else SvenskaIcons.FavoriteBorder,
                 contentDescription = stringResource(R.string.accessibility_quiz_toolbar_actions_favorite),
-                onClick = { isFavorite?.let { toggleFavorite(!isFavorite) } },
+                onClick = { isFavorite?.let { callbacks.toggleFavorite(!isFavorite) } },
                 enabled = uiState is QuizUiState.Active && isFavorite != null,
             )
         },

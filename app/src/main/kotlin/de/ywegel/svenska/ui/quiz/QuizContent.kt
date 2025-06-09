@@ -34,8 +34,7 @@ fun <A : UserAnswer, State : QuizInputState<A>, Actions : Any, AnswerResult : An
     actions: Actions,
     userAnswer: A?,
     userAnswerCorrect: AnswerResult?,
-    checkAnswer: (A) -> Unit,
-    nextWord: () -> Unit,
+    callbacks: QuizCallbacks<A>,
 ) {
     val focusManager = LocalFocusManager.current
 
@@ -72,18 +71,22 @@ fun <A : UserAnswer, State : QuizInputState<A>, Actions : Any, AnswerResult : An
             VerticalSpacerM()
         }
 
-        Button(onClick = {
-            checkAnswer(state.toUserAnswer())
-            focusManager.clearFocus()
-        }) {
+        Button(
+            onClick = {
+                callbacks.checkAnswer(state.toUserAnswer())
+                focusManager.clearFocus()
+            },
+        ) {
             Text(stringResource(R.string.quiz_check))
         }
 
         VerticalSpacerXXS()
 
-        Button(onClick = {
-            nextWord()
-        }) {
+        Button(
+            onClick = {
+                callbacks.nextWord()
+            },
+        ) {
             Text(stringResource(R.string.quiz_next))
         }
     }
