@@ -5,40 +5,12 @@ package de.ywegel.svenska.ui.container
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.combinedClickable
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.ExperimentalLayoutApi
-import androidx.compose.foundation.layout.FlowRow
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.consumeWindowInsets
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.material.icons.outlined.Abc
-import androidx.compose.material.icons.outlined.Add
-import androidx.compose.material.icons.outlined.DeleteForever
-import androidx.compose.material.icons.outlined.Edit
-import androidx.compose.material.icons.outlined.Favorite
-import androidx.compose.material.icons.outlined.Pin
-import androidx.compose.material.icons.outlined.Quiz
-import androidx.compose.material.icons.outlined.Warning
-import androidx.compose.material3.AlertDialog
-import androidx.compose.material3.Card
-import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.FilledIconButton
-import androidx.compose.material3.FloatingActionButton
-import androidx.compose.material3.Icon
-import androidx.compose.material3.OutlinedTextField
-import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Text
-import androidx.compose.material3.TopAppBarDefaults
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.ReadOnlyComposable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
+import androidx.compose.material.icons.outlined.*
+import androidx.compose.material3.*
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
@@ -50,13 +22,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.ramcosta.composedestinations.annotation.Destination
 import com.ramcosta.composedestinations.generated.NavGraphs
-import com.ramcosta.composedestinations.generated.destinations.FavoritesAndPronunciationScreenDestination
-import com.ramcosta.composedestinations.generated.destinations.OverviewScreenDestination
-import com.ramcosta.composedestinations.generated.destinations.QuizConfigurationScreenDestinationNavArgs
-import com.ramcosta.composedestinations.generated.destinations.SearchScreenDestination
-import com.ramcosta.composedestinations.generated.destinations.SettingsScreenDestination
-import com.ramcosta.composedestinations.generated.destinations.SwedishNumbersScreenDestination
-import com.ramcosta.composedestinations.generated.destinations.WordGroupsScreenDestination
+import com.ramcosta.composedestinations.generated.destinations.*
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
 import de.ywegel.svenska.R
 import de.ywegel.svenska.data.GeneratorConstants
@@ -64,13 +30,7 @@ import de.ywegel.svenska.data.container
 import de.ywegel.svenska.data.containers
 import de.ywegel.svenska.data.model.VocabularyContainer
 import de.ywegel.svenska.navigation.SvenskaGraph
-import de.ywegel.svenska.ui.common.ConfirmButton
-import de.ywegel.svenska.ui.common.ConfirmableComponent
-import de.ywegel.svenska.ui.common.DismissButton
-import de.ywegel.svenska.ui.common.HorizontalSpacerM
-import de.ywegel.svenska.ui.common.IconButton
-import de.ywegel.svenska.ui.common.VerticalSpacerXS
-import de.ywegel.svenska.ui.common.VerticalSpacerXXS
+import de.ywegel.svenska.ui.common.*
 import de.ywegel.svenska.ui.theme.Spacings
 import de.ywegel.svenska.ui.theme.SvenskaIcons
 import de.ywegel.svenska.ui.theme.SvenskaTheme
@@ -93,11 +53,11 @@ fun ContainerScreen(navigator: DestinationsNavigator) {
             when (it) {
                 BonusScreen.Numbers -> navigator.navigate(SwedishNumbersScreenDestination)
                 BonusScreen.Favorites -> navigator.navigate(
-                    FavoritesAndPronunciationScreenDestination(null, BonusScreen.Favorites),
+                    FavoritesAndPronunciationScreenDestination(it),
                 )
 
                 BonusScreen.SpecialPronunciation -> navigator.navigate(
-                    FavoritesAndPronunciationScreenDestination(null, BonusScreen.Favorites),
+                    FavoritesAndPronunciationScreenDestination(it),
                 )
 
                 BonusScreen.Quiz ->

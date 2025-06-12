@@ -7,7 +7,6 @@ import com.ramcosta.composedestinations.generated.navArgs
 import dagger.hilt.android.lifecycle.HiltViewModel
 import de.ywegel.svenska.data.VocabularyRepository
 import de.ywegel.svenska.data.model.Vocabulary
-import de.ywegel.svenska.data.model.VocabularyContainer
 import de.ywegel.svenska.di.IoDispatcher
 import de.ywegel.svenska.ui.container.BonusScreen
 import kotlinx.coroutines.CoroutineDispatcher
@@ -25,20 +24,10 @@ class FavoritesAndPronunciationViewModel @Inject constructor(
 ) : ViewModel() {
     val navArgs = savedStateHandle.navArgs<FavoritesAndPronunciationScreenNavArgs>()
 
-    private val _containerId = MutableStateFlow<Int?>(null)
-    val containerId = _containerId.asStateFlow()
-
-    private val _favorites = MutableStateFlow<List<Vocabulary>>(emptyList())
-    val favorites = _favorites.asStateFlow()
-
-    // TODO: rename all from containerNamesWithIds to containers
-    private val _containerNamesWithIds = MutableStateFlow<List<VocabularyContainer>>(emptyList())
-    val containerNamesWithIds = _containerNamesWithIds.asStateFlow()
+    private val _bonusItems = MutableStateFlow<List<Vocabulary>>(emptyList())
+    val bonusItems = _bonusItems.asStateFlow()
 
     init {
-        viewModelScope.launch {
-            loadContainerNamesWithIds()
-        }
         viewModelScope.launch {
             when (navArgs.screenType) {
                 BonusScreen.Favorites -> loadFavorites()
@@ -51,22 +40,13 @@ class FavoritesAndPronunciationViewModel @Inject constructor(
         }
     }
 
-    private fun loadContainerNamesWithIds() = viewModelScope.launch(ioDispatcher) {
-        _containerNamesWithIds.update { repository.getAllContainerNamesWithIds() }
-    }
-
     private fun loadFavorites() = viewModelScope.launch(ioDispatcher) {
-        val newFavorites = repository.getFavorites(_containerId.value)
-        _favorites.update { newFavorites }
+        val favorites = repository.getFavorites(null)
+        _bonusItems.update { favorites }
     }
 
     private fun loadPronunciations() = viewModelScope.launch(ioDispatcher) {
-        val newFavorites = repository.getFavorites(_containerId.value)
-        _favorites.update { newFavorites }
-    }
-
-    fun updateContainerId(newId: Int?) {
-        _containerId.update { newId }
-        loadFavorites() // Reload favorites when ID changes
+        val pronunciations = repository.getPronunciations(null)
+        _bonusItems.update { pronunciations }
     }
 }
