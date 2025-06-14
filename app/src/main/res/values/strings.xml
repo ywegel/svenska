@@ -75,6 +75,9 @@
     <string name="lang_adjective_abbreviation">A</string>
     <string name="lang_other_abbreviation">•</string>
 
+    <string name="lang_noun_gender_abbreviation_ultra">U</string>
+    <string name="lang_noun_gender_abbreviation_neutra">N</string>
+
     <!-- # Containers # -->
     <string name="containers_add_confirmation">Add</string>
     <string name="container_title_edit_mode">Edit containers</string>
@@ -136,6 +139,8 @@
     <string name="quiz_result_correct">Correct!</string>
     <string name="quiz_result_wrong">Wrong! The correct answer was: </string>
     <string name="quiz_result_wrong_user_answer">Your answer was: </string>
+
+    <string name="quiz_result_endings_formated">With:</string>
 
     <string name="quiz_result_with_endings_all_correct">Correct!</string>
     <string name="quiz_result_with_endings_wrong_translation">Wrong translation! The correct answer was: </string>

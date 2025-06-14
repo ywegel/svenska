@@ -30,6 +30,7 @@ import de.ywegel.svenska.data.vocabularies
 import de.ywegel.svenska.data.vocabulary
 import de.ywegel.svenska.ui.common.HorizontalSpacerXS
 import de.ywegel.svenska.ui.common.vocabulary.WordGroupBadgeExtended
+import de.ywegel.svenska.ui.common.vocabulary.abbreviation
 import de.ywegel.svenska.ui.common.vocabulary.mainGroupAbbreviation
 import de.ywegel.svenska.ui.common.vocabulary.subGroupAbbreviation
 import de.ywegel.svenska.ui.theme.Spacings
@@ -81,11 +82,7 @@ fun VocabularyListItem(vocabulary: Vocabulary, modifier: Modifier = Modifier, on
 
                     if (showGender) {
                         Text(
-                            text = when (vocabulary.gender) {
-                                // TODO: String ressources
-                                Gender.Ultra -> "U"
-                                Gender.Neutra -> "N"
-                            },
+                            text = vocabulary.gender.abbreviation(),
                             style = SvenskaTheme.typography.labelMedium,
                             color = SvenskaTheme.colors.primary,
                             modifier = Modifier.padding(start = 6.dp),

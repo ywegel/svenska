@@ -3,6 +3,7 @@ package de.ywegel.svenska.domain.quiz.strategies
 import de.ywegel.svenska.data.model.Vocabulary
 import de.ywegel.svenska.domain.quiz.QuizStrategy
 import de.ywegel.svenska.domain.quiz.model.QuizQuestion
+import de.ywegel.svenska.domain.quiz.model.QuizQuestionPromptData
 import de.ywegel.svenska.domain.quiz.model.TranslateMode
 import de.ywegel.svenska.domain.quiz.model.UserAnswer
 import de.ywegel.svenska.ui.quiz.controller.TranslateWithEndingsResult
@@ -21,32 +22,28 @@ class TranslationWithEndingsQuizStrategy(
 
         return when (effectiveMode) {
             TranslateMode.Swedish -> {
-                if (vocabulary.ending.isNotBlank()) {
-                    QuizQuestion(
-                        prompt = vocabulary.word,
-                        expectedAnswer = UserAnswer.TranslateWithEndingsAnswer(
-                            answer = vocabulary.translation,
-                            endings = vocabulary.ending,
-                        ),
-                        vocabularyId = vocabulary.id,
-                    )
-                } else {
-                    QuizQuestion(
-                        // TODO: Rethink the prompt logic. Maybe add en/ett to this to help? Or make this configurable?
-                        prompt = vocabulary.word,
-                        expectedAnswer = UserAnswer.TranslateWithEndingsAnswer(
-                            answer = vocabulary.translation,
-                            endings = null,
-                        ),
-                        vocabularyId = vocabulary.id,
-                    )
-                }
+                QuizQuestion(
+                    prompt = vocabulary.word,
+                    expectedAnswer = UserAnswer.TranslateWithEndingsAnswer(
+                        answer = vocabulary.translation,
+                        endings = null,
+                    ),
+                    vocabularyId = vocabulary.id,
+                    promptData = QuizQuestionPromptData(
+                        wordGroup = vocabulary.wordGroup,
+                        endings = vocabulary.ending.takeIf { it.isNotBlank() },
+                        gender = vocabulary.gender,
+                    ),
+                )
             }
 
             TranslateMode.Native -> {
                 QuizQuestion(
                     prompt = vocabulary.translation,
-                    expectedAnswer = UserAnswer.TranslateWithEndingsAnswer(answer = vocabulary.word, endings = null),
+                    expectedAnswer = UserAnswer.TranslateWithEndingsAnswer(
+                        answer = vocabulary.word,
+                        endings = vocabulary.ending.takeIf { it.isNotBlank() },
+                    ),
                     vocabularyId = vocabulary.id,
                 )
             }

@@ -47,9 +47,7 @@ fun QuizConfigurationScreen(navigator: DestinationsNavigator, containerId: Int?)
 
     QuizConfigurationScreen(
         configState = configState,
-        selectedModeChanged = viewModel::quizModeChanged,
-        withEndingsChanged = viewModel::withEndingsChanged,
-        onlyEndingsChanged = viewModel::onlyEndingsChanged,
+        callbacks = viewModel,
         navigateToQuiz = {
             viewModel.generateNavigationArgs()?.let { quizMode ->
                 // navigator.popBackStack() // TODO: maybe remove config screen from backstack after navigation?
@@ -68,9 +66,7 @@ fun QuizConfigurationScreen(navigator: DestinationsNavigator, containerId: Int?)
 @Composable
 private fun QuizConfigurationScreen(
     configState: ConfigurationState,
-    selectedModeChanged: (TranslateMode) -> Unit,
-    withEndingsChanged: (Boolean) -> Unit,
-    onlyEndingsChanged: (Boolean) -> Unit,
+    callbacks: QuizConfigurationCallbacks,
     navigateToQuiz: () -> Unit,
     onNavigateUp: () -> Unit,
 ) {
@@ -88,7 +84,7 @@ private fun QuizConfigurationScreen(
                 TranslationModeSelector(
                     selectedMode = configState.selectedType,
                     enabled = !configState.onlyEndings,
-                    selectedModeChanged = selectedModeChanged,
+                    selectedModeChanged = callbacks::quizModeChanged,
                 )
                 VerticalSpacerM()
 
@@ -99,7 +95,7 @@ private fun QuizConfigurationScreen(
                         text = "Additionally test endings",
                         fillTextWidth = false,
                         switchChecked = configState.withEndings,
-                        onSwitchChanged = withEndingsChanged,
+                        onSwitchChanged = callbacks::withEndingsChanged,
                     )
 
                     AnimatedVisibility(configState.withEndings) {
@@ -107,7 +103,7 @@ private fun QuizConfigurationScreen(
                             text = "Only test endings",
                             fillTextWidth = false,
                             switchChecked = configState.onlyEndings,
-                            onSwitchChanged = onlyEndingsChanged,
+                            onSwitchChanged = callbacks::onlyEndingsChanged,
                         )
                     }
                 }
@@ -184,7 +180,12 @@ private fun SwitchWithText(
 @Composable
 private fun QuizConfigPreview() {
     SvenskaTheme {
-        QuizConfigurationScreen(ConfigurationState(TranslateMode.Native), {}, {}, {}, {}, {})
+        QuizConfigurationScreen(
+            configState = ConfigurationState(TranslateMode.Native),
+            callbacks = QuizConfigurationCallbacksFake,
+            navigateToQuiz = {},
+            onNavigateUp = {},
+        )
     }
 }
 
@@ -193,12 +194,10 @@ private fun QuizConfigPreview() {
 private fun QuizConfigExtendedPreview() {
     SvenskaTheme {
         QuizConfigurationScreen(
-            ConfigurationState(TranslateMode.Native, withEndings = true, onlyEndings = true),
-            {},
-            {},
-            {},
-            {},
-            {},
+            configState = ConfigurationState(TranslateMode.Native, withEndings = true, onlyEndings = true),
+            callbacks = QuizConfigurationCallbacksFake,
+            navigateToQuiz = {},
+            onNavigateUp = {},
         )
     }
 }
