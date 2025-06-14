@@ -64,6 +64,16 @@ private fun HorizontalSpacer(spacing: Dp) {
 }
 
 @Composable
+fun HorizontalSpacerXXXS() {
+    HorizontalSpacer(spacing = Spacings.xxxs)
+}
+
+@Composable
+fun HorizontalSpacerXXS() {
+    HorizontalSpacer(spacing = Spacings.xxs)
+}
+
+@Composable
 fun HorizontalSpacerXS() {
     HorizontalSpacer(spacing = Spacings.xs)
 }

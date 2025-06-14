@@ -2,6 +2,7 @@
 
 package de.ywegel.svenska.ui.quiz
 
+import androidx.activity.compose.BackHandler
 import androidx.compose.material.icons.outlined.Favorite
 import androidx.compose.material.icons.outlined.FavoriteBorder
 import androidx.compose.material.icons.outlined.Info
@@ -64,6 +65,17 @@ private fun <A : UserAnswer, S : QuizInputState<A>, AC : Any, AR : Any> QuizScre
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val inputState by viewModel.inputState.collectAsStateWithLifecycle()
 
+    val navigateUp: () -> Unit = {
+        navigator.popBackStack(
+            route = QuizConfigurationScreenDestination,
+            inclusive = true,
+        )
+    }
+
+    BackHandler {
+        navigateUp()
+    }
+
     QuizScreen(
         uiState = uiState,
         renderer = viewModel.renderer,
@@ -71,12 +83,7 @@ private fun <A : UserAnswer, S : QuizInputState<A>, AC : Any, AR : Any> QuizScre
         actions = viewModel.actions,
         callbacks = viewModel,
         navigateToWordGroupsScreen = { navigator.navigate(WordGroupsScreenDestination) },
-        navigateToOverview = {
-            navigator.popBackStack(
-                route = QuizConfigurationScreenDestination,
-                inclusive = true,
-            )
-        },
+        navigateToOverview = navigateUp,
         onStartNewQuiz = {
             navigator.popBackStack(QuizConfigurationScreenDestination, inclusive = false)
         },

@@ -43,6 +43,7 @@ private fun WordGroupsScreen(onNavigateUp: () -> Unit) {
     )
 }
 
+// TODO: Show the corresponding WordGroupBadge in front of each Item
 @Composable
 fun VerbGroupsScreen() {
     Column(
@@ -111,6 +112,8 @@ fun NounGroupsScreen() {
             style = SvenskaTheme.typography.headlineMedium,
             fontWeight = FontWeight.Bold,
         )
+
+        // TODO: Show en Ultra, ett Neutra explanation
 
         // Group 1 (-or)
         GrammarItem(

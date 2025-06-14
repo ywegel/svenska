@@ -1,7 +1,10 @@
 package de.ywegel.svenska.domain.quiz.strategies
 
+import de.ywegel.svenska.data.model.Gender
 import de.ywegel.svenska.data.model.Vocabulary
+import de.ywegel.svenska.data.model.WordGroup
 import de.ywegel.svenska.domain.quiz.model.QuizQuestion
+import de.ywegel.svenska.domain.quiz.model.QuizQuestionPromptData
 import de.ywegel.svenska.domain.quiz.model.TranslateMode
 import de.ywegel.svenska.domain.quiz.model.UserAnswer
 import org.junit.jupiter.api.DisplayName
@@ -23,7 +26,9 @@ class TranslationWithoutEndingsQuizStrategyTest {
             word = "hund",
             translation = "dog",
             containerId = 1,
-            ending = "-en",
+            ending = "-en -ar -arna",
+            gender = Gender.Ultra,
+            wordGroup = WordGroup.Noun(WordGroup.NounSubgroup.AR),
         )
 
         @Test
@@ -40,6 +45,11 @@ class TranslationWithoutEndingsQuizStrategyTest {
                     vocabularyId = 1,
                     prompt = "hund",
                     expectedAnswer = UserAnswer.TranslateWithoutEndingsAnswer("dog"),
+                    promptData = QuizQuestionPromptData(
+                        wordGroup = WordGroup.Noun(WordGroup.NounSubgroup.AR),
+                        endings = "-en -ar -arna",
+                        gender = Gender.Ultra,
+                    ),
                 ),
             )
         }
@@ -76,6 +86,11 @@ class TranslationWithoutEndingsQuizStrategyTest {
                     vocabularyId = 1,
                     prompt = "hund",
                     expectedAnswer = UserAnswer.TranslateWithoutEndingsAnswer("dog"),
+                    promptData = QuizQuestionPromptData(
+                        wordGroup = WordGroup.Noun(WordGroup.NounSubgroup.AR),
+                        endings = "-en -ar -arna",
+                        gender = Gender.Ultra,
+                    ),
                 ),
             )
         }

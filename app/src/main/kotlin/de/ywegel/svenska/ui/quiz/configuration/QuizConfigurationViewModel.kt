@@ -7,8 +7,9 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 
-class QuizConfigurationViewModel(initialUiState: ConfigurationState = ConfigurationState()) : ViewModel(),
-    QuizConfigurationCallbacks {
+class QuizConfigurationViewModel(
+    initialUiState: ConfigurationState = ConfigurationState(),
+) : ViewModel(), QuizConfigurationCallbacks {
     private val _configurationState = MutableStateFlow(initialUiState)
     val configurationState = _configurationState.asStateFlow()
 

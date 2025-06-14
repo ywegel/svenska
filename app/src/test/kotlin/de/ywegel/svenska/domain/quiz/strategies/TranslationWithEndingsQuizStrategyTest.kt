@@ -1,11 +1,13 @@
 package de.ywegel.svenska.domain.quiz.strategies
 
+import de.ywegel.svenska.data.model.Gender
 import de.ywegel.svenska.data.model.Vocabulary
+import de.ywegel.svenska.data.model.WordGroup
 import de.ywegel.svenska.domain.quiz.model.QuizQuestion
+import de.ywegel.svenska.domain.quiz.model.QuizQuestionPromptData
 import de.ywegel.svenska.domain.quiz.model.TranslateMode
 import de.ywegel.svenska.domain.quiz.model.UserAnswer
 import de.ywegel.svenska.ui.quiz.controller.TranslateWithEndingsResult
-import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
@@ -24,6 +26,8 @@ class TranslationWithEndingsQuizStrategyTest {
             translation = "dog",
             containerId = 1,
             ending = "-en -ar -arna",
+            gender = Gender.Ultra,
+            wordGroup = WordGroup.Noun(WordGroup.NounSubgroup.AR),
         )
 
         @Test
@@ -39,12 +43,16 @@ class TranslationWithEndingsQuizStrategyTest {
                 QuizQuestion(
                     vocabularyId = 1,
                     prompt = "hund",
-                    expectedAnswer = UserAnswer.TranslateWithEndingsAnswer("dog", "-en -ar -arna"),
+                    expectedAnswer = UserAnswer.TranslateWithEndingsAnswer("dog", null),
+                    promptData = QuizQuestionPromptData(
+                        wordGroup = WordGroup.Noun(WordGroup.NounSubgroup.AR),
+                        endings = "-en -ar -arna",
+                        gender = Gender.Ultra,
+                    ),
                 ),
             )
         }
 
-        @Disabled("The ending variable does not make sense yet, if translate mode is swedish")
         @Test
         fun `when mode is Native, should create question with Native prompt`() {
             // Given
@@ -76,12 +84,16 @@ class TranslationWithEndingsQuizStrategyTest {
                 QuizQuestion(
                     vocabularyId = 1,
                     prompt = "hund",
-                    expectedAnswer = UserAnswer.TranslateWithEndingsAnswer("dog", "-en -ar -arna"),
+                    expectedAnswer = UserAnswer.TranslateWithEndingsAnswer("dog", null),
+                    promptData = QuizQuestionPromptData(
+                        wordGroup = WordGroup.Noun(WordGroup.NounSubgroup.AR),
+                        endings = "-en -ar -arna",
+                        gender = Gender.Ultra,
+                    ),
                 ),
             )
         }
 
-        @Disabled("The ending variable does not make sense yet, if translate mode is swedish")
         @Test
         fun `when mode is Random and random returns false, should create question with Native prompt`() {
             // Given
@@ -96,8 +108,8 @@ class TranslationWithEndingsQuizStrategyTest {
                     vocabularyId = 1,
                     prompt = "dog",
                     expectedAnswer = UserAnswer.TranslateWithEndingsAnswer(
-                        "en hund",
-                        "-en -ar -arna",
+                        answer = "hund",
+                        endings = "-en -ar -arna",
                     ),
                 ),
             )
@@ -118,6 +130,11 @@ class TranslationWithEndingsQuizStrategyTest {
                     vocabularyId = 1,
                     prompt = "hund",
                     expectedAnswer = UserAnswer.TranslateWithEndingsAnswer("dog", null),
+                    promptData = QuizQuestionPromptData(
+                        wordGroup = WordGroup.Noun(WordGroup.NounSubgroup.AR),
+                        endings = null,
+                        gender = Gender.Ultra,
+                    ),
                 ),
             )
         }
@@ -127,8 +144,6 @@ class TranslationWithEndingsQuizStrategyTest {
     @DisplayName("ValidateAnswer")
     inner class ValidateAnswer {
 
-        // TODO: Fixed with endings rework
-        @Disabled("The ending variable does not make sense yet, if translate mode is swedish")
         @Test
         fun `when both translation and endings are correct, should return correct result`() {
             // Given
@@ -138,7 +153,7 @@ class TranslationWithEndingsQuizStrategyTest {
                 prompt = "hund",
                 expectedAnswer = UserAnswer.TranslateWithEndingsAnswer("dog", "-en -ar -arna"),
             )
-            val userAnswer = UserAnswer.TranslateWithEndingsAnswer("car", "-en -ar -arna")
+            val userAnswer = UserAnswer.TranslateWithEndingsAnswer("dog", "-en -ar -arna")
 
             // When
             val result = strategy.validateAnswer(question, userAnswer)
@@ -152,7 +167,6 @@ class TranslationWithEndingsQuizStrategyTest {
             )
         }
 
-        @Disabled("The ending variable does not make sense yet, if translate mode is swedish")
         @Test
         fun `when translation is correct but endings are wrong, should return partial correct result`() {
             // Given
@@ -176,7 +190,6 @@ class TranslationWithEndingsQuizStrategyTest {
             )
         }
 
-        @Disabled("The ending variable does not make sense yet, if translate mode is swedish")
         @Test
         fun `when translation is wrong but endings are correct, should return partial correct result`() {
             // Given
@@ -200,7 +213,6 @@ class TranslationWithEndingsQuizStrategyTest {
             )
         }
 
-        @Disabled("The ending variable does not make sense yet, if translate mode is swedish")
         @Test
         fun `when both translation and endings are wrong, should return all incorrect result`() {
             // Given
