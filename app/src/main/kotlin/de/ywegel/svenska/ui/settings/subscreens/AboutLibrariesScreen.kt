@@ -1,6 +1,6 @@
 @file:OptIn(ExperimentalMaterial3Api::class)
 
-package de.ywegel.svenska.ui.settings.aboutlibraries
+package de.ywegel.svenska.ui.settings.subscreens
 
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material.icons.Icons
