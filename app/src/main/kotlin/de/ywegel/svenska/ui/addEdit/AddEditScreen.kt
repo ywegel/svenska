@@ -78,8 +78,8 @@ import de.ywegel.svenska.ui.common.ConfirmableComponent
 import de.ywegel.svenska.ui.common.HorizontalSpacerXS
 import de.ywegel.svenska.ui.common.IconButton
 import de.ywegel.svenska.ui.common.VerticalSpacerM
-import de.ywegel.svenska.ui.common.vocabulary.EmptyWordGroupBadge
-import de.ywegel.svenska.ui.common.vocabulary.WordGroupBadgeExtended
+import de.ywegel.svenska.ui.common.vocabulary.wordGroupBadge.AnimatedWordGroupBadgeExtended
+import de.ywegel.svenska.ui.common.vocabulary.wordGroupBadge.EmptyWordGroupBadge
 import de.ywegel.svenska.ui.overview.userFacingString
 import de.ywegel.svenska.ui.theme.Spacings
 import de.ywegel.svenska.ui.theme.SvenskaIcons
@@ -208,7 +208,7 @@ private fun WordGroupSection(
         HorizontalSpacerXS()
         Crossfade(Pair(uiState.selectedWordGroup, uiState.selectedSubGroup)) { (mainGroup, subGroup) ->
             if (mainGroup != null) {
-                WordGroupBadgeExtended(
+                AnimatedWordGroupBadgeExtended(
                     mainWordGroup = mainGroup.mainGroupAbbreviation(),
                     subWordGroup = mainGroup.subGroupAbbreviation(subGroup),
                 )

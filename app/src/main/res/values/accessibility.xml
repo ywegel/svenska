@@ -11,4 +11,7 @@
     <string name="accessibility_quiz_toolbar_actions_favorite">Favorite this word</string>
     <string name="accessibility_quiz_toolbar_actions_word_group_info">Navigate to WordGroups screen</string>
 
+    <!-- # Onboarding # -->
+    <string name="accessibility_onboarding_page_word_group_bonus_image">Shows the bonus bar containing a WordGroup item</string>
+    <string name="accessibility_onboarding_page_importer_open_with">Shows android system "open with" popup displaying this app</string>
 </resources>

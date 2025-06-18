@@ -11,6 +11,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import com.ramcosta.composedestinations.annotation.Destination
 import com.ramcosta.composedestinations.generated.NavGraphs
 import com.ramcosta.composedestinations.generated.destinations.ContainerScreenDestination
+import com.ramcosta.composedestinations.generated.destinations.WordGroupsScreenDestination
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
 import de.ywegel.svenska.R
 import de.ywegel.svenska.navigation.SvenskaGraph
@@ -31,11 +32,12 @@ fun OnboardingScreen(navigator: DestinationsNavigator) {
 
     OnboardingScreen(
         onOnboardingComplete = viewModel::completeOnboarding,
+        navigateToWordGroupScreen = { navigator.navigate(WordGroupsScreenDestination) },
     )
 }
 
 @Composable
-private fun OnboardingScreen(onOnboardingComplete: () -> Unit) {
+private fun OnboardingScreen(onOnboardingComplete: () -> Unit, navigateToWordGroupScreen: () -> Unit) {
     Scaffold(
         topBar = {
             TopAppTextBar(
@@ -47,6 +49,7 @@ private fun OnboardingScreen(onOnboardingComplete: () -> Unit) {
         OnboardingContent(
             innerPadding = innerPadding,
             onOnboardingComplete = onOnboardingComplete,
+            navigateToWordGroupScreen = navigateToWordGroupScreen,
         )
     }
 }
