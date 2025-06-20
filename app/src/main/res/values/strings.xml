@@ -193,24 +193,25 @@
 
     <!-- ## Nouns ## -->
     <string name="nouns_tab">Nouns</string>
+    <string name="noun_gender_title">Swedish Genders</string>
     <string name="nouns_title">Swedish Nouns</string>
     <string name="group_or">Group 1 (-or)</string>
-    <string name="group_or_rule">En-words that end with *-a*</string>
-    <string name="group_or_example">en flicka → flickor</string>
+    <string name="group_or_rule">En-words that end with *a*, use *-or* for the plural</string>
+    <string name="group_or_example">en flicka → flickan, flickor, flickorna</string>
     <string name="group_ar">Group 2 (-ar)</string>
-    <string name="group_ar_rule">En-words with unstressed *-e*, *-el*, *-er* or certain consonants</string>
+    <string name="group_ar_rule">En-words with unstressed *-e*, *-el*, *-er* or certain consonants, use *-ar* for the plural</string>
     <string name="group_ar_example">en cykel → cyklar</string>
     <string name="group_er">Group 3 (-er)</string>
-    <string name="group_er_rule">En-words with stress on the last syllable or certain endings</string>
+    <string name="group_er_rule">En-words with stress on the last syllable or certain endings, use *-er* for the plural</string>
     <string name="group_er_example">en station → stationer</string>
     <string name="group_r">Group 4 (-r)</string>
-    <string name="group_r_rule">One-syllable en-words that end with a stressed vowel</string>
+    <string name="group_r_rule">One-syllable en-words that end with a stressed vowel, use *-r* for the plural</string>
     <string name="group_r_example">en sko → skor</string>
     <string name="group_n">Group 5 (-n)</string>
-    <string name="group_n_rule">Ett-words that end with a vowel</string>
+    <string name="group_n_rule">Ett-words that end with a vowel, use *-n* for the plural</string>
     <string name="group_n_example">ett kvitto → kvitton</string>
     <string name="group_unchanged">Group 6 (-)</string>
-    <string name="group_unchanged_rule">Ett-words that end with a consonant, or certain en-words</string>
+    <string name="group_unchanged_rule">Ett-words that end with a consonant, or certain en-words, use the indefinite singular for the plural</string>
     <string name="group_unchanged_example">ett hus → hus, en lärare → lärare</string>
 
     <string name="example_format">Example: %s</string>
