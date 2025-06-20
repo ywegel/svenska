@@ -10,6 +10,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.pager.HorizontalPager
+import androidx.compose.foundation.pager.PagerState
 import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.material3.Button
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -23,71 +24,101 @@ import androidx.compose.ui.res.stringResource
 import de.ywegel.svenska.R
 import de.ywegel.svenska.ui.common.VerticalSpacerM
 import de.ywegel.svenska.ui.common.VerticalSpacerS
+import de.ywegel.svenska.ui.onboarding.pages.BonusPage
+import de.ywegel.svenska.ui.onboarding.pages.ImporterPage
+import de.ywegel.svenska.ui.onboarding.pages.OnboardingPage
+import de.ywegel.svenska.ui.onboarding.pages.OnboardingSimpleTextPage
+import de.ywegel.svenska.ui.onboarding.pages.WordGroupPage
 import de.ywegel.svenska.ui.theme.Spacings
 import kotlinx.coroutines.launch
 
 @Composable
-internal fun OnboardingContent(innerPadding: PaddingValues, onOnboardingComplete: () -> Unit) {
+internal fun OnboardingContent(
+    innerPadding: PaddingValues,
+    onOnboardingComplete: () -> Unit,
+    navigateToWordGroupScreen: () -> Unit,
+) {
     val pagerState = rememberPagerState(pageCount = { OnboardingPage.COUNT })
-    val coroutineScope = rememberCoroutineScope()
 
     Column(
-        modifier = Modifier.fillMaxSize().padding(innerPadding),
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(innerPadding),
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center,
     ) {
+        VerticalSpacerM()
         HorizontalPager(
             state = pagerState,
             modifier = Modifier.weight(1f),
         ) { page ->
-            OnboardingPage(
-                page = page,
-                modifier = Modifier.fillMaxSize(),
-            )
+            val page = OnboardingPage.fromIndex(page)
+            OnboardingPage(page) {
+                when (page) {
+                    OnboardingPage.WORD_GROUP -> {
+                        WordGroupPage(navigateToWordGroupScreen)
+                    }
+
+                    OnboardingPage.BONUS -> {
+                        BonusPage()
+                    }
+
+                    OnboardingPage.IMPORTER -> {
+                        ImporterPage()
+                    }
+
+                    else -> {
+                        OnboardingSimpleTextPage(page)
+                    }
+                }
+            }
         }
 
         VerticalSpacerM()
 
         // Page indicator
-        PageIndicator(
-            pageCount = OnboardingPage.COUNT,
-            currentPage = pagerState.currentPage,
-            modifier = Modifier.fillMaxWidth(),
-        )
+        PagerIndicator(pagerState)
 
         VerticalSpacerM()
 
         // Navigation buttons
-        Column(Modifier.padding(horizontal = Spacings.m)) {
-            if (pagerState.currentPage != OnboardingPage.LAST_INDEX) {
-                Button(
-                    onClick = {
-                        coroutineScope.launch {
-                            pagerState.animateScrollToPage(pagerState.currentPage + 1)
-                        }
-                    },
-                    modifier = Modifier.fillMaxWidth(),
-                ) {
-                    Text(stringResource(R.string.onboarding_button_next))
-                }
+        OnboardingNavigationButtons(pagerState = pagerState, onOnboardingComplete = onOnboardingComplete)
+    }
+}
 
-                VerticalSpacerS()
-            } else {
-                Button(
-                    onClick = onOnboardingComplete,
-                    modifier = Modifier.fillMaxWidth(),
-                ) {
-                    Text(stringResource(R.string.onboarding_button_start))
-                }
+@Composable
+private fun OnboardingNavigationButtons(pagerState: PagerState, onOnboardingComplete: () -> Unit) {
+    val coroutineScope = rememberCoroutineScope()
+
+    Column(Modifier.padding(horizontal = Spacings.m)) {
+        if (pagerState.currentPage != OnboardingPage.LAST_INDEX) {
+            Button(
+                onClick = {
+                    coroutineScope.launch {
+                        pagerState.animateScrollToPage(pagerState.currentPage + 1)
+                    }
+                },
+                modifier = Modifier.fillMaxWidth(),
+            ) {
+                Text(stringResource(R.string.onboarding_button_next))
             }
 
-            AnimatedVisibility(visible = pagerState.currentPage != OnboardingPage.LAST_INDEX) {
-                OutlinedButton(
-                    onClick = onOnboardingComplete,
-                    modifier = Modifier.fillMaxWidth(),
-                ) {
-                    Text(stringResource(R.string.onboarding_button_skip))
-                }
+            VerticalSpacerS()
+        } else {
+            Button(
+                onClick = onOnboardingComplete,
+                modifier = Modifier.fillMaxWidth(),
+            ) {
+                Text(stringResource(R.string.onboarding_button_start))
+            }
+        }
+
+        AnimatedVisibility(visible = pagerState.currentPage != OnboardingPage.LAST_INDEX) {
+            OutlinedButton(
+                onClick = onOnboardingComplete,
+                modifier = Modifier.fillMaxWidth(),
+            ) {
+                Text(stringResource(R.string.onboarding_button_skip))
             }
         }
     }

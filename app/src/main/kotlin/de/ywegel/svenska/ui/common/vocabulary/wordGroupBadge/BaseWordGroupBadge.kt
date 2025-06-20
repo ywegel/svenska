@@ -1,4 +1,4 @@
-package de.ywegel.svenska.ui.common.vocabulary
+package de.ywegel.svenska.ui.common.vocabulary.wordGroupBadge
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -10,12 +10,10 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
@@ -23,7 +21,11 @@ import de.ywegel.svenska.ui.theme.Spacings
 import de.ywegel.svenska.ui.theme.SvenskaTheme
 
 @Composable
-fun WordGroupBadge(mainWordGroup: String, color: Color = SvenskaTheme.colors.primary, surfaceAlpha: Float = 0.2f) {
+fun BaseWordGroupBadge(
+    color: Color = SvenskaTheme.colors.primary,
+    surfaceAlpha: Float = 0.2f,
+    content: @Composable (Color) -> Unit,
+) {
     Box(
         modifier = Modifier
             .size(22.dp)
@@ -33,28 +35,30 @@ fun WordGroupBadge(mainWordGroup: String, color: Color = SvenskaTheme.colors.pri
             ),
         contentAlignment = Alignment.Center,
     ) {
-        Text(
-            text = mainWordGroup.take(1),
-            style = SvenskaTheme.typography.labelSmall,
-            fontWeight = FontWeight.Bold,
-            color = color,
-        )
+        content(color)
     }
 }
 
 @Composable
-fun WordGroupBadgeExtended(mainWordGroup: String, subWordGroup: String? = null) {
+fun BaseWordGroupBadgeExtended(
+    subWordGroup: String? = null,
+    mainContent: @Composable (Color) -> Unit,
+    subContent: @Composable (Color) -> Unit,
+) {
     subWordGroup?.let {
-        WordGroupBadgeExtended(mainWordGroup = mainWordGroup, subWordGroup = subWordGroup)
-    } ?: WordGroupBadge(mainWordGroup = mainWordGroup)
+        BaseWordGroupBadgeExtendedImpl(
+            mainContent = mainContent,
+            subContent = subContent,
+        )
+    } ?: BaseWordGroupBadge(content = mainContent)
 }
 
 @Composable
-private fun WordGroupBadgeExtended(
-    mainWordGroup: String,
-    subWordGroup: String,
+private fun BaseWordGroupBadgeExtendedImpl(
     mainWordGroupColor: Color = SvenskaTheme.colors.tertiary,
     subWordGroupColor: Color = SvenskaTheme.colors.primary,
+    mainContent: @Composable (Color) -> Unit,
+    subContent: @Composable (Color) -> Unit,
 ) {
     Row(
         modifier = Modifier
@@ -70,17 +74,12 @@ private fun WordGroupBadgeExtended(
             contentAlignment = Alignment.CenterEnd,
         ) {
             Row {
-                Text(
-                    text = mainWordGroup.take(1),
-                    style = SvenskaTheme.typography.labelSmall,
-                    fontWeight = FontWeight.Bold,
-                    color = mainWordGroupColor,
-                )
+                mainContent(mainWordGroupColor)
                 Spacer(Modifier.width(2.dp))
             }
         }
         Box(modifier = Modifier.background(SvenskaTheme.colors.surface, shape = CircleShape)) {
-            WordGroupBadge(subWordGroup, subWordGroupColor, surfaceAlpha = 0.4f)
+            BaseWordGroupBadge(subWordGroupColor, surfaceAlpha = 0.4f, content = subContent)
         }
     }
 }
@@ -101,36 +100,6 @@ fun EmptyWordGroupBadge() {
             ),
         contentAlignment = Alignment.Center,
     ) { }
-}
-
-@Preview
-@Composable
-private fun BadgePreview() {
-    SvenskaTheme {
-        Row(Modifier.padding(Spacings.m, Spacings.xs)) {
-            WordGroupBadge("A")
-        }
-    }
-}
-
-@Preview
-@Composable
-private fun ExtendedBadgePreview() {
-    SvenskaTheme {
-        Row(Modifier.padding(Spacings.m, Spacings.xs)) {
-            WordGroupBadgeExtended("Na", "Bb")
-        }
-    }
-}
-
-@Preview
-@Composable
-private fun ExtendedBadgeIncompletePreview() {
-    SvenskaTheme {
-        Row(Modifier.padding(Spacings.m, Spacings.xs)) {
-            WordGroupBadgeExtended("N", null)
-        }
-    }
 }
 
 @Preview

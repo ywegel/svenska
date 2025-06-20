@@ -133,11 +133,12 @@ private fun ContainerScreen(
         modifier = Modifier.nestedScroll(scrollBehavior.nestedScrollConnection),
         topBar = {
             ContainerTopBar(
-                scrollBehavior,
-                uiState.isEditModeMode,
-                toggleIsEditMode,
-                onSettingsClicked,
-                onSearchClicked,
+                scrollBehavior = scrollBehavior,
+                editingContainers = uiState.isEditModeMode,
+                toggleIsEditMode = toggleIsEditMode,
+                navigateToSettings = onSettingsClicked,
+                navigateToSearch = onSearchClicked,
+                toggleEditMode = { toggleIsEditMode(true) },
             )
         },
         floatingActionButton = {
