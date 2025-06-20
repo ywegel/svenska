@@ -4,6 +4,10 @@
 
     <string name="accessibility_toolbar_navigate_up">Navigate up</string>
 
+    <!-- # Overview # -->
+    <string name="accessibility_overview_fab_quiz">Quiz</string>
+    <string name="accessibility_overview_fab_add">Add new</string>
+
     <!-- # AddEdit # -->
     <string name="accessibility_addEdit_navigate_word_group_info_screen">Navigate to WordGroups screen</string>
 

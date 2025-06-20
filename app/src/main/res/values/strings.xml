@@ -89,11 +89,12 @@
     <string name="containers_bonus_word_groups">Word Groups</string>
 
     <!-- # Overview # -->
-    <string name="overview_search_no_searches">No searches yet</string>
-
+    <string name="overview_fab_quiz">Quiz</string>
+    <string name="overview_fab_add">Add new</string>
 
     <!-- # Search # -->
     <string name="search_search_label">Search</string>
+    <string name="search_no_searches">No searches yet</string>
 
     <string name="search_uri_parsing_error">URL could not be handled by the system</string>
     <string name="search_base_url_dict_cc">DictCC</string>

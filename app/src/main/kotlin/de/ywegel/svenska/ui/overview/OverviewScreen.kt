@@ -2,8 +2,14 @@
 
 package de.ywegel.svenska.ui.overview
 
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.EnterTransition
+import androidx.compose.animation.core.tween
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.shrinkHorizontally
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
@@ -20,8 +26,15 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -32,15 +45,18 @@ import com.ramcosta.composedestinations.generated.destinations.EditVocabularyScr
 import com.ramcosta.composedestinations.generated.destinations.QuizConfigurationScreenDestinationNavArgs
 import com.ramcosta.composedestinations.generated.destinations.SearchScreenDestination
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
+import de.ywegel.svenska.R
 import de.ywegel.svenska.data.model.Vocabulary
 import de.ywegel.svenska.data.vocabularies
 import de.ywegel.svenska.navigation.SvenskaGraph
+import de.ywegel.svenska.ui.common.HorizontalSpacerS
 import de.ywegel.svenska.ui.common.IconButton
 import de.ywegel.svenska.ui.common.NavigationIconButton
 import de.ywegel.svenska.ui.common.VerticalSpacerM
 import de.ywegel.svenska.ui.theme.Spacings
 import de.ywegel.svenska.ui.theme.SvenskaIcons
 import de.ywegel.svenska.ui.theme.SvenskaTheme
+import kotlinx.coroutines.delay
 
 @Destination<SvenskaGraph>(navArgs = OverviewNavArgs::class)
 @Composable
@@ -147,17 +163,62 @@ data class OverviewNavArgs(
 )
 
 @Composable
-private fun OverviewFab(onClick: () -> Unit, onQuizClick: () -> Unit) {
-    Column {
-        FloatingActionButton(onClick = onQuizClick) {
-            Icon(SvenskaIcons.Quiz, null)
-        }
+private fun OverviewFab(onAddClick: () -> Unit, onQuizClick: () -> Unit) {
+    Column(horizontalAlignment = Alignment.End) {
+        AnimatedFabWithText(
+            onClick = onQuizClick,
+            text = stringResource(R.string.overview_fab_quiz),
+            icon = SvenskaIcons.Quiz,
+            contentDescription = stringResource(R.string.accessibility_overview_fab_quiz),
+        )
         VerticalSpacerM()
-        FloatingActionButton(onClick = onClick) {
-            Icon(SvenskaIcons.Add, null)
+        AnimatedFabWithText(
+            onClick = onAddClick,
+            text = stringResource(R.string.overview_fab_add),
+            icon = SvenskaIcons.Add,
+            contentDescription = stringResource(R.string.accessibility_overview_fab_add),
+        )
+    }
+}
+
+@Composable
+private fun AnimatedFabWithText(onClick: () -> Unit, text: String, icon: ImageVector, contentDescription: String?) {
+    var isExpanded by remember { mutableStateOf(true) }
+
+    LaunchedEffect(Unit) {
+        // TODO: Maybe, instead of a timer, make the text disappear on scroll
+        delay(OVERVIEW_FAB_DISAPPEARING_ANIMATION_DELAY)
+        isExpanded = false
+    }
+
+    FloatingActionButton(onClick = onClick) {
+        Row(
+            modifier = Modifier.padding(horizontal = Spacings.m),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.Center,
+        ) {
+            Icon(icon, contentDescription)
+
+            AnimatedVisibility(
+                visible = isExpanded,
+                enter = EnterTransition.None,
+                exit = fadeOut(animationSpec = tween(durationMillis = ANIMATION_DURATION_MS)) +
+                    shrinkHorizontally(
+                        animationSpec = tween(durationMillis = ANIMATION_DURATION_MS),
+                        shrinkTowards = Alignment.End,
+                    ),
+            ) {
+                Row {
+                    HorizontalSpacerS()
+                    Text(text = text, maxLines = 1)
+                }
+            }
         }
     }
 }
+
+private const val OVERVIEW_FAB_DISAPPEARING_ANIMATION_DELAY = 4000L
+private const val ANIMATION_DURATION_MS = 800
 
 @Preview
 @Composable
