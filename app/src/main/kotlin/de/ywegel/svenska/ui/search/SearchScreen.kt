@@ -69,8 +69,6 @@ import de.ywegel.svenska.ui.theme.Spacings
 import de.ywegel.svenska.ui.theme.SvenskaIcons
 import de.ywegel.svenska.ui.theme.SvenskaTheme
 import kotlinx.coroutines.launch
-import java.util.LinkedList
-import java.util.Queue
 
 private const val TAG = "SearchScreen"
 
@@ -126,7 +124,7 @@ private fun SearchScreen(
             vocabulary = vocabulary,
             searchQuery = currentSearchQuery,
             // onItemClicked = navigateToPopUp, TODO: Show a pop up view of the Item, if clicked
-            onRecentSearchedClicked = onSearchChanged,
+            onRecentSearchedClicked = onSearch,
             uiState = uiState,
             onOnlineRedirectClicked = { baseUrl, query ->
                 try {
@@ -361,7 +359,7 @@ private fun SearchScreenPreviewEmpty() {
     SvenskaTheme {
         SearchScreen(
             uiState = SearchUiState(
-                lastSearchedItems = LinkedList(listOf("abc", "def", "ghi")) as Queue<String>,
+                lastSearchedItems = ArrayDeque(listOf("abc", "def", "ghi")),
             ),
             vocabulary = emptyList(),
             currentSearchQuery = "",
@@ -378,7 +376,7 @@ private fun SearchScreenPreviewFilled() {
     SvenskaTheme {
         SearchScreen(
             uiState = SearchUiState(
-                lastSearchedItems = LinkedList(emptyList<String>()) as Queue<String>,
+                lastSearchedItems = ArrayDeque(emptyList<String>()),
             ),
             vocabulary = emptyList(),
             currentSearchQuery = "abc",

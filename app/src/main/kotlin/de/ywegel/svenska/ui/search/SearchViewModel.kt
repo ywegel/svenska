@@ -19,8 +19,6 @@ import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import java.util.LinkedList
-import java.util.Queue
 import javax.inject.Inject
 
 @HiltViewModel
@@ -72,18 +70,8 @@ class SearchViewModel @Inject constructor(
     fun onSearch(query: String) {
         _searchQuery.value = query
 
-        _uiState.update {
-            val updated = it.lastSearchedItems
-            if (updated.size == MAX_LAST_SEARCH_COUNT) {
-                updated.poll()
-            }
-            updated.add(query)
-            it.copy(lastSearchedItems = updated)
-        }
         viewModelScope.launch(ioDispatcher) {
-            userPreferencesManager.updateOverviewLastSearchedItems(
-                (_uiState.value.lastSearchedItems as LinkedList<String>),
-            )
+            userPreferencesManager.addLastSearchedItem(query)
         }
     }
 
@@ -103,10 +91,8 @@ class SearchViewModel @Inject constructor(
 }
 
 data class SearchUiState(
-    val lastSearchedItems: Queue<String> = LinkedList(),
+    val lastSearchedItems: ArrayDeque<String> = ArrayDeque(),
     val showCompactVocabularyItem: Boolean = false,
     val showOnlineRedirectFirst: Boolean = false,
     val onlineRedirectUrl: String? = null,
 )
-
-private const val MAX_LAST_SEARCH_COUNT = 5

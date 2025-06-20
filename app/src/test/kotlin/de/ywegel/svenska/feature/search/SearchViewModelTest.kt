@@ -4,7 +4,9 @@ import androidx.lifecycle.SavedStateHandle
 import app.cash.turbine.test
 import assertk.all
 import assertk.assertThat
+import assertk.assertions.containsExactly
 import assertk.assertions.containsExactlyInAnyOrder
+import assertk.assertions.doesNotContain
 import assertk.assertions.hasSize
 import assertk.assertions.isEqualTo
 import de.ywegel.svenska.data.model.Vocabulary
@@ -22,9 +24,9 @@ import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import strikt.api.expectThat
+import strikt.assertions.containsExactly
 import strikt.assertions.hasSize
 import strikt.assertions.isEqualTo
-import java.util.LinkedList
 
 @OptIn(ExperimentalCoroutinesApi::class)
 class SearchViewModelTest {
@@ -60,18 +62,29 @@ class SearchViewModelTest {
 
     @Test
     fun `onSearch adds query to last searched items`() = runTest(testDispatcher) {
-        viewModel.onSearch("hund")
+        // Given
+        val query = "hund"
+
+        // When
+        viewModel.onSearch(query)
+        advanceUntilIdle()
+
+        // Then
         val items = viewModel.uiState.value.lastSearchedItems
-        assertThat(items).containsExactlyInAnyOrder("hund")
+        assertThat(items).containsExactly(query)
     }
 
     @Test
     fun `onSearch maintains only 5 last searched items`() = runTest(testDispatcher) {
-        repeat(6) { viewModel.onSearch("word$it") }
+        repeat(9) { viewModel.onSearch("word$it") }
+
+        advanceUntilIdle()
+
         val items = viewModel.uiState.value.lastSearchedItems
         assertThat(items).all {
-            hasSize(5)
-            containsExactlyInAnyOrder("word1", "word2", "word3", "word4", "word5")
+            hasSize(8)
+            containsExactlyInAnyOrder("word1", "word2", "word3", "word4", "word5", "word6", "word7", "word8")
+            doesNotContain("word0")
         }
     }
 
@@ -121,7 +134,8 @@ class SearchViewModelTest {
         viewModel.uiState.test {
             skipItems(1) // initial state
 
-            fakePrefs.updateOverviewLastSearchedItems(LinkedList(listOf("älg", "fisk")))
+            fakePrefs.addLastSearchedItem("älg")
+            fakePrefs.addLastSearchedItem("fisk")
 
             val updated = awaitItem()
             assertThat(updated.lastSearchedItems).containsExactlyInAnyOrder("älg", "fisk")
@@ -131,9 +145,14 @@ class SearchViewModelTest {
     }
 
     @Test
-    fun `onSearch with same query twice adds only once if already max size`() = runTest {
+    fun `onSearch ignores duplicates`() = runTest {
         repeat(5) { viewModel.onSearch("same") }
         viewModel.onSearch("same")
-        assertThat(viewModel.uiState.value.lastSearchedItems.count { it == "same" }).isEqualTo(5)
+        advanceUntilIdle()
+        viewModel.uiState.test {
+            val emission = awaitItem()
+            expectThat(emission.lastSearchedItems.size).isEqualTo(1)
+            expectThat(emission.lastSearchedItems).containsExactly("same")
+        }
     }
 }
