@@ -113,6 +113,7 @@ fun VerbGroupsScreen() {
     }
 }
 
+@Suppress("LongMethod")
 @Composable
 fun NounGroupsScreen() {
     Column(
