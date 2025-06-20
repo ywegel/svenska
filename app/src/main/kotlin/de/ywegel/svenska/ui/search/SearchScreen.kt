@@ -126,6 +126,7 @@ private fun SearchScreen(
             vocabulary = vocabulary,
             searchQuery = currentSearchQuery,
             // onItemClicked = navigateToPopUp, TODO: Show a pop up view of the Item, if clicked
+            onRecentSearchedClicked = onSearchChanged,
             uiState = uiState,
             onOnlineRedirectClicked = { baseUrl, query ->
                 try {
