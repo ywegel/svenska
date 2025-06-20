@@ -13,13 +13,10 @@ import dagger.hilt.android.qualifiers.ApplicationContext
 import de.ywegel.svenska.data.SortOrder
 import de.ywegel.svenska.domain.search.OnlineSearchType
 import de.ywegel.svenska.jsonConfig
-import de.ywegel.svenska.serializers.QueueSerializer
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.map
 import java.io.IOException
-import java.util.LinkedList
-import java.util.Queue
 import javax.inject.Inject
 import javax.inject.Singleton
 
@@ -36,7 +33,7 @@ data class OverviewPreferences(
 )
 
 data class SearchPreferences(
-    val lastSearchedItems: Queue<String>,
+    val lastSearchedItems: ArrayDeque<String>,
     val showCompactVocabularyItem: Boolean,
     val showOnlineRedirectFirst: Boolean,
     val onlineRedirectType: OnlineSearchType,
@@ -59,7 +56,7 @@ interface UserPreferencesManager {
 
     suspend fun showCompactVocabularyItem(showCompactVocabularyItem: Boolean)
 
-    suspend fun updateOverviewLastSearchedItems(queue: Queue<String>)
+    suspend fun addLastSearchedItem(item: String)
 
     suspend fun showCompactVocabularyItemInSearch(show: Boolean)
 
@@ -114,10 +111,10 @@ class UserPreferencesManagerImpl @Inject constructor(@ApplicationContext val con
     override val preferencesSearchFlow: Flow<SearchPreferences> = context.dataStoreOverview.data
         .fallbackToDefaultOnError()
         .map { preferences ->
-            val lastSearchedItems: Queue<String> =
+            val lastSearchedItems: ArrayDeque<String> =
                 preferences[PreferencesKeys.SEARCH_SORT_LAST_SEARCHED_ITEMS]?.let {
-                    jsonConfig.decodeFromString(QueueSerializer, it)
-                } ?: LinkedList()
+                    jsonConfig.decodeFromString(ArrayDequeSerializer, it)
+                } ?: ArrayDeque()
 
             val showCompactVocabularyItem = preferences[PreferencesKeys.SEARCH_SHOW_COMPACT_VOCABULARY_ITEM] ?: false
             val showOnlineRedirectFirst = preferences[PreferencesKeys.SEARCH_ONLINE_REDIRECT_POSITION] ?: false
@@ -128,10 +125,16 @@ class UserPreferencesManagerImpl @Inject constructor(@ApplicationContext val con
             SearchPreferences(lastSearchedItems, showCompactVocabularyItem, showOnlineRedirectFirst, onlineRedirectUrl)
         }
 
-    override suspend fun updateOverviewLastSearchedItems(queue: Queue<String>) {
+    override suspend fun addLastSearchedItem(item: String) {
         context.dataStoreOverview.edit { preferences ->
+            val currentDeque: ArrayDeque<String> = preferences[PreferencesKeys.SEARCH_SORT_LAST_SEARCHED_ITEMS]?.let {
+                jsonConfig.decodeFromString(ArrayDequeSerializer, it)
+            } ?: ArrayDeque()
+
+            currentDeque.addToFrontAndLimit(item)
+
             preferences[PreferencesKeys.SEARCH_SORT_LAST_SEARCHED_ITEMS] =
-                jsonConfig.encodeToString(QueueSerializer, queue)
+                jsonConfig.encodeToString(ArrayDequeSerializer, currentDeque)
         }
     }
 
