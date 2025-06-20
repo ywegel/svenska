@@ -159,7 +159,7 @@ private fun ItemList(
         }
         if (uiState.lastSearchedItems.isEmpty()) {
             Text(
-                text = stringResource(R.string.overview_search_no_searches),
+                text = stringResource(R.string.search_no_searches),
                 textAlign = TextAlign.Center,
                 modifier = Modifier
                     .padding(horizontal = Spacings.m, vertical = Spacings.l)
