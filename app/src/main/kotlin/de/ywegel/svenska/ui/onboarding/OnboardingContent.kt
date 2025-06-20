@@ -10,6 +10,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.pager.HorizontalPager
+import androidx.compose.foundation.pager.PagerState
 import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.material3.Button
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -26,7 +27,7 @@ import de.ywegel.svenska.ui.common.VerticalSpacerS
 import de.ywegel.svenska.ui.onboarding.pages.BonusPage
 import de.ywegel.svenska.ui.onboarding.pages.ImporterPage
 import de.ywegel.svenska.ui.onboarding.pages.OnboardingPage
-import de.ywegel.svenska.ui.onboarding.pages.OnboardingTextPage
+import de.ywegel.svenska.ui.onboarding.pages.OnboardingSimpleTextPage
 import de.ywegel.svenska.ui.onboarding.pages.WordGroupPage
 import de.ywegel.svenska.ui.theme.Spacings
 import kotlinx.coroutines.launch
@@ -38,7 +39,6 @@ internal fun OnboardingContent(
     navigateToWordGroupScreen: () -> Unit,
 ) {
     val pagerState = rememberPagerState(pageCount = { OnboardingPage.COUNT })
-    val coroutineScope = rememberCoroutineScope()
 
     Column(
         modifier = Modifier
@@ -68,7 +68,7 @@ internal fun OnboardingContent(
                     }
 
                     else -> {
-                        OnboardingTextPage(page)
+                        OnboardingSimpleTextPage(page)
                     }
                 }
             }
@@ -82,36 +82,43 @@ internal fun OnboardingContent(
         VerticalSpacerM()
 
         // Navigation buttons
-        Column(Modifier.padding(horizontal = Spacings.m)) {
-            if (pagerState.currentPage != OnboardingPage.LAST_INDEX) {
-                Button(
-                    onClick = {
-                        coroutineScope.launch {
-                            pagerState.animateScrollToPage(pagerState.currentPage + 1)
-                        }
-                    },
-                    modifier = Modifier.fillMaxWidth(),
-                ) {
-                    Text(stringResource(R.string.onboarding_button_next))
-                }
+        OnboardingNavigationButtons(pagerState = pagerState, onOnboardingComplete = onOnboardingComplete)
+    }
+}
 
-                VerticalSpacerS()
-            } else {
-                Button(
-                    onClick = onOnboardingComplete,
-                    modifier = Modifier.fillMaxWidth(),
-                ) {
-                    Text(stringResource(R.string.onboarding_button_start))
-                }
+@Composable
+private fun OnboardingNavigationButtons(pagerState: PagerState, onOnboardingComplete: () -> Unit) {
+    val coroutineScope = rememberCoroutineScope()
+
+    Column(Modifier.padding(horizontal = Spacings.m)) {
+        if (pagerState.currentPage != OnboardingPage.LAST_INDEX) {
+            Button(
+                onClick = {
+                    coroutineScope.launch {
+                        pagerState.animateScrollToPage(pagerState.currentPage + 1)
+                    }
+                },
+                modifier = Modifier.fillMaxWidth(),
+            ) {
+                Text(stringResource(R.string.onboarding_button_next))
             }
 
-            AnimatedVisibility(visible = pagerState.currentPage != OnboardingPage.LAST_INDEX) {
-                OutlinedButton(
-                    onClick = onOnboardingComplete,
-                    modifier = Modifier.fillMaxWidth(),
-                ) {
-                    Text(stringResource(R.string.onboarding_button_skip))
-                }
+            VerticalSpacerS()
+        } else {
+            Button(
+                onClick = onOnboardingComplete,
+                modifier = Modifier.fillMaxWidth(),
+            ) {
+                Text(stringResource(R.string.onboarding_button_start))
+            }
+        }
+
+        AnimatedVisibility(visible = pagerState.currentPage != OnboardingPage.LAST_INDEX) {
+            OutlinedButton(
+                onClick = onOnboardingComplete,
+                modifier = Modifier.fillMaxWidth(),
+            ) {
+                Text(stringResource(R.string.onboarding_button_skip))
             }
         }
     }

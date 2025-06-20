@@ -35,16 +35,8 @@ fun WordGroupPage(navigateToWordGroupScreen: () -> Unit) {
         verticalArrangement = Arrangement.spacedBy(Spacings.m),
         modifier = Modifier.verticalScroll(rememberScrollState()),
     ) {
-        Text(
-            text = stringResource(R.string.onboarding_page_content_word_groups_description),
-            style = SvenskaTheme.typography.bodyLarge,
-            textAlign = TextAlign.Center,
-        )
-        Text(
-            text = stringResource(R.string.onboarding_page_content_word_groups_description_extended),
-            style = SvenskaTheme.typography.bodyLarge,
-            textAlign = TextAlign.Center,
-        )
+        OnboardingDescriptionText(R.string.onboarding_page_content_word_groups_description)
+        OnboardingDescriptionText(R.string.onboarding_page_content_word_groups_description_extended)
         AnimatedBadgeExplanationRow()
         Box(Modifier.fillMaxWidth(), contentAlignment = Alignment.TopCenter) {
             Button(navigateToWordGroupScreen) {

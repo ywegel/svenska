@@ -232,7 +232,7 @@
     <string name="settings_about_libraries_title">Licenses</string>
 
     <!-- # Onboarding # -->
-    <string name="onboarding_title">Onboarding</string>
+    <string name="onboarding_title">Introduction</string>
     <string name="onboarding_button_next">Next</string>
     <string name="onboarding_button_skip">Skip</string>
     <string name="onboarding_button_start">Let\'s go!</string>

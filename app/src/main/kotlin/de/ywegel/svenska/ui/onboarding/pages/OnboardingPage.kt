@@ -85,12 +85,3 @@ internal fun OnboardingPage(page: OnboardingPage, content: @Composable () -> Uni
         content()
     }
 }
-
-@Composable
-internal fun OnboardingTextPage(page: OnboardingPage) {
-    Text(
-        text = page.getContentText(),
-        style = SvenskaTheme.typography.bodyLarge,
-        textAlign = TextAlign.Center,
-    )
-}
