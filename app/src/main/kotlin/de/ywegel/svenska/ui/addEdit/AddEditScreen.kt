@@ -206,11 +206,11 @@ private fun WordGroupSection(
     Row(Modifier.padding(horizontal = Spacings.m), verticalAlignment = Alignment.CenterVertically) {
         Text("Selected word group:")
         HorizontalSpacerXS()
-        Crossfade(Pair(uiState.selectedWordGroup, uiState.selectedSubGroup)) { (mainGroup, subGroup) ->
+        Crossfade(uiState.selectedWordGroup) { mainGroup ->
             if (mainGroup != null) {
                 AnimatedWordGroupBadgeExtended(
                     mainWordGroup = mainGroup.mainGroupAbbreviation(),
-                    subWordGroup = mainGroup.subGroupAbbreviation(subGroup),
+                    subWordGroup = mainGroup.subGroupAbbreviation(uiState.selectedSubGroup),
                 )
             } else {
                 EmptyWordGroupBadge()
