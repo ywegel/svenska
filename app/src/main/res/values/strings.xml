@@ -85,6 +85,10 @@
     <string name="containers_bonus_quiz">Quiz</string>
     <string name="containers_bonus_word_groups">Word Groups</string>
 
+    <!-- ## Favorites & Pronunciation ## -->
+    <string name="favorites_pronunciation_explanation_favorites">This screen shows all your favorite vocabulary entries. You can add or remove favorites from the edit screen or directly during a quiz. Favorites are sorted with the most recently updated ones at the top.</string>
+    <string name="favorites_pronunciation_explanation_pronunciation">Here you’ll find all vocabulary entries that are marked with a special pronunciation. You can update this setting in each word’s edit screen. The list is sorted alphabetically.</string>
+
     <!-- # Overview # -->
     <string name="overview_search_no_searches">No searches yet</string>
 
