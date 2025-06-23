@@ -17,11 +17,11 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Text
-import androidx.compose.material3.TopAppBar
+import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -36,7 +36,7 @@ import de.ywegel.svenska.data.model.Vocabulary
 import de.ywegel.svenska.data.vocabularies
 import de.ywegel.svenska.navigation.SvenskaGraph
 import de.ywegel.svenska.ui.common.IconButton
-import de.ywegel.svenska.ui.common.NavigationIconButton
+import de.ywegel.svenska.ui.common.TopAppTextBar
 import de.ywegel.svenska.ui.common.VerticalSpacerM
 import de.ywegel.svenska.ui.theme.Spacings
 import de.ywegel.svenska.ui.theme.SvenskaIcons
@@ -81,18 +81,31 @@ private fun OverviewScreen(
     navigateToSearch: () -> Unit = {},
     navigateUp: () -> Unit = {},
 ) {
+    val scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior()
+
     Scaffold(
         topBar = {
-            OverviewTopBar(
-                containerName = containerName,
-                navigateUp = navigateUp,
-                navigateToSearch = navigateToSearch,
+            TopAppTextBar(
+                title = containerName,
+                onNavigateUp = navigateUp,
+                navigationIcon = Icons.AutoMirrored.Default.ArrowBack,
+                scrollBehavior = scrollBehavior,
+                actions = {
+                    IconButton(
+                        icon = SvenskaIcons.Search,
+                        contentDescription = null,
+                        onClick = navigateToSearch,
+                    )
+                },
             )
         },
         floatingActionButton = { OverviewFab(navigateToAdd, onQuizClick = onQuizClick) },
     ) { contentPadding ->
         if (uiState.showCompactVocabularyItem) {
-            LazyColumn(contentPadding = contentPadding) {
+            LazyColumn(
+                contentPadding = contentPadding,
+                modifier = Modifier.nestedScroll(scrollBehavior.nestedScrollConnection),
+            ) {
                 items(uiState.vocabulary, key = { it.id }) { item ->
                     VocabularyItemCompact(item) {
                         navigateToEdit(it)
@@ -103,7 +116,8 @@ private fun OverviewScreen(
             LazyColumn(
                 modifier = Modifier
                     .fillMaxSize()
-                    .padding(horizontal = Spacings.s),
+                    .padding(horizontal = Spacings.s)
+                    .nestedScroll(scrollBehavior.nestedScrollConnection),
                 contentPadding = contentPadding,
                 verticalArrangement = Arrangement.spacedBy(Spacings.xs),
             ) {
@@ -119,26 +133,6 @@ private fun OverviewScreen(
             }
         }
     }
-}
-
-@Composable
-private fun OverviewTopBar(containerName: String, navigateUp: () -> Unit, navigateToSearch: () -> Unit) {
-    TopAppBar(
-        title = { Text(text = containerName) },
-        navigationIcon = {
-            NavigationIconButton(
-                onNavigateUp = navigateUp,
-                navigationIcon = Icons.AutoMirrored.Default.ArrowBack,
-            )
-        },
-        actions = {
-            IconButton(
-                icon = SvenskaIcons.Search,
-                contentDescription = null,
-                onClick = navigateToSearch,
-            )
-        },
-    )
 }
 
 data class OverviewNavArgs(
