@@ -1,5 +1,6 @@
 package de.ywegel.svenska.ui.common
 
+import androidx.compose.foundation.layout.RowScope
 import androidx.compose.material.icons.outlined.Close
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
@@ -22,6 +23,7 @@ fun TopAppTextBar(
     modifier: Modifier = Modifier,
     scrollBehavior: TopAppBarScrollBehavior? = null,
     navigationIcon: ImageVector = SvenskaIcons.Close,
+    actions: @Composable RowScope.() -> Unit = {},
 ) {
     TopAppBar(
         title = { Text(title) },
@@ -33,6 +35,7 @@ fun TopAppTextBar(
                 navigationIcon = navigationIcon,
             )
         },
+        actions = actions,
     )
 }
 
@@ -41,7 +44,7 @@ fun NavigationIconButton(onNavigateUp: () -> Unit, navigationIcon: ImageVector =
     IconButton(onClick = onNavigateUp) {
         Icon(
             imageVector = navigationIcon,
-            contentDescription = stringResource(R.string.accessibility_toolbar_navigate_up),
+            contentDescription = stringResource(R.string.accessibility_general_toolbar_navigate_up),
         )
     }
 }

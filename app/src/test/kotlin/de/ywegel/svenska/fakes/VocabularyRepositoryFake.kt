@@ -103,7 +103,7 @@ class VocabularyRepositoryFake(
     }
 
     override fun getPronunciations(containerId: Int?): List<Vocabulary> {
-        return vocabulary.filter { it.irregularPronunciation != null && it.irregularPronunciation.isNullOrBlank() }
+        return vocabulary.filter { it.irregularPronunciation != null }
     }
 
     override fun getAllContainerNamesWithIds(): List<VocabularyContainer> {

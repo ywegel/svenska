@@ -117,15 +117,15 @@ interface VocabularyDao {
     @Query("SELECT id, name FROM vocabularycontainer ORDER BY id ASC")
     fun getAllContainerNamesWithId(): List<VocabularyContainer>
 
-    @Query("SELECT * FROM vocabulary WHERE isFavorite IS 1 AND containerId = :containerId ORDER BY created DESC")
+    @Query("SELECT * FROM vocabulary WHERE isFavorite IS 1 AND containerId = :containerId ORDER BY word ASC")
     fun getFavoritesByContainerId(containerId: Int): List<Vocabulary>
 
-    @Query("SELECT * FROM vocabulary WHERE isFavorite IS 1 ORDER BY created DESC")
+    @Query("SELECT * FROM vocabulary WHERE isFavorite IS 1 ORDER BY word ASC")
     fun getAllFavorites(): List<Vocabulary>
 
-    @Query("SELECT * FROM vocabulary WHERE irregularPronunciation IS NOT NULL AND containerId = :containerId ORDER BY created DESC")
+    @Query("SELECT * FROM vocabulary WHERE irregularPronunciation IS NOT NULL AND containerId = :containerId ORDER BY word ASC")
     fun getPronunciationsByContainerId(containerId: Int): List<Vocabulary>
 
-    @Query("SELECT * FROM vocabulary WHERE irregularPronunciation IS NOT NULL ORDER BY created DESC")
+    @Query("SELECT * FROM vocabulary WHERE irregularPronunciation IS NOT NULL ORDER BY word ASC")
     fun getAllPronunciations(): List<Vocabulary>
 }
