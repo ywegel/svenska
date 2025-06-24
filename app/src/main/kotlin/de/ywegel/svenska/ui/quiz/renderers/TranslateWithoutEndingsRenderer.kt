@@ -5,11 +5,15 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.hapticfeedback.HapticFeedbackType
+import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.style.TextAlign
@@ -39,14 +43,6 @@ class TranslateWithoutEndingsRenderer : QuizRenderer<
             textAlign = TextAlign.Center,
         )
         VerticalSpacerXXS()
-
-        // TODO: Somehow propagate vocabulary information (wordgroup + endings) to here
-        // AnimatedVisibility(uiState.vocabulary.wordGroup !is WordGroup.Other && uiState.swedishWordSearched) {
-        //     Text(
-        //         text = "Group: ${uiState.vocabulary?.wordGroup?.abbreviation()?.let { stringResource(it) }}",
-        //         style = SvenskaTheme.typography.bodyLarge,
-        //     )
-        // }
     }
 
     @Composable
@@ -70,17 +66,31 @@ class TranslateWithoutEndingsRenderer : QuizRenderer<
     override fun Solution(
         question: QuizQuestion<UserAnswer.TranslateWithoutEndingsAnswer>,
         userAnswer: UserAnswer.TranslateWithoutEndingsAnswer,
-        userAnswerResult: Boolean,
+        userAnswerCorrect: Boolean,
     ) {
-        val resultMessage = remember(userAnswerResult) {
-            if (userAnswerResult) {
+        val haptic = LocalHapticFeedback.current
+
+        LaunchedEffect(question.vocabularyId, userAnswer.answer) {
+            if (userAnswerCorrect) {
+                haptic.performHapticFeedback(HapticFeedbackType.Confirm)
+            }
+        }
+
+        val resultMessage = remember(userAnswerCorrect) {
+            if (userAnswerCorrect) {
                 R.string.quiz_result_correct
             } else {
                 R.string.quiz_result_wrong
             }
         }
 
-        Card {
+        val cardColors = if (userAnswerCorrect) {
+            CardDefaults.cardColors()
+        } else {
+            CardDefaults.cardColors(containerColor = SvenskaTheme.colors.errorContainer)
+        }
+
+        Card(colors = cardColors) {
             Column(
                 Modifier
                     .padding(vertical = Spacings.l, horizontal = Spacings.m)

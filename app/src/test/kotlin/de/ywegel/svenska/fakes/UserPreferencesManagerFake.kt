@@ -5,13 +5,12 @@ import de.ywegel.svenska.data.preferences.AppPreferences
 import de.ywegel.svenska.data.preferences.OverviewPreferences
 import de.ywegel.svenska.data.preferences.SearchPreferences
 import de.ywegel.svenska.data.preferences.UserPreferencesManager
+import de.ywegel.svenska.data.preferences.addToFrontAndLimit
 import de.ywegel.svenska.domain.search.OnlineSearchType
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
-import java.util.LinkedList
-import java.util.Queue
 
 class UserPreferencesManagerFake(
     initialSortOrder: SortOrder = SortOrder.default,
@@ -48,7 +47,7 @@ class UserPreferencesManagerFake(
     }
 
     private val currentSearchPreferences = SearchPreferences(
-        lastSearchedItems = LinkedList(),
+        lastSearchedItems = ArrayDeque(),
         showOnlineRedirectFirst = false,
         showCompactVocabularyItem = false,
         onlineRedirectType = OnlineSearchType.DictCC,
@@ -58,9 +57,11 @@ class UserPreferencesManagerFake(
 
     override val preferencesSearchFlow: Flow<SearchPreferences> = _preferencesSearchFlow.asStateFlow()
 
-    override suspend fun updateOverviewLastSearchedItems(queue: Queue<String>) {
+    override suspend fun addLastSearchedItem(item: String) {
         _preferencesSearchFlow.update {
-            it.copy(lastSearchedItems = queue)
+            val copiedQueue = ArrayDeque(it.lastSearchedItems)
+            copiedQueue.addToFrontAndLimit(item)
+            it.copy(lastSearchedItems = copiedQueue)
         }
     }
 

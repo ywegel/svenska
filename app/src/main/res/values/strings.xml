@@ -75,6 +75,9 @@
     <string name="lang_adjective_abbreviation">A</string>
     <string name="lang_other_abbreviation">•</string>
 
+    <string name="lang_noun_gender_abbreviation_ultra">U</string>
+    <string name="lang_noun_gender_abbreviation_neutra">N</string>
+
     <!-- # Containers # -->
     <string name="containers_add_confirmation">Add</string>
     <string name="container_title_edit_mode">Edit containers</string>
@@ -90,11 +93,12 @@
     <string name="favorites_pronunciation_explanation_pronunciation">Here you’ll find all vocabulary entries that are marked with a special pronunciation. You can update this setting in each word’s edit screen. The list is sorted alphabetically.</string>
 
     <!-- # Overview # -->
-    <string name="overview_search_no_searches">No searches yet</string>
-
+    <string name="overview_fab_quiz">Quiz</string>
+    <string name="overview_fab_add">Add new</string>
 
     <!-- # Search # -->
     <string name="search_search_label">Search</string>
+    <string name="search_no_searches">No searches yet</string>
 
     <string name="search_uri_parsing_error">URL could not be handled by the system</string>
     <string name="search_base_url_dict_cc">DictCC</string>
@@ -140,6 +144,8 @@
     <string name="quiz_result_correct">Correct!</string>
     <string name="quiz_result_wrong">Wrong! The correct answer was: </string>
     <string name="quiz_result_wrong_user_answer">Your answer was: </string>
+
+    <string name="quiz_result_endings_formated">With:</string>
 
     <string name="quiz_result_with_endings_all_correct">Correct!</string>
     <string name="quiz_result_with_endings_wrong_translation">Wrong translation! The correct answer was: </string>
@@ -191,24 +197,25 @@
 
     <!-- ## Nouns ## -->
     <string name="nouns_tab">Nouns</string>
+    <string name="noun_gender_title">Swedish Genders</string>
     <string name="nouns_title">Swedish Nouns</string>
     <string name="group_or">Group 1 (-or)</string>
-    <string name="group_or_rule">En-words that end with *-a*</string>
-    <string name="group_or_example">en flicka → flickor</string>
+    <string name="group_or_rule">En-words that end with *a*, use *-or* for the plural</string>
+    <string name="group_or_example">en flicka → flickan, flickor, flickorna</string>
     <string name="group_ar">Group 2 (-ar)</string>
-    <string name="group_ar_rule">En-words with unstressed *-e*, *-el*, *-er* or certain consonants</string>
+    <string name="group_ar_rule">En-words with unstressed *-e*, *-el*, *-er* or certain consonants, use *-ar* for the plural</string>
     <string name="group_ar_example">en cykel → cyklar</string>
     <string name="group_er">Group 3 (-er)</string>
-    <string name="group_er_rule">En-words with stress on the last syllable or certain endings</string>
+    <string name="group_er_rule">En-words with stress on the last syllable or certain endings, use *-er* for the plural</string>
     <string name="group_er_example">en station → stationer</string>
     <string name="group_r">Group 4 (-r)</string>
-    <string name="group_r_rule">One-syllable en-words that end with a stressed vowel</string>
+    <string name="group_r_rule">One-syllable en-words that end with a stressed vowel, use *-r* for the plural</string>
     <string name="group_r_example">en sko → skor</string>
     <string name="group_n">Group 5 (-n)</string>
-    <string name="group_n_rule">Ett-words that end with a vowel</string>
+    <string name="group_n_rule">Ett-words that end with a vowel, use *-n* for the plural</string>
     <string name="group_n_example">ett kvitto → kvitton</string>
     <string name="group_unchanged">Group 6 (-)</string>
-    <string name="group_unchanged_rule">Ett-words that end with a consonant, or certain en-words</string>
+    <string name="group_unchanged_rule">Ett-words that end with a consonant, or certain en-words, use the indefinite singular for the plural</string>
     <string name="group_unchanged_example">ett hus → hus, en lärare → lärare</string>
 
     <string name="example_format">Example: %s</string>

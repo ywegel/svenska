@@ -3,6 +3,7 @@ package de.ywegel.svenska.domain.quiz.strategies
 import de.ywegel.svenska.data.model.Vocabulary
 import de.ywegel.svenska.domain.quiz.QuizStrategy
 import de.ywegel.svenska.domain.quiz.model.QuizQuestion
+import de.ywegel.svenska.domain.quiz.model.QuizQuestionPromptData
 import de.ywegel.svenska.domain.quiz.model.TranslateMode
 import de.ywegel.svenska.domain.quiz.model.UserAnswer
 import kotlin.random.Random
@@ -23,12 +24,18 @@ class TranslationWithoutEndingsQuizStrategy(
                 vocabularyId = vocabulary.id,
                 prompt = vocabulary.word,
                 expectedAnswer = UserAnswer.TranslateWithoutEndingsAnswer(vocabulary.translation),
+                promptData = QuizQuestionPromptData(
+                    wordGroup = vocabulary.wordGroup,
+                    endings = vocabulary.ending,
+                    gender = vocabulary.gender,
+                ),
             )
 
             TranslateMode.Native -> QuizQuestion(
                 vocabularyId = vocabulary.id,
                 prompt = vocabulary.translation,
                 expectedAnswer = UserAnswer.TranslateWithoutEndingsAnswer(vocabulary.word),
+                promptData = null,
             )
 
             TranslateMode.Random -> error(
