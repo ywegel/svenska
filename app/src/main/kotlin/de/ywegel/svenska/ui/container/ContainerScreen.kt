@@ -93,11 +93,11 @@ fun ContainerScreen(navigator: DestinationsNavigator) {
             when (it) {
                 BonusScreen.Numbers -> navigator.navigate(SwedishNumbersScreenDestination)
                 BonusScreen.Favorites -> navigator.navigate(
-                    FavoritesAndPronunciationScreenDestination(null, BonusScreen.Favorites),
+                    FavoritesAndPronunciationScreenDestination(it),
                 )
 
                 BonusScreen.SpecialPronunciation -> navigator.navigate(
-                    FavoritesAndPronunciationScreenDestination(null, BonusScreen.Favorites),
+                    FavoritesAndPronunciationScreenDestination(it),
                 )
 
                 BonusScreen.Quiz ->

@@ -1,8 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <!-- General -->
-
-    <string name="accessibility_toolbar_navigate_up">Navigate up</string>
+    <string name="accessibility_general_toolbar_navigate_up">Navigate up</string>
 
     <!-- # Overview # -->
     <string name="accessibility_overview_fab_quiz">Start Quiz</string>
@@ -14,6 +13,11 @@
     <!-- # Quiz # -->
     <string name="accessibility_quiz_toolbar_actions_favorite">Favorite this word</string>
     <string name="accessibility_quiz_toolbar_actions_word_group_info">Navigate to WordGroups screen</string>
+
+    <!-- # Containers # -->
+
+    <!-- ## Favorites & Pronunciation ## -->
+    <string name="accessibility_favorites_pronunciation_explanation">Get an explanation of this screen</string>
 
     <!-- # Onboarding # -->
     <string name="accessibility_onboarding_page_word_group_bonus_image">Shows the bonus bar containing a WordGroup item</string>
