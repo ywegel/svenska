@@ -238,22 +238,33 @@
     <string name="settings_about_libraries_title">Licenses</string>
 
     <!-- # Onboarding # -->
-    <string name="onboarding_title">Onboarding</string>
+    <string name="onboarding_title">Introduction</string>
     <string name="onboarding_button_next">Next</string>
     <string name="onboarding_button_skip">Skip</string>
     <string name="onboarding_button_start">Let\'s go!</string>
-    <string name="onboarding_page_indicator">%1$d / %2$d</string>
 
-    <string name="onboarding_page_1_title">Word Groups</string>
-    <string name="onboarding_page_1_content">There are WordGroups which are assigned to words. These include nouns, verbs, adjectives — and nouns/verbs also have subgroups.</string>
+    <string name="onboarding_page_title_introduction">Welcome</string>
+    <string name="onboarding_page_content_introduction">Svenska is a simple app to make learning swedish vocabulary easier.</string>
 
-    <string name="onboarding_page_2_title">Bonus Material</string>
-    <string name="onboarding_page_2_content">There is bonus material, such as numbers and the word groups.</string>
+    <string name="onboarding_page_title_container">Container</string>
+    <string name="onboarding_page_content_container">You can group words into containers, to separate them and make learning easier.</string>
 
-    <string name="onboarding_page_3_title">Quiz</string>
-    <string name="onboarding_page_3_content">There is a quiz that helps you learn vocabulary in several different ways.</string>
+    <string name="onboarding_page_title_word_groups">Word Groups</string>
+    <string name="onboarding_page_content_word_groups_description">Each vocabulary can be assigned a WordGroup: Noun/Verb/Adjective/Other. Nouns and Verbs can be grouped into subgroups, which follow a pattern and make it easier to learn these words.</string>
+    <string name="onboarding_page_content_word_groups_description_extended">You can find out more about this below, by clicking on the info button in the quiz or in the bonus section.</string>
+    <string name="onboarding_page_content_word_groups_badge_text">You can easily identify the word group by its badge.</string>
+    <string name="onboarding_page_content_word_groups_find_out_more">Find out more here</string>
+    <string name="onboarding_page_content_word_groups_or">Or below the containers, as explained earlier</string>
 
-    <string name="onboarding_page_4_title">Vocabulary Importer</string>
-    <string name="onboarding_page_4_content">There is a vocabulary importer that accepts .json files in a specific format.</string>
+    <string name="onboarding_page_title_bonus_material">Additionally functionality</string>
+    <string name="onboarding_page_content_bonus_material">You can do more than just saving words. You can train the words in a quiz, categorize them into favorites and words with special pronunciation.</string>
+    <string name="onboarding_page_content_bonus_material_extended">You can find all this below your containers, it looks like this:</string>
+
+    <string name="onboarding_page_title_quiz">Quiz</string>
+    <string name="onboarding_page_content_quiz">There is a quiz that helps you learn vocabulary with different configuration, e.g. just to learn the words or the word endings.</string>
+
+    <string name="onboarding_page_importer_title">Vocabulary Importer</string>
+    <string name="onboarding_page_content_importer">There is a vocabulary importer that accepts .json files in a specific format.</string>
+    <string name="onboarding_page_content_importer_extended">You can either import words from the settings or by clicking on a .json file and selecting the app.</string>
 
 </resources>

@@ -111,7 +111,7 @@ fun container(): VocabularyContainer = VocabularyContainer(1, "Swedish vocabular
 
 @VisibleForTesting
 fun containers(): List<VocabularyContainer> = listOf(
-    VocabularyContainer(1, "Words from class"),
+    VocabularyContainer(1, "Chapter 1"),
     VocabularyContainer(2, "Slang"),
     VocabularyContainer(3, "Simple sentences"),
 )

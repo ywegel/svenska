@@ -27,10 +27,10 @@ import de.ywegel.svenska.navigation.BonusGraph
 import de.ywegel.svenska.ui.common.HorizontalSpacerXXS
 import de.ywegel.svenska.ui.common.NavigationBarSpacer
 import de.ywegel.svenska.ui.common.TabsScaffold
-import de.ywegel.svenska.ui.common.vocabulary.WordGroupBadgeExtended
 import de.ywegel.svenska.ui.common.vocabulary.abbreviation
 import de.ywegel.svenska.ui.common.vocabulary.mainGroupAbbreviation
 import de.ywegel.svenska.ui.common.vocabulary.subGroupAbbreviation
+import de.ywegel.svenska.ui.common.vocabulary.wordGroupBadge.StaticWordGroupBadgeExtended
 import de.ywegel.svenska.ui.theme.Spacings
 import de.ywegel.svenska.ui.theme.SvenskaTheme
 
@@ -225,7 +225,7 @@ fun GrammarItem(mainGroup: String, subGroup: String? = null, group: String, rule
             verticalArrangement = Arrangement.spacedBy(Spacings.xs),
         ) {
             Row(verticalAlignment = Alignment.CenterVertically) {
-                WordGroupBadgeExtended(mainGroup, subGroup)
+                StaticWordGroupBadgeExtended(mainGroup, subGroup)
                 HorizontalSpacerXXS()
                 Text(
                     text = group,

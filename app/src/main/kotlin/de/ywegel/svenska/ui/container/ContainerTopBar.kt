@@ -3,6 +3,7 @@
 package de.ywegel.svenska.ui.container
 
 import androidx.compose.material.icons.outlined.Close
+import androidx.compose.material.icons.outlined.Edit
 import androidx.compose.material.icons.outlined.Search
 import androidx.compose.material.icons.outlined.Settings
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -22,6 +23,7 @@ fun ContainerTopBar(
     toggleIsEditMode: (Boolean) -> Unit,
     navigateToSettings: () -> Unit,
     navigateToSearch: () -> Unit,
+    toggleEditMode: () -> Unit,
 ) {
     if (editingContainers) {
         TopAppBar(
@@ -33,6 +35,11 @@ fun ContainerTopBar(
         TopAppBar(
             title = { Text(stringResource(R.string.app_name)) },
             actions = {
+                IconButton(
+                    icon = SvenskaIcons.Edit,
+                    contentDescription = null,
+                    onClick = toggleEditMode,
+                )
                 IconButton(
                     icon = SvenskaIcons.Search,
                     contentDescription = null,
