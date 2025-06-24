@@ -250,14 +250,14 @@
     <string name="onboarding_page_content_container">You can group words into containers, to separate them and make learning easier.</string>
 
     <string name="onboarding_page_title_word_groups">Word Groups</string>
-    <string name="onboarding_page_content_word_groups_description">Each vocabulary can be assigned a WordGroup: Noun/Verb/Adjective/Other. Nouns and Verbs can be grouped into subgroups, which follow a pattern and make it easier to learn these word.</string>
+    <string name="onboarding_page_content_word_groups_description">Each vocabulary can be assigned a WordGroup: Noun/Verb/Adjective/Other. Nouns and Verbs can be grouped into subgroups, which follow a pattern and make it easier to learn these words.</string>
     <string name="onboarding_page_content_word_groups_description_extended">You can find out more about this below, by clicking on the info button in the quiz or in the bonus section.</string>
     <string name="onboarding_page_content_word_groups_badge_text">You can easily identify the word group by its badge.</string>
     <string name="onboarding_page_content_word_groups_find_out_more">Find out more here</string>
     <string name="onboarding_page_content_word_groups_or">Or below the containers, as explained earlier</string>
 
     <string name="onboarding_page_title_bonus_material">Additionally functionality</string>
-    <string name="onboarding_page_content_bonus_material">You can do more than just saving words. You can train the words in a quiz, categorize them and learn the numbers</string>
+    <string name="onboarding_page_content_bonus_material">You can do more than just saving words. You can train the words in a quiz, categorize them into favorites and words with special pronunciation.</string>
     <string name="onboarding_page_content_bonus_material_extended">You can find all this below your containers, it looks like this:</string>
 
     <string name="onboarding_page_title_quiz">Quiz</string>
