@@ -7,8 +7,10 @@ import com.ramcosta.composedestinations.generated.navArgs
 import dagger.hilt.android.lifecycle.HiltViewModel
 import de.ywegel.svenska.data.SortOrder
 import de.ywegel.svenska.data.VocabularyRepository
+import de.ywegel.svenska.data.model.Vocabulary
 import de.ywegel.svenska.data.preferences.UserPreferencesManager
 import de.ywegel.svenska.di.IoDispatcher
+import de.ywegel.svenska.ui.detail.VocabularyDetailState
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -23,7 +25,7 @@ import javax.inject.Inject
 
 @HiltViewModel
 class SearchViewModel @Inject constructor(
-    private val savedStateHandle: SavedStateHandle,
+    savedStateHandle: SavedStateHandle,
     private val repository: VocabularyRepository,
     private val userPreferencesManager: UserPreferencesManager,
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
@@ -75,6 +77,22 @@ class SearchViewModel @Inject constructor(
         }
     }
 
+    fun showVocabularyDetail(vocabulary: Vocabulary) {
+        _uiState.update {
+            it.copy(
+                detailViewState = VocabularyDetailState.Visible(vocabulary),
+            )
+        }
+    }
+
+    fun hideVocabularyDetail() {
+        _uiState.update {
+            it.copy(
+                detailViewState = VocabularyDetailState.Hidden,
+            )
+        }
+    }
+
     private fun observePreferences() = viewModelScope.launch(ioDispatcher) {
         launch {
             preferencesSearchFlow.collectLatest { preferences ->
@@ -95,4 +113,5 @@ data class SearchUiState(
     val showCompactVocabularyItem: Boolean = false,
     val showOnlineRedirectFirst: Boolean = false,
     val onlineRedirectUrl: String? = null,
+    val detailViewState: VocabularyDetailState = VocabularyDetailState.Hidden,
 )

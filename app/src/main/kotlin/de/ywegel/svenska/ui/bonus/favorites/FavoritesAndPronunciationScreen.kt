@@ -41,6 +41,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.ramcosta.composedestinations.annotation.Destination
+import com.ramcosta.composedestinations.generated.destinations.EditVocabularyScreenDestination
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
 import de.ywegel.svenska.R
 import de.ywegel.svenska.data.model.Vocabulary
@@ -50,6 +51,8 @@ import de.ywegel.svenska.ui.common.IconButton
 import de.ywegel.svenska.ui.common.TopAppTextBar
 import de.ywegel.svenska.ui.common.VerticalSpacerXXXS
 import de.ywegel.svenska.ui.container.BonusScreen
+import de.ywegel.svenska.ui.detail.VocabularyDetailScreen
+import de.ywegel.svenska.ui.detail.VocabularyDetailState
 import de.ywegel.svenska.ui.overview.VocabularyListItem
 import de.ywegel.svenska.ui.theme.Spacings
 import de.ywegel.svenska.ui.theme.SvenskaIcons
@@ -68,6 +71,16 @@ fun FavoritesAndPronunciationScreen(
         uiState = uiState,
         screenType = navArgs.screenType,
         navigateUp = navigator::navigateUp,
+        onVocabularyClick = viewModel::showVocabularyDetail,
+        onDismissDetail = viewModel::hideVocabularyDetail,
+        navigateToEdit = { item ->
+            navigator.navigate(
+                EditVocabularyScreenDestination(
+                    containerId = item.containerId,
+                    initialVocabulary = item,
+                ),
+            )
+        },
     )
 }
 
@@ -77,6 +90,9 @@ fun FavoritesAndPronunciationScreen(
     screenType: BonusScreen,
     initialShowExplanation: Boolean = false,
     navigateUp: () -> Unit,
+    onVocabularyClick: (Vocabulary) -> Unit,
+    onDismissDetail: () -> Unit,
+    navigateToEdit: (vocabulary: Vocabulary) -> Unit,
 ) {
     val scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior()
     var showExplanation by rememberSaveable { mutableStateOf(initialShowExplanation) }
@@ -104,6 +120,7 @@ fun FavoritesAndPronunciationScreen(
             is FavoritesUiState.Error -> ErrorState(uiState.message, innerPadding)
             is FavoritesUiState.Success -> SuccessState(
                 items = uiState.items,
+                detailViewState = uiState.detailViewState,
                 screenType = screenType,
                 showExplanation = showExplanation,
                 padding = innerPadding,
@@ -111,6 +128,9 @@ fun FavoritesAndPronunciationScreen(
                 toggleExplanation = {
                     showExplanation = !showExplanation
                 },
+                onVocabularyClick = onVocabularyClick,
+                onDismissDetail = onDismissDetail,
+                navigateToEdit = navigateToEdit,
             )
         }
     }
@@ -149,11 +169,15 @@ private fun ErrorState(message: String, padding: PaddingValues) {
 @Composable
 private fun SuccessState(
     items: List<Vocabulary>,
+    detailViewState: VocabularyDetailState,
     screenType: BonusScreen,
     showExplanation: Boolean,
     padding: PaddingValues,
     scrollBehavior: TopAppBarScrollBehavior,
     toggleExplanation: () -> Unit,
+    onVocabularyClick: (Vocabulary) -> Unit,
+    onDismissDetail: () -> Unit,
+    navigateToEdit: (vocabulary: Vocabulary) -> Unit,
 ) {
     LazyColumn(
         modifier = Modifier
@@ -174,9 +198,19 @@ private fun SuccessState(
             items = items,
             key = { it.id },
         ) { voc ->
-            VocabularyListItem(voc)
+            VocabularyListItem(voc, onClick = onVocabularyClick)
         }
     }
+
+    // Show detail screen if a vocabulary is selected
+    VocabularyDetailScreen(
+        state = detailViewState,
+        onDismiss = onDismissDetail,
+        onEditClick = {
+            onDismissDetail()
+            navigateToEdit(it)
+        },
+    )
 }
 
 data class FavoritesAndPronunciationScreenNavArgs(
@@ -226,6 +260,9 @@ private fun ErrorStatePreview() {
             uiState = FavoritesUiState.Error("Something went wrong while loading your favorites. Please try again."),
             screenType = BonusScreen.Favorites,
             navigateUp = {},
+            onVocabularyClick = {},
+            onDismissDetail = {},
+            navigateToEdit = {},
         )
     }
 }
@@ -238,6 +275,9 @@ private fun SuccessStatePreview() {
             uiState = FavoritesUiState.Success(vocabularies()),
             screenType = BonusScreen.Favorites,
             navigateUp = {},
+            onVocabularyClick = {},
+            onDismissDetail = {},
+            navigateToEdit = {},
         )
     }
 }
@@ -251,6 +291,9 @@ private fun SuccessStateWithExplanationPreview() {
             screenType = BonusScreen.Favorites,
             initialShowExplanation = true,
             navigateUp = {},
+            onVocabularyClick = {},
+            onDismissDetail = {},
+            navigateToEdit = {},
         )
     }
 }

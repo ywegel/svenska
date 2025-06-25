@@ -55,6 +55,7 @@ import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.ramcosta.composedestinations.annotation.Destination
+import com.ramcosta.composedestinations.generated.destinations.EditVocabularyScreenDestination
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
 import de.ywegel.svenska.R
 import de.ywegel.svenska.data.model.Vocabulary
@@ -63,6 +64,7 @@ import de.ywegel.svenska.navigation.transitions.LateralTransition
 import de.ywegel.svenska.ui.common.HorizontalSpacerM
 import de.ywegel.svenska.ui.common.IconButton
 import de.ywegel.svenska.ui.common.NavigationIconButton
+import de.ywegel.svenska.ui.detail.VocabularyDetailScreen
 import de.ywegel.svenska.ui.overview.VocabularyItemCompact
 import de.ywegel.svenska.ui.overview.VocabularyListItem
 import de.ywegel.svenska.ui.theme.Spacings
@@ -87,6 +89,16 @@ fun SearchScreen(navigator: DestinationsNavigator) {
         onSearchChanged = viewModel::updateSearchQuery,
         onSearch = viewModel::onSearch,
         navigateUp = navigator::navigateUp,
+        onVocabularyClick = viewModel::showVocabularyDetail,
+        onDismissDetail = viewModel::hideVocabularyDetail,
+        navigateToEdit = { item ->
+            navigator.navigate(
+                EditVocabularyScreenDestination(
+                    containerId = item.containerId,
+                    initialVocabulary = item,
+                ),
+            )
+        },
     )
 }
 
@@ -102,6 +114,9 @@ private fun SearchScreen(
     onSearchChanged: (String) -> Unit,
     onSearch: (String) -> Unit,
     navigateUp: () -> Unit,
+    onVocabularyClick: (Vocabulary) -> Unit,
+    onDismissDetail: () -> Unit,
+    navigateToEdit: (vocabulary: Vocabulary) -> Unit,
 ) {
     val snackBarHostState = remember { SnackbarHostState() }
     val uriHandle = LocalUriHandler.current
@@ -123,7 +138,7 @@ private fun SearchScreen(
             outerPadding = contentPadding,
             vocabulary = vocabulary,
             searchQuery = currentSearchQuery,
-            // onItemClicked = navigateToPopUp, TODO: Show a pop up view of the Item, if clicked
+            onItemClicked = onVocabularyClick,
             onRecentSearchedClicked = onSearch,
             uiState = uiState,
             onOnlineRedirectClicked = { baseUrl, query ->
@@ -135,6 +150,16 @@ private fun SearchScreen(
                         snackBarHostState.showSnackbar(context.getString(R.string.search_uri_parsing_error))
                     }
                 }
+            },
+        )
+
+        // Show detail screen if a vocabulary is selected
+        VocabularyDetailScreen(
+            state = uiState.detailViewState,
+            onDismiss = onDismissDetail,
+            onEditClick = {
+                onDismissDetail()
+                navigateToEdit(it)
             },
         )
     }
@@ -366,6 +391,9 @@ private fun SearchScreenPreviewEmpty() {
             onSearchChanged = {},
             onSearch = {},
             navigateUp = {},
+            onVocabularyClick = {},
+            onDismissDetail = {},
+            navigateToEdit = {},
         )
     }
 }
@@ -375,14 +403,15 @@ private fun SearchScreenPreviewEmpty() {
 private fun SearchScreenPreviewFilled() {
     SvenskaTheme {
         SearchScreen(
-            uiState = SearchUiState(
-                lastSearchedItems = ArrayDeque(emptyList<String>()),
-            ),
+            uiState = SearchUiState(),
             vocabulary = emptyList(),
             currentSearchQuery = "abc",
             onSearchChanged = {},
             onSearch = {},
             navigateUp = {},
+            onVocabularyClick = {},
+            onDismissDetail = {},
+            navigateToEdit = {},
         )
     }
 }

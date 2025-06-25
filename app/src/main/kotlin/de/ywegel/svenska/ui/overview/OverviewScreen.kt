@@ -79,8 +79,8 @@ fun OverviewScreen(navigator: DestinationsNavigator, navArgs: OverviewNavArgs) {
         navigateToEdit = { item ->
             navigator.navigate(
                 EditVocabularyScreenDestination(
-                    viewModel.containerId,
-                    item,
+                    containerId = viewModel.containerId,
+                    initialVocabulary = item,
                 ),
             )
         },
@@ -95,13 +95,13 @@ fun OverviewScreen(navigator: DestinationsNavigator, navArgs: OverviewNavArgs) {
 private fun OverviewScreen(
     uiState: OverviewUiState,
     containerName: String,
-    navigateToAdd: () -> Unit = {},
-    onQuizClick: () -> Unit = {},
-    navigateToEdit: (vocabulary: Vocabulary) -> Unit = {},
-    navigateToSearch: () -> Unit = {},
-    navigateUp: () -> Unit = {},
-    onVocabularyClick: (Vocabulary) -> Unit = {},
-    onDismissDetail: () -> Unit = {},
+    navigateToAdd: () -> Unit,
+    onQuizClick: () -> Unit,
+    navigateToEdit: (vocabulary: Vocabulary) -> Unit,
+    navigateToSearch: () -> Unit,
+    navigateUp: () -> Unit,
+    onVocabularyClick: (Vocabulary) -> Unit,
+    onDismissDetail: () -> Unit,
 ) {
     val scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior()
 
@@ -158,16 +158,14 @@ private fun OverviewScreen(
         }
 
         // Show detail screen if a vocabulary is selected
-        if (uiState.showDetailScreen && uiState.selectedVocabulary != null) {
-            VocabularyDetailScreen(
-                vocabulary = uiState.selectedVocabulary,
-                onDismiss = onDismissDetail,
-                onEditClick = {
-                    onDismissDetail()
-                    navigateToEdit(it)
-                },
-            )
-        }
+        VocabularyDetailScreen(
+            state = uiState.detailViewState,
+            onDismiss = onDismissDetail,
+            onEditClick = {
+                onDismissDetail()
+                navigateToEdit(it)
+            },
+        )
     }
 }
 
@@ -243,6 +241,11 @@ private fun OverviewPreview() {
             containerName = "Test container",
             onVocabularyClick = {},
             onDismissDetail = {},
+            navigateToAdd = {},
+            onQuizClick = {},
+            navigateToEdit = {},
+            navigateToSearch = {},
+            navigateUp = {},
         )
     }
 }

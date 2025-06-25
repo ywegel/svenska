@@ -52,24 +52,31 @@ import de.ywegel.svenska.ui.theme.SvenskaTheme
 
 @Composable
 fun VocabularyDetailScreen(
-    vocabulary: Vocabulary,
+    state: VocabularyDetailState,
     onDismiss: () -> Unit = {},
     onEditClick: (Vocabulary) -> Unit = {},
 ) {
-    val viewModel: VocabularyDetailViewModel = hiltViewModel()
+    if (state is VocabularyDetailState.Visible) {
+        val viewModel: VocabularyDetailViewModel = hiltViewModel()
 
-    var isFavorite by remember { mutableStateOf(vocabulary.isFavorite) }
+        var isFavorite by remember { mutableStateOf(state.selectedVocabulary.isFavorite) }
 
-    VocabularyDetailContent(
-        vocabulary = vocabulary,
-        isFavorite = isFavorite,
-        onDismiss = onDismiss,
-        onEditClick = onEditClick,
-        onFavoriteChange = { newValue ->
-            isFavorite = newValue
-            viewModel.toggleFavorite(vocabulary.id, newValue)
-        },
-    )
+        VocabularyDetailContent(
+            vocabulary = state.selectedVocabulary,
+            isFavorite = isFavorite,
+            onDismiss = onDismiss,
+            onEditClick = onEditClick,
+            onFavoriteChange = { newValue ->
+                isFavorite = newValue
+                viewModel.toggleFavorite(state.selectedVocabulary.id, newValue)
+            },
+        )
+    }
+}
+
+sealed interface VocabularyDetailState {
+    data object Hidden : VocabularyDetailState
+    data class Visible(val selectedVocabulary: Vocabulary) : VocabularyDetailState
 }
 
 @Composable
