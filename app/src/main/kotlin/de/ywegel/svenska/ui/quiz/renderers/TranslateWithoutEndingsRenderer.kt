@@ -66,25 +66,25 @@ class TranslateWithoutEndingsRenderer : QuizRenderer<
     override fun Solution(
         question: QuizQuestion<UserAnswer.TranslateWithoutEndingsAnswer>,
         userAnswer: UserAnswer.TranslateWithoutEndingsAnswer,
-        userAnswerCorrect: Boolean,
+        userAnswerResult: Boolean,
     ) {
         val haptic = LocalHapticFeedback.current
 
         LaunchedEffect(question.vocabularyId, userAnswer.answer) {
-            if (userAnswerCorrect) {
+            if (userAnswerResult) {
                 haptic.performHapticFeedback(HapticFeedbackType.Confirm)
             }
         }
 
-        val resultMessage = remember(userAnswerCorrect) {
-            if (userAnswerCorrect) {
+        val resultMessage = remember(userAnswerResult) {
+            if (userAnswerResult) {
                 R.string.quiz_result_correct
             } else {
                 R.string.quiz_result_wrong
             }
         }
 
-        val cardColors = if (userAnswerCorrect) {
+        val cardColors = if (userAnswerResult) {
             CardDefaults.cardColors()
         } else {
             CardDefaults.cardColors(containerColor = SvenskaTheme.colors.errorContainer)

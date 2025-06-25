@@ -45,6 +45,7 @@ import com.ramcosta.composedestinations.generated.destinations.AddVocabularyScre
 import com.ramcosta.composedestinations.generated.destinations.EditVocabularyScreenDestination
 import com.ramcosta.composedestinations.generated.destinations.QuizConfigurationScreenDestinationNavArgs
 import com.ramcosta.composedestinations.generated.destinations.SearchScreenDestination
+import com.ramcosta.composedestinations.generated.destinations.WordGroupsScreenDestination
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
 import de.ywegel.svenska.R
 import de.ywegel.svenska.data.model.Vocabulary
@@ -88,6 +89,7 @@ fun OverviewScreen(navigator: DestinationsNavigator, navArgs: OverviewNavArgs) {
         navigateUp = navigator::navigateUp,
         onVocabularyClick = viewModel::showVocabularyDetail,
         onDismissDetail = viewModel::hideVocabularyDetail,
+        navigateToWordGroupScreen = { navigator.navigate(WordGroupsScreenDestination) },
     )
 }
 
@@ -102,6 +104,7 @@ private fun OverviewScreen(
     navigateUp: () -> Unit,
     onVocabularyClick: (Vocabulary) -> Unit,
     onDismissDetail: () -> Unit,
+    navigateToWordGroupScreen: () -> Unit,
 ) {
     val scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior()
 
@@ -165,6 +168,7 @@ private fun OverviewScreen(
                 onDismissDetail()
                 navigateToEdit(it)
             },
+            navigateToWordGroupScreen = navigateToWordGroupScreen,
         )
     }
 }
@@ -246,6 +250,7 @@ private fun OverviewPreview() {
             navigateToEdit = {},
             navigateToSearch = {},
             navigateUp = {},
+            navigateToWordGroupScreen = {},
         )
     }
 }

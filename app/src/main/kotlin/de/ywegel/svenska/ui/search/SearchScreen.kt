@@ -56,6 +56,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.ramcosta.composedestinations.annotation.Destination
 import com.ramcosta.composedestinations.generated.destinations.EditVocabularyScreenDestination
+import com.ramcosta.composedestinations.generated.destinations.WordGroupsScreenDestination
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
 import de.ywegel.svenska.R
 import de.ywegel.svenska.data.model.Vocabulary
@@ -99,6 +100,7 @@ fun SearchScreen(navigator: DestinationsNavigator) {
                 ),
             )
         },
+        navigateToWordGroupScreen = { navigator.navigate(WordGroupsScreenDestination) },
     )
 }
 
@@ -117,6 +119,7 @@ private fun SearchScreen(
     onVocabularyClick: (Vocabulary) -> Unit,
     onDismissDetail: () -> Unit,
     navigateToEdit: (vocabulary: Vocabulary) -> Unit,
+    navigateToWordGroupScreen: () -> Unit,
 ) {
     val snackBarHostState = remember { SnackbarHostState() }
     val uriHandle = LocalUriHandler.current
@@ -161,6 +164,7 @@ private fun SearchScreen(
                 onDismissDetail()
                 navigateToEdit(it)
             },
+            navigateToWordGroupScreen = navigateToWordGroupScreen,
         )
     }
 }
@@ -394,6 +398,7 @@ private fun SearchScreenPreviewEmpty() {
             onVocabularyClick = {},
             onDismissDetail = {},
             navigateToEdit = {},
+            navigateToWordGroupScreen = {},
         )
     }
 }
@@ -412,6 +417,7 @@ private fun SearchScreenPreviewFilled() {
             onVocabularyClick = {},
             onDismissDetail = {},
             navigateToEdit = {},
+            navigateToWordGroupScreen = {},
         )
     }
 }

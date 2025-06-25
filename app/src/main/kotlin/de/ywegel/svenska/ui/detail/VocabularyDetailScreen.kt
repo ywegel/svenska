@@ -55,6 +55,7 @@ fun VocabularyDetailScreen(
     state: VocabularyDetailState,
     onDismiss: () -> Unit = {},
     onEditClick: (Vocabulary) -> Unit = {},
+    navigateToWordGroupScreen: () -> Unit,
 ) {
     if (state is VocabularyDetailState.Visible) {
         val viewModel: VocabularyDetailViewModel = hiltViewModel()
@@ -70,6 +71,7 @@ fun VocabularyDetailScreen(
                 isFavorite = newValue
                 viewModel.toggleFavorite(state.selectedVocabulary.id, newValue)
             },
+            navigateToWordGroupScreen = navigateToWordGroupScreen,
         )
     }
 }
@@ -90,6 +92,7 @@ private fun VocabularyDetailContent(
         initialValue = SheetValue.Expanded,
         skipHiddenState = false,
     ),
+    navigateToWordGroupScreen: () -> Unit,
 ) {
     ModalBottomSheet(
         onDismissRequest = onDismiss,
@@ -102,7 +105,13 @@ private fun VocabularyDetailContent(
             Header(vocabulary, isFavorite, onFavoriteChange)
 
             // Chips Section
-            WordInfoChips(vocabulary)
+            WordInfoChips(
+                vocabulary = vocabulary,
+                navigateToWordGroupScreen = {
+                    onDismiss()
+                    navigateToWordGroupScreen()
+                },
+            )
 
             Column(Modifier.padding(horizontal = Spacings.m)) {
                 // Pronunciation
@@ -192,14 +201,14 @@ private fun Header(vocabulary: Vocabulary, isFavorite: Boolean, onFavoriteChange
 }
 
 @Composable
-private fun WordInfoChips(vocabulary: Vocabulary) {
+private fun WordInfoChips(vocabulary: Vocabulary, navigateToWordGroupScreen: () -> Unit) {
     LazyRow(
         contentPadding = PaddingValues(horizontal = Spacings.m),
         horizontalArrangement = Arrangement.spacedBy(Spacings.xs),
     ) {
         item {
             AssistChip(
-                onClick = {},
+                onClick = navigateToWordGroupScreen,
                 label = {
                     Text(
                         text = with(vocabulary.wordGroup) {
@@ -275,6 +284,7 @@ private fun VocabularyDetailScreenPreview() {
                 initialValue = SheetValue.Expanded,
                 skipHiddenState = true,
             ),
+            navigateToWordGroupScreen = {},
         )
     }
 }

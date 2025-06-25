@@ -42,6 +42,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.ramcosta.composedestinations.annotation.Destination
 import com.ramcosta.composedestinations.generated.destinations.EditVocabularyScreenDestination
+import com.ramcosta.composedestinations.generated.destinations.WordGroupsScreenDestination
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
 import de.ywegel.svenska.R
 import de.ywegel.svenska.data.model.Vocabulary
@@ -81,6 +82,7 @@ fun FavoritesAndPronunciationScreen(
                 ),
             )
         },
+        navigateToWordGroupScreen = { navigator.navigate(WordGroupsScreenDestination) },
     )
 }
 
@@ -93,6 +95,7 @@ fun FavoritesAndPronunciationScreen(
     onVocabularyClick: (Vocabulary) -> Unit,
     onDismissDetail: () -> Unit,
     navigateToEdit: (vocabulary: Vocabulary) -> Unit,
+    navigateToWordGroupScreen: () -> Unit,
 ) {
     val scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior()
     var showExplanation by rememberSaveable { mutableStateOf(initialShowExplanation) }
@@ -131,6 +134,7 @@ fun FavoritesAndPronunciationScreen(
                 onVocabularyClick = onVocabularyClick,
                 onDismissDetail = onDismissDetail,
                 navigateToEdit = navigateToEdit,
+                navigateToWordGroupScreen = navigateToWordGroupScreen,
             )
         }
     }
@@ -178,6 +182,7 @@ private fun SuccessState(
     onVocabularyClick: (Vocabulary) -> Unit,
     onDismissDetail: () -> Unit,
     navigateToEdit: (vocabulary: Vocabulary) -> Unit,
+    navigateToWordGroupScreen: () -> Unit,
 ) {
     LazyColumn(
         modifier = Modifier
@@ -210,6 +215,7 @@ private fun SuccessState(
             onDismissDetail()
             navigateToEdit(it)
         },
+        navigateToWordGroupScreen = navigateToWordGroupScreen,
     )
 }
 
@@ -263,6 +269,7 @@ private fun ErrorStatePreview() {
             onVocabularyClick = {},
             onDismissDetail = {},
             navigateToEdit = {},
+            navigateToWordGroupScreen = {},
         )
     }
 }
@@ -278,6 +285,7 @@ private fun SuccessStatePreview() {
             onVocabularyClick = {},
             onDismissDetail = {},
             navigateToEdit = {},
+            navigateToWordGroupScreen = {},
         )
     }
 }
@@ -294,6 +302,7 @@ private fun SuccessStateWithExplanationPreview() {
             onVocabularyClick = {},
             onDismissDetail = {},
             navigateToEdit = {},
+            navigateToWordGroupScreen = {},
         )
     }
 }
