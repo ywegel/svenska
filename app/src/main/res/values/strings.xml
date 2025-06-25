@@ -78,6 +78,9 @@
     <string name="lang_noun_gender_abbreviation_ultra">U</string>
     <string name="lang_noun_gender_abbreviation_neutra">N</string>
 
+    <string name="lang_noun_gender_article_ultra">en</string>
+    <string name="lang_noun_gender_article_neutra">ett</string>
+
     <!-- # Containers # -->
     <string name="containers_add_confirmation">Add</string>
     <string name="container_title_edit_mode">Edit containers</string>

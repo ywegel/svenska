@@ -107,6 +107,23 @@ class OverviewViewModel @Inject constructor(
             }
         }
     }
+
+    fun showVocabularyDetail(vocabulary: Vocabulary) {
+        _uiState.update {
+            it.copy(
+                selectedVocabulary = vocabulary,
+                showDetailScreen = true,
+            )
+        }
+    }
+
+    fun hideVocabularyDetail() {
+        _uiState.update {
+            it.copy(
+                showDetailScreen = false,
+            )
+        }
+    }
 }
 
 data class OverviewUiState(
@@ -116,4 +133,6 @@ data class OverviewUiState(
     val isReverseSort: Boolean = false,
     val showSortDialog: Boolean = false,
     val showCompactVocabularyItem: Boolean = false,
+    val showDetailScreen: Boolean = false,
+    val selectedVocabulary: Vocabulary? = null,
 )

@@ -31,11 +31,12 @@ fun vocabulary(
     containerId: Int = 1,
     isFavorite: Boolean = false,
     irregularPronunciation: String? = null,
+    notes: String = "",
 ): Vocabulary = Vocabulary(
     word = "lampa",
     wordHighlights = listOf(1, 2),
     translation = "lamp",
-    notes = "",
+    notes = notes,
     wordGroup = WordGroup.Noun(WordGroup.NounSubgroup.UNDEFINED),
     gender = Gender.Ultra,
     ending = "n or orna",

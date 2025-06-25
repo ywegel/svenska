@@ -8,6 +8,19 @@ import de.ywegel.svenska.data.model.WordGroup
 
 @ReadOnlyComposable
 @Composable
+fun WordGroup.mainGroupUserFacingString(): String {
+    val id = when (this) {
+        is WordGroup.Noun -> R.string.lang_noun
+        is WordGroup.Verb -> R.string.lang_verb
+        WordGroup.Adjective -> R.string.lang_adjective
+        WordGroup.Other -> R.string.lang_other
+    }
+
+    return stringResource(id)
+}
+
+@ReadOnlyComposable
+@Composable
 fun WordGroup.mainGroupAbbreviation(): String {
     val id = when (this) {
         is WordGroup.Noun -> R.string.lang_noun_abbreviation
