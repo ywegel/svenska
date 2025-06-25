@@ -5,10 +5,11 @@ package de.ywegel.svenska.ui.overview
 import androidx.lifecycle.SavedStateHandle
 import app.cash.turbine.test
 import de.ywegel.svenska.data.VocabularyRepository
-import de.ywegel.svenska.data.model.Vocabulary
 import de.ywegel.svenska.data.preferences.UserPreferencesManager
+import de.ywegel.svenska.data.vocabulary
 import de.ywegel.svenska.fakes.UserPreferencesManagerFake
 import de.ywegel.svenska.fakes.VocabularyRepositoryFake
+import de.ywegel.svenska.ui.detail.VocabularyDetailState
 import io.mockk.clearAllMocks
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Dispatchers
@@ -22,10 +23,8 @@ import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import strikt.api.expectThat
+import strikt.assertions.isA
 import strikt.assertions.isEqualTo
-import strikt.assertions.isFalse
-import strikt.assertions.isNull
-import strikt.assertions.isTrue
 
 // Test the DetailScreen logic in the OverviewViewModel
 class OverviewViewModelDetailScreenTest {
@@ -47,7 +46,7 @@ class OverviewViewModelDetailScreenTest {
     }
 
     @Test
-    fun `initial state has showDetailScreen false and selectedVocabulary null`() = runTest(testDispatcher) {
+    fun `initial state is hidden`() = runTest(testDispatcher) {
         // Given
         val viewModel = setupViewModel()
 
@@ -57,16 +56,15 @@ class OverviewViewModelDetailScreenTest {
         // Then
         viewModel.uiState.test {
             val state = awaitItem()
-            expectThat(state.showDetailScreen).isFalse()
-            expectThat(state.selectedVocabulary).isNull()
+            expectThat(state.detailViewState).isA<VocabularyDetailState.Hidden>()
         }
     }
 
     @Test
-    fun `showVocabularyDetail sets selectedVocabulary and showDetailScreen to true`() = runTest(testDispatcher) {
+    fun `showVocabularyDetail shows the detail screen`() = runTest(testDispatcher) {
         // Given
         val viewModel = setupViewModel()
-        val vocabulary = createTestVocabulary()
+        val vocabulary = vocabulary()
 
         // When
         viewModel.showVocabularyDetail(vocabulary)
@@ -75,16 +73,18 @@ class OverviewViewModelDetailScreenTest {
         // Then
         viewModel.uiState.test {
             val state = awaitItem()
-            expectThat(state.showDetailScreen).isTrue()
-            expectThat(state.selectedVocabulary).isEqualTo(vocabulary)
+            expectThat(state.detailViewState).isA<VocabularyDetailState.Visible>()
+            val detailViewState = state.detailViewState
+            detailViewState as VocabularyDetailState.Visible
+            expectThat(detailViewState.selectedVocabulary).isEqualTo(vocabulary)
         }
     }
 
     @Test
-    fun `hideVocabularyDetail sets showDetailScreen to false`() = runTest(testDispatcher) {
+    fun `hideVocabularyDetail hides the detail screen`() = runTest(testDispatcher) {
         // Given
         val viewModel = setupViewModel()
-        val vocabulary = createTestVocabulary()
+        val vocabulary = vocabulary()
 
         // When
         viewModel.showVocabularyDetail(vocabulary)
@@ -95,9 +95,7 @@ class OverviewViewModelDetailScreenTest {
         // Then
         viewModel.uiState.test {
             val state = awaitItem()
-            expectThat(state.showDetailScreen).isFalse()
-            // Note: selectedVocabulary is not cleared, only the visibility changes
-            expectThat(state.selectedVocabulary).isEqualTo(vocabulary)
+            expectThat(state.detailViewState).isA<VocabularyDetailState.Hidden>()
         }
     }
 
@@ -116,16 +114,6 @@ class OverviewViewModelDetailScreenTest {
             repository = repository,
             userPreferencesManager = userPreferencesManager,
             ioDispatcher = dispatcher,
-        )
-    }
-
-    private fun createTestVocabulary(): Vocabulary {
-        return Vocabulary(
-            word = "testWord",
-            wordHighlights = emptyList(),
-            translation = "testTranslation",
-            containerId = 1,
-            id = 1,
         )
     }
 }
