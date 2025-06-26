@@ -32,8 +32,8 @@ fun assertVocabularyListEqualsIgnoringTimestamps(
             actual.zip(expectedList)
         }
 
-        comparisonPairs.forEach { (actualItem, expectedItem) ->
-            assertVocabularyEqualsIgnoringTimestamps(actualItem, expectedItem)
+        comparisonPairs.forEach { (expectedItem, actualItem) ->
+            assertVocabularyEqualsIgnoringTimestamps(expectedItem, actualItem)
         }
     }
 }

@@ -48,7 +48,7 @@ class FileRepositoryWordParserRoundTripTest {
                 gender = Gender.Ultra,
                 wordGroup = WordGroup.Noun(WordGroup.NounSubgroup.OR),
                 ending = "-n -or -orna",
-                containerId = 0,
+                containerId = 1,
             ),
             Vocabulary(
                 word = "verbGroup1 a",
@@ -56,7 +56,7 @@ class FileRepositoryWordParserRoundTripTest {
                 gender = null,
                 wordGroup = WordGroup.Verb(WordGroup.VerbSubgroup.GROUP_1),
                 ending = "-r -de -t",
-                containerId = 0,
+                containerId = 1,
             ),
             Vocabulary(
                 word = "nounGroup5 Neutra",
@@ -64,7 +64,7 @@ class FileRepositoryWordParserRoundTripTest {
                 gender = Gender.Neutra,
                 wordGroup = WordGroup.Noun(WordGroup.NounSubgroup.UNCHANGED_ETT),
                 ending = "-et - -en",
-                containerId = 0,
+                containerId = 1,
             ),
             Vocabulary(
                 word = "adjective",
@@ -72,7 +72,7 @@ class FileRepositoryWordParserRoundTripTest {
                 gender = null,
                 wordGroup = WordGroup.Adjective,
                 ending = "-t -a",
-                containerId = 0,
+                containerId = 1,
             ),
             Vocabulary(
                 word = "verb a",
@@ -80,7 +80,7 @@ class FileRepositoryWordParserRoundTripTest {
                 gender = null,
                 wordGroup = WordGroup.Verb(WordGroup.VerbSubgroup.GROUP_2B),
                 ending = "-er -te -t",
-                containerId = 0,
+                containerId = 1,
             ),
         )
 
