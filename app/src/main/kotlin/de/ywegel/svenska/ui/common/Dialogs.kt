@@ -21,8 +21,8 @@ import de.ywegel.svenska.ui.theme.Spacings
 import de.ywegel.svenska.ui.theme.SvenskaTheme
 
 @Composable
-fun ConfirmButton(text: String = stringResource(R.string.general_ok), onClick: () -> Unit) {
-    Button(onClick = onClick) { Text(text = text) }
+fun ConfirmButton(text: String = stringResource(R.string.general_ok), enabled: Boolean = true, onClick: () -> Unit) {
+    Button(onClick = onClick, enabled = enabled) { Text(text = text) }
 }
 
 @Composable

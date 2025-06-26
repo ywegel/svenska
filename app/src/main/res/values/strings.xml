@@ -83,6 +83,10 @@
 
     <!-- # Containers # -->
     <string name="containers_add_confirmation">Add</string>
+    <string name="containers_add_title">Add a new container</string>
+    <string name="containers_add_input_label">Container name</string>
+    <string name="containers_add_input_error">Container name can\'t be empty</string>
+
     <string name="container_title_edit_mode">Edit containers</string>
 
     <string name="containers_bonus_numbers">Numbers</string>
