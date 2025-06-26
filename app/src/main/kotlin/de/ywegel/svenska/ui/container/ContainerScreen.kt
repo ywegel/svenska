@@ -88,7 +88,7 @@ fun ContainerScreen(navigator: DestinationsNavigator) {
         },
         toggleIsEditMode = viewModel::updateIsEditMode,
         onDeleteClick = viewModel::deleteContainer,
-        onAddContainer = viewModel::addContainer,
+        onAddEditContainer = viewModel::addEditContainer,
         onBonusClick = {
             when (it) {
                 BonusScreen.Numbers -> navigator.navigate(SwedishNumbersScreenDestination)
@@ -115,13 +115,13 @@ fun ContainerScreen(navigator: DestinationsNavigator) {
 @Composable
 private fun ContainerScreen(
     uiState: ContainerUiState,
-    onContainerClick: (VocabularyContainer) -> Unit = {},
-    toggleIsEditMode: (Boolean) -> Unit = {},
-    onDeleteClick: (VocabularyContainer) -> Unit = {},
-    onAddContainer: (String) -> Unit = {},
-    onBonusClick: (BonusScreen) -> Unit = {},
-    onSettingsClicked: () -> Unit = {},
-    onSearchClicked: () -> Unit = {},
+    onContainerClick: (VocabularyContainer) -> Unit,
+    toggleIsEditMode: (Boolean) -> Unit,
+    onDeleteClick: (VocabularyContainer) -> Unit,
+    onAddEditContainer: (String, Int?) -> Unit,
+    onBonusClick: (BonusScreen) -> Unit,
+    onSettingsClicked: () -> Unit,
+    onSearchClicked: () -> Unit,
 ) {
     val scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior()
 
@@ -142,7 +142,7 @@ private fun ContainerScreen(
             )
         },
         floatingActionButton = {
-            AddContainerButtonWithTextDialog(onConfirm = onAddContainer) { onClick ->
+            AddContainerButtonWithTextDialog(onConfirm = onAddEditContainer, existingContainerId = null) { onClick ->
                 FloatingActionButton(onClick) {
                     Icon(SvenskaIcons.Add, null)
                 }
@@ -158,12 +158,12 @@ private fun ContainerScreen(
         ) {
             items(uiState.containers, key = { it.id }) { container ->
                 ContainerItem(
-                    container,
-                    uiState.isEditModeMode,
-                    onContainerClick,
-                    toggleIsEditMode,
-                    onDeleteClick,
-                    onAddContainer,
+                    container = container,
+                    isEditMode = uiState.isEditModeMode,
+                    onClick = onContainerClick,
+                    toggleIsEditMode = toggleIsEditMode,
+                    onDeleteClick = onDeleteClick,
+                    updateContainerName = onAddEditContainer,
                 )
             }
             item {
@@ -244,7 +244,7 @@ private fun ContainerItem(
     onClick: (VocabularyContainer) -> Unit,
     toggleIsEditMode: (Boolean) -> Unit,
     onDeleteClick: (VocabularyContainer) -> Unit,
-    updateContainerName: (String) -> Unit,
+    updateContainerName: (String, Int?) -> Unit,
 ) {
     Card(
         modifier = Modifier.combinedClickable(
@@ -274,6 +274,7 @@ private fun ContainerItem(
                 AddContainerButtonWithTextDialog(
                     initialInput = container.name,
                     onConfirm = updateContainerName,
+                    existingContainerId = container.id,
                 ) { onClick ->
                     IconButton(
                         icon = SvenskaIcons.Edit,
@@ -296,7 +297,8 @@ private fun ContainerItem(
 @Composable
 private fun AddContainerButtonWithTextDialog(
     initialInput: String = "",
-    onConfirm: (String) -> Unit,
+    existingContainerId: Int?,
+    onConfirm: (String, Int?) -> Unit,
     component: @Composable (onClick: () -> Unit) -> Unit,
 ) {
     var showDialog by remember { mutableStateOf(false) }
@@ -312,22 +314,32 @@ private fun AddContainerButtonWithTextDialog(
     if (showDialog) {
         AlertDialog(
             onDismissRequest = { showDialog = false },
-            title = { Text("Add a new container") },
+            title = { Text(stringResource(R.string.containers_add_title)) },
             text = {
                 Column {
                     VerticalSpacerXS()
                     OutlinedTextField(
                         value = inputText,
                         onValueChange = { inputText = it },
-                        label = { Text("Container name") },
+                        label = { Text(stringResource(R.string.containers_add_input_label)) },
+                        isError = inputText.isBlank(),
+                        supportingText = {
+                            if (inputText.isBlank()) {
+                                Text(
+                                    modifier = Modifier.fillMaxWidth(),
+                                    text = stringResource(R.string.containers_add_input_error),
+                                    color = SvenskaTheme.colors.error,
+                                )
+                            }
+                        },
                     )
                 }
             },
             confirmButton = {
-                ConfirmButton(stringResource(R.string.containers_add_confirmation)) {
-                    showDialog = false
+                ConfirmButton(stringResource(R.string.containers_add_confirmation), enabled = inputText.isNotBlank()) {
                     if (inputText.isNotBlank()) {
-                        onConfirm(inputText)
+                        showDialog = false
+                        onConfirm(inputText, existingContainerId)
                         inputText = ""
                     }
                 }
@@ -352,7 +364,8 @@ private fun ContainerCardPreview() {
             onClick = {},
             toggleIsEditMode = {},
             onDeleteClick = {},
-        ) {}
+            updateContainerName = { a, b -> },
+        )
     }
 }
 
@@ -366,7 +379,8 @@ private fun ContainerCardEditModePreview() {
             onClick = {},
             toggleIsEditMode = {},
             onDeleteClick = {},
-        ) {}
+            updateContainerName = { a, b -> },
+        )
     }
 }
 
@@ -383,7 +397,8 @@ private fun ContainerCardEditModeLongTextPreview() {
             onClick = {},
             toggleIsEditMode = {},
             onDeleteClick = {},
-        ) {}
+            updateContainerName = { a, b -> },
+        )
     }
 }
 
@@ -391,6 +406,15 @@ private fun ContainerCardEditModeLongTextPreview() {
 @Composable
 private fun ContainerPreview() {
     SvenskaTheme {
-        ContainerScreen(ContainerUiState(containers = containers()))
+        ContainerScreen(
+            ContainerUiState(containers = containers()),
+            onContainerClick = {},
+            toggleIsEditMode = {},
+            onDeleteClick = {},
+            onAddEditContainer = { a, b -> },
+            onBonusClick = {},
+            onSettingsClicked = {},
+            onSearchClicked = {},
+        )
     }
 }

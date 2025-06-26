@@ -45,9 +45,12 @@ class ContainerViewModel @Inject constructor(
         repository.deleteContainerWithAllVocabulary(container)
     }
 
-    fun addContainer(containerName: String) {
+    fun addEditContainer(containerName: String, existingContainerId: Int?) {
+        // Don't create container if name is blank. This should be blocked by the ui as well.
+        if (containerName.isBlank()) return
+
         viewModelScope.launch(ioDispatcher) {
-            repository.upsertContainer(VocabularyContainer(name = containerName))
+            repository.upsertContainer(VocabularyContainer(name = containerName, id = existingContainerId ?: 0))
         }
     }
 }
