@@ -66,6 +66,8 @@ class OverviewViewModelDetailScreenTest {
         val viewModel = setupViewModel()
         val vocabulary = vocabulary()
 
+        advanceUntilIdle()
+
         // When
         viewModel.showVocabularyDetail(vocabulary)
         advanceUntilIdle()
