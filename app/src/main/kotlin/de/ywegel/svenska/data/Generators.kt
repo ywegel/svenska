@@ -2,6 +2,7 @@
     "detekt:MatchingDeclarationName",
     "detekt:MagicNumber",
     "detekt:TooManyFunctions",
+    "LongParameterList",
 )
 
 package de.ywegel.svenska.data
@@ -23,19 +24,27 @@ object GeneratorConstants {
             "aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse " +
             "cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in " +
             "culpa qui officia deserunt mollit anim id est laborum."
+
+    @VisibleForTesting
+    const val TEST_DATE = 1735686000000
 }
 
 @VisibleForTesting
 fun vocabulary(
     id: Int = 1,
+    word: String = "lampa",
+    translation: String = "lamp",
     containerId: Int = 1,
     isFavorite: Boolean = false,
     irregularPronunciation: String? = null,
+    notes: String = "",
+    lastEdited: Long = System.currentTimeMillis(),
+    created: Long = System.currentTimeMillis(),
 ): Vocabulary = Vocabulary(
-    word = "lampa",
+    word = word,
     wordHighlights = listOf(1, 2),
-    translation = "lamp",
-    notes = "",
+    translation = translation,
+    notes = notes,
     wordGroup = WordGroup.Noun(WordGroup.NounSubgroup.UNDEFINED),
     gender = Gender.Ultra,
     ending = "n or orna",
@@ -43,6 +52,8 @@ fun vocabulary(
     id = id,
     isFavorite = isFavorite,
     irregularPronunciation = irregularPronunciation,
+    lastEdited = lastEdited,
+    created = created,
 )
 
 @VisibleForTesting

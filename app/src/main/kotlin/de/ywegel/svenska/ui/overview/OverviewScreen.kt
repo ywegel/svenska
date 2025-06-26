@@ -45,6 +45,7 @@ import com.ramcosta.composedestinations.generated.destinations.AddVocabularyScre
 import com.ramcosta.composedestinations.generated.destinations.EditVocabularyScreenDestination
 import com.ramcosta.composedestinations.generated.destinations.QuizConfigurationScreenDestinationNavArgs
 import com.ramcosta.composedestinations.generated.destinations.SearchScreenDestination
+import com.ramcosta.composedestinations.generated.destinations.WordGroupsScreenDestination
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
 import de.ywegel.svenska.R
 import de.ywegel.svenska.data.model.Vocabulary
@@ -54,6 +55,7 @@ import de.ywegel.svenska.ui.common.HorizontalSpacerS
 import de.ywegel.svenska.ui.common.IconButton
 import de.ywegel.svenska.ui.common.TopAppTextBar
 import de.ywegel.svenska.ui.common.VerticalSpacerM
+import de.ywegel.svenska.ui.detail.VocabularyDetailScreen
 import de.ywegel.svenska.ui.theme.Spacings
 import de.ywegel.svenska.ui.theme.SvenskaIcons
 import de.ywegel.svenska.ui.theme.SvenskaTheme
@@ -78,13 +80,16 @@ fun OverviewScreen(navigator: DestinationsNavigator, navArgs: OverviewNavArgs) {
         navigateToEdit = { item ->
             navigator.navigate(
                 EditVocabularyScreenDestination(
-                    viewModel.containerId,
-                    item,
+                    containerId = viewModel.containerId,
+                    initialVocabulary = item,
                 ),
             )
         },
         navigateToSearch = { navigator.navigate(SearchScreenDestination(containerId = viewModel.containerId)) },
         navigateUp = navigator::navigateUp,
+        onVocabularyClick = viewModel::showVocabularyDetail,
+        onDismissDetail = viewModel::hideVocabularyDetail,
+        navigateToWordGroupScreen = { navigator.navigate(WordGroupsScreenDestination) },
     )
 }
 
@@ -92,11 +97,14 @@ fun OverviewScreen(navigator: DestinationsNavigator, navArgs: OverviewNavArgs) {
 private fun OverviewScreen(
     uiState: OverviewUiState,
     containerName: String,
-    navigateToAdd: () -> Unit = {},
-    onQuizClick: () -> Unit = {},
-    navigateToEdit: (vocabulary: Vocabulary) -> Unit = {},
-    navigateToSearch: () -> Unit = {},
-    navigateUp: () -> Unit = {},
+    navigateToAdd: () -> Unit,
+    onQuizClick: () -> Unit,
+    navigateToEdit: (vocabulary: Vocabulary) -> Unit,
+    navigateToSearch: () -> Unit,
+    navigateUp: () -> Unit,
+    onVocabularyClick: (Vocabulary) -> Unit,
+    onDismissDetail: () -> Unit,
+    navigateToWordGroupScreen: () -> Unit,
 ) {
     val scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior()
 
@@ -125,7 +133,7 @@ private fun OverviewScreen(
             ) {
                 items(uiState.vocabulary, key = { it.id }) { item ->
                     VocabularyItemCompact(item) {
-                        navigateToEdit(it)
+                        onVocabularyClick(it)
                     }
                 }
             }
@@ -144,11 +152,24 @@ private fun OverviewScreen(
                 ) { vocab ->
                     VocabularyListItem(
                         vocabulary = vocab,
-                        onClick = { navigateToEdit(it) },
+                        onClick = {
+                            onVocabularyClick(it)
+                        },
                     )
                 }
             }
         }
+
+        // Show detail screen if a vocabulary is selected
+        VocabularyDetailScreen(
+            state = uiState.detailViewState,
+            onDismiss = onDismissDetail,
+            onEditClick = {
+                onDismissDetail()
+                navigateToEdit(it)
+            },
+            navigateToWordGroupScreen = navigateToWordGroupScreen,
+        )
     }
 }
 
@@ -219,6 +240,17 @@ private const val ANIMATION_DURATION_MS = 800
 @Composable
 private fun OverviewPreview() {
     SvenskaTheme {
-        OverviewScreen(OverviewUiState(vocabulary = vocabularies()), containerName = "Test container")
+        OverviewScreen(
+            uiState = OverviewUiState(vocabulary = vocabularies()),
+            containerName = "Test container",
+            onVocabularyClick = {},
+            onDismissDetail = {},
+            navigateToAdd = {},
+            onQuizClick = {},
+            navigateToEdit = {},
+            navigateToSearch = {},
+            navigateUp = {},
+            navigateToWordGroupScreen = {},
+        )
     }
 }

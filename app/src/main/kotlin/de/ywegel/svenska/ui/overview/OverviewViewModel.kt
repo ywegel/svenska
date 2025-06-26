@@ -10,6 +10,7 @@ import de.ywegel.svenska.data.VocabularyRepository
 import de.ywegel.svenska.data.model.Vocabulary
 import de.ywegel.svenska.data.preferences.UserPreferencesManager
 import de.ywegel.svenska.di.IoDispatcher
+import de.ywegel.svenska.ui.detail.VocabularyDetailState
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -107,6 +108,22 @@ class OverviewViewModel @Inject constructor(
             }
         }
     }
+
+    fun showVocabularyDetail(vocabulary: Vocabulary) {
+        _uiState.update {
+            it.copy(
+                detailViewState = VocabularyDetailState.Visible(vocabulary),
+            )
+        }
+    }
+
+    fun hideVocabularyDetail() {
+        _uiState.update {
+            it.copy(
+                detailViewState = VocabularyDetailState.Hidden,
+            )
+        }
+    }
 }
 
 data class OverviewUiState(
@@ -116,4 +133,5 @@ data class OverviewUiState(
     val isReverseSort: Boolean = false,
     val showSortDialog: Boolean = false,
     val showCompactVocabularyItem: Boolean = false,
+    val detailViewState: VocabularyDetailState = VocabularyDetailState.Hidden,
 )

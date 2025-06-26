@@ -78,6 +78,9 @@
     <string name="lang_noun_gender_abbreviation_ultra">U</string>
     <string name="lang_noun_gender_abbreviation_neutra">N</string>
 
+    <string name="lang_noun_gender_article_ultra">en</string>
+    <string name="lang_noun_gender_article_neutra">ett</string>
+
     <!-- # Containers # -->
     <string name="containers_add_confirmation">Add</string>
     <string name="container_title_edit_mode">Edit containers</string>
@@ -267,4 +270,14 @@
     <string name="onboarding_page_content_importer">There is a vocabulary importer that accepts .json files in a specific format.</string>
     <string name="onboarding_page_content_importer_extended">You can either import words from the settings or by clicking on a .json file and selecting the app.</string>
 
+    <!-- # VocabularyDetailScreen # -->
+    <string name="vocabulary_detail_section_pronunciation">Pronunciation</string>
+    <string name="vocabulary_detail_section_notes">Notes</string>
+    <string name="vocabulary_detail_section_metadata">Metadata</string>
+    <string name="vocabulary_detail_section_metadata_created">Created: %1$s</string>
+    <string name="vocabulary_detail_section_metadata_edited">Last edited: %1$s</string>
+    <string name="vocabulary_detail_chip_group">%1$s (%2$s)</string>
+    <string name="vocabulary_detail_chip_gender">Gender: %1$s (%2$s)</string>
+    <string name="vocabulary_detail_chip_endings">Endings: %1$s</string>
+    <string name="vocabulary_detail_edit_btn">Edit</string>
 </resources>

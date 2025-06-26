@@ -22,4 +22,8 @@
     <!-- # Onboarding # -->
     <string name="accessibility_onboarding_page_word_group_bonus_image">Shows the bonus bar containing a WordGroup item</string>
     <string name="accessibility_onboarding_page_importer_open_with">Shows android system "open with" popup displaying this app</string>
+
+    <!-- # VocabularyDetailScreen # -->
+    <string name="vocabulary_detail_remove_favorite">Remove from favorites</string>
+    <string name="vocabulary_detail_add_favorite">Add to favorites</string>
 </resources>

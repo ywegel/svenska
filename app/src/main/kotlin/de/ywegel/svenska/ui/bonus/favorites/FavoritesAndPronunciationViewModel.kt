@@ -9,16 +9,18 @@ import de.ywegel.svenska.data.VocabularyRepository
 import de.ywegel.svenska.data.model.Vocabulary
 import de.ywegel.svenska.di.IoDispatcher
 import de.ywegel.svenska.ui.container.BonusScreen
+import de.ywegel.svenska.ui.detail.VocabularyDetailState
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
 class FavoritesAndPronunciationViewModel @Inject constructor(
     private val repository: VocabularyRepository,
-    private val savedStateHandle: SavedStateHandle,
+    savedStateHandle: SavedStateHandle,
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
 ) : ViewModel() {
 
@@ -44,10 +46,38 @@ class FavoritesAndPronunciationViewModel @Inject constructor(
                 .onFailure { _uiState.value = FavoritesUiState.Error(it.message ?: "Unknown error") }
         }
     }
+
+    fun showVocabularyDetail(vocabulary: Vocabulary) {
+        _uiState.update {
+            if (it is FavoritesUiState.Success) {
+                it.copy(
+                    detailViewState = VocabularyDetailState.Visible(vocabulary),
+                )
+            } else {
+                it
+            }
+        }
+    }
+
+    fun hideVocabularyDetail() {
+        _uiState.update {
+            if (it is FavoritesUiState.Success) {
+                it.copy(
+                    detailViewState = VocabularyDetailState.Hidden,
+                )
+            } else {
+                it
+            }
+        }
+    }
 }
 
 sealed class FavoritesUiState {
     object Loading : FavoritesUiState()
-    data class Success(val items: List<Vocabulary>) : FavoritesUiState()
+    data class Success(
+        val items: List<Vocabulary>,
+        val detailViewState: VocabularyDetailState = VocabularyDetailState.Hidden,
+    ) : FavoritesUiState()
+
     data class Error(val message: String) : FavoritesUiState()
 }
