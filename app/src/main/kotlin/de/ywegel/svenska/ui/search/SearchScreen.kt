@@ -60,11 +60,13 @@ import com.ramcosta.composedestinations.generated.destinations.WordGroupsScreenD
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
 import de.ywegel.svenska.R
 import de.ywegel.svenska.data.model.Vocabulary
+import de.ywegel.svenska.data.vocabularies
 import de.ywegel.svenska.navigation.SvenskaGraph
 import de.ywegel.svenska.navigation.transitions.LateralTransition
 import de.ywegel.svenska.ui.common.HorizontalSpacerM
 import de.ywegel.svenska.ui.common.IconButton
 import de.ywegel.svenska.ui.common.NavigationIconButton
+import de.ywegel.svenska.ui.common.rememberColumnScaffoldInsets
 import de.ywegel.svenska.ui.detail.VocabularyDetailScreen
 import de.ywegel.svenska.ui.overview.VocabularyItemCompact
 import de.ywegel.svenska.ui.overview.VocabularyListItem
@@ -195,6 +197,8 @@ private fun ItemList(
             )
         }
     } else {
+        val outerPadding = rememberColumnScaffoldInsets(outerPadding, Spacings.xs)
+
         LazyColumn(
             contentPadding = outerPadding,
             modifier = Modifier.padding(horizontal = Spacings.s),
@@ -251,7 +255,12 @@ private fun LastSearchedItem(query: String, onItemClick: (String) -> Unit) {
 
 @Composable
 private fun OnlineRedirectItem(onClick: () -> Unit) {
-    Card(onClick = onClick, modifier = Modifier.padding(Spacings.xs)) {
+    Card(
+        onClick = onClick,
+        modifier = Modifier
+            .padding(horizontal = Spacings.xs)
+            .padding(bottom = Spacings.m),
+    ) {
         Row(
             Modifier
                 .fillMaxWidth()
@@ -410,6 +419,25 @@ private fun SearchScreenPreviewFilled() {
         SearchScreen(
             uiState = SearchUiState(),
             vocabulary = emptyList(),
+            currentSearchQuery = "abc",
+            onSearchChanged = {},
+            onSearch = {},
+            navigateUp = {},
+            onVocabularyClick = {},
+            onDismissDetail = {},
+            navigateToEdit = {},
+            navigateToWordGroupScreen = {},
+        )
+    }
+}
+
+@PreviewLightDark
+@Composable
+private fun SearchScreenPreviewFilledAndItemsAvailable() {
+    SvenskaTheme {
+        SearchScreen(
+            uiState = SearchUiState(),
+            vocabulary = vocabularies(),
             currentSearchQuery = "abc",
             onSearchChanged = {},
             onSearch = {},

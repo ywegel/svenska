@@ -6,6 +6,7 @@ import androidx.compose.foundation.layout.calculateStartPadding
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.platform.LocalLayoutDirection
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 
 /**
@@ -15,12 +16,12 @@ import androidx.compose.ui.unit.dp
  * Add a [de.ywegel.svenska.ui.common.NavigationBarSpacer] at the end of the Column to handle bottom insets.
  */
 @Composable
-fun rememberColumnScaffoldInsets(paddingValues: PaddingValues): PaddingValues {
+fun rememberColumnScaffoldInsets(paddingValues: PaddingValues, topPadding: Dp = 0.dp): PaddingValues {
     val layoutDirection = LocalLayoutDirection.current
 
     return remember(paddingValues, layoutDirection) {
         PaddingValues(
-            top = paddingValues.calculateTopPadding(),
+            top = paddingValues.calculateTopPadding() + topPadding,
             start = paddingValues.calculateStartPadding(layoutDirection),
             end = paddingValues.calculateEndPadding(layoutDirection),
             // 0 to allow drawing behind the navbar. A spacer is added at the end of the Column

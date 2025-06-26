@@ -15,17 +15,16 @@ plugins {
     alias(libs.plugins.room)
     alias(libs.plugins.kotlinx.kover)
     id("kotlin-parcelize")
-    id("kotlin-kapt")
 }
 
 android {
     namespace = "de.ywegel.svenska"
-    compileSdk = 35
+    compileSdk = 36
 
     defaultConfig {
         applicationId = "de.ywegel.svenska"
         minSdk = 24
-        targetSdk = 35
+        targetSdk = 36
         versionCode = 3
         versionName = "0.2"
 
@@ -81,7 +80,6 @@ android {
 dependencies {
     implementation(libs.core.ktx)
     implementation(libs.lifecycle.runtime.ktx)
-    implementation(libs.about.libraries)
     implementation(libs.kotlinx.serialization)
 
     // Compose
@@ -111,7 +109,7 @@ dependencies {
 
     // Hilt
     implementation(libs.hilt.android)
-    kapt(libs.hilt.compiler)
+    ksp(libs.hilt.compiler)
     implementation(libs.androidx.hilt.navigation)
 
     // Datastore
@@ -130,7 +128,6 @@ dependencies {
     androidTestImplementation(libs.espresso.core)
     androidTestImplementation(platform(libs.compose.bom))
     testImplementation(libs.kotlinx.coroutines.test)
-    androidTestImplementation(libs.kotest.assertions)
     testImplementation(libs.mockk)
     testImplementation(libs.assertk)
     testImplementation(libs.turbine)
@@ -140,10 +137,6 @@ dependencies {
     testImplementation(libs.junit5.api)
     testRuntimeOnly(libs.junit5.engine)
     testImplementation(libs.junit5.params)
-}
-
-kapt {
-    correctErrorTypes = true
 }
 
 ksp {
