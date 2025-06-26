@@ -85,15 +85,17 @@ class VocabularyRepositoryFake(
     }
 
     override suspend fun upsertContainer(container: VocabularyContainer): Long {
-        if (container.id == 0) {
+        return if (container.id == 0) {
             val newId = (containers.maxOfOrNull { it.id } ?: 0) + 1
             containers.add(container.copy(id = newId))
+            containersFlow.emit(containers)
+            newId.toLong()
         } else {
             containers.removeIf { it.id == container.id }
             containers.add(container)
+            containersFlow.emit(containers)
+            container.id.toLong()
         }
-        containersFlow.emit(containers)
-        return container.id.toLong()
     }
 
     override suspend fun deleteContainerWithAllVocabulary(container: VocabularyContainer) {
