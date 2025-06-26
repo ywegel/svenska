@@ -1,16 +1,15 @@
 [versions]
 agp = "8.9.2"
-dagger-hilt = "2.54"
-kotest-assertions = "5.8.0"
+dagger-hilt = "2.56.2"
 kotlin = "2.1.20"
 core-ktx = "1.15.0"
 junit = "4.13.2"
 androidx-test-ext-junit = "1.2.1"
 espresso-core = "3.6.1"
-lifecycle-runtime-ktx = "2.8.7"
+lifecycle-runtime-ktx = "2.9.1"
 activity-compose = "1.10.1"
 compose-bom = "2025.04.01"
-room-version = "2.7.1"
+room-version = "2.7.2"
 androidx-hilt = "1.2.0"
 compose-destinations = "2.2.0"
 junit5 = "5.11.2"
@@ -19,7 +18,6 @@ about-libraries = "12.1.2"
 [libraries]
 core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "core-ktx" }
 lifecycle-runtime-ktx = { group = "androidx.lifecycle", name = "lifecycle-runtime-ktx", version.ref = "lifecycle-runtime-ktx" }
-about-libraries = "com.mikepenz:aboutlibraries-compose-m3:10.10.0"
 kotlinx-serialization = "org.jetbrains.kotlinx:kotlinx-serialization-json:1.6.3"
 
 # compose
@@ -51,7 +49,7 @@ hilt-compiler = { module = "com.google.dagger:hilt-compiler", version.ref = "dag
 androidx-hilt-navigation = { module = "androidx.hilt:hilt-navigation-compose", version.ref = "androidx-hilt" }
 
 # datastore
-androidx-datastore = "androidx.datastore:datastore-preferences:1.1.1"
+androidx-datastore = "androidx.datastore:datastore-preferences:1.1.7"
 
 # about libraries
 about-libraries-core = { module = "com.mikepenz:aboutlibraries-core", version.ref = "about-libraries" }
@@ -65,13 +63,12 @@ splish-splash-screen = "androidx.core:core-splashscreen:1.0.1"
 junit = { group = "junit", name = "junit", version.ref = "junit" }
 androidx-test-ext-junit = { group = "androidx.test.ext", name = "junit", version.ref = "androidx-test-ext-junit" }
 espresso-core = { group = "androidx.test.espresso", name = "espresso-core", version.ref = "espresso-core" }
-kotlinx-coroutines-test = "org.jetbrains.kotlinx:kotlinx-coroutines-test:1.9.0"
-kotest-assertions = { module = "io.kotest:kotest-assertions-core", version.ref = "kotest-assertions" }
-mockk = "io.mockk:mockk:1.13.8"
+kotlinx-coroutines-test = "org.jetbrains.kotlinx:kotlinx-coroutines-test:1.10.2"
+mockk = "io.mockk:mockk:1.14.4"
 assertk = "com.willowtreeapps.assertk:assertk:0.26.1"
-turbine = "app.cash.turbine:turbine:1.2.0"
+turbine = "app.cash.turbine:turbine:1.2.1"
 
-strikt = "io.strikt:strikt-core:0.34.0"
+strikt = "io.strikt:strikt-core:0.35.1"
 
 # junit5 https://github.com/mannodermaus/android-junit5
 junit5-api = { module = "org.junit.jupiter:junit-jupiter-api", version.ref = "junit5" }
@@ -83,7 +80,7 @@ com-android-application = { id = "com.android.application", version.ref = "agp" 
 kotlin-android = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }
 kotlin-compose-compiler = { id = "org.jetbrains.kotlin.plugin.compose", version.ref = "kotlin" }
 kotlinx-serialization = { id = "org.jetbrains.kotlin.plugin.serialization", version.ref = "kotlin" }
-dagger-hilt-android = "com.google.dagger.hilt.android:2.48"
+dagger-hilt-android = { id = "com.google.dagger.hilt.android", version.ref = "dagger-hilt" }
 google-ksp = "com.google.devtools.ksp:2.1.20-2.0.1"
 junit5 = "de.mannodermaus.android-junit5:1.11.2.0"
 ktlint = "org.jlleitschuh.gradle.ktlint:12.2.0"
