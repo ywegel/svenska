@@ -10,7 +10,6 @@ import androidx.compose.foundation.selection.selectable
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.RadioButton
 import androidx.compose.material3.Scaffold
@@ -35,10 +34,8 @@ import de.ywegel.svenska.R
 import de.ywegel.svenska.domain.search.OnlineSearchType
 import de.ywegel.svenska.navigation.SettingsNavGraph
 import de.ywegel.svenska.ui.common.HorizontalSpacerM
-import de.ywegel.svenska.ui.common.SwitchWithText
 import de.ywegel.svenska.ui.common.TopAppTextBar
 import de.ywegel.svenska.ui.common.VerticalSpacerS
-import de.ywegel.svenska.ui.common.VerticalSpacerXS
 import de.ywegel.svenska.ui.search.toUrl
 import de.ywegel.svenska.ui.search.userFacingTitle
 import de.ywegel.svenska.ui.settings.SettingsCallbacks
@@ -71,19 +68,12 @@ private fun SearchSettingsScreen(uiState: SettingsUiState, callbacks: SettingsCa
             )
         },
     ) { innerPadding ->
-        Column(Modifier.padding(innerPadding).padding(horizontal = Spacings.m)) {
-            SwitchWithText(
-                title = stringResource(R.string.settings_search_compact_vocabulary_item_title),
-                description = stringResource(R.string.settings_search_compact_vocabulary_item_description),
-                checked = uiState.searchShowCompactVocabularyItem,
-                onCheckedChange = callbacks::toggleSearchShowCompactVocabularyItem,
-            )
-
-            VerticalSpacerXS()
-
-            HorizontalDivider()
-
-            VerticalSpacerXS()
+        Column(
+            Modifier
+                .padding(innerPadding)
+                .padding(horizontal = Spacings.m),
+        ) {
+            VerticalSpacerS()
 
             Text(stringResource(R.string.settings_search_online_redirect_title))
 
@@ -187,7 +177,6 @@ fun SearchSettingsScreenPreview() {
     SvenskaTheme {
         SearchSettingsScreen(
             uiState = SettingsUiState(
-                searchShowCompactVocabularyItem = true,
                 selectedOnlineSearchType = OnlineSearchType.Pons,
             ),
             callbacks = SettingsCallbacksFake,

@@ -34,7 +34,6 @@ data class OverviewPreferences(
 
 data class SearchPreferences(
     val lastSearchedItems: ArrayDeque<String>,
-    val showCompactVocabularyItem: Boolean,
     val showOnlineRedirectFirst: Boolean,
     val onlineRedirectType: OnlineSearchType,
 )
@@ -57,8 +56,6 @@ interface UserPreferencesManager {
     suspend fun showCompactVocabularyItem(showCompactVocabularyItem: Boolean)
 
     suspend fun addLastSearchedItem(item: String)
-
-    suspend fun showCompactVocabularyItemInSearch(show: Boolean)
 
     suspend fun updateOnlineRedirectPosition(first: Boolean)
 
@@ -116,13 +113,12 @@ class UserPreferencesManagerImpl @Inject constructor(@ApplicationContext val con
                     jsonConfig.decodeFromString(ArrayDequeSerializer, it)
                 } ?: ArrayDeque()
 
-            val showCompactVocabularyItem = preferences[PreferencesKeys.SEARCH_SHOW_COMPACT_VOCABULARY_ITEM] ?: false
             val showOnlineRedirectFirst = preferences[PreferencesKeys.SEARCH_ONLINE_REDIRECT_POSITION] ?: false
             val onlineRedirectUrl = preferences[PreferencesKeys.SEARCH_ONLINE_REDIRECT_TYPE]?.let {
                 jsonConfig.decodeFromString<OnlineSearchType>(it)
             } ?: OnlineSearchType.DictCC
 
-            SearchPreferences(lastSearchedItems, showCompactVocabularyItem, showOnlineRedirectFirst, onlineRedirectUrl)
+            SearchPreferences(lastSearchedItems, showOnlineRedirectFirst, onlineRedirectUrl)
         }
 
     override suspend fun addLastSearchedItem(item: String) {
@@ -135,12 +131,6 @@ class UserPreferencesManagerImpl @Inject constructor(@ApplicationContext val con
 
             preferences[PreferencesKeys.SEARCH_SORT_LAST_SEARCHED_ITEMS] =
                 jsonConfig.encodeToString(ArrayDequeSerializer, currentDeque)
-        }
-    }
-
-    override suspend fun showCompactVocabularyItemInSearch(show: Boolean) {
-        context.dataStoreOverview.edit { preferences ->
-            preferences[PreferencesKeys.SEARCH_SHOW_COMPACT_VOCABULARY_ITEM] = show
         }
     }
 
@@ -168,7 +158,6 @@ class UserPreferencesManagerImpl @Inject constructor(@ApplicationContext val con
         val OVERVIEW_SHOW_COMPACT_VOCABULARY_ITEM = booleanPreferencesKey("overview_show_compact_vocabulary_item")
 
         val SEARCH_SORT_LAST_SEARCHED_ITEMS = stringPreferencesKey("search_sort_last_searched_items")
-        val SEARCH_SHOW_COMPACT_VOCABULARY_ITEM = booleanPreferencesKey("search_show_compact_vocabulary_item")
         val SEARCH_ONLINE_REDIRECT_POSITION = booleanPreferencesKey("search_online_redirect_position")
         val SEARCH_ONLINE_REDIRECT_TYPE = stringPreferencesKey("search_online_redirect_type")
 

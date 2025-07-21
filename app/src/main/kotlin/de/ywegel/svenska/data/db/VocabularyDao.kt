@@ -71,6 +71,9 @@ interface VocabularyDao {
     @Query("UPDATE vocabulary SET isFavorite = :isFavorite WHERE id = :id ")
     suspend fun toggleVocabularyFavorite(id: Int, isFavorite: Boolean)
 
+    @Query("SELECT isFavorite FROM vocabulary WHERE id = :vocabularyId")
+    fun isVocabularyFavorite(vocabularyId: Int): Flow<Boolean>
+
     @Query("SELECT * FROM vocabulary WHERE containerId = :containerId AND (word LIKE '%' || :searchQuery || '%' OR translation LIKE '%' || :searchQuery || '%')")
     fun searchVocabulariesById(containerId: Int, searchQuery: String): Flow<List<Vocabulary>>
 

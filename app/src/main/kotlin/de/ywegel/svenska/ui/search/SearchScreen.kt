@@ -4,15 +4,13 @@ package de.ywegel.svenska.ui.search
 
 import android.util.Log
 import androidx.activity.compose.BackHandler
+import androidx.annotation.VisibleForTesting
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
@@ -67,9 +65,9 @@ import de.ywegel.svenska.ui.common.HorizontalSpacerM
 import de.ywegel.svenska.ui.common.IconButton
 import de.ywegel.svenska.ui.common.NavigationIconButton
 import de.ywegel.svenska.ui.common.rememberColumnScaffoldInsets
-import de.ywegel.svenska.ui.detail.VocabularyDetailScreen
-import de.ywegel.svenska.ui.overview.VocabularyItemCompact
-import de.ywegel.svenska.ui.overview.VocabularyListItem
+import de.ywegel.svenska.ui.common.vocabulary.VocabularyList
+import de.ywegel.svenska.ui.common.vocabulary.VocabularyListCallbacks
+import de.ywegel.svenska.ui.common.vocabulary.VocabularyListCallbacksFake
 import de.ywegel.svenska.ui.theme.Spacings
 import de.ywegel.svenska.ui.theme.SvenskaIcons
 import de.ywegel.svenska.ui.theme.SvenskaTheme
@@ -92,8 +90,6 @@ fun SearchScreen(navigator: DestinationsNavigator) {
         onSearchChanged = viewModel::updateSearchQuery,
         onSearch = viewModel::onSearch,
         navigateUp = navigator::navigateUp,
-        onVocabularyClick = viewModel::showVocabularyDetail,
-        onDismissDetail = viewModel::hideVocabularyDetail,
         navigateToEdit = { item ->
             navigator.navigate(
                 EditVocabularyScreenDestination(
@@ -103,6 +99,7 @@ fun SearchScreen(navigator: DestinationsNavigator) {
             )
         },
         navigateToWordGroupScreen = { navigator.navigate(WordGroupsScreenDestination) },
+        vocabularyListCallbacks = viewModel,
     )
 }
 
@@ -118,8 +115,7 @@ private fun SearchScreen(
     onSearchChanged: (String) -> Unit,
     onSearch: (String) -> Unit,
     navigateUp: () -> Unit,
-    onVocabularyClick: (Vocabulary) -> Unit,
-    onDismissDetail: () -> Unit,
+    vocabularyListCallbacks: VocabularyListCallbacks,
     navigateToEdit: (vocabulary: Vocabulary) -> Unit,
     navigateToWordGroupScreen: () -> Unit,
 ) {
@@ -142,10 +138,11 @@ private fun SearchScreen(
         ItemList(
             outerPadding = contentPadding,
             vocabulary = vocabulary,
-            searchQuery = currentSearchQuery,
-            onItemClicked = onVocabularyClick,
-            onRecentSearchedClicked = onSearch,
             uiState = uiState,
+            searchQuery = currentSearchQuery,
+            navigateToEdit = navigateToEdit,
+            navigateToWordGroupScreen = navigateToWordGroupScreen,
+            onRecentSearchedClicked = onSearch,
             onOnlineRedirectClicked = { baseUrl, query ->
                 try {
                     uriHandle.openUri(baseUrl + query)
@@ -156,17 +153,7 @@ private fun SearchScreen(
                     }
                 }
             },
-        )
-
-        // Show detail screen if a vocabulary is selected
-        VocabularyDetailScreen(
-            state = uiState.detailViewState,
-            onDismiss = onDismissDetail,
-            onEditClick = {
-                onDismissDetail()
-                navigateToEdit(it)
-            },
-            navigateToWordGroupScreen = navigateToWordGroupScreen,
+            vocabularyListCallbacks = vocabularyListCallbacks,
         )
     }
 }
@@ -177,65 +164,71 @@ private fun ItemList(
     vocabulary: List<Vocabulary>,
     uiState: SearchUiState,
     searchQuery: String,
-    onItemClicked: (Vocabulary) -> Unit = {},
+    vocabularyListCallbacks: VocabularyListCallbacks,
+    navigateToEdit: (vocabulary: Vocabulary) -> Unit,
+    navigateToWordGroupScreen: () -> Unit,
     onRecentSearchedClicked: (String) -> Unit = {},
     onOnlineRedirectClicked: (baseUrl: String, query: String) -> Unit,
 ) {
     if (searchQuery.isBlank()) {
-        Column(modifier = Modifier.padding(outerPadding)) {
-            uiState.lastSearchedItems.forEach { lastSearch ->
-                LastSearchedItem(lastSearch, onRecentSearchedClicked)
-            }
-        }
-        if (uiState.lastSearchedItems.isEmpty()) {
-            Text(
-                text = stringResource(R.string.search_no_searches),
-                textAlign = TextAlign.Center,
-                modifier = Modifier
-                    .padding(horizontal = Spacings.m, vertical = Spacings.l)
-                    .fillMaxWidth(),
-            )
-        }
+        EmptySearchScreen(
+            outerPadding = outerPadding,
+            uiState = uiState,
+            onRecentSearchedClicked = onRecentSearchedClicked,
+        )
     } else {
         val outerPadding = rememberColumnScaffoldInsets(outerPadding, Spacings.xs)
 
-        LazyColumn(
-            contentPadding = outerPadding,
-            modifier = Modifier.padding(horizontal = Spacings.s),
-            verticalArrangement = if (uiState.showCompactVocabularyItem) {
-                Arrangement.Top
-            } else {
-                Arrangement.spacedBy(Spacings.xs)
+        VocabularyList(
+            vocabularies = vocabulary,
+            showContainerInformation = true,
+            vocabularyDetailState = uiState.detailViewState,
+            headerItems = {
+                if (uiState.showOnlineRedirectFirst && uiState.onlineRedirectUrl != null) {
+                    item {
+                        OnlineRedirectItem {
+                            onOnlineRedirectClicked(uiState.onlineRedirectUrl, searchQuery)
+                        }
+                    }
+                }
             },
-        ) {
-            if (uiState.showOnlineRedirectFirst && uiState.onlineRedirectUrl != null) {
-                item {
-                    OnlineRedirectItem {
-                        onOnlineRedirectClicked(uiState.onlineRedirectUrl, searchQuery)
+            footerItems = {
+                if (!uiState.showOnlineRedirectFirst && uiState.onlineRedirectUrl != null) {
+                    item {
+                        OnlineRedirectItem {
+                            onOnlineRedirectClicked(uiState.onlineRedirectUrl, searchQuery)
+                        }
                     }
                 }
-            }
-            if (uiState.showCompactVocabularyItem) {
-                items(vocabulary, key = { it.id }) { item ->
-                    VocabularyItemCompact(vocabulary = item, modifier = Modifier.animateItem()) {
-                        onItemClicked(it)
-                    }
-                }
-            } else {
-                items(vocabulary, key = { it.id }) { item ->
-                    VocabularyListItem(vocabulary = item, modifier = Modifier.animateItem()) {
-                        onItemClicked(it)
-                    }
-                }
-            }
-            if (!uiState.showOnlineRedirectFirst && uiState.onlineRedirectUrl != null) {
-                item {
-                    OnlineRedirectItem {
-                        onOnlineRedirectClicked(uiState.onlineRedirectUrl, searchQuery)
-                    }
-                }
-            }
+            },
+            scrollBehavior = null,
+            contentPadding = outerPadding,
+            vocabularyListCallbacks = vocabularyListCallbacks,
+            navigateToEdit = navigateToEdit,
+            navigateToWordGroupScreen = navigateToWordGroupScreen,
+        )
+    }
+}
+
+@Composable
+private fun EmptySearchScreen(
+    outerPadding: PaddingValues,
+    uiState: SearchUiState,
+    onRecentSearchedClicked: (String) -> Unit = {},
+) {
+    Column(modifier = Modifier.padding(outerPadding)) {
+        uiState.lastSearchedItems.forEach { lastSearch ->
+            LastSearchedItem(lastSearch, onRecentSearchedClicked)
         }
+    }
+    if (uiState.lastSearchedItems.isEmpty()) {
+        Text(
+            text = stringResource(R.string.search_no_searches),
+            textAlign = TextAlign.Center,
+            modifier = Modifier
+                .padding(horizontal = Spacings.m, vertical = Spacings.l)
+                .fillMaxWidth(),
+        )
     }
 }
 
@@ -404,14 +397,14 @@ private fun SearchScreenPreviewEmpty() {
             onSearchChanged = {},
             onSearch = {},
             navigateUp = {},
-            onVocabularyClick = {},
-            onDismissDetail = {},
             navigateToEdit = {},
             navigateToWordGroupScreen = {},
+            vocabularyListCallbacks = VocabularyListCallbacksFake,
         )
     }
 }
 
+@VisibleForTesting
 @PreviewLightDark
 @Composable
 private fun SearchScreenPreviewFilled() {
@@ -423,14 +416,14 @@ private fun SearchScreenPreviewFilled() {
             onSearchChanged = {},
             onSearch = {},
             navigateUp = {},
-            onVocabularyClick = {},
-            onDismissDetail = {},
             navigateToEdit = {},
             navigateToWordGroupScreen = {},
+            vocabularyListCallbacks = VocabularyListCallbacksFake,
         )
     }
 }
 
+@VisibleForTesting
 @PreviewLightDark
 @Composable
 private fun SearchScreenPreviewFilledAndItemsAvailable() {
@@ -442,10 +435,9 @@ private fun SearchScreenPreviewFilledAndItemsAvailable() {
             onSearchChanged = {},
             onSearch = {},
             navigateUp = {},
-            onVocabularyClick = {},
-            onDismissDetail = {},
             navigateToEdit = {},
             navigateToWordGroupScreen = {},
+            vocabularyListCallbacks = VocabularyListCallbacksFake,
         )
     }
 }

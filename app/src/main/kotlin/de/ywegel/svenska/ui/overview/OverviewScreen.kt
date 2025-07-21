@@ -10,7 +10,6 @@ import androidx.compose.animation.shrinkHorizontally
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -55,7 +54,9 @@ import de.ywegel.svenska.ui.common.HorizontalSpacerS
 import de.ywegel.svenska.ui.common.IconButton
 import de.ywegel.svenska.ui.common.TopAppTextBar
 import de.ywegel.svenska.ui.common.VerticalSpacerM
-import de.ywegel.svenska.ui.detail.VocabularyDetailScreen
+import de.ywegel.svenska.ui.common.vocabulary.VocabularyList
+import de.ywegel.svenska.ui.common.vocabulary.VocabularyListCallbacks
+import de.ywegel.svenska.ui.common.vocabulary.VocabularyListCallbacksFake
 import de.ywegel.svenska.ui.theme.Spacings
 import de.ywegel.svenska.ui.theme.SvenskaIcons
 import de.ywegel.svenska.ui.theme.SvenskaTheme
@@ -87,8 +88,7 @@ fun OverviewScreen(navigator: DestinationsNavigator, navArgs: OverviewNavArgs) {
         },
         navigateToSearch = { navigator.navigate(SearchScreenDestination(containerId = viewModel.containerId)) },
         navigateUp = navigator::navigateUp,
-        onVocabularyClick = viewModel::showVocabularyDetail,
-        onDismissDetail = viewModel::hideVocabularyDetail,
+        vocabularyListCallbacks = viewModel,
         navigateToWordGroupScreen = { navigator.navigate(WordGroupsScreenDestination) },
     )
 }
@@ -99,12 +99,11 @@ private fun OverviewScreen(
     containerName: String,
     navigateToAdd: () -> Unit,
     onQuizClick: () -> Unit,
-    navigateToEdit: (vocabulary: Vocabulary) -> Unit,
     navigateToSearch: () -> Unit,
     navigateUp: () -> Unit,
-    onVocabularyClick: (Vocabulary) -> Unit,
-    onDismissDetail: () -> Unit,
     navigateToWordGroupScreen: () -> Unit,
+    navigateToEdit: (vocabulary: Vocabulary) -> Unit,
+    vocabularyListCallbacks: VocabularyListCallbacks,
 ) {
     val scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior()
 
@@ -133,43 +132,25 @@ private fun OverviewScreen(
             ) {
                 items(uiState.vocabulary, key = { it.id }) { item ->
                     VocabularyItemCompact(item) {
-                        onVocabularyClick(it)
+                        vocabularyListCallbacks.onVocabularyClick(vocabulary = it, showContainerInformation = false)
                     }
                 }
             }
         } else {
-            LazyColumn(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .padding(horizontal = Spacings.s)
-                    .nestedScroll(scrollBehavior.nestedScrollConnection),
+            VocabularyList(
+                vocabularies = uiState.vocabulary,
+                showContainerInformation = false,
+                vocabularyDetailState = uiState.detailViewState,
+                scrollBehavior = scrollBehavior,
                 contentPadding = contentPadding,
-                verticalArrangement = Arrangement.spacedBy(Spacings.xs),
-            ) {
-                items(
-                    items = uiState.vocabulary,
-                    key = { it.id },
-                ) { vocab ->
-                    VocabularyListItem(
-                        vocabulary = vocab,
-                        onClick = {
-                            onVocabularyClick(it)
-                        },
-                    )
-                }
-            }
+                navigateToEdit = {
+                    vocabularyListCallbacks.onDismissVocabularyDetail()
+                    navigateToEdit(it)
+                },
+                navigateToWordGroupScreen = navigateToWordGroupScreen,
+                vocabularyListCallbacks = vocabularyListCallbacks,
+            )
         }
-
-        // Show detail screen if a vocabulary is selected
-        VocabularyDetailScreen(
-            state = uiState.detailViewState,
-            onDismiss = onDismissDetail,
-            onEditClick = {
-                onDismissDetail()
-                navigateToEdit(it)
-            },
-            navigateToWordGroupScreen = navigateToWordGroupScreen,
-        )
     }
 }
 
@@ -243,14 +224,13 @@ private fun OverviewPreview() {
         OverviewScreen(
             uiState = OverviewUiState(vocabulary = vocabularies()),
             containerName = "Test container",
-            onVocabularyClick = {},
-            onDismissDetail = {},
             navigateToAdd = {},
             onQuizClick = {},
             navigateToEdit = {},
             navigateToSearch = {},
             navigateUp = {},
             navigateToWordGroupScreen = {},
+            vocabularyListCallbacks = VocabularyListCallbacksFake,
         )
     }
 }

@@ -36,7 +36,9 @@ import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.tooling.preview.PreviewParameterProvider
 import de.ywegel.svenska.R
 import de.ywegel.svenska.data.GeneratorConstants
+import de.ywegel.svenska.data.container
 import de.ywegel.svenska.data.model.Vocabulary
+import de.ywegel.svenska.data.model.VocabularyContainer
 import de.ywegel.svenska.data.model.WordGroup
 import de.ywegel.svenska.data.vocabulary
 import de.ywegel.svenska.ui.common.HorizontalSpacerS
@@ -56,13 +58,15 @@ import de.ywegel.svenska.ui.theme.SvenskaTheme
 internal fun VocabularyDetailContent(
     vocabulary: Vocabulary,
     isFavorite: Boolean,
-    onDismiss: () -> Unit,
-    onEditClick: (Vocabulary) -> Unit,
-    onFavoriteChange: (Boolean) -> Unit,
+    showContainerInformation: Boolean = false,
+    container: VocabularyContainer?,
     sheetState: SheetState = rememberStandardBottomSheetState(
         initialValue = SheetValue.Expanded,
         skipHiddenState = false,
     ),
+    onDismiss: () -> Unit,
+    onEditClick: (Vocabulary) -> Unit,
+    onFavoriteChange: (Boolean) -> Unit,
     navigateToWordGroupScreen: () -> Unit,
 ) {
     ModalBottomSheet(
@@ -99,7 +103,11 @@ internal fun VocabularyDetailContent(
                 }
 
                 // Metadata
-                MetadataSection(vocabulary)
+                MetadataSection(
+                    vocabulary = vocabulary,
+                    containerName = container?.name,
+                    showContainerInformation = showContainerInformation,
+                )
 
                 VerticalSpacerXXS()
 
@@ -242,12 +250,23 @@ private fun WordInfoSection(title: String, content: String) {
 }
 
 @Composable
-private fun MetadataSection(vocabulary: Vocabulary) {
+private fun MetadataSection(vocabulary: Vocabulary, containerName: String?, showContainerInformation: Boolean) {
     Text(
         text = stringResource(R.string.vocabulary_detail_section_metadata),
         style = SvenskaTheme.typography.titleMedium,
         color = SvenskaTheme.colors.primary,
     )
+    // TODO: Add a "go to container" button #46
+    if (showContainerInformation && containerName != null) {
+        Text(
+            text = stringResource(
+                id = R.string.vocabulary_detail_section_metadata_container,
+                containerName,
+            ),
+            style = SvenskaTheme.typography.bodyMedium,
+            color = SvenskaTheme.colors.onSurfaceVariant,
+        )
+    }
     Text(
         text = stringResource(
             id = R.string.vocabulary_detail_section_metadata_created,
@@ -274,6 +293,7 @@ private fun VocabularyDetailScreenPreview(
     SvenskaTheme {
         VocabularyDetailContent(
             vocabulary = vocabulary,
+            container = container(),
             isFavorite = vocabulary.isFavorite,
             onDismiss = {},
             onEditClick = {},
