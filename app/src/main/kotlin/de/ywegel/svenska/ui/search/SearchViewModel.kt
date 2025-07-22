@@ -80,10 +80,7 @@ class SearchViewModel @Inject constructor(
         }
     }
 
-    override fun onVocabularyClick(
-        vocabulary: Vocabulary,
-        showContainerInformation: Boolean,
-    ) {
+    override fun onVocabularyClick(vocabulary: Vocabulary, showContainerInformation: Boolean) {
         _uiState.update {
             it.copy(
                 detailViewState = VocabularyDetailState.Visible(

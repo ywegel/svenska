@@ -50,10 +50,7 @@ class FavoritesAndPronunciationViewModel @Inject constructor(
         }
     }
 
-    override fun onVocabularyClick(
-        vocabulary: Vocabulary,
-        showContainerInformation: Boolean,
-    ) {
+    override fun onVocabularyClick(vocabulary: Vocabulary, showContainerInformation: Boolean) {
         _uiState.updateIfSuccessState {
             it.copy(
                 detailViewState = VocabularyDetailState.Visible(
@@ -92,7 +89,9 @@ class FavoritesAndPronunciationViewModel @Inject constructor(
     }
 }
 
-private fun MutableStateFlow<FavoritesUiState>.updateIfSuccessState(block: (FavoritesUiState.Success) -> FavoritesUiState) {
+private fun MutableStateFlow<FavoritesUiState>.updateIfSuccessState(
+    block: (FavoritesUiState.Success) -> FavoritesUiState,
+) {
     this.update {
         if (it is FavoritesUiState.Success) {
             block(it)
