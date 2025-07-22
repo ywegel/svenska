@@ -128,4 +128,10 @@ class VocabularyRepositoryFake(
             vocabulary.add(new)
         }
     }
+
+    override fun isVocabularyFavorite(vocabularyId: Int): Flow<Boolean> {
+        return vocabularyFlow.map {
+            it.find { it.id == vocabularyId }?.isFavorite ?: false
+        }
+    }
 }

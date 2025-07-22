@@ -10,6 +10,7 @@ import assertk.assertions.doesNotContain
 import assertk.assertions.hasSize
 import assertk.assertions.isEqualTo
 import de.ywegel.svenska.data.model.Vocabulary
+import de.ywegel.svenska.domain.ToggleVocabularyFavoriteUseCase
 import de.ywegel.svenska.fakes.UserPreferencesManagerFake
 import de.ywegel.svenska.fakes.VocabularyRepositoryFake
 import de.ywegel.svenska.ui.search.SearchViewModel
@@ -46,6 +47,10 @@ class SearchViewModelTest {
             repository = fakeRepo,
             userPreferencesManager = fakePrefs,
             ioDispatcher = testDispatcher,
+            toggleVocabularyFavoriteUseCase = ToggleVocabularyFavoriteUseCase(
+                repository = fakeRepo,
+                ioDispatcher = testDispatcher,
+            ),
         )
     }
 

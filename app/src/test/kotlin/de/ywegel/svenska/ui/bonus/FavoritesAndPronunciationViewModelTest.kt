@@ -3,6 +3,7 @@ package de.ywegel.svenska.ui.bonus
 import androidx.lifecycle.SavedStateHandle
 import app.cash.turbine.test
 import de.ywegel.svenska.data.vocabulary
+import de.ywegel.svenska.domain.ToggleVocabularyFavoriteUseCase
 import de.ywegel.svenska.fakes.VocabularyRepositoryFake
 import de.ywegel.svenska.ui.bonus.favorites.FavoritesAndPronunciationViewModel
 import de.ywegel.svenska.ui.bonus.favorites.FavoritesUiState
@@ -67,6 +68,10 @@ class FavoritesAndPronunciationViewModelTest {
             repository = repository,
             savedStateHandle = savedStateHandle,
             ioDispatcher = testDispatcher,
+            toggleVocabularyFavoriteUseCase = ToggleVocabularyFavoriteUseCase(
+                repository = repository,
+                ioDispatcher = testDispatcher,
+            ),
         )
     }
 
@@ -125,6 +130,10 @@ class FavoritesAndPronunciationViewModelTest {
             repository = throwingRepository,
             savedStateHandle = savedStateHandle,
             ioDispatcher = testDispatcher,
+            toggleVocabularyFavoriteUseCase = ToggleVocabularyFavoriteUseCase(
+                repository = throwingRepository,
+                ioDispatcher = testDispatcher,
+            ),
         )
 
         viewModel.uiState.test {

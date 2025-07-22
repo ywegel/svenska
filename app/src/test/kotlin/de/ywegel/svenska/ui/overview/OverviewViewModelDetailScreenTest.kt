@@ -7,6 +7,7 @@ import app.cash.turbine.test
 import de.ywegel.svenska.data.VocabularyRepository
 import de.ywegel.svenska.data.preferences.UserPreferencesManager
 import de.ywegel.svenska.data.vocabulary
+import de.ywegel.svenska.domain.ToggleVocabularyFavoriteUseCase
 import de.ywegel.svenska.fakes.UserPreferencesManagerFake
 import de.ywegel.svenska.fakes.VocabularyRepositoryFake
 import de.ywegel.svenska.ui.detail.VocabularyDetailState
@@ -69,7 +70,7 @@ class OverviewViewModelDetailScreenTest {
         advanceUntilIdle()
 
         // When
-        viewModel.showVocabularyDetail(vocabulary)
+        viewModel.onVocabularyClick(vocabulary, false)
         advanceUntilIdle()
 
         // Then
@@ -89,9 +90,9 @@ class OverviewViewModelDetailScreenTest {
         val vocabulary = vocabulary()
 
         // When
-        viewModel.showVocabularyDetail(vocabulary)
+        viewModel.onVocabularyClick(vocabulary, false)
         advanceUntilIdle()
-        viewModel.hideVocabularyDetail()
+        viewModel.onDismissVocabularyDetail()
         advanceUntilIdle()
 
         // Then
@@ -116,6 +117,7 @@ class OverviewViewModelDetailScreenTest {
             repository = repository,
             userPreferencesManager = userPreferencesManager,
             ioDispatcher = dispatcher,
+            toggleVocabularyFavoriteUseCase = ToggleVocabularyFavoriteUseCase(repository, testDispatcher),
         )
     }
 }
