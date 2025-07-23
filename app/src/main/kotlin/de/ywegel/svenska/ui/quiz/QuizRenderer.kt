@@ -13,5 +13,10 @@ interface QuizRenderer<A : UserAnswer, State : QuizInputState<A>, Actions : Any,
     fun UserInput(question: QuizQuestion<A>, state: State, actions: Actions)
 
     @Composable
-    fun Solution(question: QuizQuestion<A>, userAnswer: A, userAnswerResult: AnswerResult)
+    fun Solution(
+        question: QuizQuestion<A>,
+        userAnswer: A,
+        userAnswerResult: AnswerResult,
+        wordGroupSection: (@Composable () -> Unit)?,
+    )
 }

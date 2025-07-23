@@ -36,7 +36,7 @@ abstract class BaseQuizViewModel<A : UserAnswer, S : QuizInputState<A>, AC : Any
     init {
         launchSafely {
             manager.startQuiz()
-            setupQuestion(manager.getCurrentQuestion())
+            setupQuestion()
         }
     }
 
@@ -46,7 +46,7 @@ abstract class BaseQuizViewModel<A : UserAnswer, S : QuizInputState<A>, AC : Any
             inputController.resetState()
 
             if (nextQuestionAvailable) {
-                setupQuestion(manager.getCurrentQuestion())
+                setupQuestion()
             } else {
                 val (correctAnswers, totalQuestions) = manager.getQuizStatistics()
                 _uiState.update {
@@ -60,7 +60,8 @@ abstract class BaseQuizViewModel<A : UserAnswer, S : QuizInputState<A>, AC : Any
         }
     }
 
-    private fun setupQuestion(question: QuizQuestion<A>) {
+    private fun setupQuestion() {
+        val question = manager.getCurrentQuestion()
         _uiState.update { currentState ->
             QuizUiState.Active(
                 quizQuestion = question,
@@ -85,7 +86,7 @@ abstract class BaseQuizViewModel<A : UserAnswer, S : QuizInputState<A>, AC : Any
     override fun returnToPreviousQuestion() {
         inputController.resetState()
         manager.goToPreviousQuestion()
-        setupQuestion(manager.getCurrentQuestion())
+        setupQuestion()
     }
 
     override fun toggleFavorite(isFavorite: Boolean) {

@@ -1,8 +1,6 @@
 package de.ywegel.svenska.ui.quiz.renderers
 
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.text.KeyboardActions
@@ -15,6 +13,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusDirection
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.SpanStyle
@@ -93,8 +92,32 @@ class TranslateWithEndingsRenderer : QuizRenderer<
         question: QuizQuestion<UserAnswer.TranslateWithEndingsAnswer>,
         userAnswer: UserAnswer.TranslateWithEndingsAnswer,
         userAnswerResult: TranslateWithEndingsResult,
+        wordGroupSection: (@Composable () -> Unit)?,
     ) {
+        val context = LocalContext.current
+        val colors = SvenskaTheme.colors
+
         val resultMessage = rememberResultTitle(userAnswerResult)
+
+        val userAnswerText = remember(userAnswer, colors) {
+            buildAnnotatedString {
+                if (userAnswer.answer.isNotBlank()) {
+                    append(userAnswer.answer)
+                    append(" ")
+                }
+                if (userAnswer.answer.isNotBlank() && !userAnswer.endings.isNullOrBlank()) {
+                    withStyle(SpanStyle(color = colors.onSurface)) {
+                        append(context.getString(R.string.quiz_result_endings_formated))
+                    }
+                    append(" ")
+                }
+                if (!userAnswer.endings.isNullOrBlank()) {
+                    withStyle(SpanStyle(color = colors.tertiary)) {
+                        append(userAnswer.endings)
+                    }
+                }
+            }
+        }
 
         val cardColors = if (userAnswerResult.translationCorrect && userAnswerResult.endingsCorrect) {
             CardDefaults.cardColors()
@@ -114,27 +137,14 @@ class TranslateWithEndingsRenderer : QuizRenderer<
                     style = SvenskaTheme.typography.titleMedium,
                 )
                 VerticalSpacerXXS()
-                FlowRow(verticalArrangement = Arrangement.spacedBy(Spacings.xxxs)) {
-                    Text(
-                        text = question.expectedAnswer.answer + " ",
-                        style = SvenskaTheme.typography.bodyLarge,
-                        color = SvenskaTheme.colors.primary,
-                    )
-                    question.expectedAnswer.endings?.let { endings ->
-                        val formattedEndings = buildAnnotatedString {
-                            withStyle(SpanStyle(color = SvenskaTheme.colors.onSurface)) {
-                                append(stringResource(R.string.quiz_result_endings_formated))
-                            }
-                            append(" ")
-                            withStyle(SpanStyle(color = SvenskaTheme.colors.tertiary)) {
-                                append(endings)
-                            }
-                        }
-                        Text(
-                            text = formattedEndings,
-                            style = SvenskaTheme.typography.bodyLarge,
-                        )
-                    }
+                Text(
+                    text = question.expectedAnswer.answer,
+                    style = SvenskaTheme.typography.bodyLarge,
+                    color = SvenskaTheme.colors.primary,
+                )
+                wordGroupSection?.let {
+                    VerticalSpacerXXS()
+                    it()
                 }
                 VerticalSpacerXXS()
                 Text(
@@ -143,7 +153,7 @@ class TranslateWithEndingsRenderer : QuizRenderer<
                 )
                 VerticalSpacerXXS()
                 Text(
-                    text = userAnswer.answer,
+                    text = userAnswerText,
                     style = SvenskaTheme.typography.bodyLarge,
                 )
             }

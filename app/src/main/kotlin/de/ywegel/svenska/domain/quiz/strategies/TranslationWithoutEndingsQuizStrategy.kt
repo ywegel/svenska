@@ -2,8 +2,8 @@ package de.ywegel.svenska.domain.quiz.strategies
 
 import de.ywegel.svenska.data.model.Vocabulary
 import de.ywegel.svenska.domain.quiz.QuizStrategy
+import de.ywegel.svenska.domain.quiz.model.AdditionalInfo
 import de.ywegel.svenska.domain.quiz.model.QuizQuestion
-import de.ywegel.svenska.domain.quiz.model.QuizQuestionPromptData
 import de.ywegel.svenska.domain.quiz.model.TranslateMode
 import de.ywegel.svenska.domain.quiz.model.UserAnswer
 import kotlin.random.Random
@@ -16,26 +16,31 @@ class TranslationWithoutEndingsQuizStrategy(
     override fun generateQuestion(vocabulary: Vocabulary): QuizQuestion<UserAnswer.TranslateWithoutEndingsAnswer> {
         val effectiveMode = when (mode) {
             TranslateMode.SwedishToNative, TranslateMode.NativeToSwedish -> mode
-            TranslateMode.Random -> if (randomGenerator()) TranslateMode.SwedishToNative else TranslateMode.NativeToSwedish
+            TranslateMode.Random -> if (randomGenerator()) {
+                TranslateMode.SwedishToNative
+            } else {
+                TranslateMode.NativeToSwedish
+            }
         }
+
+        val promptData = AdditionalInfo.createFromVocabulary(
+            vocabulary = vocabulary,
+            translateMode = effectiveMode,
+        )
 
         return when (effectiveMode) {
             TranslateMode.SwedishToNative -> QuizQuestion(
                 vocabularyId = vocabulary.id,
                 prompt = vocabulary.word,
                 expectedAnswer = UserAnswer.TranslateWithoutEndingsAnswer(vocabulary.translation),
-                promptData = QuizQuestionPromptData(
-                    wordGroup = vocabulary.wordGroup,
-                    endings = vocabulary.ending,
-                    gender = vocabulary.gender,
-                ),
+                promptData = promptData,
             )
 
             TranslateMode.NativeToSwedish -> QuizQuestion(
                 vocabularyId = vocabulary.id,
                 prompt = vocabulary.translation,
                 expectedAnswer = UserAnswer.TranslateWithoutEndingsAnswer(vocabulary.word),
-                promptData = null,
+                promptData = promptData,
             )
 
             TranslateMode.Random -> error(

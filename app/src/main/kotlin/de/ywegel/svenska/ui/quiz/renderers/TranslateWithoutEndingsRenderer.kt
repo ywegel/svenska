@@ -67,6 +67,7 @@ class TranslateWithoutEndingsRenderer : QuizRenderer<
         question: QuizQuestion<UserAnswer.TranslateWithoutEndingsAnswer>,
         userAnswer: UserAnswer.TranslateWithoutEndingsAnswer,
         userAnswerResult: Boolean,
+        wordGroupSection: (@Composable () -> Unit)?,
     ) {
         val haptic = LocalHapticFeedback.current
 
@@ -106,6 +107,10 @@ class TranslateWithoutEndingsRenderer : QuizRenderer<
                     style = SvenskaTheme.typography.bodyLarge,
                     color = SvenskaTheme.colors.primary,
                 )
+                wordGroupSection?.let {
+                    VerticalSpacerXXS()
+                    it()
+                }
                 VerticalSpacerXXS()
                 Text(
                     text = stringResource(R.string.quiz_result_wrong_user_answer),

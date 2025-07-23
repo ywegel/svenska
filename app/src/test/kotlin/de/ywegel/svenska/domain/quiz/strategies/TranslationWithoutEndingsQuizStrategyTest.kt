@@ -3,8 +3,8 @@ package de.ywegel.svenska.domain.quiz.strategies
 import de.ywegel.svenska.data.model.Gender
 import de.ywegel.svenska.data.model.Vocabulary
 import de.ywegel.svenska.data.model.WordGroup
+import de.ywegel.svenska.domain.quiz.model.AdditionalInfo
 import de.ywegel.svenska.domain.quiz.model.QuizQuestion
-import de.ywegel.svenska.domain.quiz.model.QuizQuestionPromptData
 import de.ywegel.svenska.domain.quiz.model.TranslateMode
 import de.ywegel.svenska.domain.quiz.model.UserAnswer
 import org.junit.jupiter.api.DisplayName
@@ -45,7 +45,7 @@ class TranslationWithoutEndingsQuizStrategyTest {
                     vocabularyId = 1,
                     prompt = "hund",
                     expectedAnswer = UserAnswer.TranslateWithoutEndingsAnswer("dog"),
-                    promptData = QuizQuestionPromptData(
+                    promptData = AdditionalInfo.PromptInfo(
                         wordGroup = WordGroup.Noun(WordGroup.NounSubgroup.AR),
                         endings = "-en -ar -arna",
                         gender = Gender.Ultra,
@@ -68,6 +68,11 @@ class TranslationWithoutEndingsQuizStrategyTest {
                     vocabularyId = 1,
                     prompt = "dog",
                     expectedAnswer = UserAnswer.TranslateWithoutEndingsAnswer("hund"),
+                    promptData = AdditionalInfo.SolutionInfo(
+                        wordGroup = WordGroup.Noun(WordGroup.NounSubgroup.AR),
+                        endings = "-en -ar -arna",
+                        gender = Gender.Ultra,
+                    ),
                 ),
             )
         }
@@ -86,7 +91,7 @@ class TranslationWithoutEndingsQuizStrategyTest {
                     vocabularyId = 1,
                     prompt = "hund",
                     expectedAnswer = UserAnswer.TranslateWithoutEndingsAnswer("dog"),
-                    promptData = QuizQuestionPromptData(
+                    promptData = AdditionalInfo.PromptInfo(
                         wordGroup = WordGroup.Noun(WordGroup.NounSubgroup.AR),
                         endings = "-en -ar -arna",
                         gender = Gender.Ultra,
@@ -109,6 +114,11 @@ class TranslationWithoutEndingsQuizStrategyTest {
                     vocabularyId = 1,
                     prompt = "dog",
                     expectedAnswer = UserAnswer.TranslateWithoutEndingsAnswer("hund"),
+                    promptData = AdditionalInfo.SolutionInfo(
+                        wordGroup = WordGroup.Noun(WordGroup.NounSubgroup.AR),
+                        endings = "-en -ar -arna",
+                        gender = Gender.Ultra,
+                    ),
                 ),
             )
         }

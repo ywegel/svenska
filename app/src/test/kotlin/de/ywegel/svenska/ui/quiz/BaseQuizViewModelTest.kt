@@ -112,6 +112,7 @@ class BaseQuizViewModelTest {
             question: QuizQuestion<UserAnswer.TranslateWithoutEndingsAnswer>,
             userAnswer: UserAnswer.TranslateWithoutEndingsAnswer,
             userAnswerResult: Boolean,
+            wordGroupSection: (@Composable () -> Unit)?,
         ) {
             // Empty test implementation}
         }

@@ -147,6 +147,8 @@
     <string name="quiz_translate">Translate:</string>
     <string name="quiz_next">Next word</string>
     <string name="quiz_check">Check</string>
+    <string name="quiz_endings">Endings: %1$s</string>
+    <string name="quiz_no_endings">No endings</string>
 
     <string name="quiz_result_correct">Correct!</string>
     <string name="quiz_result_wrong">Wrong! The correct answer was: </string>
