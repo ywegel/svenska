@@ -3,8 +3,8 @@ package de.ywegel.svenska.domain.quiz.strategies
 import de.ywegel.svenska.data.model.Gender
 import de.ywegel.svenska.data.model.Vocabulary
 import de.ywegel.svenska.data.model.WordGroup
+import de.ywegel.svenska.domain.quiz.model.AdditionalInfo
 import de.ywegel.svenska.domain.quiz.model.QuizQuestion
-import de.ywegel.svenska.domain.quiz.model.QuizQuestionPromptData
 import de.ywegel.svenska.domain.quiz.model.TranslateMode
 import de.ywegel.svenska.domain.quiz.model.UserAnswer
 import org.junit.jupiter.api.DisplayName
@@ -34,7 +34,7 @@ class TranslationWithoutEndingsQuizStrategyTest {
         @Test
         fun `when mode is Swedish, should create question with Swedish prompt`() {
             // Given
-            val strategy = TranslationWithoutEndingsQuizStrategy(TranslateMode.Swedish)
+            val strategy = TranslationWithoutEndingsQuizStrategy(TranslateMode.SwedishToNative)
 
             // When
             val question = strategy.generateQuestion(testVocabulary)
@@ -45,7 +45,7 @@ class TranslationWithoutEndingsQuizStrategyTest {
                     vocabularyId = 1,
                     prompt = "hund",
                     expectedAnswer = UserAnswer.TranslateWithoutEndingsAnswer("dog"),
-                    promptData = QuizQuestionPromptData(
+                    promptData = AdditionalInfo.PromptInfo(
                         wordGroup = WordGroup.Noun(WordGroup.NounSubgroup.AR),
                         endings = "-en -ar -arna",
                         gender = Gender.Ultra,
@@ -57,7 +57,7 @@ class TranslationWithoutEndingsQuizStrategyTest {
         @Test
         fun `when mode is Native, should create question with Native prompt`() {
             // Given
-            val strategy = TranslationWithoutEndingsQuizStrategy(TranslateMode.Native)
+            val strategy = TranslationWithoutEndingsQuizStrategy(TranslateMode.NativeToSwedish)
 
             // When
             val question = strategy.generateQuestion(testVocabulary)
@@ -68,6 +68,11 @@ class TranslationWithoutEndingsQuizStrategyTest {
                     vocabularyId = 1,
                     prompt = "dog",
                     expectedAnswer = UserAnswer.TranslateWithoutEndingsAnswer("hund"),
+                    promptData = AdditionalInfo.SolutionInfo(
+                        wordGroup = WordGroup.Noun(WordGroup.NounSubgroup.AR),
+                        endings = "-en -ar -arna",
+                        gender = Gender.Ultra,
+                    ),
                 ),
             )
         }
@@ -86,7 +91,7 @@ class TranslationWithoutEndingsQuizStrategyTest {
                     vocabularyId = 1,
                     prompt = "hund",
                     expectedAnswer = UserAnswer.TranslateWithoutEndingsAnswer("dog"),
-                    promptData = QuizQuestionPromptData(
+                    promptData = AdditionalInfo.PromptInfo(
                         wordGroup = WordGroup.Noun(WordGroup.NounSubgroup.AR),
                         endings = "-en -ar -arna",
                         gender = Gender.Ultra,
@@ -109,6 +114,11 @@ class TranslationWithoutEndingsQuizStrategyTest {
                     vocabularyId = 1,
                     prompt = "dog",
                     expectedAnswer = UserAnswer.TranslateWithoutEndingsAnswer("hund"),
+                    promptData = AdditionalInfo.SolutionInfo(
+                        wordGroup = WordGroup.Noun(WordGroup.NounSubgroup.AR),
+                        endings = "-en -ar -arna",
+                        gender = Gender.Ultra,
+                    ),
                 ),
             )
         }
@@ -121,7 +131,7 @@ class TranslationWithoutEndingsQuizStrategyTest {
         @Test
         fun `when answer matches expected exactly, should return true`() {
             // Given
-            val strategy = TranslationWithoutEndingsQuizStrategy(TranslateMode.Swedish)
+            val strategy = TranslationWithoutEndingsQuizStrategy(TranslateMode.SwedishToNative)
             val question = QuizQuestion(
                 vocabularyId = 1,
                 prompt = "hund",
@@ -139,7 +149,7 @@ class TranslationWithoutEndingsQuizStrategyTest {
         @Test
         fun `when answer matches expected with different case, should return true`() {
             // Given
-            val strategy = TranslationWithoutEndingsQuizStrategy(TranslateMode.Swedish)
+            val strategy = TranslationWithoutEndingsQuizStrategy(TranslateMode.SwedishToNative)
             val question = QuizQuestion(
                 vocabularyId = 1,
                 prompt = "hund",
@@ -157,7 +167,7 @@ class TranslationWithoutEndingsQuizStrategyTest {
         @Test
         fun `when answer has extra whitespace, should return true`() {
             // Given
-            val strategy = TranslationWithoutEndingsQuizStrategy(TranslateMode.Swedish)
+            val strategy = TranslationWithoutEndingsQuizStrategy(TranslateMode.SwedishToNative)
             val question = QuizQuestion(
                 vocabularyId = 1,
                 prompt = "hund",
@@ -175,7 +185,7 @@ class TranslationWithoutEndingsQuizStrategyTest {
         @Test
         fun `when answer is different, should return false`() {
             // Given
-            val strategy = TranslationWithoutEndingsQuizStrategy(TranslateMode.Swedish)
+            val strategy = TranslationWithoutEndingsQuizStrategy(TranslateMode.SwedishToNative)
             val question = QuizQuestion(
                 vocabularyId = 1,
                 prompt = "hund",

@@ -112,6 +112,7 @@ class BaseQuizViewModelTest {
             question: QuizQuestion<UserAnswer.TranslateWithoutEndingsAnswer>,
             userAnswer: UserAnswer.TranslateWithoutEndingsAnswer,
             userAnswerResult: Boolean,
+            wordGroupSection: (@Composable () -> Unit)?,
         ) {
             // Empty test implementation}
         }
@@ -131,7 +132,7 @@ class BaseQuizViewModelTest {
     fun setup() {
         val repositoryMockData = vocabularies()
         repository = VocabularyRepositoryFake(repositoryMockData)
-        strategy = TranslationWithoutEndingsQuizStrategy(TranslateMode.Swedish)
+        strategy = TranslationWithoutEndingsQuizStrategy(TranslateMode.SwedishToNative)
         testDispatcher = StandardTestDispatcher()
         renderer = TestRenderer()
         controller = spyk(TestController())

@@ -2,8 +2,8 @@ package de.ywegel.svenska.domain.quiz.strategies
 
 import de.ywegel.svenska.data.model.Vocabulary
 import de.ywegel.svenska.domain.quiz.QuizStrategy
+import de.ywegel.svenska.domain.quiz.model.AdditionalInfo
 import de.ywegel.svenska.domain.quiz.model.QuizQuestion
-import de.ywegel.svenska.domain.quiz.model.QuizQuestionPromptData
 import de.ywegel.svenska.domain.quiz.model.TranslateMode
 import de.ywegel.svenska.domain.quiz.model.UserAnswer
 import de.ywegel.svenska.ui.quiz.controller.TranslateWithEndingsResult
@@ -16,12 +16,21 @@ class TranslationWithEndingsQuizStrategy(
 
     override fun generateQuestion(vocabulary: Vocabulary): QuizQuestion<UserAnswer.TranslateWithEndingsAnswer> {
         val effectiveMode = when (mode) {
-            TranslateMode.Swedish, TranslateMode.Native -> mode
-            TranslateMode.Random -> if (randomGenerator()) TranslateMode.Swedish else TranslateMode.Native
+            TranslateMode.SwedishToNative, TranslateMode.NativeToSwedish -> mode
+            TranslateMode.Random -> if (randomGenerator()) {
+                TranslateMode.SwedishToNative
+            } else {
+                TranslateMode.NativeToSwedish
+            }
         }
 
+        val promptData = AdditionalInfo.createFromVocabulary(
+            vocabulary = vocabulary,
+            translateMode = effectiveMode,
+        )
+
         return when (effectiveMode) {
-            TranslateMode.Swedish -> {
+            TranslateMode.SwedishToNative -> {
                 QuizQuestion(
                     prompt = vocabulary.word,
                     expectedAnswer = UserAnswer.TranslateWithEndingsAnswer(
@@ -29,15 +38,11 @@ class TranslationWithEndingsQuizStrategy(
                         endings = null,
                     ),
                     vocabularyId = vocabulary.id,
-                    promptData = QuizQuestionPromptData(
-                        wordGroup = vocabulary.wordGroup,
-                        endings = vocabulary.ending.takeIf { it.isNotBlank() },
-                        gender = vocabulary.gender,
-                    ),
+                    promptData = promptData,
                 )
             }
 
-            TranslateMode.Native -> {
+            TranslateMode.NativeToSwedish -> {
                 QuizQuestion(
                     prompt = vocabulary.translation,
                     expectedAnswer = UserAnswer.TranslateWithEndingsAnswer(
@@ -45,6 +50,7 @@ class TranslationWithEndingsQuizStrategy(
                         endings = vocabulary.ending.takeIf { it.isNotBlank() },
                     ),
                     vocabularyId = vocabulary.id,
+                    promptData = promptData,
                 )
             }
 

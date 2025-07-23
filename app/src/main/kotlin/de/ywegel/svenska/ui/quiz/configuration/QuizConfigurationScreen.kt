@@ -153,8 +153,8 @@ private fun TranslationModeSelector(
 fun TranslateMode.userFacingString(): String {
     return when (this) {
         TranslateMode.Random -> stringResource(R.string.quiz_mode_random)
-        TranslateMode.Swedish -> stringResource(R.string.quiz_mode_swedish)
-        TranslateMode.Native -> stringResource(R.string.quiz_mode_native)
+        TranslateMode.SwedishToNative -> stringResource(R.string.quiz_mode_swedish)
+        TranslateMode.NativeToSwedish -> stringResource(R.string.quiz_mode_native)
     }
 }
 
@@ -182,7 +182,7 @@ private fun SwitchWithText(
 private fun QuizConfigPreview() {
     SvenskaTheme {
         QuizConfigurationScreen(
-            configState = ConfigurationState(TranslateMode.Native),
+            configState = ConfigurationState(TranslateMode.NativeToSwedish),
             callbacks = QuizConfigurationCallbacksFake,
             navigateToQuiz = {},
             onNavigateUp = {},
@@ -195,7 +195,7 @@ private fun QuizConfigPreview() {
 private fun QuizConfigExtendedPreview() {
     SvenskaTheme {
         QuizConfigurationScreen(
-            configState = ConfigurationState(TranslateMode.Native, withEndings = true, onlyEndings = true),
+            configState = ConfigurationState(TranslateMode.NativeToSwedish, withEndings = true, onlyEndings = true),
             callbacks = QuizConfigurationCallbacksFake,
             navigateToQuiz = {},
             onNavigateUp = {},

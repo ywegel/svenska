@@ -28,8 +28,12 @@ class QuizConfigurationViewModelTest {
                 QuizMode.Translate(TranslateMode.Random),
             ),
             Pair(
-                ConfigurationState(selectedType = TranslateMode.Swedish, withEndings = false, onlyEndings = false),
-                QuizMode.Translate(TranslateMode.Swedish),
+                ConfigurationState(
+                    selectedType = TranslateMode.SwedishToNative,
+                    withEndings = false,
+                    onlyEndings = false,
+                ),
+                QuizMode.Translate(TranslateMode.SwedishToNative),
             ),
             Pair(
                 ConfigurationState(selectedType = null, withEndings = false, onlyEndings = false),
@@ -40,15 +44,23 @@ class QuizConfigurationViewModelTest {
                 QuizMode.TranslateWithEndings(TranslateMode.Random),
             ),
             Pair(
-                ConfigurationState(selectedType = TranslateMode.Swedish, withEndings = true, onlyEndings = false),
-                QuizMode.TranslateWithEndings(TranslateMode.Swedish),
+                ConfigurationState(
+                    selectedType = TranslateMode.SwedishToNative,
+                    withEndings = true,
+                    onlyEndings = false,
+                ),
+                QuizMode.TranslateWithEndings(TranslateMode.SwedishToNative),
             ),
             Pair(
                 ConfigurationState(selectedType = null, withEndings = true, onlyEndings = false),
                 null,
             ),
             Pair(
-                ConfigurationState(selectedType = TranslateMode.Swedish, withEndings = true, onlyEndings = true),
+                ConfigurationState(
+                    selectedType = TranslateMode.SwedishToNative,
+                    withEndings = true,
+                    onlyEndings = true,
+                ),
                 QuizMode.OnlyEndings,
             ),
             Pair(
@@ -56,7 +68,11 @@ class QuizConfigurationViewModelTest {
                 QuizMode.OnlyEndings,
             ),
             Pair(
-                ConfigurationState(selectedType = TranslateMode.Swedish, withEndings = false, onlyEndings = true),
+                ConfigurationState(
+                    selectedType = TranslateMode.SwedishToNative,
+                    withEndings = false,
+                    onlyEndings = true,
+                ),
                 QuizMode.OnlyEndings,
             ),
             Pair(

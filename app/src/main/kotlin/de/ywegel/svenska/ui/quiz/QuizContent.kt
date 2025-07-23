@@ -26,8 +26,8 @@ import androidx.compose.ui.tooling.preview.Preview
 import de.ywegel.svenska.R
 import de.ywegel.svenska.data.model.Gender
 import de.ywegel.svenska.data.model.WordGroup
+import de.ywegel.svenska.domain.quiz.model.AdditionalInfo
 import de.ywegel.svenska.domain.quiz.model.QuizQuestion
-import de.ywegel.svenska.domain.quiz.model.QuizQuestionPromptData
 import de.ywegel.svenska.domain.quiz.model.UserAnswer
 import de.ywegel.svenska.ui.common.HorizontalSpacerXXS
 import de.ywegel.svenska.ui.common.HorizontalSpacerXXXS
@@ -84,7 +84,16 @@ fun <A : UserAnswer, State : QuizInputState<A>, Actions : Any, AnswerResult : An
 
         VerticalSpacerXXXS()
 
-        WordGroupSection(currentQuestion.promptData)
+        AnimatedVisibility(currentQuestion.promptData is AdditionalInfo.PromptInfo) {
+            if (currentQuestion.promptData is AdditionalInfo.PromptInfo) {
+                WordGroupSection(
+                    wordGroup = currentQuestion.promptData.wordGroup,
+                    endings = currentQuestion.promptData.endings,
+                    gender = currentQuestion.promptData.gender,
+                    informAboutNoEndings = false,
+                )
+            }
+        }
 
         VerticalSpacerM()
 
@@ -93,7 +102,24 @@ fun <A : UserAnswer, State : QuizInputState<A>, Actions : Any, AnswerResult : An
         VerticalSpacerM()
 
         if (userAnswer != null && userAnswerCorrect != null) {
-            renderer.Solution(currentQuestion, userAnswer, userAnswerCorrect)
+            renderer.Solution(
+                question = currentQuestion,
+                userAnswer = userAnswer,
+                userAnswerResult = userAnswerCorrect,
+                wordGroupSection = if (currentQuestion.promptData is AdditionalInfo.SolutionInfo) {
+                    {
+                        WordGroupSection(
+                            wordGroup = currentQuestion.promptData.wordGroup,
+                            endings = currentQuestion.promptData.endings,
+                            gender = currentQuestion.promptData.gender,
+                            // Only inform the user that no endings exist, if we translate with endings and only show it in the solution section
+                            informAboutNoEndings = userAnswer is UserAnswer.TranslateWithEndingsAnswer,
+                        )
+                    }
+                } else {
+                    null
+                },
+            )
 
             VerticalSpacerM()
         }
@@ -120,34 +146,43 @@ fun <A : UserAnswer, State : QuizInputState<A>, Actions : Any, AnswerResult : An
 }
 
 @Composable
-private fun WordGroupSection(promptData: QuizQuestionPromptData?) {
-    AnimatedVisibility(promptData?.wordGroup != null) {
-        promptData?.wordGroup?.let { wordGroup ->
-            FlowRow(
-                itemVerticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.Center,
-                verticalArrangement = Arrangement.spacedBy(Spacings.xxxs),
-            ) {
-                Row(verticalAlignment = Alignment.CenterVertically) {
-                    StaticWordGroupBadgeExtended(
-                        mainWordGroup = wordGroup.mainGroupAbbreviation(),
-                        subWordGroup = wordGroup.subGroupAbbreviation(),
-                    )
-                    if (promptData.gender != null && wordGroup is WordGroup.Noun) {
-                        HorizontalSpacerXXXS()
-                        Text(
-                            text = promptData.gender.abbreviation(),
-                            color = SvenskaTheme.colors.primary,
-                        )
-                    }
-                }
-                if (!promptData.endings.isNullOrBlank()) {
-                    HorizontalSpacerXXS()
+private fun WordGroupSection(
+    wordGroup: WordGroup?,
+    endings: String?,
+    gender: Gender?,
+    informAboutNoEndings: Boolean = false,
+) {
+    wordGroup?.let { wordGroup ->
+        FlowRow(
+            itemVerticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.Center,
+            verticalArrangement = Arrangement.spacedBy(Spacings.xxxs),
+        ) {
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                StaticWordGroupBadgeExtended(
+                    mainWordGroup = wordGroup.mainGroupAbbreviation(),
+                    subWordGroup = wordGroup.subGroupAbbreviation(),
+                )
+                if (gender != null && wordGroup is WordGroup.Noun) {
+                    HorizontalSpacerXXXS()
                     Text(
-                        text = "Endings: ${promptData.endings}",
-                        style = SvenskaTheme.typography.bodyLarge,
+                        text = gender.abbreviation(),
+                        color = SvenskaTheme.colors.primary,
                     )
                 }
+            }
+            if (!endings.isNullOrBlank()) {
+                HorizontalSpacerXXS()
+                Text(
+                    text = stringResource(R.string.quiz_endings, endings),
+                    style = SvenskaTheme.typography.bodyLarge,
+                )
+            } else if (informAboutNoEndings) {
+                HorizontalSpacerXXS()
+                Text(
+                    text = stringResource(R.string.quiz_no_endings),
+                    style = SvenskaTheme.typography.bodyLarge,
+                )
             }
         }
     }
@@ -161,11 +196,11 @@ private fun QuizContentPreview() {
             QuizContent(
                 innerPadding = PaddingValues(),
                 renderer = TranslateWithoutEndingsRenderer(),
-                currentQuestion = QuizQuestion<UserAnswer.TranslateWithoutEndingsAnswer>(
+                currentQuestion = QuizQuestion(
                     vocabularyId = 2,
                     prompt = "testPrompt",
                     expectedAnswer = UserAnswer.TranslateWithoutEndingsAnswer("testAnswer"),
-                    promptData = QuizQuestionPromptData(
+                    promptData = AdditionalInfo.PromptInfo(
                         wordGroup = WordGroup.Noun(WordGroup.NounSubgroup.AR),
                         endings = "-en -ar -arna",
                     ),
@@ -188,11 +223,11 @@ private fun QuizContentNoEndingsPreview() {
             QuizContent(
                 innerPadding = PaddingValues(),
                 renderer = TranslateWithoutEndingsRenderer(),
-                currentQuestion = QuizQuestion<UserAnswer.TranslateWithoutEndingsAnswer>(
+                currentQuestion = QuizQuestion(
                     vocabularyId = 2,
                     prompt = "testPrompt",
                     expectedAnswer = UserAnswer.TranslateWithoutEndingsAnswer("testAnswer"),
-                    promptData = QuizQuestionPromptData(
+                    promptData = AdditionalInfo.PromptInfo(
                         wordGroup = WordGroup.Noun(WordGroup.NounSubgroup.AR),
                         endings = "",
                     ),
@@ -215,11 +250,11 @@ private fun QuizContentWithAnswerPreview() {
             QuizContent(
                 innerPadding = PaddingValues(),
                 renderer = TranslateWithoutEndingsRenderer(),
-                currentQuestion = QuizQuestion<UserAnswer.TranslateWithoutEndingsAnswer>(
+                currentQuestion = QuizQuestion(
                     vocabularyId = 2,
                     prompt = "testPrompt",
                     expectedAnswer = UserAnswer.TranslateWithoutEndingsAnswer("testAnswer"),
-                    promptData = QuizQuestionPromptData(
+                    promptData = AdditionalInfo.PromptInfo(
                         wordGroup = WordGroup.Noun(WordGroup.NounSubgroup.AR),
                         endings = "-en -ar -arna",
                         gender = Gender.Ultra,
@@ -243,11 +278,11 @@ private fun QuizContentLongEndingsPreview() {
             QuizContent(
                 innerPadding = PaddingValues(),
                 renderer = TranslateWithoutEndingsRenderer(),
-                currentQuestion = QuizQuestion<UserAnswer.TranslateWithoutEndingsAnswer>(
+                currentQuestion = QuizQuestion(
                     vocabularyId = 2,
                     prompt = "TV",
                     expectedAnswer = UserAnswer.TranslateWithoutEndingsAnswer("teve"),
-                    promptData = QuizQuestionPromptData(
+                    promptData = AdditionalInfo.PromptInfo(
                         wordGroup = WordGroup.Noun(WordGroup.NounSubgroup.AR),
                         endings = "-n teveapparater teveapparaterna",
                         gender = Gender.Ultra,
@@ -279,14 +314,14 @@ private fun QuizContentWithEndingsLongEndingsPreview() {
             QuizContent(
                 innerPadding = PaddingValues(),
                 renderer = TranslateWithEndingsRenderer(),
-                currentQuestion = QuizQuestion<UserAnswer.TranslateWithEndingsAnswer>(
+                currentQuestion = QuizQuestion(
                     vocabularyId = 2,
                     prompt = "TV",
                     expectedAnswer = UserAnswer.TranslateWithEndingsAnswer(
                         answer = "teve but extra long",
                         endings = "-n teveapparater teveapparaterna",
                     ),
-                    promptData = QuizQuestionPromptData(
+                    promptData = AdditionalInfo.PromptInfo(
                         wordGroup = WordGroup.Noun(WordGroup.NounSubgroup.AR),
                         endings = "-n teveapparater teveapparaterna",
                         gender = Gender.Ultra,

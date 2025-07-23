@@ -27,7 +27,10 @@ class QuizConfigurationViewModel(
 
     override fun onlyEndingsChanged(onlyEndings: Boolean) {
         _configurationState.update {
-            it.copy(onlyEndings = onlyEndings, selectedType = TranslateMode.Native) // Only Native mode is supported
+            it.copy(
+                onlyEndings = onlyEndings,
+                selectedType = TranslateMode.NativeToSwedish,
+            ) // Only Native mode is supported
         }
     }
 
