@@ -141,7 +141,7 @@ private fun AppInformationSection(navigateToAboutLibraries: () -> Unit) {
 private fun SettingsScreenPreview() {
     SvenskaTheme {
         SettingsScreen(
-            uiState = SettingsUiState(true, true, OnlineSearchType.Pons),
+            uiState = SettingsUiState(true, OnlineSearchType.Pons),
             callbacks = SettingsCallbacksFake,
             navigateUp = {},
             navigateToWordImporter = {},

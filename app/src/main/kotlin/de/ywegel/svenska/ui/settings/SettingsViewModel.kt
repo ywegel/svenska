@@ -35,12 +35,6 @@ class SettingsViewModel @Inject constructor(
         }
     }
 
-    override fun toggleSearchShowCompactVocabularyItem(showCompactVocabularyItem: Boolean) {
-        viewModelScope.launch(ioDispatcher) {
-            preferencesManager.showCompactVocabularyItemInSearch(showCompactVocabularyItem)
-        }
-    }
-
     override fun onOnlineSearchTypeSelected(onlineSearchType: OnlineSearchType) {
         viewModelScope.launch(ioDispatcher) {
             preferencesManager.updateOnlineRedirectType(onlineSearchType)
@@ -61,7 +55,6 @@ class SettingsViewModel @Inject constructor(
             searchPreferencesFlow.collectLatest { preferences ->
                 _uiState.update {
                     it.copy(
-                        searchShowCompactVocabularyItem = preferences.showCompactVocabularyItem,
                         selectedOnlineSearchType = preferences.onlineRedirectType,
                     )
                 }
@@ -72,6 +65,5 @@ class SettingsViewModel @Inject constructor(
 
 data class SettingsUiState(
     val overviewShowCompactVocabularyItem: Boolean = false,
-    val searchShowCompactVocabularyItem: Boolean = false,
     val selectedOnlineSearchType: OnlineSearchType? = null,
 )

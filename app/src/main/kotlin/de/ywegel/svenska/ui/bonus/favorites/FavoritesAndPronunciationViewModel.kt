@@ -8,6 +8,8 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import de.ywegel.svenska.data.VocabularyRepository
 import de.ywegel.svenska.data.model.Vocabulary
 import de.ywegel.svenska.di.IoDispatcher
+import de.ywegel.svenska.domain.ToggleVocabularyFavoriteUseCase
+import de.ywegel.svenska.ui.common.vocabulary.VocabularyListCallbacks
 import de.ywegel.svenska.ui.container.BonusScreen
 import de.ywegel.svenska.ui.detail.VocabularyDetailState
 import kotlinx.coroutines.CoroutineDispatcher
@@ -20,9 +22,10 @@ import javax.inject.Inject
 @HiltViewModel
 class FavoritesAndPronunciationViewModel @Inject constructor(
     private val repository: VocabularyRepository,
+    private val toggleVocabularyFavoriteUseCase: ToggleVocabularyFavoriteUseCase,
     savedStateHandle: SavedStateHandle,
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
-) : ViewModel() {
+) : ViewModel(), VocabularyListCallbacks {
 
     val navArgs = savedStateHandle.navArgs<FavoritesAndPronunciationScreenNavArgs>()
 
@@ -47,27 +50,53 @@ class FavoritesAndPronunciationViewModel @Inject constructor(
         }
     }
 
-    fun showVocabularyDetail(vocabulary: Vocabulary) {
-        _uiState.update {
-            if (it is FavoritesUiState.Success) {
-                it.copy(
-                    detailViewState = VocabularyDetailState.Visible(vocabulary),
-                )
-            } else {
-                it
+    override fun onVocabularyClick(vocabulary: Vocabulary, showContainerInformation: Boolean) {
+        _uiState.updateIfSuccessState {
+            it.copy(
+                detailViewState = VocabularyDetailState.Visible(
+                    selectedVocabulary = vocabulary,
+                    selectedVocabularyContainer = null,
+                ),
+            )
+        }
+        if (showContainerInformation) {
+            viewModelScope.launch {
+                val container = repository.getContainerById(vocabulary.containerId)
+                _uiState.updateIfSuccessState {
+                    it.copy(
+                        detailViewState = VocabularyDetailState.Visible(
+                            selectedVocabulary = vocabulary,
+                            selectedVocabularyContainer = container,
+                        ),
+                    )
+                }
             }
         }
     }
 
-    fun hideVocabularyDetail() {
-        _uiState.update {
-            if (it is FavoritesUiState.Success) {
-                it.copy(
-                    detailViewState = VocabularyDetailState.Hidden,
-                )
-            } else {
-                it
-            }
+    override fun onDismissVocabularyDetail() {
+        _uiState.updateIfSuccessState {
+            it.copy(
+                detailViewState = VocabularyDetailState.Hidden,
+            )
+        }
+    }
+
+    override fun toggleFavorite(vocabularyId: Int, isFavorite: Boolean) {
+        viewModelScope.launch {
+            toggleVocabularyFavoriteUseCase(vocabularyId, isFavorite)
+        }
+    }
+}
+
+private fun MutableStateFlow<FavoritesUiState>.updateIfSuccessState(
+    block: (FavoritesUiState.Success) -> FavoritesUiState,
+) {
+    this.update {
+        if (it is FavoritesUiState.Success) {
+            block(it)
+        } else {
+            it
         }
     }
 }

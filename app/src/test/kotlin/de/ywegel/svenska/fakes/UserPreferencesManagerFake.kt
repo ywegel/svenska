@@ -49,7 +49,6 @@ class UserPreferencesManagerFake(
     private val currentSearchPreferences = SearchPreferences(
         lastSearchedItems = ArrayDeque(),
         showOnlineRedirectFirst = false,
-        showCompactVocabularyItem = false,
         onlineRedirectType = OnlineSearchType.DictCC,
     )
 
@@ -62,12 +61,6 @@ class UserPreferencesManagerFake(
             val copiedQueue = ArrayDeque(it.lastSearchedItems)
             copiedQueue.addToFrontAndLimit(item)
             it.copy(lastSearchedItems = copiedQueue)
-        }
-    }
-
-    override suspend fun showCompactVocabularyItemInSearch(show: Boolean) {
-        _preferencesSearchFlow.update {
-            it.copy(showCompactVocabularyItem = show)
         }
     }
 

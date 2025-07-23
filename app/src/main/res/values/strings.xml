@@ -286,6 +286,7 @@
     <string name="vocabulary_detail_section_pronunciation">Pronunciation</string>
     <string name="vocabulary_detail_section_notes">Notes</string>
     <string name="vocabulary_detail_section_metadata">Metadata</string>
+    <string name="vocabulary_detail_section_metadata_container">Located in container: %1$s</string>
     <string name="vocabulary_detail_section_metadata_created">Created: %1$s</string>
     <string name="vocabulary_detail_section_metadata_edited">Last edited: %1$s</string>
     <string name="vocabulary_detail_chip_group">%1$s (%2$s)</string>

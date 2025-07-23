@@ -10,6 +10,8 @@ import de.ywegel.svenska.data.VocabularyRepository
 import de.ywegel.svenska.data.model.Vocabulary
 import de.ywegel.svenska.data.preferences.UserPreferencesManager
 import de.ywegel.svenska.di.IoDispatcher
+import de.ywegel.svenska.domain.ToggleVocabularyFavoriteUseCase
+import de.ywegel.svenska.ui.common.vocabulary.VocabularyListCallbacks
 import de.ywegel.svenska.ui.detail.VocabularyDetailState
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -27,9 +29,10 @@ import javax.inject.Inject
 class OverviewViewModel @Inject constructor(
     savedStateHandle: SavedStateHandle,
     private val repository: VocabularyRepository,
+    private val toggleVocabularyFavoriteUseCase: ToggleVocabularyFavoriteUseCase,
     userPreferencesManager: UserPreferencesManager,
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
-) : ViewModel() {
+) : ViewModel(), VocabularyListCallbacks {
 
     val containerId: Int = savedStateHandle.navArgs<OverviewNavArgs>().containerId
 
@@ -109,19 +112,31 @@ class OverviewViewModel @Inject constructor(
         }
     }
 
-    fun showVocabularyDetail(vocabulary: Vocabulary) {
+    override fun onVocabularyClick(
+        vocabulary: Vocabulary,
+        showContainerInformation: Boolean, // We never show the container information in the overviewModel
+    ) {
         _uiState.update {
             it.copy(
-                detailViewState = VocabularyDetailState.Visible(vocabulary),
+                detailViewState = VocabularyDetailState.Visible(
+                    selectedVocabulary = vocabulary,
+                    selectedVocabularyContainer = null,
+                ),
             )
         }
     }
 
-    fun hideVocabularyDetail() {
+    override fun onDismissVocabularyDetail() {
         _uiState.update {
             it.copy(
                 detailViewState = VocabularyDetailState.Hidden,
             )
+        }
+    }
+
+    override fun toggleFavorite(vocabularyId: Int, isFavorite: Boolean) {
+        viewModelScope.launch {
+            toggleVocabularyFavoriteUseCase(vocabularyId, isFavorite)
         }
     }
 }

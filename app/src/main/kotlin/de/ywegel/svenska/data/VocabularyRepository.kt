@@ -28,6 +28,8 @@ interface VocabularyRepository {
 
     suspend fun toggleVocabularyFavorite(vocabularyId: Int, isFavorite: Boolean)
 
+    fun isVocabularyFavorite(vocabularyId: Int): Flow<Boolean>
+
     fun getAllContainers(): Flow<List<VocabularyContainer>>
 
     suspend fun getContainerById(id: Int): VocabularyContainer?
@@ -100,6 +102,10 @@ class VocabularyRepositoryImpl @Inject constructor(private val dao: VocabularyDa
 
     override suspend fun toggleVocabularyFavorite(vocabularyId: Int, isFavorite: Boolean) {
         dao.toggleVocabularyFavorite(vocabularyId, isFavorite)
+    }
+
+    override fun isVocabularyFavorite(vocabularyId: Int): Flow<Boolean> {
+        return dao.isVocabularyFavorite(vocabularyId)
     }
 
     override suspend fun getContainerById(id: Int): VocabularyContainer? {

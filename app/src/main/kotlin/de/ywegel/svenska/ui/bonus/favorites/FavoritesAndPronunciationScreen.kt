@@ -7,15 +7,12 @@ import androidx.compose.animation.expandVertically
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.animation.shrinkVertically
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.outlined.Close
 import androidx.compose.material.icons.outlined.Info
 import androidx.compose.material3.Button
@@ -34,7 +31,6 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
@@ -51,10 +47,11 @@ import de.ywegel.svenska.navigation.BonusGraph
 import de.ywegel.svenska.ui.common.IconButton
 import de.ywegel.svenska.ui.common.TopAppTextBar
 import de.ywegel.svenska.ui.common.VerticalSpacerXXXS
+import de.ywegel.svenska.ui.common.vocabulary.VocabularyList
+import de.ywegel.svenska.ui.common.vocabulary.VocabularyListCallbacks
+import de.ywegel.svenska.ui.common.vocabulary.VocabularyListCallbacksFake
 import de.ywegel.svenska.ui.container.BonusScreen
-import de.ywegel.svenska.ui.detail.VocabularyDetailScreen
 import de.ywegel.svenska.ui.detail.VocabularyDetailState
-import de.ywegel.svenska.ui.overview.VocabularyListItem
 import de.ywegel.svenska.ui.theme.Spacings
 import de.ywegel.svenska.ui.theme.SvenskaIcons
 import de.ywegel.svenska.ui.theme.SvenskaTheme
@@ -72,8 +69,6 @@ fun FavoritesAndPronunciationScreen(
         uiState = uiState,
         screenType = navArgs.screenType,
         navigateUp = navigator::navigateUp,
-        onVocabularyClick = viewModel::showVocabularyDetail,
-        onDismissDetail = viewModel::hideVocabularyDetail,
         navigateToEdit = { item ->
             navigator.navigate(
                 EditVocabularyScreenDestination(
@@ -83,6 +78,7 @@ fun FavoritesAndPronunciationScreen(
             )
         },
         navigateToWordGroupScreen = { navigator.navigate(WordGroupsScreenDestination) },
+        vocabularyListCallbacks = viewModel,
     )
 }
 
@@ -92,8 +88,7 @@ fun FavoritesAndPronunciationScreen(
     screenType: BonusScreen,
     initialShowExplanation: Boolean = false,
     navigateUp: () -> Unit,
-    onVocabularyClick: (Vocabulary) -> Unit,
-    onDismissDetail: () -> Unit,
+    vocabularyListCallbacks: VocabularyListCallbacks,
     navigateToEdit: (vocabulary: Vocabulary) -> Unit,
     navigateToWordGroupScreen: () -> Unit,
 ) {
@@ -131,8 +126,7 @@ fun FavoritesAndPronunciationScreen(
                 toggleExplanation = {
                     showExplanation = !showExplanation
                 },
-                onVocabularyClick = onVocabularyClick,
-                onDismissDetail = onDismissDetail,
+                vocabularyListCallbacks = vocabularyListCallbacks,
                 navigateToEdit = navigateToEdit,
                 navigateToWordGroupScreen = navigateToWordGroupScreen,
             )
@@ -179,42 +173,27 @@ private fun SuccessState(
     padding: PaddingValues,
     scrollBehavior: TopAppBarScrollBehavior,
     toggleExplanation: () -> Unit,
-    onVocabularyClick: (Vocabulary) -> Unit,
-    onDismissDetail: () -> Unit,
+    vocabularyListCallbacks: VocabularyListCallbacks,
     navigateToEdit: (vocabulary: Vocabulary) -> Unit,
     navigateToWordGroupScreen: () -> Unit,
 ) {
-    LazyColumn(
-        modifier = Modifier
-            .fillMaxSize()
-            .padding(horizontal = Spacings.s)
-            .nestedScroll(scrollBehavior.nestedScrollConnection),
-        contentPadding = padding,
-        verticalArrangement = Arrangement.spacedBy(Spacings.xs),
-    ) {
-        item {
-            ExplanationCard(
-                showExplanation = showExplanation,
-                screenType = screenType,
-                onClose = toggleExplanation,
-            )
-        }
-        items(
-            items = items,
-            key = { it.id },
-        ) { voc ->
-            VocabularyListItem(voc, onClick = onVocabularyClick)
-        }
-    }
-
-    // Show detail screen if a vocabulary is selected
-    VocabularyDetailScreen(
-        state = detailViewState,
-        onDismiss = onDismissDetail,
-        onEditClick = {
-            onDismissDetail()
-            navigateToEdit(it)
+    VocabularyList(
+        vocabularies = items,
+        showContainerInformation = true,
+        vocabularyDetailState = detailViewState,
+        headerItems = {
+            item {
+                ExplanationCard(
+                    showExplanation = showExplanation,
+                    screenType = screenType,
+                    onClose = toggleExplanation,
+                )
+            }
         },
+        scrollBehavior = scrollBehavior,
+        contentPadding = padding,
+        vocabularyListCallbacks = vocabularyListCallbacks,
+        navigateToEdit = navigateToEdit,
         navigateToWordGroupScreen = navigateToWordGroupScreen,
     )
 }
@@ -266,8 +245,7 @@ private fun ErrorStatePreview() {
             uiState = FavoritesUiState.Error("Something went wrong while loading your favorites. Please try again."),
             screenType = BonusScreen.Favorites,
             navigateUp = {},
-            onVocabularyClick = {},
-            onDismissDetail = {},
+            vocabularyListCallbacks = VocabularyListCallbacksFake,
             navigateToEdit = {},
             navigateToWordGroupScreen = {},
         )
@@ -282,8 +260,7 @@ private fun SuccessStatePreview() {
             uiState = FavoritesUiState.Success(vocabularies()),
             screenType = BonusScreen.Favorites,
             navigateUp = {},
-            onVocabularyClick = {},
-            onDismissDetail = {},
+            vocabularyListCallbacks = VocabularyListCallbacksFake,
             navigateToEdit = {},
             navigateToWordGroupScreen = {},
         )
@@ -299,8 +276,7 @@ private fun SuccessStateWithExplanationPreview() {
             screenType = BonusScreen.Favorites,
             initialShowExplanation = true,
             navigateUp = {},
-            onVocabularyClick = {},
-            onDismissDetail = {},
+            vocabularyListCallbacks = VocabularyListCallbacksFake,
             navigateToEdit = {},
             navigateToWordGroupScreen = {},
         )
