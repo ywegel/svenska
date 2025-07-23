@@ -15,12 +15,12 @@ class TranslationWithoutEndingsQuizStrategy(
 
     override fun generateQuestion(vocabulary: Vocabulary): QuizQuestion<UserAnswer.TranslateWithoutEndingsAnswer> {
         val effectiveMode = when (mode) {
-            TranslateMode.Swedish, TranslateMode.Native -> mode
-            TranslateMode.Random -> if (randomGenerator()) TranslateMode.Swedish else TranslateMode.Native
+            TranslateMode.SwedishToNative, TranslateMode.NativeToSwedish -> mode
+            TranslateMode.Random -> if (randomGenerator()) TranslateMode.SwedishToNative else TranslateMode.NativeToSwedish
         }
 
         return when (effectiveMode) {
-            TranslateMode.Swedish -> QuizQuestion(
+            TranslateMode.SwedishToNative -> QuizQuestion(
                 vocabularyId = vocabulary.id,
                 prompt = vocabulary.word,
                 expectedAnswer = UserAnswer.TranslateWithoutEndingsAnswer(vocabulary.translation),
@@ -31,7 +31,7 @@ class TranslationWithoutEndingsQuizStrategy(
                 ),
             )
 
-            TranslateMode.Native -> QuizQuestion(
+            TranslateMode.NativeToSwedish -> QuizQuestion(
                 vocabularyId = vocabulary.id,
                 prompt = vocabulary.translation,
                 expectedAnswer = UserAnswer.TranslateWithoutEndingsAnswer(vocabulary.word),

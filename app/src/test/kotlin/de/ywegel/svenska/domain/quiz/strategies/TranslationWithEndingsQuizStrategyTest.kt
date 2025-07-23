@@ -33,7 +33,7 @@ class TranslationWithEndingsQuizStrategyTest {
         @Test
         fun `when mode is Swedish, should create question with Swedish prompt and endings in expected answer`() {
             // Given
-            val strategy = TranslationWithEndingsQuizStrategy(TranslateMode.Swedish)
+            val strategy = TranslationWithEndingsQuizStrategy(TranslateMode.SwedishToNative)
 
             // When
             val question = strategy.generateQuestion(testVocabulary)
@@ -56,7 +56,7 @@ class TranslationWithEndingsQuizStrategyTest {
         @Test
         fun `when mode is Native, should create question with Native prompt`() {
             // Given
-            val strategy = TranslationWithEndingsQuizStrategy(TranslateMode.Native)
+            val strategy = TranslationWithEndingsQuizStrategy(TranslateMode.NativeToSwedish)
 
             // When
             val question = strategy.generateQuestion(testVocabulary)
@@ -119,7 +119,7 @@ class TranslationWithEndingsQuizStrategyTest {
         fun `when vocabulary has null endings, should create question with null endings in expected answer`() {
             // Given
             val vocabularyWithoutEndings = testVocabulary.copy(ending = "")
-            val strategy = TranslationWithEndingsQuizStrategy(TranslateMode.Swedish)
+            val strategy = TranslationWithEndingsQuizStrategy(TranslateMode.SwedishToNative)
 
             // When
             val question = strategy.generateQuestion(vocabularyWithoutEndings)
@@ -147,7 +147,7 @@ class TranslationWithEndingsQuizStrategyTest {
         @Test
         fun `when both translation and endings are correct, should return correct result`() {
             // Given
-            val strategy = TranslationWithEndingsQuizStrategy(TranslateMode.Swedish)
+            val strategy = TranslationWithEndingsQuizStrategy(TranslateMode.SwedishToNative)
             val question = QuizQuestion(
                 vocabularyId = 1,
                 prompt = "hund",
@@ -170,7 +170,7 @@ class TranslationWithEndingsQuizStrategyTest {
         @Test
         fun `when translation is correct but endings are wrong, should return partial correct result`() {
             // Given
-            val strategy = TranslationWithEndingsQuizStrategy(TranslateMode.Swedish)
+            val strategy = TranslationWithEndingsQuizStrategy(TranslateMode.SwedishToNative)
             val question = QuizQuestion(
                 vocabularyId = 1,
                 prompt = "en bil",
@@ -193,7 +193,7 @@ class TranslationWithEndingsQuizStrategyTest {
         @Test
         fun `when translation is wrong but endings are correct, should return partial correct result`() {
             // Given
-            val strategy = TranslationWithEndingsQuizStrategy(TranslateMode.Swedish)
+            val strategy = TranslationWithEndingsQuizStrategy(TranslateMode.SwedishToNative)
             val question = QuizQuestion(
                 vocabularyId = 1,
                 prompt = "en bil",
@@ -216,7 +216,7 @@ class TranslationWithEndingsQuizStrategyTest {
         @Test
         fun `when both translation and endings are wrong, should return all incorrect result`() {
             // Given
-            val strategy = TranslationWithEndingsQuizStrategy(TranslateMode.Swedish)
+            val strategy = TranslationWithEndingsQuizStrategy(TranslateMode.SwedishToNative)
             val question = QuizQuestion(
                 vocabularyId = 1,
                 prompt = "en bil",

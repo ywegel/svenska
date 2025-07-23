@@ -34,7 +34,7 @@ class TranslationWithoutEndingsQuizStrategyTest {
         @Test
         fun `when mode is Swedish, should create question with Swedish prompt`() {
             // Given
-            val strategy = TranslationWithoutEndingsQuizStrategy(TranslateMode.Swedish)
+            val strategy = TranslationWithoutEndingsQuizStrategy(TranslateMode.SwedishToNative)
 
             // When
             val question = strategy.generateQuestion(testVocabulary)
@@ -57,7 +57,7 @@ class TranslationWithoutEndingsQuizStrategyTest {
         @Test
         fun `when mode is Native, should create question with Native prompt`() {
             // Given
-            val strategy = TranslationWithoutEndingsQuizStrategy(TranslateMode.Native)
+            val strategy = TranslationWithoutEndingsQuizStrategy(TranslateMode.NativeToSwedish)
 
             // When
             val question = strategy.generateQuestion(testVocabulary)
@@ -121,7 +121,7 @@ class TranslationWithoutEndingsQuizStrategyTest {
         @Test
         fun `when answer matches expected exactly, should return true`() {
             // Given
-            val strategy = TranslationWithoutEndingsQuizStrategy(TranslateMode.Swedish)
+            val strategy = TranslationWithoutEndingsQuizStrategy(TranslateMode.SwedishToNative)
             val question = QuizQuestion(
                 vocabularyId = 1,
                 prompt = "hund",
@@ -139,7 +139,7 @@ class TranslationWithoutEndingsQuizStrategyTest {
         @Test
         fun `when answer matches expected with different case, should return true`() {
             // Given
-            val strategy = TranslationWithoutEndingsQuizStrategy(TranslateMode.Swedish)
+            val strategy = TranslationWithoutEndingsQuizStrategy(TranslateMode.SwedishToNative)
             val question = QuizQuestion(
                 vocabularyId = 1,
                 prompt = "hund",
@@ -157,7 +157,7 @@ class TranslationWithoutEndingsQuizStrategyTest {
         @Test
         fun `when answer has extra whitespace, should return true`() {
             // Given
-            val strategy = TranslationWithoutEndingsQuizStrategy(TranslateMode.Swedish)
+            val strategy = TranslationWithoutEndingsQuizStrategy(TranslateMode.SwedishToNative)
             val question = QuizQuestion(
                 vocabularyId = 1,
                 prompt = "hund",
@@ -175,7 +175,7 @@ class TranslationWithoutEndingsQuizStrategyTest {
         @Test
         fun `when answer is different, should return false`() {
             // Given
-            val strategy = TranslationWithoutEndingsQuizStrategy(TranslateMode.Swedish)
+            val strategy = TranslationWithoutEndingsQuizStrategy(TranslateMode.SwedishToNative)
             val question = QuizQuestion(
                 vocabularyId = 1,
                 prompt = "hund",
