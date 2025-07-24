@@ -20,7 +20,7 @@ fun assertVocabularyListEqualsIgnoringTimestamps(
     sort: Boolean = false,
 ) {
     assertThat(actualList).isNotNull().given { actual ->
-        assertThat(expectedList.size).isEqualTo(actualList.size)
+        assertThat(actualList.size).isEqualTo(expectedList.size)
 
         val comparisonPairs = if (sort) {
             actual

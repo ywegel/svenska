@@ -131,4 +131,10 @@ interface VocabularyDao {
 
     @Query("SELECT * FROM vocabulary WHERE irregularPronunciation IS NOT NULL ORDER BY word ASC")
     fun getAllPronunciations(): List<Vocabulary>
+
+    @Query("SELECT * FROM vocabulary WHERE ending IS NOT NULL AND TRIM(ending, '') != ''")
+    suspend fun getAllVocabulariesWithEndings(): List<Vocabulary>
+
+    @Query("SELECT * FROM vocabulary WHERE containerId = :containerId AND ending IS NOT NULL AND TRIM(ending, '') != ''")
+    suspend fun getAllVocabulariesWithEndings(containerId: Int): List<Vocabulary>
 }

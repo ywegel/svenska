@@ -106,7 +106,7 @@ class FileRepositoryWordParserRoundTripTest {
         assertThat(insertedFilesResult.last()).isEqualTo(entries[0].words.size)
         assertVocabularyListEqualsIgnoringTimestamps(
             expectedList = expected,
-            actualList = vocRepository.getAllVocabulariesSnapshot(containerId),
+            actualList = vocRepository.getAllVocabulariesSnapshot(null),
             // We need to sort, because we don't know if the VocabularyRepositoryFake can maintain the insertion order.
             sort = true,
         )

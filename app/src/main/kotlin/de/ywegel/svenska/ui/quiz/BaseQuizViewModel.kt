@@ -3,6 +3,7 @@ package de.ywegel.svenska.ui.quiz
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import de.ywegel.svenska.data.VocabularyRepository
+import de.ywegel.svenska.data.model.Vocabulary
 import de.ywegel.svenska.domain.quiz.QuizManager
 import de.ywegel.svenska.domain.quiz.QuizStrategy
 import de.ywegel.svenska.domain.quiz.model.QuizQuestion
@@ -22,7 +23,9 @@ abstract class BaseQuizViewModel<A : UserAnswer, S : QuizInputState<A>, AC : Any
     protected val containerId: Int?,
 ) : ViewModel(), QuizCallbacks<A> {
 
-    private val manager = QuizManager(strategy, repository, containerId)
+    abstract val renderer: QuizRenderer<A, S, AC, AR>
+
+    abstract suspend fun loadVocabularies(containerId: Int?): List<Vocabulary>
 
     private val _uiState = MutableStateFlow<QuizUiState<A, AR>>(QuizUiState.Loading())
     val uiState: StateFlow<QuizUiState<A, AR>> = _uiState.asStateFlow()
@@ -31,7 +34,11 @@ abstract class BaseQuizViewModel<A : UserAnswer, S : QuizInputState<A>, AC : Any
     val inputState: StateFlow<S> = inputController.state
     val actions: AC = inputController.actions
 
-    abstract val renderer: QuizRenderer<A, S, AC, AR>
+    private val manager = QuizManager(
+        strategy = strategy,
+        loadVocabularies = ::loadVocabularies,
+        containerId = containerId,
+    )
 
     init {
         launchSafely {

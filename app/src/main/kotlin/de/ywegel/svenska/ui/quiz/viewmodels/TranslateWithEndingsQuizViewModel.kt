@@ -5,6 +5,7 @@ import dagger.assisted.AssistedFactory
 import dagger.assisted.AssistedInject
 import dagger.hilt.android.lifecycle.HiltViewModel
 import de.ywegel.svenska.data.VocabularyRepository
+import de.ywegel.svenska.data.model.Vocabulary
 import de.ywegel.svenska.di.IoDispatcher
 import de.ywegel.svenska.domain.quiz.model.TranslateMode
 import de.ywegel.svenska.domain.quiz.model.UserAnswer
@@ -37,6 +38,10 @@ class TranslateWithEndingsQuizViewModel @AssistedInject constructor(
 ) {
 
     override val renderer = TranslateWithEndingsRenderer()
+
+    override suspend fun loadVocabularies(containerId: Int?): List<Vocabulary> {
+        return repository.getAllVocabulariesSnapshot(containerId)
+    }
 
     @AssistedFactory
     interface Factory {
