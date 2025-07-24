@@ -57,6 +57,7 @@ class FileRepositoryImpl @Inject constructor(
     override fun parseAndSaveEntriesToDbWithProgress(entries: List<ImporterChapter>, containerId: Int?): Flow<Int> =
         flow {
             // TODO: containerId is ignored rn, because the importer only supports importing chapters at the moment
+            // When no longer ignoring containerId, we need to adjust the test as well
             var lastChapterWordSize = 0
 
             entries.forEach { chapter ->

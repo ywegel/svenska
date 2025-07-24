@@ -118,7 +118,9 @@ class VocabularyRepositoryFake(
     }
 
     override suspend fun getAllVocabulariesSnapshot(containerId: Int?): List<Vocabulary> {
-        return vocabulary.toList()
+        return containerId?.let {
+            vocabulary.filter { it.containerId == containerId }
+        } ?: vocabulary.toList()
     }
 
     override suspend fun toggleVocabularyFavorite(vocabularyId: Int, isFavorite: Boolean) {
@@ -133,5 +135,11 @@ class VocabularyRepositoryFake(
         return vocabularyFlow.map {
             it.find { it.id == vocabularyId }?.isFavorite ?: false
         }
+    }
+
+    override suspend fun getAllVocabulariesWithEndings(containerId: Int?): List<Vocabulary> {
+        return containerId?.let {
+            vocabulary.filter { it.ending.isNotBlank() && it.containerId == containerId }
+        } ?: vocabulary.filter { it.ending.isNotBlank() }
     }
 }

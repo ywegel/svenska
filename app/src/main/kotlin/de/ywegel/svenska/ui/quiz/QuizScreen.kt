@@ -25,6 +25,7 @@ import de.ywegel.svenska.domain.quiz.model.UserAnswer
 import de.ywegel.svenska.navigation.QuizGraph
 import de.ywegel.svenska.ui.common.IconButton
 import de.ywegel.svenska.ui.common.NavigationIconButton
+import de.ywegel.svenska.ui.quiz.viewmodels.OnlyEndingsQuizViewModel
 import de.ywegel.svenska.ui.quiz.viewmodels.TranslateQuizViewModel
 import de.ywegel.svenska.ui.quiz.viewmodels.TranslateWithEndingsQuizViewModel
 import de.ywegel.svenska.ui.theme.SvenskaIcons
@@ -32,29 +33,33 @@ import de.ywegel.svenska.ui.theme.SvenskaIcons
 @Destination<QuizGraph>(navArgs = QuizNavArgs::class)
 @Composable
 fun QuizScreen(navArgs: QuizNavArgs, navigator: DestinationsNavigator) {
-    when (val quizMode = navArgs.quizMode) {
+    val viewModel = when (val quizMode = navArgs.quizMode) {
         is QuizMode.Translate -> {
-            val viewModel: TranslateQuizViewModel = hiltViewModel(
+            hiltViewModel<TranslateQuizViewModel, TranslateQuizViewModel.Factory>(
                 creationCallback = { factory: TranslateQuizViewModel.Factory ->
                     factory.create(quizMode.mode, navArgs.containerId)
                 },
             )
-            QuizScreen(viewModel, navigator)
         }
 
         is QuizMode.TranslateWithEndings -> {
-            val viewModel: TranslateWithEndingsQuizViewModel = hiltViewModel(
+            hiltViewModel<TranslateWithEndingsQuizViewModel, TranslateWithEndingsQuizViewModel.Factory>(
                 creationCallback = { factory: TranslateWithEndingsQuizViewModel.Factory ->
                     factory.create(quizMode.mode, navArgs.containerId)
                 },
             )
-            QuizScreen(viewModel, navigator)
         }
 
         is QuizMode.OnlyEndings -> {
-            TODO("Implement OnlyEndings quiz type")
+            hiltViewModel<OnlyEndingsQuizViewModel, OnlyEndingsQuizViewModel.Factory>(
+                creationCallback = { factory: OnlyEndingsQuizViewModel.Factory ->
+                    factory.create(navArgs.containerId)
+                },
+            )
         }
     }
+
+    QuizScreen(viewModel, navigator)
 }
 
 @Composable

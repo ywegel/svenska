@@ -1,13 +1,12 @@
 package de.ywegel.svenska.domain.quiz
 
-import de.ywegel.svenska.data.VocabularyRepository
 import de.ywegel.svenska.data.model.Vocabulary
 import de.ywegel.svenska.domain.quiz.model.QuizQuestion
 import de.ywegel.svenska.domain.quiz.model.UserAnswer
 
 class QuizManager<A : UserAnswer, AnswerResult : Any>(
     private val strategy: QuizStrategy<A, AnswerResult>,
-    private val vocabularyRepository: VocabularyRepository,
+    private val loadVocabularies: suspend (containerId: Int?) -> List<Vocabulary>,
     private val containerId: Int?,
 ) {
     private val vocabularyList: MutableList<Vocabulary> = mutableListOf()
@@ -16,7 +15,7 @@ class QuizManager<A : UserAnswer, AnswerResult : Any>(
     suspend fun startQuiz() {
         vocabularyList.clear()
         vocabularyList.addAll(
-            vocabularyRepository.getAllVocabulariesSnapshot(containerId).shuffled(),
+            loadVocabularies(containerId).shuffled(),
         )
         currentIndex = 0
     }

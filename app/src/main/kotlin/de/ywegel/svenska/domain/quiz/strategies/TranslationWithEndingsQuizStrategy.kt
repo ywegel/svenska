@@ -66,20 +66,10 @@ class TranslationWithEndingsQuizStrategy(
     ): TranslateWithEndingsResult {
         return TranslateWithEndingsResult(
             translationCorrect = question.expectedAnswer.answer.trim().equals(userAnswer.answer.trim(), true),
-            endingsCorrect = compareEndings(question.expectedAnswer.endings.orEmpty(), userAnswer.endings.orEmpty()),
+            endingsCorrect = ComparisonHelpers.compareEndings(
+                expected = question.expectedAnswer.endings.orEmpty(),
+                userInput = userAnswer.endings.orEmpty(),
+            ),
         )
     }
-
-    /**
-     * Possible user input: "-en -ar -arna", "en ar arna", "-et - -en".
-     * Therefore we remove all "-" and whitespaces.
-     */
-    private fun compareEndings(expected: String, userInput: String): Boolean {
-        return expected.replace(
-            regex = compareAlphabeticRegex,
-            replacement = "",
-        ).equals(userInput.replace(compareAlphabeticRegex, ""), ignoreCase = true)
-    }
-
-    private val compareAlphabeticRegex = Regex("[\\s-]")
 }

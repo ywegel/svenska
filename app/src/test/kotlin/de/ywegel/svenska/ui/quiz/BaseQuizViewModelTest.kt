@@ -61,7 +61,11 @@ class BaseQuizViewModelTest {
         strategy,
         userInputControllerFactory,
         containerId,
-    )
+    ) {
+        override suspend fun loadVocabularies(containerId: Int?): List<Vocabulary> {
+            return repository.getAllVocabulariesSnapshot(containerId)
+        }
+    }
 
     // Simple test implementations
     private class TestState : QuizInputState<UserAnswer.TranslateWithoutEndingsAnswer> {

@@ -9,4 +9,8 @@ sealed class UserAnswer {
         val answer: String,
         val endings: String?,
     ) : UserAnswer()
+
+    data class OnlyEndingsAnswer(
+        val endings: String,
+    ) : UserAnswer()
 }

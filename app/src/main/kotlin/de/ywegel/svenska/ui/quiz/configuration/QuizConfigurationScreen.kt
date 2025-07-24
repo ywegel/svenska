@@ -2,7 +2,6 @@
 
 package de.ywegel.svenska.ui.quiz.configuration
 
-import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.IntrinsicSize
@@ -96,17 +95,16 @@ private fun QuizConfigurationScreen(
                         text = "Additionally test endings",
                         fillTextWidth = false,
                         switchChecked = configState.withEndings,
+                        enabled = !configState.onlyEndings,
                         onSwitchChanged = callbacks::withEndingsChanged,
                     )
 
-                    AnimatedVisibility(configState.withEndings) {
-                        SwitchWithText(
-                            text = "Only test endings",
-                            fillTextWidth = false,
-                            switchChecked = configState.onlyEndings,
-                            onSwitchChanged = callbacks::onlyEndingsChanged,
-                        )
-                    }
+                    SwitchWithText(
+                        text = "Only test endings",
+                        fillTextWidth = false,
+                        switchChecked = configState.onlyEndings,
+                        onSwitchChanged = callbacks::onlyEndingsChanged,
+                    )
                 }
             }
             Button(
@@ -163,10 +161,11 @@ private fun SwitchWithText(
     text: String,
     switchChecked: Boolean,
     fillTextWidth: Boolean = true,
+    enabled: Boolean = true,
     onSwitchChanged: (Boolean) -> Unit,
 ) {
     Row(verticalAlignment = Alignment.CenterVertically) {
-        Switch(switchChecked, onSwitchChanged)
+        Switch(checked = switchChecked, onCheckedChange = onSwitchChanged, enabled = enabled)
         HorizontalSpacerS()
         Text(
             modifier = if (fillTextWidth) Modifier.weight(1f) else Modifier,
@@ -182,7 +181,7 @@ private fun SwitchWithText(
 private fun QuizConfigPreview() {
     SvenskaTheme {
         QuizConfigurationScreen(
-            configState = ConfigurationState(TranslateMode.NativeToSwedish),
+            configState = ConfigurationState(TranslateMode.SwedishToNative),
             callbacks = QuizConfigurationCallbacksFake,
             navigateToQuiz = {},
             onNavigateUp = {},
@@ -192,7 +191,20 @@ private fun QuizConfigPreview() {
 
 @Preview
 @Composable
-private fun QuizConfigExtendedPreview() {
+private fun QuizConfigWithEndingsPreview() {
+    SvenskaTheme {
+        QuizConfigurationScreen(
+            configState = ConfigurationState(TranslateMode.SwedishToNative, withEndings = true, onlyEndings = false),
+            callbacks = QuizConfigurationCallbacksFake,
+            navigateToQuiz = {},
+            onNavigateUp = {},
+        )
+    }
+}
+
+@Preview
+@Composable
+private fun QuizConfigOnlyEndingsPreview() {
     SvenskaTheme {
         QuizConfigurationScreen(
             configState = ConfigurationState(TranslateMode.NativeToSwedish, withEndings = true, onlyEndings = true),

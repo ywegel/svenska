@@ -43,6 +43,8 @@ interface VocabularyRepository {
     fun getPronunciations(containerId: Int?): List<Vocabulary>
 
     fun getAllContainerNamesWithIds(): List<VocabularyContainer>
+
+    suspend fun getAllVocabulariesWithEndings(containerId: Int?): List<Vocabulary>
 }
 
 @Singleton
@@ -138,6 +140,12 @@ class VocabularyRepositoryImpl @Inject constructor(private val dao: VocabularyDa
         } else {
             dao.getPronunciationsByContainerId(containerId)
         }
+    }
+
+    override suspend fun getAllVocabulariesWithEndings(containerId: Int?): List<Vocabulary> {
+        return containerId?.let { id ->
+            dao.getAllVocabulariesWithEndings(id)
+        } ?: dao.getAllVocabulariesWithEndings()
     }
 }
 
