@@ -17,6 +17,6 @@ interface QuizRenderer<A : UserAnswer, State : QuizInputState<A>, Actions : Any,
         question: QuizQuestion<A>,
         userAnswer: A,
         userAnswerResult: AnswerResult,
-        wordGroupSection: (@Composable () -> Unit)?,
+        wordGroupSection: (@Composable (highlightEndings: Boolean) -> Unit)?,
     )
 }

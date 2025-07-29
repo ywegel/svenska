@@ -21,6 +21,8 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.SpanStyle
+import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import de.ywegel.svenska.R
@@ -107,13 +109,14 @@ fun <A : UserAnswer, State : QuizInputState<A>, Actions : Any, AnswerResult : An
                 userAnswer = userAnswer,
                 userAnswerResult = userAnswerCorrect,
                 wordGroupSection = if (currentQuestion.promptData is AdditionalInfo.SolutionInfo) {
-                    {
+                    { highlightEndings ->
                         WordGroupSection(
                             wordGroup = currentQuestion.promptData.wordGroup,
                             endings = currentQuestion.promptData.endings,
                             gender = currentQuestion.promptData.gender,
                             // Only inform the user that no endings exist, if we translate with endings and only show it in the solution section
                             informAboutNoEndings = userAnswer is UserAnswer.TranslateWithEndingsAnswer,
+                            highlightEndings = highlightEndings,
                         )
                     }
                 } else {
@@ -151,6 +154,7 @@ private fun WordGroupSection(
     endings: String?,
     gender: Gender?,
     informAboutNoEndings: Boolean = false,
+    highlightEndings: Boolean = false,
 ) {
     wordGroup?.let { wordGroup ->
         FlowRow(
@@ -174,7 +178,12 @@ private fun WordGroupSection(
             if (!endings.isNullOrBlank()) {
                 HorizontalSpacerXXS()
                 Text(
-                    text = stringResource(R.string.quiz_endings, endings),
+                    text = buildAnnotatedString {
+                        if (highlightEndings) {
+                            pushStyle(SpanStyle(color = SvenskaTheme.colors.primary))
+                        }
+                        append(stringResource(R.string.quiz_endings, endings))
+                    },
                     style = SvenskaTheme.typography.bodyLarge,
                 )
             } else if (informAboutNoEndings) {

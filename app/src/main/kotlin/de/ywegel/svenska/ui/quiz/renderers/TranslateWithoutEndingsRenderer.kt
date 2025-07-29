@@ -67,7 +67,7 @@ class TranslateWithoutEndingsRenderer : QuizRenderer<
         question: QuizQuestion<UserAnswer.TranslateWithoutEndingsAnswer>,
         userAnswer: UserAnswer.TranslateWithoutEndingsAnswer,
         userAnswerResult: Boolean,
-        wordGroupSection: (@Composable () -> Unit)?,
+        wordGroupSection: (@Composable (highlightEndings: Boolean) -> Unit)?,
     ) {
         val haptic = LocalHapticFeedback.current
 
@@ -109,7 +109,7 @@ class TranslateWithoutEndingsRenderer : QuizRenderer<
                 )
                 wordGroupSection?.let {
                     VerticalSpacerXXS()
-                    it()
+                    it(false)
                 }
                 VerticalSpacerXXS()
                 Text(

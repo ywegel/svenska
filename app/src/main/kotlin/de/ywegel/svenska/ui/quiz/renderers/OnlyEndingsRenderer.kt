@@ -14,6 +14,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.style.TextAlign
 import de.ywegel.svenska.R
+import de.ywegel.svenska.domain.quiz.model.AdditionalInfo
 import de.ywegel.svenska.domain.quiz.model.QuizQuestion
 import de.ywegel.svenska.domain.quiz.model.UserAnswer
 import de.ywegel.svenska.ui.common.VerticalSpacerXXS
@@ -63,7 +64,7 @@ class OnlyEndingsRenderer : QuizRenderer<
         question: QuizQuestion<UserAnswer.OnlyEndingsAnswer>,
         userAnswer: UserAnswer.OnlyEndingsAnswer,
         userAnswerResult: Boolean,
-        wordGroupSection: @Composable (() -> Unit)?,
+        wordGroupSection: @Composable ((highlightEndings: Boolean) -> Unit)?,
     ) {
         val cardColors = if (userAnswerResult) {
             CardDefaults.cardColors()
@@ -89,7 +90,14 @@ class OnlyEndingsRenderer : QuizRenderer<
                 )
                 wordGroupSection?.let {
                     VerticalSpacerXXS()
-                    it()
+                    it(true)
+                }
+                (question.promptData as? AdditionalInfo.SolutionInfo)?.vocabulary?.word?.let {
+                    VerticalSpacerXXS()
+                    Text(
+                        text = it,
+                        style = SvenskaTheme.typography.bodyLarge,
+                    )
                 }
                 VerticalSpacerXXS()
                 Text(
