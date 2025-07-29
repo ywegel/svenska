@@ -154,6 +154,7 @@
     <string name="quiz_result_correct">Correct!</string>
     <string name="quiz_result_wrong">Wrong! The correct answer was: </string>
     <string name="quiz_result_wrong_user_answer">Your answer was: </string>
+    <string name="quiz_endings_only_translation">Translates to: %1$d</string>
 
     <string name="quiz_result_endings_formated">With:</string>
 
