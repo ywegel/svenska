@@ -64,6 +64,16 @@ enum class OnboardingPage {
         }
         return stringResource(id)
     }
+
+    @ReadOnlyComposable
+    @Composable
+    fun getAdditionalContentText(): String? {
+        val id = when (this) {
+            QUIZ -> R.string.onboarding_page_content_quiz_expanded
+            else -> null
+        }
+        return id?.let { stringResource(it) }
+    }
 }
 
 @Composable
