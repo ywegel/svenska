@@ -19,12 +19,6 @@ jobs:
           token: ${{ secrets.ADMIN_PAT }}
           fetch-depth: 0
 
-      - name: Set up JDK
-        uses: actions/setup-java@v3
-        with:
-          distribution: 'temurin'
-          java-version: '22'
-
       - name: Validate versionName
         env:
           VERSION_NAME: ${{ github.event.inputs.versionName }}
