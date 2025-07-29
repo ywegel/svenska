@@ -25,6 +25,7 @@ sealed class AdditionalInfo {
         val wordGroup: WordGroup?,
         val endings: String?,
         val gender: Gender? = null,
+        val vocabulary: Vocabulary? = null,
     ) : AdditionalInfo()
 
     object None : AdditionalInfo()

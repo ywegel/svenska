@@ -18,7 +18,6 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.style.TextAlign
 import de.ywegel.svenska.R
 import de.ywegel.svenska.data.model.WordGroup
 import de.ywegel.svenska.ui.common.HorizontalSpacerS
@@ -26,7 +25,6 @@ import de.ywegel.svenska.ui.common.vocabulary.mainGroupAbbreviation
 import de.ywegel.svenska.ui.common.vocabulary.subGroupAbbreviation
 import de.ywegel.svenska.ui.common.vocabulary.wordGroupBadge.AnimatedWordGroupBadgeExtended
 import de.ywegel.svenska.ui.theme.Spacings
-import de.ywegel.svenska.ui.theme.SvenskaTheme
 import kotlinx.coroutines.delay
 
 @Composable
@@ -43,12 +41,6 @@ fun WordGroupPage(navigateToWordGroupScreen: () -> Unit) {
                 Text(stringResource(R.string.onboarding_page_content_word_groups_find_out_more))
             }
         }
-        Text(
-            text = stringResource(R.string.onboarding_page_content_word_groups_or),
-            modifier = Modifier.fillMaxWidth(),
-            textAlign = TextAlign.Center,
-            style = SvenskaTheme.typography.labelMedium,
-        )
     }
 }
 

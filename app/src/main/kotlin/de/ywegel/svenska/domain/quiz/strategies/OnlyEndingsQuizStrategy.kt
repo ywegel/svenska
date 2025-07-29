@@ -17,6 +17,7 @@ class OnlyEndingsQuizStrategy : QuizStrategy<UserAnswer.OnlyEndingsAnswer, Boole
                 wordGroup = vocabulary.wordGroup,
                 endings = vocabulary.ending,
                 gender = vocabulary.gender,
+                vocabulary = vocabulary,
             ),
         )
     }

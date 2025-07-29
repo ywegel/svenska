@@ -311,10 +311,16 @@ private fun AddContainerButtonWithTextDialog(
         inputText = ""
     }
 
+    val dialogTitle = if (inputText.isEmpty()) {
+        stringResource(R.string.containers_add_title)
+    } else {
+        stringResource(R.string.containers_edit_title)
+    }
+
     if (showDialog) {
         AlertDialog(
             onDismissRequest = { showDialog = false },
-            title = { Text(stringResource(R.string.containers_add_title)) },
+            title = { Text(dialogTitle) },
             text = {
                 Column {
                     VerticalSpacerXS()

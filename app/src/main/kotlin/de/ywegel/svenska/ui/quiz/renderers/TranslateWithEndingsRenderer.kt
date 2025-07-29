@@ -92,7 +92,7 @@ class TranslateWithEndingsRenderer : QuizRenderer<
         question: QuizQuestion<UserAnswer.TranslateWithEndingsAnswer>,
         userAnswer: UserAnswer.TranslateWithEndingsAnswer,
         userAnswerResult: TranslateWithEndingsResult,
-        wordGroupSection: (@Composable () -> Unit)?,
+        wordGroupSection: (@Composable (highlightEndings: Boolean) -> Unit)?,
     ) {
         val context = LocalContext.current
         val colors = SvenskaTheme.colors
@@ -144,7 +144,7 @@ class TranslateWithEndingsRenderer : QuizRenderer<
                 )
                 wordGroupSection?.let {
                     VerticalSpacerXXS()
-                    it()
+                    it(false)
                 }
                 VerticalSpacerXXS()
                 Text(
