@@ -1,0 +1,71 @@
+name: Bump Version and Create Tag
+
+on:
+  workflow_dispatch:
+    inputs:
+      versionName:
+        description: 'New version name (e.g., 2025.7.0)'
+        required: true
+permissions:
+  contents: write
+
+jobs:
+  bump:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          fetch-depth: 0
+
+      - name: Set up JDK
+        uses: actions/setup-java@v3
+        with:
+          distribution: 'temurin'
+          java-version: '22'
+
+      - name: Validate versionName
+        env:
+          VERSION_NAME: ${{ github.event.inputs.versionName }}
+        run: |
+          if ! echo "$VERSION_NAME" | grep -E '^[0-9]+\.[0-9]+\.[0-9]+(-[a-zA-Z0-9]+)?$'; then
+            echo "Error: Invalid versionName format. Expected format: x.y.z or x.y.z-beta (e.g., 2025.7.0)"
+            exit 1
+          fi
+
+      - name: Bump version in libs.versions.toml
+        env:
+          VERSION_NAME: ${{ github.event.inputs.versionName }}
+          VERSION_CODE: ${{ github.run_number }}
+        run: |
+          TOML_FILE="gradle/libs.versions.toml"
+          if [ ! -f "$TOML_FILE" ]; then
+            echo "Error: $TOML_FILE not found"
+            exit 1
+          fi
+          if [ $(grep -c "app-version-code = " $TOML_FILE) -ne 1 ]; then
+            echo "Error: Multiple app-version-code entries found"
+            exit 1
+          fi
+          if [ $(grep -c "app-version-name = " $TOML_FILE) -ne 1 ]; then
+            echo "Error: Multiple app-version-name entries found"
+            exit 1
+          fi
+          sed -i "s/app-version-code = \"[0-9]*\"/app-version-code = \"$VERSION_CODE\"/" $TOML_FILE
+          sed -i "s/app-version-name = \".*\"/app-version-name = \"$VERSION_NAME\"/" $TOML_FILE
+
+      - name: Commit changes
+        run: |
+          git config --local user.email "action@github.com"
+          git config --local user.name "GitHub Action"
+          git add gradle/libs.versions.toml
+          git commit -m "Bump version to ${{ github.event.inputs.versionName }}" || exit 1
+
+      - name: Push changes
+        run: git push || exit 1
+
+      - name: Create tag
+        run: |
+          git tag v${{ github.event.inputs.versionName }}
+          git push origin v${{ github.event.inputs.versionName }} || exit 1
