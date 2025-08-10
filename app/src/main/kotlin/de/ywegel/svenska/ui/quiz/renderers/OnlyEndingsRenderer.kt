@@ -92,10 +92,10 @@ class OnlyEndingsRenderer : QuizRenderer<
                     VerticalSpacerXXS()
                     it(true)
                 }
-                (question.promptData as? AdditionalInfo.SolutionInfo)?.vocabulary?.word?.let {
+                (question.promptData as? AdditionalInfo.SolutionInfo)?.vocabulary?.translation?.let {
                     VerticalSpacerXXS()
                     Text(
-                        text = it,
+                        text = stringResource(R.string.quiz_endings_only_translation, it),
                         style = SvenskaTheme.typography.bodyLarge,
                     )
                 }
