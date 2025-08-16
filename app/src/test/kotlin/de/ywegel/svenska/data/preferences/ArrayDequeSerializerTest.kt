@@ -1,6 +1,7 @@
 package de.ywegel.svenska.data.preferences
 
 import de.ywegel.svenska.jsonConfig
+import de.ywegel.svenska.serializers.ArrayDequeSerializer
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.Test

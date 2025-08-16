@@ -118,7 +118,7 @@ fun vocabularies(containerId: Int = 1): List<Vocabulary> = listOf(
 )
 
 @VisibleForTesting
-fun container(): VocabularyContainer = VocabularyContainer(1, "Swedish vocabulary")
+fun container(id: Int = 1): VocabularyContainer = VocabularyContainer(id, "Swedish vocabulary")
 
 @VisibleForTesting
 fun containers(): List<VocabularyContainer> = listOf(
