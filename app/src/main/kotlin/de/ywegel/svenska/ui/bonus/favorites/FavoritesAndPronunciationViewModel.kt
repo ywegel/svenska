@@ -87,16 +87,16 @@ class FavoritesAndPronunciationViewModel @Inject constructor(
             toggleVocabularyFavoriteUseCase(vocabularyId, isFavorite)
         }
     }
-}
 
-private fun MutableStateFlow<FavoritesUiState>.updateIfSuccessState(
-    block: (FavoritesUiState.Success) -> FavoritesUiState,
-) {
-    this.update {
-        if (it is FavoritesUiState.Success) {
-            block(it)
-        } else {
-            it
+    private fun MutableStateFlow<FavoritesUiState>.updateIfSuccessState(
+        block: (FavoritesUiState.Success) -> FavoritesUiState,
+    ) {
+        this.update {
+            if (it is FavoritesUiState.Success) {
+                block(it)
+            } else {
+                it
+            }
         }
     }
 }

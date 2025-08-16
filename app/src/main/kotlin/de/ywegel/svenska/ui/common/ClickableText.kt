@@ -1,5 +1,6 @@
 package de.ywegel.svenska.ui.common
 
+import androidx.annotation.VisibleForTesting
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Column
@@ -62,6 +63,7 @@ fun ClickableTextPreview(@PreviewParameter(ClickableTextPreviewProvider::class) 
     }
 }
 
+@VisibleForTesting
 private class ClickableTextPreviewProvider : PreviewParameterProvider<ClickableTextPreviewData> {
     override val values: Sequence<ClickableTextPreviewData> = listOf(
         ClickableTextPreviewData(title = "Short title"),

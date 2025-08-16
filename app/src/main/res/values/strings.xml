@@ -45,8 +45,6 @@
     <string name="lang_numbers_eighty">å*tt*io</string>
     <string name="lang_numbers_ninety">ni*tt*io</string>
     <string name="lang_numbers_hundred">(ett) hu*nd*ra</string>
-    <string name="lang_numbers_thousand">(ett) t*u*sen</string>
-    <string name="lang_numbers_million">en milj*o*n</string>
 
     <string name="lang_noun">Noun</string>
     <string name="lang_verb">Verb</string>
@@ -86,7 +84,7 @@
     <string name="containers_add_title">Add a new container</string>
     <string name="containers_edit_title">Edit container</string>
     <string name="containers_add_input_label">Container name</string>
-    <string name="containers_add_input_error">Container name can\'t be empty</string>
+    <string name="containers_add_input_error">Container name can&#8217;t be empty</string>
 
     <string name="container_title_edit_mode">Edit containers</string>
 
@@ -158,7 +156,6 @@
 
     <string name="quiz_result_endings_formated">With:</string>
 
-    <string name="quiz_result_with_endings_all_correct">Correct!</string>
     <string name="quiz_result_with_endings_wrong_translation">Wrong translation! The correct answer was: </string>
     <string name="quiz_result_with_endings_wrong_endings">Wrong endings! The correct answer was: </string>
     <string name="quiz_result_with_endings_wrong_both">Wrong endings and translation! The correct answer was: </string>
@@ -169,9 +166,9 @@
     <string name="quiz_finished_correct_answers_label">%1$d out of %2$d correct</string>
     <string name="quiz_finished_score_label">Score: %1$d%%</string>
 
-    <string name="quiz_finished_motivation_awesome">Fantastic! You\'re almost fluent 🎉</string>
+    <string name="quiz_finished_motivation_awesome">Fantastic! You&#8217;re almost fluent 🎉</string>
     <string name="quiz_finished_motivation_good_job">Well done! Keep it up 💪</string>
-    <string name="quiz_finished_motivation_keep_going">You\'re on the right track 👣</string>
+    <string name="quiz_finished_motivation_keep_going">You&#8217;re on the right track 👣</string>
     <string name="quiz_finished_motivation_dont_give_up">Don’t give up – practice makes perfect 🔁</string>
 
     <string name="quiz_error_title">😵 Oops!</string>
@@ -238,8 +235,6 @@
     <string name="settings_overview_compact_vocabulary_item_description">Show compact Vocabulary Item for containers</string>
     <string name="settings_search_settings_title">Configure the search</string>
     <string name="settings_search_settings_description">Configure the search behaviour and appearance</string>
-    <string name="settings_search_compact_vocabulary_item_title">Compact Item - Search</string>
-    <string name="settings_search_compact_vocabulary_item_description">Show compact Vocabulary Item for the search</string>
     <string name="settings_naviagate_word_importer_screen_title">Show word importer</string>
     <string name="settings_naviagate_word_importer_screen_description">Import words from a file</string>
     <string name="settings_naviagate_about_libraries_screen_title">Licenses</string>
@@ -260,7 +255,7 @@
     <string name="onboarding_title">Introduction</string>
     <string name="onboarding_button_next">Next</string>
     <string name="onboarding_button_skip">Skip</string>
-    <string name="onboarding_button_start">Let\'s go!</string>
+    <string name="onboarding_button_start">Let&#8217;s go!</string>
 
     <string name="onboarding_page_title_introduction">Welcome</string>
     <string name="onboarding_page_content_introduction">Svenska is a simple app to make learning swedish vocabulary easier.</string>

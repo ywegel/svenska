@@ -102,8 +102,8 @@ private fun <T> ChipRow(
     items: List<T>,
     selectedItem: T?,
     onItemSelected: (T) -> Unit,
-    labelProvider: @Composable (T) -> String,
     animate: Boolean = true,
+    labelProvider: @Composable (T) -> String,
 ) {
     LazyRow(
         modifier = Modifier.fillMaxWidth(),
