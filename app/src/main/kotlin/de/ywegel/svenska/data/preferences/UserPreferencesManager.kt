@@ -13,6 +13,7 @@ import dagger.hilt.android.qualifiers.ApplicationContext
 import de.ywegel.svenska.data.SortOrder
 import de.ywegel.svenska.domain.search.OnlineSearchType
 import de.ywegel.svenska.jsonConfig
+import de.ywegel.svenska.serializers.ArrayDequeSerializer
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.map

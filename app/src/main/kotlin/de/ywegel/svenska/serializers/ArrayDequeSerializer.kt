@@ -1,4 +1,4 @@
-package de.ywegel.svenska.data.preferences
+package de.ywegel.svenska.serializers
 
 import kotlinx.serialization.KSerializer
 import kotlinx.serialization.builtins.ListSerializer
@@ -8,7 +8,7 @@ import kotlinx.serialization.encoding.Decoder
 import kotlinx.serialization.encoding.Encoder
 
 object ArrayDequeSerializer : KSerializer<ArrayDeque<String>> {
-    private val delegateSerializer = ListSerializer(String.serializer())
+    private val delegateSerializer = ListSerializer(String.Companion.serializer())
 
     override val descriptor: SerialDescriptor = delegateSerializer.descriptor
 

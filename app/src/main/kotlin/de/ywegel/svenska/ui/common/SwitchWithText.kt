@@ -1,5 +1,6 @@
 package de.ywegel.svenska.ui.common
 
+import androidx.annotation.VisibleForTesting
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Column
@@ -82,6 +83,7 @@ private fun SwitchWithTextPreview(@PreviewParameter(SwitchWithTextPreviewProvide
     }
 }
 
+@VisibleForTesting
 private class SwitchWithTextPreviewProvider : PreviewParameterProvider<SwitchTextPreviewData> {
     override val values: Sequence<SwitchTextPreviewData> = listOf(
         SwitchTextPreviewData(title = "Short title", description = null),

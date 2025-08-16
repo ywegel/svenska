@@ -16,8 +16,16 @@ class WordGroupConverter {
     fun fromString(value: String): WordGroup {
         val parts = value.split(":")
         return when (parts[0]) {
-            "VERB" -> WordGroup.Verb(WordGroup.VerbSubgroup.valueOf(parts[1]))
-            "NOUN" -> WordGroup.Noun(WordGroup.NounSubgroup.valueOf(parts[1]))
+            "VERB" -> WordGroup.Verb(
+                parts.getOrNull(1)?.let { WordGroup.VerbSubgroup.valueOf(it) }
+                    ?: WordGroup.VerbSubgroup.UNDEFINED,
+            )
+
+            "NOUN" -> WordGroup.Noun(
+                parts.getOrNull(1)?.let { WordGroup.NounSubgroup.valueOf(it) }
+                    ?: WordGroup.NounSubgroup.UNDEFINED,
+            )
+
             "ADJECTIVE" -> WordGroup.Adjective
             else -> WordGroup.Other
         }
