@@ -4,6 +4,7 @@ import android.content.ContentResolver
 import android.net.Uri
 import android.util.Log
 import de.ywegel.svenska.data.model.VocabularyContainer
+import de.ywegel.svenska.domain.wordImporter.WordParser
 import de.ywegel.svenska.jsonConfig
 import de.ywegel.svenska.ui.wordImporter.ImporterChapter
 import kotlinx.coroutines.CoroutineDispatcher

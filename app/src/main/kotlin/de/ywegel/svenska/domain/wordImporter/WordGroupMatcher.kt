@@ -1,4 +1,4 @@
-package de.ywegel.svenska.data
+package de.ywegel.svenska.domain.wordImporter
 
 import de.ywegel.svenska.data.model.Gender
 import de.ywegel.svenska.data.model.WordGroup

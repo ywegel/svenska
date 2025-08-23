@@ -10,6 +10,7 @@ import de.ywegel.svenska.assertVocabularyListEqualsIgnoringTimestamps
 import de.ywegel.svenska.data.model.Gender
 import de.ywegel.svenska.data.model.Vocabulary
 import de.ywegel.svenska.data.model.WordGroup
+import de.ywegel.svenska.domain.wordImporter.WordParserImpl
 import de.ywegel.svenska.fakes.VocabularyRepositoryFake
 import io.mockk.clearAllMocks
 import io.mockk.every
@@ -92,7 +93,9 @@ class FileRepositoryWordParserRoundTripTest {
 
         every { contentResolver.openInputStream(uri) } returns inputStream
 
-        val repository = FileRepositoryImpl(contentResolver, vocRepository, vocRepository, WordParserImpl())
+        val repository = FileRepositoryImpl(contentResolver, vocRepository, vocRepository,
+            WordParserImpl()
+        )
 
         // When
         val (containerId, entries) = repository.parseFile(uri, testDispatcher).getOrNull()

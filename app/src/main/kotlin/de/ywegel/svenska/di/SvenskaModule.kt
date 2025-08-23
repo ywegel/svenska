@@ -20,8 +20,6 @@ import de.ywegel.svenska.data.FavoritesAndPronunciationsRepository
 import de.ywegel.svenska.data.FileRepository
 import de.ywegel.svenska.data.FileRepositoryImpl
 import de.ywegel.svenska.data.VocabularyRepository
-import de.ywegel.svenska.data.WordParser
-import de.ywegel.svenska.data.WordParserImpl
 import de.ywegel.svenska.data.db.ContainerDao
 import de.ywegel.svenska.data.db.VocabularyDao
 import de.ywegel.svenska.data.db.VocabularyDatabase
@@ -29,6 +27,8 @@ import de.ywegel.svenska.data.impl.ContainerRepositoryImpl
 import de.ywegel.svenska.data.impl.FavoritesAndPronunciationsRepositoryImpl
 import de.ywegel.svenska.data.impl.VocabularyRepositoryImpl
 import de.ywegel.svenska.data.preferences.OVERVIEW_PREFERENCES_NAME
+import de.ywegel.svenska.domain.wordImporter.WordParser
+import de.ywegel.svenska.domain.wordImporter.WordParserImpl
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
