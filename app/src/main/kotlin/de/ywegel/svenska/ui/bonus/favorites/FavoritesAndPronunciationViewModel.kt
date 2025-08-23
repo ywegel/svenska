@@ -6,7 +6,7 @@ import androidx.lifecycle.viewModelScope
 import com.ramcosta.composedestinations.generated.navArgs
 import dagger.hilt.android.lifecycle.HiltViewModel
 import de.ywegel.svenska.data.ContainerRepository
-import de.ywegel.svenska.data.VocabularyRepository
+import de.ywegel.svenska.data.FavoritesAndPronunciationsRepository
 import de.ywegel.svenska.data.model.Vocabulary
 import de.ywegel.svenska.di.IoDispatcher
 import de.ywegel.svenska.domain.ToggleVocabularyFavoriteUseCase
@@ -22,8 +22,8 @@ import javax.inject.Inject
 
 @HiltViewModel
 class FavoritesAndPronunciationViewModel @Inject constructor(
-    private val vocabularyRepository: VocabularyRepository,
     private val containerRepository: ContainerRepository,
+    private val favoritesAndPronunciationsRepository: FavoritesAndPronunciationsRepository,
     private val toggleVocabularyFavoriteUseCase: ToggleVocabularyFavoriteUseCase,
     savedStateHandle: SavedStateHandle,
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
@@ -38,8 +38,11 @@ class FavoritesAndPronunciationViewModel @Inject constructor(
         viewModelScope.launch(ioDispatcher) {
             _uiState.value = FavoritesUiState.Loading
             val result = when (navArgs.screenType) {
-                BonusScreen.Favorites -> runCatching { vocabularyRepository.getFavorites(null) }
-                BonusScreen.SpecialPronunciation -> runCatching { vocabularyRepository.getPronunciations(null) }
+                BonusScreen.Favorites -> runCatching { favoritesAndPronunciationsRepository.getFavorites(null) }
+                BonusScreen.SpecialPronunciation -> runCatching {
+                    favoritesAndPronunciationsRepository.getPronunciations(null)
+                }
+
                 else -> Result.failure(
                     // This can't happen, as you can only navigate to FavoritesAndPronunciationScreen for Favorites or Pronunciation
                     IllegalStateException("This screen type is not supported"),

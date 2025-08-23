@@ -67,22 +67,6 @@ class VocabularyRepositoryImpl @Inject constructor(private val dao: VocabularyDa
         return dao.isVocabularyFavorite(vocabularyId)
     }
 
-    override fun getFavorites(containerId: Int?): List<Vocabulary> {
-        return if (containerId == null) {
-            dao.getAllFavorites()
-        } else {
-            dao.getFavoritesByContainerId(containerId)
-        }
-    }
-
-    override fun getPronunciations(containerId: Int?): List<Vocabulary> {
-        return if (containerId == null) {
-            dao.getAllPronunciations()
-        } else {
-            dao.getPronunciationsByContainerId(containerId)
-        }
-    }
-
     override suspend fun getAllVocabulariesWithEndings(containerId: Int?): List<Vocabulary> {
         return containerId?.let { id ->
             dao.getAllVocabulariesWithEndings(id)

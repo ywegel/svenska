@@ -26,10 +26,6 @@ interface VocabularyRepository {
 
     fun isVocabularyFavorite(vocabularyId: Int): Flow<Boolean>
 
-    fun getFavorites(containerId: Int?): List<Vocabulary>
-
-    fun getPronunciations(containerId: Int?): List<Vocabulary>
-
     suspend fun getAllVocabulariesWithEndings(containerId: Int?): List<Vocabulary>
 }
 

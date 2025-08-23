@@ -16,6 +16,7 @@ import dagger.hilt.InstallIn
 import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
 import de.ywegel.svenska.data.ContainerRepository
+import de.ywegel.svenska.data.FavoritesAndPronunciationsRepository
 import de.ywegel.svenska.data.FileRepository
 import de.ywegel.svenska.data.FileRepositoryImpl
 import de.ywegel.svenska.data.VocabularyRepository
@@ -25,6 +26,7 @@ import de.ywegel.svenska.data.db.ContainerDao
 import de.ywegel.svenska.data.db.VocabularyDao
 import de.ywegel.svenska.data.db.VocabularyDatabase
 import de.ywegel.svenska.data.impl.ContainerRepositoryImpl
+import de.ywegel.svenska.data.impl.FavoritesAndPronunciationsRepositoryImpl
 import de.ywegel.svenska.data.impl.VocabularyRepositoryImpl
 import de.ywegel.svenska.data.preferences.OVERVIEW_PREFERENCES_NAME
 import kotlinx.coroutines.CoroutineDispatcher
@@ -67,6 +69,11 @@ class SvenskaModule {
     @Singleton
     @Provides
     fun provideContainerRepository(dao: ContainerDao): ContainerRepository = ContainerRepositoryImpl(dao)
+
+    @Singleton
+    @Provides
+    fun provideFavoritesAndPronunciationsRepository(dao: VocabularyDao): FavoritesAndPronunciationsRepository =
+        FavoritesAndPronunciationsRepositoryImpl(dao)
 
     @Singleton
     @Provides

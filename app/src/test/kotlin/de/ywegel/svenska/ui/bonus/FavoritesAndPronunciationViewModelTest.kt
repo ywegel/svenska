@@ -65,8 +65,8 @@ class FavoritesAndPronunciationViewModelTest {
             mapOf("screenType" to screen),
         )
         return FavoritesAndPronunciationViewModel(
-            vocabularyRepository = repository,
             containerRepository = repository,
+            favoritesAndPronunciationsRepository = repository,
             savedStateHandle = savedStateHandle,
             ioDispatcher = testDispatcher,
             toggleVocabularyFavoriteUseCase = ToggleVocabularyFavoriteUseCase(
@@ -128,8 +128,8 @@ class FavoritesAndPronunciationViewModelTest {
 
         val savedStateHandle = SavedStateHandle(mapOf("screenType" to BonusScreen.Favorites))
         val viewModel = FavoritesAndPronunciationViewModel(
-            vocabularyRepository = throwingRepository,
             containerRepository = throwingRepository,
+            favoritesAndPronunciationsRepository = throwingRepository,
             savedStateHandle = savedStateHandle,
             ioDispatcher = testDispatcher,
             toggleVocabularyFavoriteUseCase = ToggleVocabularyFavoriteUseCase(
