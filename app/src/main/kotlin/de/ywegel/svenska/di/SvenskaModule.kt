@@ -18,11 +18,11 @@ import dagger.hilt.components.SingletonComponent
 import de.ywegel.svenska.data.FileRepository
 import de.ywegel.svenska.data.FileRepositoryImpl
 import de.ywegel.svenska.data.VocabularyRepository
-import de.ywegel.svenska.data.VocabularyRepositoryImpl
 import de.ywegel.svenska.data.WordParser
 import de.ywegel.svenska.data.WordParserImpl
 import de.ywegel.svenska.data.db.VocabularyDao
 import de.ywegel.svenska.data.db.VocabularyDatabase
+import de.ywegel.svenska.data.impl.VocabularyRepositoryImpl
 import de.ywegel.svenska.data.preferences.OVERVIEW_PREFERENCES_NAME
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
