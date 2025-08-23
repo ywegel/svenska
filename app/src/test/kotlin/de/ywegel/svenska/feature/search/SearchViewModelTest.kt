@@ -44,7 +44,8 @@ class SearchViewModelTest {
         fakePrefs = UserPreferencesManagerFake()
         viewModel = SearchViewModel(
             savedStateHandle = SavedStateHandle(),
-            repository = fakeRepo,
+            vocabularyRepository = fakeRepo,
+            containerRepository = fakeRepo,
             userPreferencesManager = fakePrefs,
             ioDispatcher = testDispatcher,
             toggleVocabularyFavoriteUseCase = ToggleVocabularyFavoriteUseCase(

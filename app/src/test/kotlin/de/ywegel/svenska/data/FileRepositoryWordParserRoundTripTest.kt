@@ -85,14 +85,14 @@ class FileRepositoryWordParserRoundTripTest {
         )
 
         // Given
-        val vocRepository: VocabularyRepository = VocabularyRepositoryFake()
+        val vocRepository: VocabularyRepositoryFake = VocabularyRepositoryFake()
         val contentResolver: ContentResolver = mockk()
         val inputStream = javaClass.classLoader?.getResourceAsStream("sample_words.json")
         val uri = mockk<Uri>()
 
         every { contentResolver.openInputStream(uri) } returns inputStream
 
-        val repository = FileRepositoryImpl(contentResolver, vocRepository, WordParserImpl())
+        val repository = FileRepositoryImpl(contentResolver, vocRepository, vocRepository, WordParserImpl())
 
         // When
         val (containerId, entries) = repository.parseFile(uri, testDispatcher).getOrNull()

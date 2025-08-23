@@ -5,6 +5,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.ramcosta.composedestinations.generated.navArgs
 import dagger.hilt.android.lifecycle.HiltViewModel
+import de.ywegel.svenska.data.ContainerRepository
 import de.ywegel.svenska.data.VocabularyRepository
 import de.ywegel.svenska.data.model.Vocabulary
 import de.ywegel.svenska.di.IoDispatcher
@@ -21,7 +22,8 @@ import javax.inject.Inject
 
 @HiltViewModel
 class FavoritesAndPronunciationViewModel @Inject constructor(
-    private val repository: VocabularyRepository,
+    private val vocabularyRepository: VocabularyRepository,
+    private val containerRepository: ContainerRepository,
     private val toggleVocabularyFavoriteUseCase: ToggleVocabularyFavoriteUseCase,
     savedStateHandle: SavedStateHandle,
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
@@ -36,8 +38,8 @@ class FavoritesAndPronunciationViewModel @Inject constructor(
         viewModelScope.launch(ioDispatcher) {
             _uiState.value = FavoritesUiState.Loading
             val result = when (navArgs.screenType) {
-                BonusScreen.Favorites -> runCatching { repository.getFavorites(null) }
-                BonusScreen.SpecialPronunciation -> runCatching { repository.getPronunciations(null) }
+                BonusScreen.Favorites -> runCatching { vocabularyRepository.getFavorites(null) }
+                BonusScreen.SpecialPronunciation -> runCatching { vocabularyRepository.getPronunciations(null) }
                 else -> Result.failure(
                     // This can't happen, as you can only navigate to FavoritesAndPronunciationScreen for Favorites or Pronunciation
                     IllegalStateException("This screen type is not supported"),
@@ -61,7 +63,7 @@ class FavoritesAndPronunciationViewModel @Inject constructor(
         }
         if (showContainerInformation) {
             viewModelScope.launch {
-                val container = repository.getContainerById(vocabulary.containerId)
+                val container = containerRepository.getContainerById(vocabulary.containerId)
                 _uiState.updateIfSuccessState {
                     it.copy(
                         detailViewState = VocabularyDetailState.Visible(

@@ -28,7 +28,8 @@ interface FileRepository {
 
 class FileRepositoryImpl @Inject constructor(
     private val contentResolver: ContentResolver,
-    private val repository: VocabularyRepository,
+    private val vocabularyRepository: VocabularyRepository,
+    private val containerRepository: ContainerRepository,
     private val wordParser: WordParser,
 ) : FileRepository {
 
@@ -61,7 +62,7 @@ class FileRepositoryImpl @Inject constructor(
             var lastChapterWordSize = 0
 
             entries.forEach { chapter ->
-                val newContainerId = repository.upsertContainer(VocabularyContainer(name = chapter.chapter))
+                val newContainerId = containerRepository.upsertContainer(VocabularyContainer(name = chapter.chapter))
 
                 chapter.words.asFlow()
                     .onEach { wordPair ->
@@ -71,7 +72,7 @@ class FileRepositoryImpl @Inject constructor(
                             containerId = newContainerId.toInt(),
                         )
 
-                        repository.upsertVocabulary(newVocabulary)
+                        vocabularyRepository.upsertVocabulary(newVocabulary)
                         lastChapterWordSize++
                     }
                     .sample(100)

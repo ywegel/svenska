@@ -6,6 +6,7 @@ import android.content.ContentResolver
 import android.net.Uri
 import assertk.assertThat
 import assertk.assertions.isEqualTo
+import de.ywegel.svenska.fakes.VocabularyRepositoryFake
 import de.ywegel.svenska.fakes.WordParserFake
 import de.ywegel.svenska.ui.wordImporter.ImporterChapter
 import io.mockk.clearAllMocks
@@ -35,7 +36,7 @@ class FileRepositoryTest {
 
     private lateinit var repository: FileRepository
     private lateinit var contentResolver: ContentResolver
-    private lateinit var vocRepository: VocabularyRepository
+    private lateinit var vocRepository: VocabularyRepositoryFake
     private val testDispatcher = StandardTestDispatcher()
 
     @BeforeEach
@@ -43,7 +44,7 @@ class FileRepositoryTest {
         Dispatchers.setMain(testDispatcher)
         contentResolver = mockk()
         vocRepository = mockk(relaxUnitFun = true, relaxed = true)
-        repository = FileRepositoryImpl(contentResolver, vocRepository, WordParserFake())
+        repository = FileRepositoryImpl(contentResolver, vocRepository, vocRepository, WordParserFake())
     }
 
     @AfterEach

@@ -4,7 +4,6 @@ import de.ywegel.svenska.data.SortOrder
 import de.ywegel.svenska.data.VocabularyRepository
 import de.ywegel.svenska.data.db.VocabularyDao
 import de.ywegel.svenska.data.model.Vocabulary
-import de.ywegel.svenska.data.model.VocabularyContainer
 import kotlinx.coroutines.flow.Flow
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -60,32 +59,12 @@ class VocabularyRepositoryImpl @Inject constructor(private val dao: VocabularyDa
 
     override suspend fun getVocabularyById(id: Int) = dao.getVocabularyById(id)
 
-    override fun getAllContainers(): Flow<List<VocabularyContainer>> {
-        return dao.getAllContainers()
-    }
-
     override suspend fun toggleVocabularyFavorite(vocabularyId: Int, isFavorite: Boolean) {
         dao.toggleVocabularyFavorite(vocabularyId, isFavorite)
     }
 
     override fun isVocabularyFavorite(vocabularyId: Int): Flow<Boolean> {
         return dao.isVocabularyFavorite(vocabularyId)
-    }
-
-    override suspend fun getContainerById(id: Int): VocabularyContainer? {
-        return dao.getContainerById(id)
-    }
-
-    override suspend fun upsertContainer(container: VocabularyContainer): Long {
-        return dao.upsertContainer(container)
-    }
-
-    override suspend fun deleteContainerWithAllVocabulary(container: VocabularyContainer) {
-        dao.deleteContainerWithVocabulary(container)
-    }
-
-    override fun getAllContainerNamesWithIds(): List<VocabularyContainer> {
-        return dao.getAllContainerNamesWithId()
     }
 
     override fun getFavorites(containerId: Int?): List<Vocabulary> {

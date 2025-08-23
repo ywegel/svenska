@@ -1,5 +1,6 @@
 package de.ywegel.svenska.fakes
 
+import de.ywegel.svenska.data.ContainerRepository
 import de.ywegel.svenska.data.SortOrder
 import de.ywegel.svenska.data.VocabularyRepository
 import de.ywegel.svenska.data.model.Vocabulary
@@ -12,7 +13,7 @@ import kotlinx.coroutines.runBlocking
 class VocabularyRepositoryFake(
     initialVocabulary: List<Vocabulary> = emptyList(),
     initialContainers: List<VocabularyContainer> = emptyList(),
-) : VocabularyRepository {
+) : VocabularyRepository, ContainerRepository {
 
     constructor(
         initialContainers: List<VocabularyContainer> = emptyList(),

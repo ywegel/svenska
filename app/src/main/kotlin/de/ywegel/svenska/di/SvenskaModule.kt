@@ -15,13 +15,16 @@ import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
+import de.ywegel.svenska.data.ContainerRepository
 import de.ywegel.svenska.data.FileRepository
 import de.ywegel.svenska.data.FileRepositoryImpl
 import de.ywegel.svenska.data.VocabularyRepository
 import de.ywegel.svenska.data.WordParser
 import de.ywegel.svenska.data.WordParserImpl
+import de.ywegel.svenska.data.db.ContainerDao
 import de.ywegel.svenska.data.db.VocabularyDao
 import de.ywegel.svenska.data.db.VocabularyDatabase
+import de.ywegel.svenska.data.impl.ContainerRepositoryImpl
 import de.ywegel.svenska.data.impl.VocabularyRepositoryImpl
 import de.ywegel.svenska.data.preferences.OVERVIEW_PREFERENCES_NAME
 import kotlinx.coroutines.CoroutineDispatcher
@@ -55,7 +58,15 @@ class SvenskaModule {
 
     @Singleton
     @Provides
+    fun provideContainerDao(db: VocabularyDatabase): ContainerDao = db.container()
+
+    @Singleton
+    @Provides
     fun provideVocabularyRepository(dao: VocabularyDao): VocabularyRepository = VocabularyRepositoryImpl(dao)
+
+    @Singleton
+    @Provides
+    fun provideContainerRepository(dao: ContainerDao): ContainerRepository = ContainerRepositoryImpl(dao)
 
     @Singleton
     @Provides
@@ -85,10 +96,16 @@ class SvenskaModule {
     @Singleton
     fun provideFileRepository(
         contentResolver: ContentResolver,
-        repository: VocabularyRepository,
+        vocabularyRepository: VocabularyRepository,
+        containerRepository: ContainerRepository,
         wordParser: WordParser,
     ): FileRepository {
-        return FileRepositoryImpl(contentResolver, repository, wordParser)
+        return FileRepositoryImpl(
+            contentResolver = contentResolver,
+            vocabularyRepository = vocabularyRepository,
+            containerRepository = containerRepository,
+            wordParser = wordParser,
+        )
     }
 
     @DefaultDispatcher
