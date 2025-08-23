@@ -83,9 +83,7 @@ class OverviewViewModel @Inject constructor(
                 }
             }
             .flatMapLatest { preferences ->
-                // TODO: maybe replace with a search without query
                 repository.getVocabularies(
-                    query = "",
                     containerId = containerId,
                     sortOrder = preferences.sortOrder,
                     reverse = preferences.revert,

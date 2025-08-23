@@ -93,8 +93,11 @@ class FileRepositoryWordParserRoundTripTest {
 
         every { contentResolver.openInputStream(uri) } returns inputStream
 
-        val repository = FileRepositoryImpl(contentResolver, vocRepository, vocRepository,
-            WordParserImpl()
+        val repository = FileRepositoryImpl(
+            contentResolver = contentResolver,
+            vocabularyRepository = vocRepository,
+            containerRepository = vocRepository,
+            wordParser = WordParserImpl(),
         )
 
         // When

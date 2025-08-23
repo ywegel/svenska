@@ -28,6 +28,8 @@ abstract class VocabularyDatabase : RoomDatabase() {
 
     abstract fun container(): ContainerDao
 
+    abstract fun search(): SearchDao
+
     class Callback @Inject constructor(
         private val vocabularyRepositoryProvider: Provider<VocabularyRepository>,
         private val containerRepositoryProvider: Provider<ContainerRepository>,

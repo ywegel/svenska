@@ -11,20 +11,7 @@ import javax.inject.Singleton
 @Singleton
 class VocabularyRepositoryImpl @Inject constructor(private val dao: VocabularyDao) : VocabularyRepository {
 
-    override fun getVocabularies(
-        query: String,
-        containerId: Int?,
-        sortOrder: SortOrder,
-        reverse: Boolean,
-    ): Flow<List<Vocabulary>> {
-        if (containerId == null) {
-            return dao.searchAllVocabularies(query)
-        }
-
-        if (query.isNotBlank()) {
-            return dao.searchVocabulariesById(containerId, query)
-        }
-
+    override fun getVocabularies(containerId: Int, sortOrder: SortOrder, reverse: Boolean): Flow<List<Vocabulary>> {
         return if (!reverse) {
             when (sortOrder) {
                 SortOrder.Word -> dao.getVocabulariesByWordASC(containerId)

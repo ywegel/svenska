@@ -7,12 +7,7 @@ import kotlinx.coroutines.flow.Flow
 
 interface VocabularyRepository {
 
-    fun getVocabularies(
-        query: String,
-        containerId: Int?,
-        sortOrder: SortOrder,
-        reverse: Boolean = false,
-    ): Flow<List<Vocabulary>>
+    fun getVocabularies(containerId: Int, sortOrder: SortOrder, reverse: Boolean = false): Flow<List<Vocabulary>>
 
     suspend fun getAllVocabulariesSnapshot(containerId: Int?): List<Vocabulary>
 

@@ -43,12 +43,6 @@ interface VocabularyDao {
     @Query("SELECT isFavorite FROM vocabulary WHERE id = :vocabularyId")
     fun isVocabularyFavorite(vocabularyId: Int): Flow<Boolean>
 
-    @Query("SELECT * FROM vocabulary WHERE containerId = :containerId AND (word LIKE '%' || :searchQuery || '%' OR translation LIKE '%' || :searchQuery || '%')")
-    fun searchVocabulariesById(containerId: Int, searchQuery: String): Flow<List<Vocabulary>>
-
-    @Query("SELECT * FROM vocabulary WHERE (word LIKE '%' || :searchQuery || '%' OR translation LIKE '%' || :searchQuery || '%')")
-    fun searchAllVocabularies(searchQuery: String): Flow<List<Vocabulary>>
-
     // Combined operations
     @Query("SELECT * FROM vocabulary ORDER BY created ASC")
     fun getVocabularies(): Flow<List<Vocabulary>>
