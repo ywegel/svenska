@@ -2,7 +2,7 @@ package de.ywegel.svenska.domain.addEdit
 
 import de.ywegel.svenska.data.model.Gender
 import de.ywegel.svenska.data.model.WordGroup
-import de.ywegel.svenska.data.vocabulary
+import de.ywegel.svenska.data.model.vocabulary
 import de.ywegel.svenska.ui.addEdit.AddEditUiState
 import de.ywegel.svenska.ui.addEdit.models.ViewWordGroup
 import de.ywegel.svenska.ui.addEdit.models.ViewWordSubGroup

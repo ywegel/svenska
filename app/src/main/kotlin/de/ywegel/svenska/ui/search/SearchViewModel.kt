@@ -5,8 +5,8 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.ramcosta.composedestinations.generated.navArgs
 import dagger.hilt.android.lifecycle.HiltViewModel
-import de.ywegel.svenska.data.SortOrder
-import de.ywegel.svenska.data.VocabularyRepository
+import de.ywegel.svenska.data.ContainerRepository
+import de.ywegel.svenska.data.SearchRepository
 import de.ywegel.svenska.data.model.Vocabulary
 import de.ywegel.svenska.data.preferences.UserPreferencesManager
 import de.ywegel.svenska.di.IoDispatcher
@@ -29,7 +29,8 @@ import javax.inject.Inject
 class SearchViewModel @Inject constructor(
     savedStateHandle: SavedStateHandle,
     private val toggleVocabularyFavoriteUseCase: ToggleVocabularyFavoriteUseCase,
-    private val repository: VocabularyRepository,
+    private val containerRepository: ContainerRepository,
+    private val searchRepository: SearchRepository,
     private val userPreferencesManager: UserPreferencesManager,
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
 ) : ViewModel(), VocabularyListCallbacks {
@@ -46,11 +47,9 @@ class SearchViewModel @Inject constructor(
 
     @OptIn(ExperimentalCoroutinesApi::class)
     val vocabularyFlow = _searchQuery.flatMapLatest {
-        repository.getVocabularies(
+        searchRepository.searchVocabularies(
             query = it,
             containerId = containerId,
-            sortOrder = SortOrder.Created,
-            reverse = false,
         )
     }.stateIn(
         scope = viewModelScope,
@@ -91,7 +90,7 @@ class SearchViewModel @Inject constructor(
         }
         if (showContainerInformation) {
             viewModelScope.launch {
-                val container = repository.getContainerById(vocabulary.containerId)
+                val container = containerRepository.getContainerById(vocabulary.containerId)
                 _uiState.update {
                     it.copy(
                         detailViewState = VocabularyDetailState.Visible(

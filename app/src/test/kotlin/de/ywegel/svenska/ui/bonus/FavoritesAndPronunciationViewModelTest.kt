@@ -2,7 +2,7 @@ package de.ywegel.svenska.ui.bonus
 
 import androidx.lifecycle.SavedStateHandle
 import app.cash.turbine.test
-import de.ywegel.svenska.data.vocabulary
+import de.ywegel.svenska.data.model.vocabulary
 import de.ywegel.svenska.domain.ToggleVocabularyFavoriteUseCase
 import de.ywegel.svenska.fakes.VocabularyRepositoryFake
 import de.ywegel.svenska.ui.bonus.favorites.FavoritesAndPronunciationViewModel
@@ -73,7 +73,8 @@ class FavoritesAndPronunciationViewModelTest {
             mapOf("screenType" to screen),
         )
         return FavoritesAndPronunciationViewModel(
-            repository = repository,
+            containerRepository = repository,
+            favoritesAndPronunciationsRepository = repository,
             savedStateHandle = savedStateHandle,
             ioDispatcher = testDispatcher,
             toggleVocabularyFavoriteUseCase = toggleVocabularyFavoriteUseCase,
@@ -132,7 +133,8 @@ class FavoritesAndPronunciationViewModelTest {
 
         val savedStateHandle = SavedStateHandle(mapOf("screenType" to BonusScreen.Favorites))
         val viewModel = FavoritesAndPronunciationViewModel(
-            repository = throwingRepository,
+            containerRepository = throwingRepository,
+            favoritesAndPronunciationsRepository = throwingRepository,
             savedStateHandle = savedStateHandle,
             ioDispatcher = testDispatcher,
             toggleVocabularyFavoriteUseCase = ToggleVocabularyFavoriteUseCase(

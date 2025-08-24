@@ -4,6 +4,7 @@ import de.ywegel.svenska.assertVocabularyEqualsIgnoringTimestamps
 import de.ywegel.svenska.data.model.Gender
 import de.ywegel.svenska.data.model.Vocabulary
 import de.ywegel.svenska.data.model.WordGroup
+import de.ywegel.svenska.domain.wordImporter.WordParserImpl
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.Arguments
 import org.junit.jupiter.params.provider.MethodSource

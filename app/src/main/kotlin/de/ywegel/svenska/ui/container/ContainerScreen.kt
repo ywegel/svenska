@@ -59,10 +59,10 @@ import com.ramcosta.composedestinations.generated.destinations.SwedishNumbersScr
 import com.ramcosta.composedestinations.generated.destinations.WordGroupsScreenDestination
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
 import de.ywegel.svenska.R
-import de.ywegel.svenska.data.GeneratorConstants
-import de.ywegel.svenska.data.container
-import de.ywegel.svenska.data.containers
+import de.ywegel.svenska.data.model.GeneratorConstants
 import de.ywegel.svenska.data.model.VocabularyContainer
+import de.ywegel.svenska.data.model.container
+import de.ywegel.svenska.data.model.containers
 import de.ywegel.svenska.navigation.SvenskaGraph
 import de.ywegel.svenska.ui.common.ConfirmButton
 import de.ywegel.svenska.ui.common.ConfirmableComponent

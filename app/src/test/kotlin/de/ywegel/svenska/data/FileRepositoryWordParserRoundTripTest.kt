@@ -7,9 +7,11 @@ import android.net.Uri
 import assertk.assertThat
 import assertk.assertions.isEqualTo
 import de.ywegel.svenska.assertVocabularyListEqualsIgnoringTimestamps
+import de.ywegel.svenska.data.impl.FileRepositoryImpl
 import de.ywegel.svenska.data.model.Gender
 import de.ywegel.svenska.data.model.Vocabulary
 import de.ywegel.svenska.data.model.WordGroup
+import de.ywegel.svenska.domain.wordImporter.WordParserImpl
 import de.ywegel.svenska.fakes.VocabularyRepositoryFake
 import io.mockk.clearAllMocks
 import io.mockk.every
@@ -85,14 +87,19 @@ class FileRepositoryWordParserRoundTripTest {
         )
 
         // Given
-        val vocRepository: VocabularyRepository = VocabularyRepositoryFake()
+        val vocRepository: VocabularyRepositoryFake = VocabularyRepositoryFake()
         val contentResolver: ContentResolver = mockk()
         val inputStream = javaClass.classLoader?.getResourceAsStream("sample_words.json")
         val uri = mockk<Uri>()
 
         every { contentResolver.openInputStream(uri) } returns inputStream
 
-        val repository = FileRepositoryImpl(contentResolver, vocRepository, WordParserImpl())
+        val repository = FileRepositoryImpl(
+            contentResolver = contentResolver,
+            vocabularyRepository = vocRepository,
+            containerRepository = vocRepository,
+            wordParser = WordParserImpl(),
+        )
 
         // When
         val (containerId, entries) = repository.parseFile(uri, testDispatcher).getOrNull()

@@ -1,6 +1,6 @@
 package de.ywegel.svenska.fakes
 
-import de.ywegel.svenska.data.SortOrder
+import de.ywegel.svenska.data.model.SortOrder
 import de.ywegel.svenska.data.preferences.AppPreferences
 import de.ywegel.svenska.data.preferences.OverviewPreferences
 import de.ywegel.svenska.data.preferences.SearchPreferences

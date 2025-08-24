@@ -5,8 +5,8 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.ramcosta.composedestinations.generated.navArgs
 import dagger.hilt.android.lifecycle.HiltViewModel
-import de.ywegel.svenska.data.SortOrder
 import de.ywegel.svenska.data.VocabularyRepository
+import de.ywegel.svenska.data.model.SortOrder
 import de.ywegel.svenska.data.model.Vocabulary
 import de.ywegel.svenska.data.preferences.UserPreferencesManager
 import de.ywegel.svenska.di.IoDispatcher
@@ -83,9 +83,7 @@ class OverviewViewModel @Inject constructor(
                 }
             }
             .flatMapLatest { preferences ->
-                // TODO: maybe replace with a search without query
                 repository.getVocabularies(
-                    query = "",
                     containerId = containerId,
                     sortOrder = preferences.sortOrder,
                     reverse = preferences.revert,

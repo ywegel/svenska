@@ -10,7 +10,7 @@ import androidx.datastore.preferences.core.emptyPreferences
 import androidx.datastore.preferences.core.stringPreferencesKey
 import androidx.datastore.preferences.preferencesDataStore
 import dagger.hilt.android.qualifiers.ApplicationContext
-import de.ywegel.svenska.data.SortOrder
+import de.ywegel.svenska.data.model.SortOrder
 import de.ywegel.svenska.domain.search.OnlineSearchType
 import de.ywegel.svenska.jsonConfig
 import de.ywegel.svenska.serializers.ArrayDequeSerializer

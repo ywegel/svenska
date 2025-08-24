@@ -35,12 +35,12 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.tooling.preview.PreviewParameterProvider
 import de.ywegel.svenska.R
-import de.ywegel.svenska.data.GeneratorConstants
-import de.ywegel.svenska.data.container
+import de.ywegel.svenska.data.model.GeneratorConstants
 import de.ywegel.svenska.data.model.Vocabulary
 import de.ywegel.svenska.data.model.VocabularyContainer
 import de.ywegel.svenska.data.model.WordGroup
-import de.ywegel.svenska.data.vocabulary
+import de.ywegel.svenska.data.model.container
+import de.ywegel.svenska.data.model.vocabulary
 import de.ywegel.svenska.ui.common.HorizontalSpacerS
 import de.ywegel.svenska.ui.common.VerticalSpacerXS
 import de.ywegel.svenska.ui.common.VerticalSpacerXXS

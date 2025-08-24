@@ -5,13 +5,9 @@
     "LongParameterList",
 )
 
-package de.ywegel.svenska.data
+package de.ywegel.svenska.data.model
 
 import androidx.annotation.VisibleForTesting
-import de.ywegel.svenska.data.model.Gender
-import de.ywegel.svenska.data.model.Vocabulary
-import de.ywegel.svenska.data.model.VocabularyContainer
-import de.ywegel.svenska.data.model.WordGroup
 import de.ywegel.svenska.ui.wordImporter.ImporterChapter
 
 // TODO: create annotation VisibleForTestingAndPreviews

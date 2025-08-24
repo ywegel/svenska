@@ -4,8 +4,8 @@ import androidx.compose.runtime.Composable
 import app.cash.turbine.test
 import de.ywegel.svenska.data.VocabularyRepository
 import de.ywegel.svenska.data.model.Vocabulary
-import de.ywegel.svenska.data.vocabularies
-import de.ywegel.svenska.data.vocabulary
+import de.ywegel.svenska.data.model.vocabularies
+import de.ywegel.svenska.data.model.vocabulary
 import de.ywegel.svenska.domain.quiz.QuizStrategy
 import de.ywegel.svenska.domain.quiz.model.QuizQuestion
 import de.ywegel.svenska.domain.quiz.model.TranslateMode

@@ -1,7 +1,10 @@
 package de.ywegel.svenska.fakes
 
-import de.ywegel.svenska.data.SortOrder
+import de.ywegel.svenska.data.ContainerRepository
+import de.ywegel.svenska.data.FavoritesAndPronunciationsRepository
+import de.ywegel.svenska.data.SearchRepository
 import de.ywegel.svenska.data.VocabularyRepository
+import de.ywegel.svenska.data.model.SortOrder
 import de.ywegel.svenska.data.model.Vocabulary
 import de.ywegel.svenska.data.model.VocabularyContainer
 import kotlinx.coroutines.flow.Flow
@@ -12,7 +15,7 @@ import kotlinx.coroutines.runBlocking
 class VocabularyRepositoryFake(
     initialVocabulary: List<Vocabulary> = emptyList(),
     initialContainers: List<VocabularyContainer> = emptyList(),
-) : VocabularyRepository {
+) : VocabularyRepository, ContainerRepository, FavoritesAndPronunciationsRepository, SearchRepository {
 
     constructor(
         initialContainers: List<VocabularyContainer> = emptyList(),
@@ -37,28 +40,33 @@ class VocabularyRepositoryFake(
         vocabularyFlow.emit(vocabulary.toList())
     }
 
-    override fun getVocabularies(
-        query: String,
-        containerId: Int?,
-        sortOrder: SortOrder,
-        reverse: Boolean,
-    ): Flow<List<Vocabulary>> {
-        // TODO: handle null container scenario
-        val flow = vocabularyFlow.map { list ->
-            when (sortOrder) {
-                SortOrder.Word -> list.sortedBy { it.word }
-                SortOrder.Translation -> list.sortedBy { it.translation }
-                SortOrder.Created -> list.sortedBy { it.created }
-                SortOrder.LastEdited -> list.sortedBy { it.lastEdited }
+    override fun getVocabularies(containerId: Int, sortOrder: SortOrder, reverse: Boolean): Flow<List<Vocabulary>> {
+        return vocabularyFlow.map { list ->
+            list.filter {
+                it.containerId == containerId
+            }.let { filtered ->
+                when (sortOrder) {
+                    SortOrder.Word -> filtered.sortedBy { it.word }
+                    SortOrder.Translation -> filtered.sortedBy { it.translation }
+                    SortOrder.Created -> filtered.sortedBy { it.created }
+                    SortOrder.LastEdited -> filtered.sortedBy { it.lastEdited }
+                }
             }.let { sorted ->
                 if (reverse) sorted.reversed() else sorted
             }
         }
+    }
 
+    override fun searchVocabularies(query: String, containerId: Int?): Flow<List<Vocabulary>> {
         return if (query.isNotBlank()) {
-            flow.map { item -> item.filter { it.word.lowercase().contains(query.lowercase()) } }
+            vocabularyFlow.map { item ->
+                item.filter {
+                    it.word.lowercase().contains(query.lowercase()) &&
+                        (containerId == null || it.containerId == containerId)
+                }
+            }
         } else {
-            flow
+            vocabularyFlow.map { item -> item.filter { containerId == null || it.containerId == containerId } }
         }
     }
 
@@ -72,10 +80,6 @@ class VocabularyRepositoryFake(
         this.vocabulary.add(vocabulary)
         vocabularyFlow.emit(this.vocabulary)
         return vocabulary.id.toLong()
-    }
-
-    override suspend fun getVocabularyById(id: Int): Vocabulary? {
-        return vocabulary.firstOrNull { it.id == id }
     }
 
     override fun getAllContainers(): Flow<List<VocabularyContainer>> = containersFlow
@@ -113,10 +117,6 @@ class VocabularyRepositoryFake(
         return vocabulary.filter { it.irregularPronunciation != null }
     }
 
-    override fun getAllContainerNamesWithIds(): List<VocabularyContainer> {
-        return containers.toList()
-    }
-
     override suspend fun getAllVocabulariesSnapshot(containerId: Int?): List<Vocabulary> {
         return containerId?.let {
             vocabulary.filter { it.containerId == containerId }
@@ -128,12 +128,6 @@ class VocabularyRepositoryFake(
             vocabulary.remove(old)
             val new = old.copy(isFavorite = isFavorite)
             vocabulary.add(new)
-        }
-    }
-
-    override fun isVocabularyFavorite(vocabularyId: Int): Flow<Boolean> {
-        return vocabularyFlow.map {
-            it.find { it.id == vocabularyId }?.isFavorite ?: false
         }
     }
 

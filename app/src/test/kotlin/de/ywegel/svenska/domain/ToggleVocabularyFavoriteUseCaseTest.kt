@@ -1,7 +1,7 @@
 package de.ywegel.svenska.domain
 
-import de.ywegel.svenska.data.container
-import de.ywegel.svenska.data.vocabulary
+import de.ywegel.svenska.data.model.container
+import de.ywegel.svenska.data.model.vocabulary
 import de.ywegel.svenska.fakes.VocabularyRepositoryFake
 import io.mockk.coVerify
 import io.mockk.spyk

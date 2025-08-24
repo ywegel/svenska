@@ -4,12 +4,13 @@ import android.annotation.SuppressLint
 import androidx.room.Database
 import androidx.room.RoomDatabase
 import androidx.sqlite.db.SupportSQLiteDatabase
+import de.ywegel.svenska.data.ContainerRepository
 import de.ywegel.svenska.data.VocabularyRepository
-import de.ywegel.svenska.data.containers
 import de.ywegel.svenska.data.model.Vocabulary
 import de.ywegel.svenska.data.model.VocabularyContainer
-import de.ywegel.svenska.data.vocabularies
-import de.ywegel.svenska.data.vocabulary
+import de.ywegel.svenska.data.model.containers
+import de.ywegel.svenska.data.model.vocabularies
+import de.ywegel.svenska.data.model.vocabulary
 import de.ywegel.svenska.di.ApplicationScope
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
@@ -25,23 +26,29 @@ abstract class VocabularyDatabase : RoomDatabase() {
 
     abstract fun vocabulary(): VocabularyDao
 
+    abstract fun container(): ContainerDao
+
+    abstract fun search(): SearchDao
+
     class Callback @Inject constructor(
-        private val vocabularyRepository: Provider<VocabularyRepository>,
+        private val vocabularyRepositoryProvider: Provider<VocabularyRepository>,
+        private val containerRepositoryProvider: Provider<ContainerRepository>,
         @ApplicationScope private val applicationScope: CoroutineScope,
     ) : RoomDatabase.Callback() {
         @SuppressLint("VisibleForTests") // TODO: remove after implementing useful demo data
         override fun onCreate(db: SupportSQLiteDatabase) {
             super.onCreate(db)
 
-            val repository = vocabularyRepository.get()
+            val vocabularyRepository = vocabularyRepositoryProvider.get()
+            val containerRepository = containerRepositoryProvider.get()
 
             applicationScope.launch {
                 vocabularies().forEach {
-                    repository.upsertVocabulary(it)
+                    vocabularyRepository.upsertVocabulary(it)
                 }
-                repository.upsertVocabulary(vocabulary(id = 1, containerId = 2))
+                vocabularyRepository.upsertVocabulary(vocabulary(id = 1, containerId = 2))
                 containers().forEach {
-                    repository.upsertContainer(it)
+                    containerRepository.upsertContainer(it)
                 }
             }
         }

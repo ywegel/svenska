@@ -3,7 +3,7 @@ package de.ywegel.svenska.ui.container
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
-import de.ywegel.svenska.data.VocabularyRepository
+import de.ywegel.svenska.data.ContainerRepository
 import de.ywegel.svenska.data.model.VocabularyContainer
 import de.ywegel.svenska.di.IoDispatcher
 import kotlinx.coroutines.CoroutineDispatcher
@@ -16,7 +16,7 @@ import javax.inject.Inject
 
 @HiltViewModel
 class ContainerViewModel @Inject constructor(
-    private val repository: VocabularyRepository,
+    private val containerRepository: ContainerRepository,
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
 ) : ViewModel() {
 
@@ -28,7 +28,7 @@ class ContainerViewModel @Inject constructor(
     }
 
     private fun observerContainers() = viewModelScope.launch(ioDispatcher) {
-        repository.getAllContainers().collectLatest { containers ->
+        containerRepository.getAllContainers().collectLatest { containers ->
             _uiState.update {
                 it.copy(containers = containers)
             }
@@ -42,7 +42,7 @@ class ContainerViewModel @Inject constructor(
     }
 
     fun deleteContainer(container: VocabularyContainer) = viewModelScope.launch(ioDispatcher) {
-        repository.deleteContainerWithAllVocabulary(container)
+        containerRepository.deleteContainerWithAllVocabulary(container)
     }
 
     fun addEditContainer(containerName: String, existingContainerId: Int?) {
@@ -50,7 +50,12 @@ class ContainerViewModel @Inject constructor(
         if (containerName.isBlank()) return
 
         viewModelScope.launch(ioDispatcher) {
-            repository.upsertContainer(VocabularyContainer(name = containerName, id = existingContainerId ?: 0))
+            containerRepository.upsertContainer(
+                container = VocabularyContainer(
+                    name = containerName,
+                    id = existingContainerId ?: 0,
+                ),
+            )
         }
     }
 }
