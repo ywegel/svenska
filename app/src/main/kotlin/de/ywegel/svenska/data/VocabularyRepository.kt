@@ -15,23 +15,7 @@ interface VocabularyRepository {
 
     suspend fun upsertVocabulary(vocabulary: Vocabulary): Long
 
-    suspend fun getVocabularyById(id: Int): Vocabulary?
-
     suspend fun toggleVocabularyFavorite(vocabularyId: Int, isFavorite: Boolean)
 
-    fun isVocabularyFavorite(vocabularyId: Int): Flow<Boolean>
-
     suspend fun getAllVocabulariesWithEndings(containerId: Int?): List<Vocabulary>
-}
-
-enum class SortOrder {
-    Word,
-    Translation,
-    Created,
-    LastEdited,
-    ;
-
-    companion object {
-        val default = Created
-    }
 }

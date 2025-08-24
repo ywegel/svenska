@@ -2,8 +2,6 @@ package de.ywegel.svenska.data.db
 
 import androidx.room.Dao
 import androidx.room.Delete
-import androidx.room.Insert
-import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import androidx.room.Transaction
 import androidx.room.Upsert
@@ -12,9 +10,6 @@ import kotlinx.coroutines.flow.Flow
 
 @Dao
 interface ContainerDao {
-    @Insert(onConflict = OnConflictStrategy.REPLACE)
-    suspend fun insertContainer(container: VocabularyContainer): Long
-
     @Upsert
     suspend fun upsertContainer(container: VocabularyContainer): Long
 
@@ -23,9 +18,6 @@ interface ContainerDao {
 
     @Query("SELECT * FROM vocabularycontainer")
     fun getAllContainers(): Flow<List<VocabularyContainer>>
-
-    @Query("SELECT * FROM vocabularycontainer")
-    fun getAllContainersSnapshot(): List<VocabularyContainer>
 
     @Query("DELETE FROM vocabulary WHERE containerId = :containerId")
     suspend fun deleteVocabularyByContainerId(containerId: Int)
@@ -38,7 +30,4 @@ interface ContainerDao {
         deleteVocabularyByContainerId(container.id)
         deleteContainer(container)
     }
-
-    @Query("SELECT id, name FROM vocabularycontainer ORDER BY id ASC")
-    fun getAllContainerNamesWithId(): List<VocabularyContainer>
 }

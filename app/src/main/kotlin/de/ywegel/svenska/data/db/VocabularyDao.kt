@@ -2,8 +2,6 @@ package de.ywegel.svenska.data.db
 
 import androidx.room.Dao
 import androidx.room.Delete
-import androidx.room.Insert
-import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import androidx.room.Upsert
 import de.ywegel.svenska.data.model.Vocabulary
@@ -18,18 +16,11 @@ import kotlinx.coroutines.flow.Flow
 )
 @Dao
 interface VocabularyDao {
-    // Vocabulary operations
-    @Insert(onConflict = OnConflictStrategy.REPLACE)
-    suspend fun insertVocabulary(vocabulary: Vocabulary): Long
-
     @Delete
     suspend fun deleteVocabulary(vocabulary: Vocabulary)
 
     @Upsert
     suspend fun upsertVocabulary(vocabulary: Vocabulary): Long
-
-    @Query("SELECT * FROM vocabulary WHERE id = :vocabularyId")
-    suspend fun getVocabularyById(vocabularyId: Int): Vocabulary?
 
     @Query("SELECT * FROM vocabulary")
     suspend fun getAllVocabulariesSnapshot(): List<Vocabulary>
@@ -39,16 +30,6 @@ interface VocabularyDao {
 
     @Query("UPDATE vocabulary SET isFavorite = :isFavorite WHERE id = :id ")
     suspend fun toggleVocabularyFavorite(id: Int, isFavorite: Boolean)
-
-    @Query("SELECT isFavorite FROM vocabulary WHERE id = :vocabularyId")
-    fun isVocabularyFavorite(vocabularyId: Int): Flow<Boolean>
-
-    // Combined operations
-    @Query("SELECT * FROM vocabulary ORDER BY created ASC")
-    fun getVocabularies(): Flow<List<Vocabulary>>
-
-    @Query("SELECT * FROM vocabulary WHERE containerId = :containerId ORDER BY created ASC")
-    fun getVocabularies(containerId: Int): Flow<List<Vocabulary>>
 
     @Query("SELECT * FROM vocabulary WHERE containerId = :containerId ORDER BY created ASC")
     fun getVocabulariesByCreatedASC(containerId: Int): Flow<List<Vocabulary>>
@@ -73,12 +54,6 @@ interface VocabularyDao {
 
     @Query("SELECT * FROM vocabulary WHERE containerId = :containerId ORDER BY translation DESC")
     fun getVocabulariesByTranslationDESC(containerId: Int): Flow<List<Vocabulary>>
-
-    @Query("SELECT * FROM vocabulary WHERE containerId = :containerId ORDER BY created ASC")
-    fun getVocabulariesByCustomASC(containerId: Int): Flow<List<Vocabulary>> // TODO implement custom sorting
-
-    @Query("SELECT * FROM vocabulary WHERE containerId = :containerId ORDER BY created DESC")
-    fun getVocabulariesByCustomDESC(containerId: Int): Flow<List<Vocabulary>> // TODO implement custom sorting. This requires adjusting the Repository Fake!
 
     @Query("SELECT * FROM vocabulary WHERE isFavorite IS 1 AND containerId = :containerId ORDER BY word ASC")
     fun getFavoritesByContainerId(containerId: Int): List<Vocabulary>

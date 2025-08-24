@@ -18,10 +18,6 @@ class ContainerRepositoryImpl(private val containerDao: ContainerDao) : Containe
         containerDao.deleteContainerWithVocabulary(container)
     }
 
-    override fun getAllContainerNamesWithIds(): List<VocabularyContainer> {
-        return containerDao.getAllContainerNamesWithId()
-    }
-
     override fun getAllContainers(): Flow<List<VocabularyContainer>> {
         return containerDao.getAllContainers()
     }

@@ -11,6 +11,4 @@ interface ContainerRepository {
     suspend fun upsertContainer(container: VocabularyContainer): Long
 
     suspend fun deleteContainerWithAllVocabulary(container: VocabularyContainer)
-
-    fun getAllContainerNamesWithIds(): List<VocabularyContainer>
 }

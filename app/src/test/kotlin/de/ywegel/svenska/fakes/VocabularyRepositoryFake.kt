@@ -82,10 +82,6 @@ class VocabularyRepositoryFake(
         return vocabulary.id.toLong()
     }
 
-    override suspend fun getVocabularyById(id: Int): Vocabulary? {
-        return vocabulary.firstOrNull { it.id == id }
-    }
-
     override fun getAllContainers(): Flow<List<VocabularyContainer>> = containersFlow
 
     override suspend fun getContainerById(id: Int): VocabularyContainer? {
@@ -121,10 +117,6 @@ class VocabularyRepositoryFake(
         return vocabulary.filter { it.irregularPronunciation != null }
     }
 
-    override fun getAllContainerNamesWithIds(): List<VocabularyContainer> {
-        return containers.toList()
-    }
-
     override suspend fun getAllVocabulariesSnapshot(containerId: Int?): List<Vocabulary> {
         return containerId?.let {
             vocabulary.filter { it.containerId == containerId }
@@ -136,12 +128,6 @@ class VocabularyRepositoryFake(
             vocabulary.remove(old)
             val new = old.copy(isFavorite = isFavorite)
             vocabulary.add(new)
-        }
-    }
-
-    override fun isVocabularyFavorite(vocabularyId: Int): Flow<Boolean> {
-        return vocabularyFlow.map {
-            it.find { it.id == vocabularyId }?.isFavorite ?: false
         }
     }
 

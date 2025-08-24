@@ -44,14 +44,8 @@ class VocabularyRepositoryImpl @Inject constructor(private val dao: VocabularyDa
         return dao.upsertVocabulary(vocabulary)
     }
 
-    override suspend fun getVocabularyById(id: Int) = dao.getVocabularyById(id)
-
     override suspend fun toggleVocabularyFavorite(vocabularyId: Int, isFavorite: Boolean) {
         dao.toggleVocabularyFavorite(vocabularyId, isFavorite)
-    }
-
-    override fun isVocabularyFavorite(vocabularyId: Int): Flow<Boolean> {
-        return dao.isVocabularyFavorite(vocabularyId)
     }
 
     override suspend fun getAllVocabulariesWithEndings(containerId: Int?): List<Vocabulary> {
