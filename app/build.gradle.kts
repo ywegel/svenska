@@ -209,3 +209,21 @@ detekt {
     baseline = file("${rootProject.projectDir}/config/detekt/detekt-baseline.xml")
     buildUponDefaultConfig = true
 }
+
+kover {
+    reports {
+        filters {
+            excludes {
+                classes(
+                    "_generated._ramcosta._composedestinations._moduleregistry.*",
+                    "com.ramcosta.composedestinations.generated.*",
+                    "dagger.hilt.internal.aggregatedroot.codegen.*",
+                    "hilt_aggregated_deps.*",
+                    "*_Factory*",
+                    "*_Impl*",
+                    "*_HiltModules*",
+                )
+            }
+        }
+    }
+}

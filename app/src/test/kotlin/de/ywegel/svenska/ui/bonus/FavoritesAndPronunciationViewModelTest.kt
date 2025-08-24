@@ -9,11 +9,13 @@ import de.ywegel.svenska.ui.bonus.favorites.FavoritesAndPronunciationViewModel
 import de.ywegel.svenska.ui.bonus.favorites.FavoritesUiState
 import de.ywegel.svenska.ui.container.BonusScreen
 import io.mockk.clearAllMocks
+import io.mockk.coVerify
 import io.mockk.every
 import io.mockk.spyk
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.StandardTestDispatcher
+import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
@@ -60,7 +62,13 @@ class FavoritesAndPronunciationViewModelTest {
         Dispatchers.resetMain()
     }
 
-    private fun createViewModelForScreen(screen: BonusScreen): FavoritesAndPronunciationViewModel {
+    private fun createViewModelForScreen(
+        screen: BonusScreen,
+        toggleVocabularyFavoriteUseCase: ToggleVocabularyFavoriteUseCase = ToggleVocabularyFavoriteUseCase(
+            repository = repository,
+            ioDispatcher = testDispatcher,
+        ),
+    ): FavoritesAndPronunciationViewModel {
         val savedStateHandle = SavedStateHandle(
             mapOf("screenType" to screen),
         )
@@ -69,10 +77,7 @@ class FavoritesAndPronunciationViewModelTest {
             favoritesAndPronunciationsRepository = repository,
             savedStateHandle = savedStateHandle,
             ioDispatcher = testDispatcher,
-            toggleVocabularyFavoriteUseCase = ToggleVocabularyFavoriteUseCase(
-                repository = repository,
-                ioDispatcher = testDispatcher,
-            ),
+            toggleVocabularyFavoriteUseCase = toggleVocabularyFavoriteUseCase,
         )
     }
 
@@ -107,7 +112,7 @@ class FavoritesAndPronunciationViewModelTest {
     }
 
     @Test
-    fun `IllegalStateException when viewModel loads for unsopported screenType`() = runTest(testDispatcher) {
+    fun `IllegalStateException when viewModel loads for unsupported screenType`() = runTest(testDispatcher) {
         val viewModel = createViewModelForScreen(BonusScreen.Quiz)
 
         viewModel.uiState.test {
@@ -146,5 +151,20 @@ class FavoritesAndPronunciationViewModelTest {
 
             cancelAndIgnoreRemainingEvents()
         }
+    }
+
+    @Test
+    fun `Toggling favorites calls the favorite use case`() = runTest(testDispatcher) {
+        val toggleFavoriteUseCaseSpy = spyk(ToggleVocabularyFavoriteUseCase(repository, testDispatcher))
+        val viewModel = createViewModelForScreen(
+            screen = BonusScreen.Favorites,
+            toggleVocabularyFavoriteUseCase = toggleFavoriteUseCaseSpy,
+        )
+
+        viewModel.toggleFavorite(1, true)
+
+        advanceUntilIdle()
+
+        coVerify { toggleFavoriteUseCaseSpy.invoke(1, true) }
     }
 }
