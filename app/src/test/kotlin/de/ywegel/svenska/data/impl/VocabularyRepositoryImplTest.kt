@@ -2,9 +2,9 @@ package de.ywegel.svenska.data.impl
 
 import app.cash.turbine.test
 import de.ywegel.svenska.common.streamOf
-import de.ywegel.svenska.data.SortOrder
 import de.ywegel.svenska.data.VocabularyRepository
 import de.ywegel.svenska.data.db.VocabularyDao
+import de.ywegel.svenska.data.model.SortOrder
 import de.ywegel.svenska.data.model.Vocabulary
 import io.mockk.coVerify
 import io.mockk.every

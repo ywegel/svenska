@@ -6,11 +6,11 @@ import androidx.room.RoomDatabase
 import androidx.sqlite.db.SupportSQLiteDatabase
 import de.ywegel.svenska.data.ContainerRepository
 import de.ywegel.svenska.data.VocabularyRepository
-import de.ywegel.svenska.data.containers
 import de.ywegel.svenska.data.model.Vocabulary
 import de.ywegel.svenska.data.model.VocabularyContainer
-import de.ywegel.svenska.data.vocabularies
-import de.ywegel.svenska.data.vocabulary
+import de.ywegel.svenska.data.model.containers
+import de.ywegel.svenska.data.model.vocabularies
+import de.ywegel.svenska.data.model.vocabulary
 import de.ywegel.svenska.di.ApplicationScope
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch

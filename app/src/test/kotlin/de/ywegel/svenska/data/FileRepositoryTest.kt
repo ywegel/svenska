@@ -6,6 +6,8 @@ import android.content.ContentResolver
 import android.net.Uri
 import assertk.assertThat
 import assertk.assertions.isEqualTo
+import de.ywegel.svenska.data.impl.FileRepositoryImpl
+import de.ywegel.svenska.data.model.importerChapter
 import de.ywegel.svenska.fakes.VocabularyRepositoryFake
 import de.ywegel.svenska.fakes.WordParserFake
 import de.ywegel.svenska.ui.wordImporter.ImporterChapter

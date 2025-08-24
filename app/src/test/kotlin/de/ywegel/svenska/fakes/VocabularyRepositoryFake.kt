@@ -3,8 +3,8 @@ package de.ywegel.svenska.fakes
 import de.ywegel.svenska.data.ContainerRepository
 import de.ywegel.svenska.data.FavoritesAndPronunciationsRepository
 import de.ywegel.svenska.data.SearchRepository
-import de.ywegel.svenska.data.SortOrder
 import de.ywegel.svenska.data.VocabularyRepository
+import de.ywegel.svenska.data.model.SortOrder
 import de.ywegel.svenska.data.model.Vocabulary
 import de.ywegel.svenska.data.model.VocabularyContainer
 import kotlinx.coroutines.flow.Flow

@@ -5,8 +5,8 @@ package de.ywegel.svenska.ui.overview
 import androidx.lifecycle.SavedStateHandle
 import app.cash.turbine.test
 import de.ywegel.svenska.data.VocabularyRepository
+import de.ywegel.svenska.data.model.vocabulary
 import de.ywegel.svenska.data.preferences.UserPreferencesManager
-import de.ywegel.svenska.data.vocabulary
 import de.ywegel.svenska.domain.ToggleVocabularyFavoriteUseCase
 import de.ywegel.svenska.fakes.UserPreferencesManagerFake
 import de.ywegel.svenska.fakes.VocabularyRepositoryFake

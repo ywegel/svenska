@@ -7,6 +7,7 @@ import android.net.Uri
 import assertk.assertThat
 import assertk.assertions.isEqualTo
 import de.ywegel.svenska.assertVocabularyListEqualsIgnoringTimestamps
+import de.ywegel.svenska.data.impl.FileRepositoryImpl
 import de.ywegel.svenska.data.model.Gender
 import de.ywegel.svenska.data.model.Vocabulary
 import de.ywegel.svenska.data.model.WordGroup

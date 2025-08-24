@@ -4,8 +4,8 @@ package de.ywegel.svenska.ui.container
 
 import app.cash.turbine.test
 import de.ywegel.svenska.data.ContainerRepository
-import de.ywegel.svenska.data.containers
 import de.ywegel.svenska.data.model.VocabularyContainer
+import de.ywegel.svenska.data.model.containers
 import de.ywegel.svenska.fakes.VocabularyRepositoryFake
 import io.mockk.clearAllMocks
 import kotlinx.coroutines.CoroutineDispatcher

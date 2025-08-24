@@ -26,8 +26,8 @@ import de.ywegel.svenska.R
 import de.ywegel.svenska.data.model.Gender
 import de.ywegel.svenska.data.model.Vocabulary
 import de.ywegel.svenska.data.model.WordGroup
-import de.ywegel.svenska.data.vocabularies
-import de.ywegel.svenska.data.vocabulary
+import de.ywegel.svenska.data.model.vocabularies
+import de.ywegel.svenska.data.model.vocabulary
 import de.ywegel.svenska.ui.common.HorizontalSpacerXS
 import de.ywegel.svenska.ui.common.vocabulary.abbreviation
 import de.ywegel.svenska.ui.common.vocabulary.mainGroupAbbreviation

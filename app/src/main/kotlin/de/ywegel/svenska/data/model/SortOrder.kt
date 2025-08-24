@@ -1,4 +1,4 @@
-package de.ywegel.svenska.data
+package de.ywegel.svenska.data.model
 
 enum class SortOrder {
     Word,

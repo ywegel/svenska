@@ -2,7 +2,7 @@ package de.ywegel.svenska.ui.bonus
 
 import androidx.lifecycle.SavedStateHandle
 import app.cash.turbine.test
-import de.ywegel.svenska.data.vocabulary
+import de.ywegel.svenska.data.model.vocabulary
 import de.ywegel.svenska.domain.ToggleVocabularyFavoriteUseCase
 import de.ywegel.svenska.fakes.VocabularyRepositoryFake
 import de.ywegel.svenska.ui.bonus.favorites.FavoritesAndPronunciationViewModel

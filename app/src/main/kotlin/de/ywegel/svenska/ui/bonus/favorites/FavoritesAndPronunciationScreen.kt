@@ -42,7 +42,7 @@ import com.ramcosta.composedestinations.generated.destinations.WordGroupsScreenD
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
 import de.ywegel.svenska.R
 import de.ywegel.svenska.data.model.Vocabulary
-import de.ywegel.svenska.data.vocabularies
+import de.ywegel.svenska.data.model.vocabularies
 import de.ywegel.svenska.navigation.BonusGraph
 import de.ywegel.svenska.ui.common.IconButton
 import de.ywegel.svenska.ui.common.TopAppTextBar

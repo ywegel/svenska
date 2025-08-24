@@ -1,8 +1,8 @@
 package de.ywegel.svenska.data.impl
 
-import de.ywegel.svenska.data.SortOrder
 import de.ywegel.svenska.data.VocabularyRepository
 import de.ywegel.svenska.data.db.VocabularyDao
+import de.ywegel.svenska.data.model.SortOrder
 import de.ywegel.svenska.data.model.Vocabulary
 import kotlinx.coroutines.flow.Flow
 import javax.inject.Inject
