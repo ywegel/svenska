@@ -2,9 +2,9 @@ package de.ywegel.svenska.domain.addEdit
 
 import de.ywegel.svenska.data.model.Gender
 import de.ywegel.svenska.data.model.Vocabulary
-import de.ywegel.svenska.data.model.extractAnnotations
 import de.ywegel.svenska.ui.addEdit.AddEditUiState
 import de.ywegel.svenska.ui.addEdit.models.ViewWordGroup
+import de.ywegel.svenska.ui.common.vocabulary.HighlightUtils
 
 /**
  * Maps a [AddEditUiState] and optional [initialVocabulary] into a [Vocabulary] object.
@@ -36,7 +36,8 @@ class MapUiStateToVocabularyUseCase {
         val viewWordGroup = snapshot.selectedWordGroup ?: return null
         val wordGroup = viewWordGroup.toWordGroup(snapshot.selectedSubGroup) ?: return null
 
-        val (wordHighlights, cleanWord) = extractAnnotations(snapshot.wordWithAnnotation)
+        val (cleanWord, wordHighlights) = HighlightUtils.parseHighlights(snapshot.wordWithAnnotation)
+            .getOrElse { return null }
 
         val gender = if (viewWordGroup == ViewWordGroup.Noun && snapshot.gender == null) {
             Gender.defaultIfEmpty

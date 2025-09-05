@@ -7,7 +7,7 @@ import androidx.room.PrimaryKey
 import androidx.room.TypeConverters
 import de.ywegel.svenska.data.db.HighlightConverter
 import de.ywegel.svenska.data.db.WordGroupConverter
-import de.ywegel.svenska.ui.common.vocabulary.annotatedStringFromHighlights
+import de.ywegel.svenska.ui.common.vocabulary.HighlightUtils
 import kotlinx.parcelize.IgnoredOnParcel
 import kotlinx.parcelize.Parcelize
 import java.text.DateFormat
@@ -17,7 +17,7 @@ import java.text.DateFormat
 @TypeConverters(HighlightConverter::class, WordGroupConverter::class)
 data class Vocabulary(
     val word: String,
-    val wordHighlights: List<Int> = emptyList(),
+    val wordHighlights: List<Pair<Int, Int>> = emptyList(),
     val translation: String,
     // "ett" or "en"
     val gender: Gender? = null,
@@ -35,7 +35,7 @@ data class Vocabulary(
 
     @IgnoredOnParcel
     val annotatedWord: AnnotatedString by lazy {
-        annotatedStringFromHighlights(word, wordHighlights)
+        HighlightUtils.buildAnnotatedWord(word, wordHighlights)
     }
 
     val createdDateFormatted: String
@@ -43,53 +43,6 @@ data class Vocabulary(
 
     val lastEditedDateFormatted: String
         get() = DateFormat.getDateTimeInstance().format(lastEdited)
-
-    companion object {
-        fun fromAnnotatedWord(
-            wordWithHighlights: String,
-            translation: String,
-            gender: Gender?,
-            wordGroup: WordGroup,
-            ending: String,
-            notes: String,
-            containerId: Int,
-            lastEdited: Long = System.currentTimeMillis(),
-            created: Long = System.currentTimeMillis(),
-        ): Vocabulary {
-            val (annotations, cleanString) = extractAnnotations(wordWithHighlights)
-
-            return Vocabulary(
-                word = cleanString,
-                wordHighlights = annotations,
-                translation = translation,
-                gender = gender,
-                wordGroup = wordGroup,
-                ending = ending,
-                notes = notes,
-                containerId = containerId,
-                lastEdited = lastEdited,
-                created = created,
-            )
-        }
-    }
-}
-
-// TODO: if highlights are just one apart (a**b), remove the highlight
-fun extractAnnotations(wordWithHighlights: String): Pair<List<Int>, String> {
-    var annotationCount = 0
-    val annotations = mutableListOf<Int>()
-    val cleanString = StringBuilder(wordWithHighlights.length)
-
-    wordWithHighlights.forEachIndexed { index, c ->
-        if (c == '*') {
-            annotations.add(index - annotationCount)
-            annotationCount++
-        } else {
-            cleanString.append(c)
-        }
-    }
-
-    return Pair(annotations, cleanString.toString())
 }
 
 enum class Gender {

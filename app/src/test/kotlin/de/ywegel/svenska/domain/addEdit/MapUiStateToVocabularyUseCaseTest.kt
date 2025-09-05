@@ -176,6 +176,6 @@ class MapUiStateToVocabularyUseCaseTest {
 
         expectThat(result).isNotNull()
         expectThat(result!!.word).isEqualTo("penna")
-        expectThat(result.wordHighlights).isEqualTo(listOf(0, 1))
+        expectThat(result.wordHighlights).isEqualTo(listOf(0 to 1))
     }
 }
