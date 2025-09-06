@@ -70,6 +70,9 @@ android {
             signingConfig = signingConfigs.getByName("debug")
         }
     }
+    sourceSets {
+        getByName("androidTest").assets.srcDir("$projectDir/schemas")
+    }
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_17
         targetCompatibility = JavaVersion.VERSION_17
@@ -140,6 +143,8 @@ dependencies {
     implementation(libs.androidx.room.runtime)
     ksp(libs.androidx.room.compiler)
     implementation(libs.androidx.room.ktx)
+    testImplementation(libs.androidx.room.testing)
+    androidTestImplementation(libs.androidx.room.testing)
 
     // Hilt
     implementation(libs.hilt.android)
@@ -157,8 +162,6 @@ dependencies {
     implementation(libs.splish.splash.screen)
 
     // testing
-    testImplementation(libs.junit)
-    androidTestImplementation(libs.androidx.test.ext.junit)
     androidTestImplementation(libs.espresso.core)
     androidTestImplementation(platform(libs.compose.bom))
     testImplementation(libs.kotlinx.coroutines.test)
@@ -166,11 +169,18 @@ dependencies {
     testImplementation(libs.assertk)
     testImplementation(libs.turbine)
     testImplementation(libs.strikt)
+    androidTestImplementation(libs.strikt)
 
     // junit5
     testImplementation(libs.junit5.api)
+    androidTestImplementation(libs.junit5.api)
     testRuntimeOnly(libs.junit5.engine)
     testImplementation(libs.junit5.params)
+
+    // Enable junit4 tests
+    testImplementation(libs.junit)
+    testRuntimeOnly(libs.junit.vintage.engine)
+    androidTestImplementation(libs.androidx.test.ext.junit)
 }
 
 ksp {

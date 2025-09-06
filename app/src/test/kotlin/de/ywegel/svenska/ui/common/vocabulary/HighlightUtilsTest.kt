@@ -1,5 +1,6 @@
 package de.ywegel.svenska.ui.common.vocabulary
 
+import de.ywegel.svenska.common.streamOf
 import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.params.ParameterizedTest
@@ -141,7 +142,7 @@ class HighlightUtilsTest {
 
     companion object {
         @JvmStatic
-        fun balancedHighlightCases(): List<Arguments> = listOf(
+        fun balancedHighlightCases() = streamOf(
             Arguments.of("hello", "hello", emptyList<Pair<Int, Int>>()),
             Arguments.of("fr*å*ga", "fråga", listOf(2 to 3)),
             Arguments.of("t*abc*est", "tabcest", listOf(1 to 4)),
@@ -161,7 +162,7 @@ class HighlightUtilsTest {
         )
 
         @JvmStatic
-        fun unbalancedHighlightCases(): List<Arguments> = listOf(
+        fun unbalancedHighlightCases() = streamOf(
             Arguments.of("*", 1),
             Arguments.of("fr*å*ga*", 3),
             Arguments.of("*fråga", 1),
@@ -171,7 +172,7 @@ class HighlightUtilsTest {
         )
 
         @JvmStatic
-        fun validReconstructCases(): List<Arguments> = listOf(
+        fun validReconstructCases() = streamOf(
             Arguments.of("hello", emptyList<Pair<Int, Int>>(), "hello"),
             Arguments.of("fråga", listOf(2 to 3), "fr*å*ga"),
             Arguments.of("tabcest", listOf(1 to 4), "t*abc*est"),
@@ -184,7 +185,7 @@ class HighlightUtilsTest {
         )
 
         @JvmStatic
-        fun invalidReconstructCases(): List<Arguments> = listOf(
+        fun invalidReconstructCases() = streamOf(
             // Negative start index
             Arguments.of("abc", listOf(-1 to 1), "abc"),
             // Negative end index

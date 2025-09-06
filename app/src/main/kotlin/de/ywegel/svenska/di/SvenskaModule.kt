@@ -21,6 +21,7 @@ import de.ywegel.svenska.data.FileRepository
 import de.ywegel.svenska.data.SearchRepository
 import de.ywegel.svenska.data.VocabularyRepository
 import de.ywegel.svenska.data.db.ContainerDao
+import de.ywegel.svenska.data.db.MIGRATION_1_2
 import de.ywegel.svenska.data.db.SearchDao
 import de.ywegel.svenska.data.db.VocabularyDao
 import de.ywegel.svenska.data.db.VocabularyDatabase
@@ -54,6 +55,7 @@ class SvenskaModule {
     @Provides
     fun provideVocabularyDatabase(app: Application, dbCallback: VocabularyDatabase.Callback) =
         Room.databaseBuilder(app, VocabularyDatabase::class.java, "vocabulary")
+            .addMigrations(MIGRATION_1_2)
             .addCallback(dbCallback)
             .build()
 
