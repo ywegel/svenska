@@ -28,15 +28,14 @@ jobs:
       - name: Run ktlint
         run: ./gradlew ktlintCheck --build-cache --parallel --max-workers=2
 
-      - name: Cache build results
+      - name: Restore cached gradle
         uses: actions/cache@v4
         with:
           path: |
             ~/.gradle/caches
             ~/.gradle/wrapper
             .gradle
-            build
-          key: ${{ runner.os }}-gradle-${{ github.sha }}
+          key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties') }}
           restore-keys: |
             ${{ runner.os }}-gradle-
 
@@ -58,15 +57,14 @@ jobs:
       - name: Run detekt
         run: ./gradlew detekt --build-cache --parallel --max-workers=2
 
-      - name: Cache build results
+      - name: Restore cached gradle
         uses: actions/cache@v4
         with:
           path: |
             ~/.gradle/caches
             ~/.gradle/wrapper
             .gradle
-            build
-          key: ${{ runner.os }}-gradle-${{ github.sha }}
+          key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties') }}
           restore-keys: |
             ${{ runner.os }}-gradle-
 
@@ -85,14 +83,14 @@ jobs:
           distribution: 'temurin'
           cache: gradle
 
-      - name: Restore cached build results
+      - name: Restore cached gradle
         uses: actions/cache@v4
         with:
           path: |
             ~/.gradle/caches
             ~/.gradle/wrapper
             .gradle
-          key: ${{ runner.os }}-gradle-${{ github.sha }}
+          key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties') }}
           restore-keys: |
             ${{ runner.os }}-gradle-
 
@@ -105,6 +103,7 @@ jobs:
         with:
           name: lint-report
           path: '**/build/reports/lint-results-*.html'
+          retention-days: 7
 
   unit_tests:
     name: Unit Tests
@@ -122,14 +121,14 @@ jobs:
           distribution: 'temurin'
           cache: gradle
 
-      - name: Restore cached build results
+      - name: Restore cached gradle
         uses: actions/cache@v4
         with:
           path: |
             ~/.gradle/caches
             ~/.gradle/wrapper
             .gradle
-          key: ${{ runner.os }}-gradle-${{ github.sha }}
+          key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties') }}
           restore-keys: |
             ${{ runner.os }}-gradle-
 
@@ -142,6 +141,7 @@ jobs:
         with:
           name: test-report
           path: '**/build/reports/tests/'
+          retention-days: 7
 
       - name: Generate Coverage Report
         run: ./gradlew koverXmlReport
@@ -155,10 +155,13 @@ jobs:
           title: Code Coverage Report
           coverage-counter-type: BRANCH
 
-  assemble:
-    name: Assemble App
+  build-and-test:
+    name: Build and Run Instrumentation Tests
     needs: [ lint, unit_tests ]
     runs-on: ubuntu-latest
+    env:
+      JAVA_TOOL_OPTIONS: -Xmx4g
+    timeout-minutes: 20
     steps:
       - uses: actions/checkout@v4
 
@@ -169,16 +172,37 @@ jobs:
           distribution: 'temurin'
           cache: gradle
 
-      - name: Restore cached build results
+      - name: Restore cached Gradle
         uses: actions/cache@v4
         with:
           path: |
             ~/.gradle/caches
             ~/.gradle/wrapper
             .gradle
-          key: ${{ runner.os }}-gradle-${{ github.sha }}
+          key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties') }}
           restore-keys: |
             ${{ runner.os }}-gradle-
 
-      - name: Assemble Debug APK
-        run: ./gradlew assembleDebug --build-cache --parallel --max-workers=2
+      - name: Enable KVM for Linux runners
+        if: runner.os == 'Linux'
+        run: |
+          echo 'KERNEL=="kvm", GROUP="kvm", MODE="0666", OPTIONS+="static_node=kvm"' | sudo tee /etc/udev/rules.d/99-kvm4all.rules
+          sudo udevadm control --reload-rules
+          sudo udevadm trigger --name-match=kvm
+
+      - name: Set up Android Emulator and Run Tests
+        uses: reactivecircus/android-emulator-runner@v2
+        with:
+          api-level: 35
+          target: google_apis
+          arch: x86_64
+          profile: Nexus 6
+          script: ./gradlew connectedDebugAndroidTest --build-cache --parallel --max-workers=2
+
+      - name: Upload Instrumentation Test Report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: instrumentation-test-report
+          path: app/build/reports/androidTests/connected/
+          retention-days: 7
