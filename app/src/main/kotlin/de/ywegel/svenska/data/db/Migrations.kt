@@ -12,11 +12,11 @@ val MIGRATION_1_2 = object : Migration(1, 2) {
         val cursor = db.query("SELECT id, wordHighlights, word FROM Vocabulary")
         while (cursor.moveToNext()) {
             val id = cursor.getInt(0)
-            val oldHighlightsStr = cursor.getString(1) // Old format: "1,3,5,7,8"
+            val oldHighlightsStr = cursor.getString(1) // Old format: "1;3;5;7;8"
             val word = cursor.getString(2)
 
             val newHighlightsStr = if (oldHighlightsStr.isNotEmpty()) {
-                oldHighlightsStr.split(",")
+                oldHighlightsStr.split(";")
                     .mapNotNull { it.trim().toIntOrNull() } // Drop invalid highlights
                     .chunked(2)
                     .filter { it.size == 2 }

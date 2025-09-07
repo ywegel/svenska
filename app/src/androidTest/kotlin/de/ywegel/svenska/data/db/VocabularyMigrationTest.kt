@@ -8,6 +8,7 @@ import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
 import strikt.api.expectThat
+import strikt.assertions.containsExactly
 import strikt.assertions.isEqualTo
 
 private const val TEST_DB_NAME = "test_db"
@@ -16,6 +17,8 @@ private const val TEST_DB_NAME = "test_db"
 class VocabularyMigrationTest {
 
     private val currentTime = System.currentTimeMillis()
+
+    private val highlightConverter = HighlightConverter()
 
     @get:Rule
     val helper: MigrationTestHelper = MigrationTestHelper(
@@ -31,7 +34,7 @@ class VocabularyMigrationTest {
             execSQL(
                 """
                 INSERT INTO Vocabulary (id, word, wordHighlights, translation, gender, wordGroup, ending, notes, irregularPronunciation, isFavorite, containerId, lastEdited, created)
-                VALUES (1, 'fråga', '2,3', 'question', 'Ultra', 'Other', '', '', NULL, 0, 1, $currentTime, $currentTime)
+                VALUES (1, 'fråga', '2;3', 'question', 'Ultra', 'Other', '', '', NULL, 0, 1, $currentTime, $currentTime)
                 """.trimIndent(),
             )
             close()
@@ -46,6 +49,9 @@ class VocabularyMigrationTest {
             it.moveToNext()
             val newHighlights = it.getString(0)
             expectThat(newHighlights).isEqualTo("2:3")
+
+            val highlights = highlightConverter.toHighlightRanges(it.getString(0))
+            expectThat(highlights).containsExactly(listOf(2 to 3))
         }
     }
 
@@ -80,7 +86,7 @@ class VocabularyMigrationTest {
             execSQL(
                 """
                 INSERT INTO Vocabulary (id, word, wordHighlights, translation, gender, wordGroup, ending, notes, irregularPronunciation, isFavorite, containerId, lastEdited, created)
-                VALUES (1, 'abcdefgh', '0,1,2,4,5,6,7,8', 'test', 'Ultra', 'Other', '', '', NULL, 0, 1, $currentTime, $currentTime)
+                VALUES (1, 'abcdefgh', '0;1;2;4;5;6;7;8', 'test', 'Ultra', 'Other', '', '', NULL, 0, 1, $currentTime, $currentTime)
                 """.trimIndent(),
             )
             close()
@@ -94,6 +100,9 @@ class VocabularyMigrationTest {
         cursor.use {
             it.moveToNext()
             expectThat(it.getString(0)).isEqualTo("0:1,2:4,5:6,7:8")
+
+            val highlights = highlightConverter.toHighlightRanges(it.getString(0))
+            expectThat(highlights).containsExactly(listOf(0 to 1, 2 to 4, 5 to 6, 7 to 8))
         }
     }
 
@@ -130,6 +139,10 @@ class VocabularyMigrationTest {
         cursor.use {
             it.moveToNext()
             expectThat(it.getString(0)).isEqualTo("")
+
+
+            val highlights = highlightConverter.toHighlightRanges(it.getString(0))
+            expectThat(highlights).containsExactly(emptyList())
         }
     }
 
@@ -140,7 +153,7 @@ class VocabularyMigrationTest {
             execSQL(
                 sql = """   
                     INSERT INTO Vocabulary (id, word, wordHighlights, translation, gender, wordGroup, ending, notes, irregularPronunciation, isFavorite, containerId, lastEdited, created)
-                    VALUES (1, 'test', '-1,4', 'test', 'Ultra', 'Other', '', '', NULL, 0, 1, $currentTime, $currentTime)
+                    VALUES (1, 'test', '-1;4', 'test', 'Ultra', 'Other', '', '', NULL, 0, 1, $currentTime, $currentTime)
                 """.trimIndent(),
             )
             close()
@@ -164,7 +177,7 @@ class VocabularyMigrationTest {
             execSQL(
                 """
                     INSERT INTO Vocabulary (id, word, wordHighlights, translation, gender, wordGroup, ending, notes, irregularPronunciation, isFavorite, containerId, lastEdited, created)
-                    VALUES (1, 'test', '10,12', 'test', 'Ultra', 'Other', '', '', NULL, 0, 1, $currentTime, $currentTime)
+                    VALUES (1, 'test', '10;12', 'test', 'Ultra', 'Other', '', '', NULL, 0, 1, $currentTime, $currentTime)
                 """.trimIndent(),
             )
             close()
@@ -188,7 +201,7 @@ class VocabularyMigrationTest {
             execSQL(
                 """
                     INSERT INTO Vocabulary (id, word, wordHighlights, translation, gender, wordGroup, ending, notes, irregularPronunciation, isFavorite, containerId, lastEdited, created)
-                    VALUES (1, 'test', '2,10', 'test', 'Ultra', 'Other', '', '', NULL, 0, 1, $currentTime, $currentTime)
+                    VALUES (1, 'test', '2;10', 'test', 'Ultra', 'Other', '', '', NULL, 0, 1, $currentTime, $currentTime)
                 """.trimIndent(),
             )
             close()
@@ -212,7 +225,7 @@ class VocabularyMigrationTest {
             execSQL(
                 """
                     INSERT INTO Vocabulary (id, word, wordHighlights, translation, gender, wordGroup, ending, notes, irregularPronunciation, isFavorite, containerId, lastEdited, created)
-                    VALUES (1, 'test', '-4,-2,-1,4,2,3,10,12', 'test', 'Ultra', 'Other', '', '', NULL, 0, 1, $currentTime, $currentTime)
+                    VALUES (1, 'test', '-4;-2;-1;4;2;3;10;12', 'test', 'Ultra', 'Other', '', '', NULL, 0, 1, $currentTime, $currentTime)
                 """.trimIndent(),
             )
             close()
@@ -226,6 +239,10 @@ class VocabularyMigrationTest {
         cursor.use {
             it.moveToNext()
             expectThat(it.getString(0)).isEqualTo("2:3")
+
+
+            val highlights = highlightConverter.toHighlightRanges(it.getString(0))
+            expectThat(highlights).containsExactly(listOf(2 to 3))
         }
     }
 }
