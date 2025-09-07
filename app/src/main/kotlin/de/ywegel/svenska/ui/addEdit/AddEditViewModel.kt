@@ -13,6 +13,7 @@ import de.ywegel.svenska.di.IoDispatcher
 import de.ywegel.svenska.domain.addEdit.MapUiStateToVocabularyUseCase
 import de.ywegel.svenska.ui.addEdit.models.ViewWordGroup
 import de.ywegel.svenska.ui.addEdit.models.ViewWordSubGroup
+import de.ywegel.svenska.ui.common.vocabulary.HighlightUtils
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -157,7 +158,10 @@ data class AddEditUiState(
                     selectedWordGroup = ViewWordGroup.fromWordGroup(vocabulary.wordGroup),
                     selectedSubGroup = ViewWordSubGroup.fromWordGroup(vocabulary.wordGroup),
                     gender = vocabulary.gender,
-                    wordWithAnnotation = vocabulary.word,
+                    wordWithAnnotation = HighlightUtils.reconstructWithStars(
+                        vocabulary.word,
+                        vocabulary.wordHighlights,
+                    ),
                     translation = vocabulary.translation,
                     ending = vocabulary.ending,
                     notes = vocabulary.notes,

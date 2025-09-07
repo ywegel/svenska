@@ -120,6 +120,58 @@ class AddEditViewModelTest {
                 .isEqualTo(expected)
         }
     }
+    
+    @Test
+    fun `ViewModel is initialised with navigation data and correctly reconstructs pronunciations`() = runTest(testDispatcher) {
+        val expected = AddEditUiState(
+            selectedWordGroup = ViewWordGroup.Verb,
+            selectedSubGroup = ViewWordSubGroup.Verb(WordGroup.VerbSubgroup.GROUP_2A),
+            gender = null,
+            wordWithAnnotation = "t*e*st*With*An**not*at*ions",
+            translation = "testTranslation",
+            ending = "-er -de -t",
+            notes = "testNote",
+            isIrregularPronunciation = true,
+            irregularPronunciation = "testPronunciation",
+            isFavorite = false,
+            editingExistingVocabulary = "testWithAnnotations",
+        )
+
+        // Given
+        val containerId = 1
+
+        val navigationVocabulary = Vocabulary(
+            word = "testWithAnnotations",
+            wordHighlights = listOf(1 to 2, 4 to 8, 10 to 10, 13 to 15),
+            translation = "testTranslation",
+            gender = null,
+            wordGroup = WordGroup.Verb(WordGroup.VerbSubgroup.GROUP_2A),
+            ending = "-er -de -t",
+            notes = "testNote",
+            irregularPronunciation = "testPronunciation",
+            isFavorite = false,
+            containerId = containerId,
+            id = 1,
+        )
+
+        // When
+        val viewModel = setupViewModel(
+            savedState = SavedStateHandle(
+                initialState = mapOf(
+                    "containerId" to containerId,
+                    "initialVocabulary" to navigationVocabulary,
+                ),
+            ),
+        )
+
+        advanceUntilIdle()
+
+        // Then
+        viewModel.uiState.test {
+            expectThat(awaitItem())
+                .isEqualTo(expected)
+        }
+    }
 
     private fun setupViewModel(
         repository: VocabularyRepository = VocabularyRepositoryFake(),
