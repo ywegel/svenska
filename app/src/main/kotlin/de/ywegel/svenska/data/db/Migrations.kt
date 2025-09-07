@@ -20,7 +20,10 @@ val MIGRATION_1_2 = object : Migration(1, 2) {
                     .mapNotNull { it.trim().toIntOrNull() } // Drop invalid highlights
                     .chunked(2)
                     .filter { it.size == 2 }
-                    .filter { (first, second) -> first >= 0 && second >= 0 && first <= word.length && second <= word.length } // Filter out negative and out of bounds highlights
+                    .filter { (first, second) ->
+                        // Filter out negative and out of bounds highlights
+                        first >= 0 && second >= 0 && first <= word.length && second <= word.length
+                    }
                     .joinToString(",") { (first, second) -> "$first:$second" } // New format: "1:3,5:7"
             } else {
                 ""

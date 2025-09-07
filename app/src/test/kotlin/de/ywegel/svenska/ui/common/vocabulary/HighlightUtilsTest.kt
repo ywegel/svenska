@@ -75,11 +75,7 @@ class HighlightUtilsTest {
 
         @ParameterizedTest(name = "reconstructWithStars skips invalid ranges: {0} with {1}")
         @MethodSource("de.ywegel.svenska.ui.common.vocabulary.HighlightUtilsTest#invalidReconstructCases")
-        fun `reconstructWithStars skips invalid ranges`(
-            word: String,
-            ranges: List<Pair<Int, Int>>,
-            expected: String,
-        ) {
+        fun `reconstructWithStars skips invalid ranges`(word: String, ranges: List<Pair<Int, Int>>, expected: String) {
             // When
             val result = HighlightUtils.reconstructWithStars(word, ranges)
 
@@ -116,7 +112,10 @@ class HighlightUtilsTest {
             }
         }
 
-        @ParameterizedTest(name = "reverse round-trip: reconstructWithStars then parseHighlights recovers original word and ranges: {0} with {1}")
+        @ParameterizedTest(
+            name = "reverse round-trip: reconstructWithStars then parseHighlights recovers original" +
+                " word and ranges: {0} with {1}",
+        )
         @MethodSource("de.ywegel.svenska.ui.common.vocabulary.HighlightUtilsTest#balancedHighlightCases")
         fun `reverse round-trip reconstructWithStars and parseHighlights recovers original input`(
             intermediate: String,

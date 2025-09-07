@@ -114,10 +114,10 @@ class VocabularyMigrationTest {
         // Given
         val dbV1 = helper.createDatabase(TEST_DB_NAME, 1).apply {
             execSQL(
-                """
-            INSERT INTO Vocabulary (id, word, wordHighlights, translation, gender, wordGroup, ending, notes, irregularPronunciation, isFavorite, containerId, lastEdited, created)
-            VALUES (1, 'test', 'invalid', 'test', 'Ultra', 'Other', '', '', NULL, 0, 1, $currentTime, $currentTime)
-            """.trimIndent(),
+                sql = """
+                    INSERT INTO Vocabulary (id, word, wordHighlights, translation, gender, wordGroup, ending, notes, irregularPronunciation, isFavorite, containerId, lastEdited, created)
+                    VALUES (1, 'test', 'invalid', 'test', 'Ultra', 'Other', '', '', NULL, 0, 1, $currentTime, $currentTime)
+                """.trimIndent(),
             )
             close()
         }
@@ -138,10 +138,10 @@ class VocabularyMigrationTest {
         // Given
         val dbV1 = helper.createDatabase(TEST_DB_NAME, 1).apply {
             execSQL(
-                """
-            INSERT INTO Vocabulary (id, word, wordHighlights, translation, gender, wordGroup, ending, notes, irregularPronunciation, isFavorite, containerId, lastEdited, created)
-            VALUES (1, 'test', '-1,4', 'test', 'Ultra', 'Other', '', '', NULL, 0, 1, $currentTime, $currentTime)
-            """.trimIndent(),
+                sql = """   
+                    INSERT INTO Vocabulary (id, word, wordHighlights, translation, gender, wordGroup, ending, notes, irregularPronunciation, isFavorite, containerId, lastEdited, created)
+                    VALUES (1, 'test', '-1,4', 'test', 'Ultra', 'Other', '', '', NULL, 0, 1, $currentTime, $currentTime)
+                """.trimIndent(),
             )
             close()
         }
@@ -163,9 +163,9 @@ class VocabularyMigrationTest {
         val dbV1 = helper.createDatabase(TEST_DB_NAME, 1).apply {
             execSQL(
                 """
-            INSERT INTO Vocabulary (id, word, wordHighlights, translation, gender, wordGroup, ending, notes, irregularPronunciation, isFavorite, containerId, lastEdited, created)
-            VALUES (1, 'test', '10,12', 'test', 'Ultra', 'Other', '', '', NULL, 0, 1, $currentTime, $currentTime)
-            """.trimIndent(),
+                    INSERT INTO Vocabulary (id, word, wordHighlights, translation, gender, wordGroup, ending, notes, irregularPronunciation, isFavorite, containerId, lastEdited, created)
+                    VALUES (1, 'test', '10,12', 'test', 'Ultra', 'Other', '', '', NULL, 0, 1, $currentTime, $currentTime)
+                """.trimIndent(),
             )
             close()
         }
@@ -187,9 +187,9 @@ class VocabularyMigrationTest {
         val dbV1 = helper.createDatabase(TEST_DB_NAME, 1).apply {
             execSQL(
                 """
-            INSERT INTO Vocabulary (id, word, wordHighlights, translation, gender, wordGroup, ending, notes, irregularPronunciation, isFavorite, containerId, lastEdited, created)
-            VALUES (1, 'test', '2,10', 'test', 'Ultra', 'Other', '', '', NULL, 0, 1, $currentTime, $currentTime)
-            """.trimIndent(),
+                    INSERT INTO Vocabulary (id, word, wordHighlights, translation, gender, wordGroup, ending, notes, irregularPronunciation, isFavorite, containerId, lastEdited, created)
+                    VALUES (1, 'test', '2,10', 'test', 'Ultra', 'Other', '', '', NULL, 0, 1, $currentTime, $currentTime)
+                """.trimIndent(),
             )
             close()
         }
@@ -211,9 +211,9 @@ class VocabularyMigrationTest {
         val dbV1 = helper.createDatabase(TEST_DB_NAME, 1).apply {
             execSQL(
                 """
-            INSERT INTO Vocabulary (id, word, wordHighlights, translation, gender, wordGroup, ending, notes, irregularPronunciation, isFavorite, containerId, lastEdited, created)
-            VALUES (1, 'test', '-4,-2,-1,4,2,3,10,12', 'test', 'Ultra', 'Other', '', '', NULL, 0, 1, $currentTime, $currentTime)
-            """.trimIndent(),
+                    INSERT INTO Vocabulary (id, word, wordHighlights, translation, gender, wordGroup, ending, notes, irregularPronunciation, isFavorite, containerId, lastEdited, created)
+                    VALUES (1, 'test', '-4,-2,-1,4,2,3,10,12', 'test', 'Ultra', 'Other', '', '', NULL, 0, 1, $currentTime, $currentTime)
+                """.trimIndent(),
             )
             close()
         }

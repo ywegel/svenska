@@ -48,7 +48,7 @@ class HighlightConverterTest {
             Arguments.of(listOf(Pair(1, 2), Pair(3, 4)), "1:2,3:4"),
             Arguments.of(listOf(Pair(0, 0)), "0:0"),
             Arguments.of(emptyList<Pair<Int, Int>>(), ""),
-            Arguments.of(listOf(Pair(-1, -2)), "-1:-2")
+            Arguments.of(listOf(Pair(-1, -2)), "-1:-2"),
         )
     }
 }
