@@ -75,6 +75,7 @@ object HighlightUtils {
             append(word)
             highlightRanges.forEach { (start, end) ->
                 addStyle(
+                    // TODO: Make it possible for the user to choose between colors and boldness
                     style = SpanStyle(fontWeight = FontWeight.Bold),
                     start = start,
                     end = end,
@@ -82,11 +83,17 @@ object HighlightUtils {
             }
         }
     }
+
+    /**
+     * Builds an AnnotatedString directly from a star-annotated string.
+     * Returns null if star-annotations could not be parsed.
+     */
+    fun buildAnnotatedWord(wordWithAnnotations: String): AnnotatedString? {
+        return wordWithAnnotations.parseHighlights().getOrNull()?.toAnnotatedWord()
+    }
 }
 
 fun String.parseHighlights(): Result<Pair<String, List<Pair<Int, Int>>>> = HighlightUtils.parseHighlights(this)
-fun Pair<String, List<Pair<Int, Int>>>.reconstructWithStars(): String =
-    HighlightUtils.reconstructWithStars(first, second)
 
 fun Pair<String, List<Pair<Int, Int>>>.toAnnotatedWord(): AnnotatedString =
     HighlightUtils.buildAnnotatedWord(first, second)

@@ -9,7 +9,9 @@ import assertk.assertions.isEqualTo
 import de.ywegel.svenska.data.VocabularyRepository
 import de.ywegel.svenska.data.model.Vocabulary
 import de.ywegel.svenska.data.model.WordGroup
+import de.ywegel.svenska.data.preferences.UserPreferencesManager
 import de.ywegel.svenska.domain.addEdit.MapUiStateToVocabularyUseCase
+import de.ywegel.svenska.fakes.UserPreferencesManagerFake
 import de.ywegel.svenska.fakes.VocabularyRepositoryFake
 import de.ywegel.svenska.ui.addEdit.models.ViewWordGroup
 import de.ywegel.svenska.ui.addEdit.models.ViewWordSubGroup
@@ -59,6 +61,7 @@ class AddEditViewModelTest {
             irregularPronunciation = null,
             isFavorite = false,
             editingExistingVocabulary = null,
+            annotationInformationHidden = false,
         )
 
         advanceUntilIdle()
@@ -83,6 +86,7 @@ class AddEditViewModelTest {
             irregularPronunciation = "testPronunciation",
             isFavorite = false,
             editingExistingVocabulary = "testWord",
+            annotationInformationHidden = false,
         )
 
         // Given
@@ -120,9 +124,9 @@ class AddEditViewModelTest {
                 .isEqualTo(expected)
         }
     }
-    
+
     @Test
-    fun `ViewModel is initialised with navigation data and correctly reconstructs pronunciations`() = runTest(testDispatcher) {
+    fun `ViewModel with navigation data correctly reconstructs pronunciations`() = runTest(testDispatcher) {
         val expected = AddEditUiState(
             selectedWordGroup = ViewWordGroup.Verb,
             selectedSubGroup = ViewWordSubGroup.Verb(WordGroup.VerbSubgroup.GROUP_2A),
@@ -135,6 +139,7 @@ class AddEditViewModelTest {
             irregularPronunciation = "testPronunciation",
             isFavorite = false,
             editingExistingVocabulary = "testWithAnnotations",
+            annotationInformationHidden = false,
         )
 
         // Given
@@ -177,6 +182,7 @@ class AddEditViewModelTest {
         repository: VocabularyRepository = VocabularyRepositoryFake(),
         savedState: SavedStateHandle = SavedStateHandle(initialState = mapOf("containerId" to 1)),
         dispatcher: CoroutineDispatcher = testDispatcher,
+        userPreferencesManager: UserPreferencesManager = UserPreferencesManagerFake(),
         mapUiStateToVocabularyUseCase: MapUiStateToVocabularyUseCase = MapUiStateToVocabularyUseCase(),
     ): AddEditViewModel {
         return AddEditViewModel(
@@ -185,6 +191,7 @@ class AddEditViewModelTest {
             ioDispatcher = dispatcher,
             immediateDispatcher = dispatcher,
             mapUiStateToVocabularyUseCase = mapUiStateToVocabularyUseCase,
+            userPreferencesManager = userPreferencesManager,
         )
     }
 }

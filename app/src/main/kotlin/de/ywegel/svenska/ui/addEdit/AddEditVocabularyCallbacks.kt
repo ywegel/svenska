@@ -21,4 +21,5 @@ interface AddEditVocabularyCallbacks {
     fun updateIrregularPronunciation(pronunciation: String)
     fun deleteVocabulary()
     fun saveAndNavigateUp()
+    fun hideAnnotationInfo()
 }

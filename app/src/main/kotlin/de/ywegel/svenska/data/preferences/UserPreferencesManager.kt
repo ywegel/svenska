@@ -27,6 +27,9 @@ private const val TAG = "UserPreferencesManager"
 const val OVERVIEW_PREFERENCES_NAME = "user-preferences_overview"
 val Context.dataStoreOverview: DataStore<Preferences> by preferencesDataStore(name = OVERVIEW_PREFERENCES_NAME)
 
+const val ADD_EDIT_PREFERENCES_NAME = "user-preferences_add-edit"
+val Context.dataStoreAddEdit: DataStore<Preferences> by preferencesDataStore(name = ADD_EDIT_PREFERENCES_NAME)
+
 data class OverviewPreferences(
     val sortOrder: SortOrder,
     val revert: Boolean,
@@ -43,8 +46,14 @@ data class AppPreferences(
     val hasCompletedOnboarding: Boolean,
 )
 
+data class AddEditPreferences(
+    val annotationInformationHidden: Boolean,
+)
+
 interface UserPreferencesManager {
     val preferencesOverviewFlow: Flow<OverviewPreferences>
+
+    val preferencesAddEditFlow: Flow<AddEditPreferences>
 
     val preferencesSearchFlow: Flow<SearchPreferences>
 
@@ -55,6 +64,8 @@ interface UserPreferencesManager {
     suspend fun updateOverviewSortOrderRevert(revert: Boolean)
 
     suspend fun showCompactVocabularyItem(showCompactVocabularyItem: Boolean)
+
+    suspend fun setAnnotationInformationHidden()
 
     suspend fun addLastSearchedItem(item: String)
 
@@ -75,6 +86,26 @@ class UserPreferencesManagerImpl @Inject constructor(@ApplicationContext val con
             val hasCompletedOnboarding = preferences[PreferencesKeys.APP_HAS_COMPLETED_ONBOARDING] ?: false
             AppPreferences(hasCompletedOnboarding)
         }
+
+    override suspend fun updateHasCompletedOnboarding(hasCompleted: Boolean) {
+        context.dataStoreOverview.edit { preferences ->
+            preferences[PreferencesKeys.APP_HAS_COMPLETED_ONBOARDING] = hasCompleted
+        }
+    }
+
+    override val preferencesAddEditFlow: Flow<AddEditPreferences> = context.dataStoreAddEdit.data
+        .fallbackToDefaultOnError()
+        .map { preferences ->
+            val annotationInformationHidden =
+                preferences[PreferencesKeys.ADD_EDIT_ANNOTATION_INFORMATION_HIDDEN] ?: false
+            AddEditPreferences(annotationInformationHidden)
+        }
+
+    override suspend fun setAnnotationInformationHidden() {
+        context.dataStoreAddEdit.edit { preferences ->
+            preferences[PreferencesKeys.ADD_EDIT_ANNOTATION_INFORMATION_HIDDEN] = true
+        }
+    }
 
     override val preferencesOverviewFlow = context.dataStoreOverview.data
         .fallbackToDefaultOnError()
@@ -147,16 +178,12 @@ class UserPreferencesManagerImpl @Inject constructor(@ApplicationContext val con
         }
     }
 
-    override suspend fun updateHasCompletedOnboarding(hasCompleted: Boolean) {
-        context.dataStoreOverview.edit { preferences ->
-            preferences[PreferencesKeys.APP_HAS_COMPLETED_ONBOARDING] = hasCompleted
-        }
-    }
-
     private object PreferencesKeys {
         val OVERVIEW_SORT_ORDER = stringPreferencesKey("overview_sort_order")
         val OVERVIEW_SORT_ORDER_REVERT = booleanPreferencesKey("overview_sort_order_revert")
         val OVERVIEW_SHOW_COMPACT_VOCABULARY_ITEM = booleanPreferencesKey("overview_show_compact_vocabulary_item")
+
+        val ADD_EDIT_ANNOTATION_INFORMATION_HIDDEN = booleanPreferencesKey("add_edit_annotation_information_hidden")
 
         val SEARCH_SORT_LAST_SEARCHED_ITEMS = stringPreferencesKey("search_sort_last_searched_items")
         val SEARCH_ONLINE_REDIRECT_POSITION = booleanPreferencesKey("search_online_redirect_position")

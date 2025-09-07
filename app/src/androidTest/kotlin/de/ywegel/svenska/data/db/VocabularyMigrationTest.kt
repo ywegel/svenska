@@ -140,7 +140,6 @@ class VocabularyMigrationTest {
             it.moveToNext()
             expectThat(it.getString(0)).isEqualTo("")
 
-
             val highlights = highlightConverter.toHighlightRanges(it.getString(0))
             expectThat(highlights).containsExactly(emptyList())
         }
@@ -239,7 +238,6 @@ class VocabularyMigrationTest {
         cursor.use {
             it.moveToNext()
             expectThat(it.getString(0)).isEqualTo("2:3")
-
 
             val highlights = highlightConverter.toHighlightRanges(it.getString(0))
             expectThat(highlights).containsExactly(listOf(2 to 3))

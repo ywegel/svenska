@@ -9,6 +9,7 @@
 
     <!-- # AddEdit # -->
     <string name="accessibility_addEdit_navigate_word_group_info_screen">Navigate to WordGroups screen</string>
+    <string name="accessibility_addEdit_annotation_information_hide">Hide this information</string>
 
     <!-- # Quiz # -->
     <string name="accessibility_quiz_toolbar_actions_favorite">Favorite this word</string>

@@ -136,6 +136,8 @@
 
     <string name="addEdit_group_selector_invalid_configuration">You have either not selected a group or subgroup</string>
 
+    <string name="addEdit_annotation_information_text">You can emphasize lonng pronunciations by surrounding the pronounced letters with two stars:\ne*ll*er -> </string>
+
     <!-- # Quiz # -->
     <string name="quiz_title">Quiz</string>
 

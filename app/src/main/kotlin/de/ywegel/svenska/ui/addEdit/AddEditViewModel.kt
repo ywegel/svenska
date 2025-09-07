@@ -8,6 +8,7 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import de.ywegel.svenska.data.VocabularyRepository
 import de.ywegel.svenska.data.model.Gender
 import de.ywegel.svenska.data.model.Vocabulary
+import de.ywegel.svenska.data.preferences.UserPreferencesManager
 import de.ywegel.svenska.di.ImmediateDispatcher
 import de.ywegel.svenska.di.IoDispatcher
 import de.ywegel.svenska.domain.addEdit.MapUiStateToVocabularyUseCase
@@ -18,6 +19,7 @@ import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
@@ -29,6 +31,7 @@ class AddEditViewModel @Inject constructor(
     savedStateHandle: SavedStateHandle,
     private val repository: VocabularyRepository,
     private val mapUiStateToVocabularyUseCase: MapUiStateToVocabularyUseCase,
+    private val userPreferencesManager: UserPreferencesManager,
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
     @ImmediateDispatcher private val immediateDispatcher: CoroutineDispatcher,
 ) : ViewModel(), AddEditVocabularyCallbacks {
@@ -41,6 +44,17 @@ class AddEditViewModel @Inject constructor(
 
     private val _uiEvents = Channel<UiEvent>() // TODO: Rename to _uiEventsChannel once ktlint is upgraded to 1.3.1
     val uiEvents = _uiEvents.receiveAsFlow()
+
+    init {
+        viewModelScope.launch {
+            userPreferencesManager.preferencesAddEditFlow
+                .collectLatest { preferences ->
+                    _uiState.update {
+                        it.copy(annotationInformationHidden = preferences.annotationInformationHidden)
+                    }
+                }
+        }
+    }
 
     override fun updateSelectedWordGroup(group: ViewWordGroup) {
         _uiState.update {
@@ -132,6 +146,15 @@ class AddEditViewModel @Inject constructor(
         }
     }
 
+    override fun hideAnnotationInfo() {
+        _uiState.update {
+            it.copy(annotationInformationHidden = true)
+        }
+        viewModelScope.launch(ioDispatcher) {
+            userPreferencesManager.setAnnotationInformationHidden()
+        }
+    }
+
     sealed interface UiEvent {
         data object NavigateUp : UiEvent
         data object InvalidWordGroupConfiguration : UiEvent
@@ -150,6 +173,7 @@ data class AddEditUiState(
     val irregularPronunciation: String? = null,
     val isFavorite: Boolean = false,
     val editingExistingVocabulary: String? = null,
+    val annotationInformationHidden: Boolean = true,
 ) {
     companion object {
         fun fromExistingVocabulary(vocabulary: Vocabulary?): AddEditUiState {
