@@ -4,13 +4,16 @@ import androidx.room.TypeConverter
 
 class HighlightConverter {
     @TypeConverter
-    fun fromString(value: String?): List<Int> {
-        if (value.isNullOrEmpty()) return emptyList()
-        return value.split(";").map { it.toInt() }
-    }
+    fun fromHighlightRanges(ranges: List<Pair<Int, Int>>): String =
+        ranges.joinToString(",") { "${it.first}:${it.second}" }
 
     @TypeConverter
-    fun toString(highlights: List<Int>): String {
-        return highlights.joinToString(";")
+    fun toHighlightRanges(value: String): List<Pair<Int, Int>> = if (value.isEmpty()) {
+        emptyList()
+    } else {
+        value.split(",").map {
+            val (start, end) = it.split(":").map(String::toInt)
+            start to end
+        }
     }
 }

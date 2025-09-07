@@ -5,23 +5,7 @@ import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
 
-fun annotatedStringFromHighlights(
-    word: String,
-    highlights: List<Int>,
-    style: SpanStyle = SpanStyle(fontWeight = FontWeight.Bold),
-): AnnotatedString {
-    return buildAnnotatedString {
-        append(word)
-        for (highlight in highlights.indices step 2) {
-            addStyle(
-                style = style,
-                start = highlights[highlight],
-                end = highlights[highlight + 1],
-            )
-        }
-    }
-}
-
+// TODO: Refactor the number screen. Don't extract highlights from *, but rather supply the correct highlight locations
 fun stringWithHighlightSeparators(
     input: String,
     style: SpanStyle = SpanStyle(fontWeight = FontWeight.Bold),

@@ -7,7 +7,6 @@ dagger-hilt = "2.56.2"
 kotlin = "2.1.20"
 core-ktx = "1.15.0"
 junit = "4.13.2"
-androidx-test-ext-junit = "1.2.1"
 espresso-core = "3.6.1"
 lifecycle-runtime-ktx = "2.9.1"
 activity-compose = "1.10.1"
@@ -45,6 +44,7 @@ compose-ui-test-junit4 = { group = "androidx.compose.ui", name = "ui-test-junit4
 androidx-room-runtime = { module = "androidx.room:room-runtime", version.ref = "room-version" }
 androidx-room-compiler = { module = "androidx.room:room-compiler", version.ref = "room-version" }
 androidx-room-ktx = { module = "androidx.room:room-ktx", version.ref = "room-version" }
+androidx-room-testing = { module = "androidx.room:room-testing", version.ref = "room-version" }
 
 # dagger hilt
 hilt-android = { module = "com.google.dagger:hilt-android", version.ref = "dagger-hilt" }
@@ -63,8 +63,6 @@ splish-splash-screen = "androidx.core:core-splashscreen:1.0.1"
 
 
 # testing
-junit = { group = "junit", name = "junit", version.ref = "junit" }
-androidx-test-ext-junit = { group = "androidx.test.ext", name = "junit", version.ref = "androidx-test-ext-junit" }
 espresso-core = { group = "androidx.test.espresso", name = "espresso-core", version.ref = "espresso-core" }
 kotlinx-coroutines-test = "org.jetbrains.kotlinx:kotlinx-coroutines-test:1.10.2"
 mockk = "io.mockk:mockk:1.14.4"
@@ -77,6 +75,12 @@ strikt = "io.strikt:strikt-core:0.35.1"
 junit5-api = { module = "org.junit.jupiter:junit-jupiter-api", version.ref = "junit5" }
 junit5-engine = { module = "org.junit.jupiter:junit-jupiter-engine", version.ref = "junit5" }
 junit5-params = { module = "org.junit.jupiter:junit-jupiter-params", version.ref = "junit5" }
+
+# Enable junit4 tests
+junit = { group = "junit", name = "junit", version.ref = "junit" }
+junit-vintage-engine = "org.junit.vintage:junit-vintage-engine:5.13.1"
+androidx-test-ext-junit = "androidx.test.ext:junit-ktx:1.3.0"
+
 
 [plugins]
 com-android-application = { id = "com.android.application", version.ref = "agp" }

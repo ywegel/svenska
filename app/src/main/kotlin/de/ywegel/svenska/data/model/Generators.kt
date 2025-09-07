@@ -38,7 +38,7 @@ fun vocabulary(
     created: Long = System.currentTimeMillis(),
 ): Vocabulary = Vocabulary(
     word = word,
-    wordHighlights = listOf(1, 2),
+    wordHighlights = listOf(1 to 2),
     translation = translation,
     notes = notes,
     wordGroup = WordGroup.Noun(WordGroup.NounSubgroup.UNDEFINED),
@@ -56,7 +56,7 @@ fun vocabulary(
 fun vocabularies(containerId: Int = 1): List<Vocabulary> = listOf(
     Vocabulary(
         word = "lampa",
-        wordHighlights = listOf(1, 2),
+        wordHighlights = listOf(1 to 2),
         translation = "lamp",
         notes = "",
         wordGroup = WordGroup.Noun(WordGroup.NounSubgroup.UNDEFINED),
@@ -67,7 +67,7 @@ fun vocabularies(containerId: Int = 1): List<Vocabulary> = listOf(
     ),
     Vocabulary(
         word = "lång",
-        wordHighlights = listOf(1, 2),
+        wordHighlights = listOf(1 to 2),
         translation = "long",
         notes = "",
         wordGroup = WordGroup.Adjective,
@@ -78,7 +78,7 @@ fun vocabularies(containerId: Int = 1): List<Vocabulary> = listOf(
     ),
     Vocabulary(
         word = "eller",
-        wordHighlights = listOf(1, 3),
+        wordHighlights = listOf(1 to 3),
         translation = "or",
         notes = "",
         wordGroup = WordGroup.Other,
@@ -89,7 +89,7 @@ fun vocabularies(containerId: Int = 1): List<Vocabulary> = listOf(
     ),
     Vocabulary(
         word = "fråga",
-        wordHighlights = listOf(2, 3),
+        wordHighlights = listOf(2 to 3),
         translation = "ask",
         notes = "",
         wordGroup = WordGroup.Verb(WordGroup.VerbSubgroup.UNDEFINED),
