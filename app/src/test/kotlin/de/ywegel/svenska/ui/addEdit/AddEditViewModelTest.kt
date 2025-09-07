@@ -9,6 +9,7 @@ import assertk.assertions.isEqualTo
 import de.ywegel.svenska.data.VocabularyRepository
 import de.ywegel.svenska.data.model.Vocabulary
 import de.ywegel.svenska.data.model.WordGroup
+import de.ywegel.svenska.data.model.vocabulary
 import de.ywegel.svenska.data.preferences.UserPreferencesManager
 import de.ywegel.svenska.domain.addEdit.MapUiStateToVocabularyUseCase
 import de.ywegel.svenska.fakes.UserPreferencesManagerFake
@@ -16,6 +17,9 @@ import de.ywegel.svenska.fakes.VocabularyRepositoryFake
 import de.ywegel.svenska.ui.addEdit.models.ViewWordGroup
 import de.ywegel.svenska.ui.addEdit.models.ViewWordSubGroup
 import io.mockk.clearAllMocks
+import io.mockk.coVerify
+import io.mockk.every
+import io.mockk.mockk
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -29,6 +33,7 @@ import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import strikt.api.expectThat
 import strikt.assertions.isEqualTo
+import strikt.assertions.isTrue
 
 class AddEditViewModelTest {
 
@@ -176,6 +181,99 @@ class AddEditViewModelTest {
             expectThat(awaitItem())
                 .isEqualTo(expected)
         }
+    }
+
+    @Test
+    fun `saveAndNavigateUp runs the use case and upserts the vocabulary correctly`() = runTest {
+        // Given
+        val expectedVocabulary = vocabulary()
+        val mockedMapUiStateToVocabularyUseCase = mockk<MapUiStateToVocabularyUseCase> {
+            every { this@mockk.invoke(any(), any(), any()) } returns expectedVocabulary
+        }
+
+        val mockedRepository = mockk<VocabularyRepository>(relaxed = true)
+
+        val viewModel = setupViewModel(
+            mapUiStateToVocabularyUseCase = mockedMapUiStateToVocabularyUseCase,
+            repository = mockedRepository,
+        )
+
+        // When
+        viewModel.saveAndNavigateUp()
+
+        advanceUntilIdle()
+
+        // Then
+        coVerify {
+            mockedMapUiStateToVocabularyUseCase.invoke(
+                snapshot = any(),
+                initialVocabulary = any(),
+                containerId = any(),
+            )
+        }
+
+        coVerify { mockedRepository.upsertVocabulary(expectedVocabulary) }
+
+        viewModel.uiEvents.test {
+            expectThat(awaitItem()).isEqualTo(AddEditViewModel.UiEvent.NavigateUp)
+            expectNoEvents()
+        }
+    }
+
+    @Test
+    fun `saveAndNavigateUp emits an error event if the use case fails`() = runTest(testDispatcher) {
+        // Given
+        val mockedMapUiStateToVocabularyUseCase = mockk<MapUiStateToVocabularyUseCase> {
+            // null equals an error in the use case
+            every { this@mockk.invoke(any(), any(), any()) } returns null
+        }
+
+        val mockedRepository = mockk<VocabularyRepository>(relaxed = true)
+
+        val viewModel = setupViewModel(
+            mapUiStateToVocabularyUseCase = mockedMapUiStateToVocabularyUseCase,
+            repository = mockedRepository,
+        )
+
+        // When
+        viewModel.saveAndNavigateUp()
+
+        advanceUntilIdle()
+
+        // Then
+        coVerify {
+            mockedMapUiStateToVocabularyUseCase.invoke(
+                snapshot = any(),
+                initialVocabulary = any(),
+                containerId = any(),
+            )
+        }
+
+        coVerify(exactly = 0) { mockedRepository.upsertVocabulary(any()) }
+
+        viewModel.uiEvents.test {
+            expectThat(awaitItem()).isEqualTo(AddEditViewModel.UiEvent.InvalidWordGroupConfiguration)
+            expectNoEvents()
+        }
+    }
+
+    @Test
+    fun `hideAnnotationInfo sets the annotation information to hidden in the preferences`() = runTest(testDispatcher) {
+        // Given
+        val mockedPreferences = mockk<UserPreferencesManager>(relaxed = true)
+        val viewModel = setupViewModel(userPreferencesManager = mockedPreferences)
+
+        // When
+        viewModel.hideAnnotationInfo()
+
+        advanceUntilIdle()
+
+        // Then
+        viewModel.uiState.test {
+            expectThat(awaitItem().annotationInformationHidden).isTrue()
+        }
+
+        coVerify(exactly = 1) { mockedPreferences.setAnnotationInformationHidden() }
     }
 
     private fun setupViewModel(
