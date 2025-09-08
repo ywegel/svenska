@@ -95,7 +95,7 @@ class UserPreferencesManagerFake(
     override val preferencesAddEditFlow = MutableStateFlow(addEditPreferences)
 
     override suspend fun setAnnotationInformationHidden() {
-        addEditPreferences.copy(annotationInformationHidden = true)
+        addEditPreferences = addEditPreferences.copy(annotationInformationHidden = true)
         preferencesAddEditFlow.emit(addEditPreferences)
     }
 }
