@@ -2,6 +2,7 @@
 
 package de.ywegel.svenska.ui.addEdit
 
+import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.Crossfade
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Column
@@ -23,6 +24,7 @@ import androidx.compose.material.icons.outlined.Done
 import androidx.compose.material.icons.outlined.Favorite
 import androidx.compose.material.icons.outlined.FavoriteBorder
 import androidx.compose.material.icons.outlined.Info
+import androidx.compose.material3.Card
 import androidx.compose.material3.Checkbox
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -54,6 +56,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.AnnotatedString
+import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -78,12 +82,15 @@ import de.ywegel.svenska.ui.common.ConfirmableComponent
 import de.ywegel.svenska.ui.common.HorizontalSpacerXS
 import de.ywegel.svenska.ui.common.IconButton
 import de.ywegel.svenska.ui.common.VerticalSpacerM
+import de.ywegel.svenska.ui.common.VerticalSpacerXS
+import de.ywegel.svenska.ui.common.vocabulary.HighlightUtils
 import de.ywegel.svenska.ui.common.vocabulary.wordGroupBadge.AnimatedWordGroupBadgeExtended
 import de.ywegel.svenska.ui.common.vocabulary.wordGroupBadge.EmptyWordGroupBadge
 import de.ywegel.svenska.ui.overview.userFacingString
 import de.ywegel.svenska.ui.theme.Spacings
 import de.ywegel.svenska.ui.theme.SvenskaIcons
 import de.ywegel.svenska.ui.theme.SvenskaTheme
+import de.ywegel.svenska.ui.theme.Typography
 import kotlinx.coroutines.flow.collectLatest
 
 @Destination<SvenskaGraph>(
@@ -228,6 +235,14 @@ private fun WordGroupSection(
 @Suppress("LongMethod")
 @Composable
 private fun AddEditInputSection(uiState: AddEditUiState, callbacks: AddEditVocabularyCallbacks) {
+    val optionalHighlightedWord: AnnotatedString? = remember(uiState.wordWithAnnotation) {
+        return@remember if (uiState.wordWithAnnotation.contains('*')) {
+            HighlightUtils.buildAnnotatedWord(uiState.wordWithAnnotation)
+        } else {
+            null
+        }
+    }
+
     Column(
         modifier = Modifier
             .padding(horizontal = Spacings.m)
@@ -250,7 +265,14 @@ private fun AddEditInputSection(uiState: AddEditUiState, callbacks: AddEditVocab
                 label = { Text(stringResource(R.string.addEdit_label_word)) },
             )
         }
-        VerticalSpacerM()
+        VerticalSpacerXS()
+        optionalHighlightedWord?.let {
+            Text(text = it)
+        }
+        AnimatedVisibility(!uiState.annotationInformationHidden) {
+            AnnotationInformation(callbacks::hideAnnotationInfo)
+        }
+        VerticalSpacerXS()
         OutlinedTextField(
             modifier = Modifier.fillMaxWidth(),
             value = uiState.translation,
@@ -416,6 +438,32 @@ private fun GenderDropDown(selectedGender: Gender, onGenderSelected: (Gender) ->
     }
 }
 
+@Composable
+private fun AnnotationInformation(hideAnnotationInfo: () -> Unit) {
+    Card {
+        Row(
+            Modifier.padding(horizontal = Spacings.m, vertical = Spacings.xs),
+            verticalAlignment = Alignment.CenterVertically,
+        ) {
+            Text(
+                modifier = Modifier.weight(1f),
+                text = buildAnnotatedString {
+                    append(stringResource(R.string.addEdit_annotation_information_text))
+                    append(' ')
+                    @Suppress("MagicNumber")
+                    append(HighlightUtils.buildAnnotatedWord("eller", listOf(1 to 3)))
+                },
+                style = Typography.bodyMedium,
+            )
+            IconButton(
+                SvenskaIcons.Close,
+                contentDescription = stringResource(R.string.accessibility_addEdit_annotation_information_hide),
+                onClick = hideAnnotationInfo,
+            )
+        }
+    }
+}
+
 data class AddEditNavArgs(
     val containerId: Int,
     val initialVocabulary: Vocabulary? = null,
@@ -436,12 +484,28 @@ private fun AddEditScreenPreview() {
 
 @Preview
 @Composable
+private fun AddEditScreenWithAnnotatedWordPreview() {
+    SvenskaTheme {
+        AddEditScreen(
+            uiState = AddEditUiState(
+                wordWithAnnotation = "t*e*st*With*An**not*at*ions",
+            ),
+            callbacks = AddEditVocabularyCallbacksFake,
+            navigateUp = {},
+            navigateToWordGroupsScreen = {},
+        )
+    }
+}
+
+@Preview
+@Composable
 private fun AddEditScreenSelectionExpandedPreview() {
     SvenskaTheme {
         AddEditScreen(
             uiState = AddEditUiState(
                 selectedWordGroup = ViewWordGroup.Noun,
                 selectedSubGroup = ViewWordSubGroup.Noun(WordGroup.NounSubgroup.OR),
+                annotationInformationHidden = false,
             ),
             callbacks = AddEditVocabularyCallbacksFake,
             navigateUp = {},

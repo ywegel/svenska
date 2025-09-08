@@ -1,6 +1,7 @@
 package de.ywegel.svenska.fakes
 
 import de.ywegel.svenska.data.model.SortOrder
+import de.ywegel.svenska.data.preferences.AddEditPreferences
 import de.ywegel.svenska.data.preferences.AppPreferences
 import de.ywegel.svenska.data.preferences.OverviewPreferences
 import de.ywegel.svenska.data.preferences.SearchPreferences
@@ -88,5 +89,13 @@ class UserPreferencesManagerFake(
         _preferencesAppFlow.update {
             it.copy(hasCompletedOnboarding = hasCompleted)
         }
+    }
+
+    private var addEditPreferences = AddEditPreferences(annotationInformationHidden = false)
+    override val preferencesAddEditFlow = MutableStateFlow(addEditPreferences)
+
+    override suspend fun setAnnotationInformationHidden() {
+        addEditPreferences = addEditPreferences.copy(annotationInformationHidden = true)
+        preferencesAddEditFlow.emit(addEditPreferences)
     }
 }

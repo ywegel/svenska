@@ -19,4 +19,5 @@ object AddEditVocabularyCallbacksFake : AddEditVocabularyCallbacks {
     override fun updateIrregularPronunciation(pronunciation: String) {}
     override fun deleteVocabulary() {}
     override fun saveAndNavigateUp() {}
+    override fun hideAnnotationInfo() {}
 }
