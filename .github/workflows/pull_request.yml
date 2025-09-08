@@ -25,9 +25,6 @@ jobs:
           distribution: 'temurin'
           cache: gradle
 
-      - name: Run ktlint
-        run: ./gradlew ktlintCheck --build-cache --parallel --max-workers=2
-
       - name: Restore cached gradle
         uses: actions/cache@v4
         with:
@@ -38,6 +35,9 @@ jobs:
           key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties') }}
           restore-keys: |
             ${{ runner.os }}-gradle-
+
+      - name: Run ktlint
+        run: ./gradlew ktlintCheck --build-cache --parallel --max-workers=2
 
   detekt:
     name: Detekt
@@ -54,9 +54,6 @@ jobs:
           distribution: 'temurin'
           cache: gradle
 
-      - name: Run detekt
-        run: ./gradlew detekt --build-cache --parallel --max-workers=2
-
       - name: Restore cached gradle
         uses: actions/cache@v4
         with:
@@ -67,6 +64,10 @@ jobs:
           key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties') }}
           restore-keys: |
             ${{ runner.os }}-gradle-
+
+      - name: Run detekt
+        run: ./gradlew detekt --build-cache --parallel --max-workers=2
+
 
   # TODO: Setup lint to be more aggressive
   lint:
