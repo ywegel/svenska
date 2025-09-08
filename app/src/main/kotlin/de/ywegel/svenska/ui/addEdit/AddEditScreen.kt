@@ -441,7 +441,10 @@ private fun GenderDropDown(selectedGender: Gender, onGenderSelected: (Gender) ->
 @Composable
 private fun AnnotationInformation(hideAnnotationInfo: () -> Unit) {
     Card {
-        Row(Modifier.padding(horizontal = Spacings.m, vertical = Spacings.xs), verticalAlignment = Alignment.CenterVertically) {
+        Row(
+            Modifier.padding(horizontal = Spacings.m, vertical = Spacings.xs),
+            verticalAlignment = Alignment.CenterVertically,
+        ) {
             Text(
                 modifier = Modifier.weight(1f),
                 text = buildAnnotatedString {
