@@ -2,6 +2,8 @@ import fitz  # PyMuPDF
 import json
 import re
 
+# Use this for the third edition of the book. The book with the half yellow and half blue cover.
+
 # Install dependencies:
 # pip install pymupdf
 
@@ -33,33 +35,29 @@ def extract_words_from_pdf(pdf_path):
                 if 'lines' in block:
                     for line in block['lines']:
                         swedish_word = ''
-                        german_word = ''
+                        english_word = ''
                         for span in line['spans']:
-                            if 'bold' in span['font'].lower():  # Bold words
-                                german_word += span['text'] + ' '
-                            else:
+                            if span['size'] == 11.0: # Skip "Sidan 123" page numbers
+                                continue
+                            elif span['size'] == 18.0: # Extract Chapters
+                                chapter_match = re.search(r'\bKAPITEL\s\d+\b', span['text'])
+                                if chapter_match:
+                                    if current_chapter is not None:
+                                        data.append({
+                                            "chapter": current_chapter,
+                                            "words": chapter_words
+                                        })
+                                        chapter_words = []
+                                    current_chapter = chapter_match.group()
+                                continue
+                            elif span['size'] == 9.0:  # Swedish words
                                 swedish_word += span['text'] + ' '
-
-                        # Filter page numbers like "Sidan 123"
-                        if re.search(r'\bSidan\s\d+\b', swedish_word) or re.search(r'\bSidan\s\d+\b', german_word):
-                            continue
-
-                        # Chapter indicators like "Kapitel 13"
-                        if re.search(r'\bKapitel\s\d+\b', swedish_word) or re.search(r'\bKapitel\s\d+\b', german_word):
-                            chapter_match = re.search(r'\bKapitel\s\d+\b', swedish_word) or re.search(r'\bKapitel\s\d+\b', german_word)
-                            if chapter_match:
-                                if current_chapter is not None:
-                                    data.append({
-                                        "chapter": current_chapter,
-                                        "words": chapter_words
-                                    })
-                                    chapter_words = []
-                                current_chapter = chapter_match.group()
-                            continue
+                            else:
+                                english_word += span['text'] + ' ' # English words
 
                         # Add words if both fields are filled
-                        if swedish_word.strip() and german_word.strip():
-                            chapter_words.append((swedish_word.strip(), german_word.strip()))
+                        if swedish_word.strip() and english_word.strip():
+                            chapter_words.append((swedish_word.strip(), english_word.strip()))
 
     # Add the last chapter
     if current_chapter is not None:
