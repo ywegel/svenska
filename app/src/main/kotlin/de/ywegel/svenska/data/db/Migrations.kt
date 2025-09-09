@@ -12,6 +12,8 @@ val MIGRATION_1_2 = object : Migration(1, 2) {
 
         db.beginTransaction()
         try {
+            val statement = db.compileStatement("UPDATE Vocabulary SET wordHighlights = ? WHERE id = ?")
+
             // Convert each highlight to the new pair format
             val cursor = db.query("SELECT id, wordHighlights, word FROM Vocabulary")
 
@@ -35,12 +37,15 @@ val MIGRATION_1_2 = object : Migration(1, 2) {
                 }
 
                 // Update the temp column with new format
-                db.execSQL(
-                    sql = "UPDATE Vocabulary SET wordHighlights = ? WHERE id = ?",
-                    bindArgs = arrayOf<Any>(newHighlightsStr, id),
-                )
+                statement.apply {
+                    bindString(1, newHighlightsStr)
+                    bindLong(2, id.toLong())
+                    executeUpdateDelete()
+                    clearBindings()
+                }
             }
             cursor.close()
+            statement.close()
             db.setTransactionSuccessful()
         } finally {
             db.endTransaction()
