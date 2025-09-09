@@ -23,7 +23,7 @@ class VocabularyMigrationTest {
     @get:Rule
     val helper: MigrationTestHelper = MigrationTestHelper(
         instrumentation = InstrumentationRegistry.getInstrumentation(),
-        assetsFolder = VocabularyDatabase::class.java.canonicalName,
+        assetsFolder = VocabularyDatabase::class.java.canonicalName!!,
         openFactory = FrameworkSQLiteOpenHelperFactory(),
     )
 
@@ -103,6 +103,48 @@ class VocabularyMigrationTest {
 
             val highlights = highlightConverter.toHighlightRanges(it.getString(0))
             expectThat(highlights).containsExactly(listOf(0 to 1, 2 to 4, 5 to 6, 7 to 8))
+        }
+    }
+
+    @Test
+    fun migrate1To2_withMultipleEntries_convertsAllCorrectly() {
+        // Given
+        val dbV1 = helper.createDatabase(TEST_DB_NAME, 1).apply {
+            execSQL(
+                """
+                INSERT INTO Vocabulary (id, word, wordHighlights, translation, gender, wordGroup, ending, notes, irregularPronunciation, isFavorite, containerId, lastEdited, created)
+                VALUES 
+                    (1, 'fråga', '2;3', 'question', 'Ultra', 'Other', '', '', NULL, 0, 1, $currentTime, $currentTime),
+                    (2, 'abcdefgh', '0;1;2;4;5;6;7;8', 'test', 'Ultra', 'Other', '', '', NULL, 0, 1, $currentTime, $currentTime),
+                    (3, 'abc', '0;2', 'abc', 'Ultra', 'Verb', '', '', NULL, 0, 1, $currentTime, $currentTime)
+                """.trimIndent(),
+            )
+            close()
+        }
+
+        // When
+        val dbV2 = helper.runMigrationsAndValidate(TEST_DB_NAME, 2, true, MIGRATION_1_2)
+
+        // Then
+        val cursor = dbV2.query("SELECT id, wordHighlights FROM Vocabulary ORDER BY id")
+        cursor.use {
+            it.moveToNext()
+            expectThat(it.getInt(it.getColumnIndexOrThrow("id"))).isEqualTo(1)
+            expectThat(it.getString(it.getColumnIndexOrThrow("wordHighlights"))).isEqualTo("2:3")
+            expectThat(highlightConverter.toHighlightRanges(it.getString(it.getColumnIndexOrThrow("wordHighlights"))))
+                .containsExactly(listOf(2 to 3))
+
+            it.moveToNext()
+            expectThat(it.getInt(it.getColumnIndexOrThrow("id"))).isEqualTo(2)
+            expectThat(it.getString(it.getColumnIndexOrThrow("wordHighlights"))).isEqualTo("0:1,2:4,5:6,7:8")
+            expectThat(highlightConverter.toHighlightRanges(it.getString(it.getColumnIndexOrThrow("wordHighlights"))))
+                .containsExactly(listOf(0 to 1, 2 to 4, 5 to 6, 7 to 8))
+
+            it.moveToNext()
+            expectThat(it.getInt(it.getColumnIndexOrThrow("id"))).isEqualTo(3)
+            expectThat(it.getString(it.getColumnIndexOrThrow("wordHighlights"))).isEqualTo("0:2")
+            expectThat(highlightConverter.toHighlightRanges(it.getString(it.getColumnIndexOrThrow("wordHighlights"))))
+                .containsExactly(listOf(0 to 2))
         }
     }
 
