@@ -2,6 +2,7 @@
 
 package de.ywegel.svenska.ui.settings
 
+import android.content.Intent
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
@@ -18,6 +19,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.ramcosta.composedestinations.annotation.Destination
+import com.ramcosta.composedestinations.annotation.parameters.DeepLink
 import com.ramcosta.composedestinations.generated.destinations.AboutLibrariesScreenDestination
 import com.ramcosta.composedestinations.generated.destinations.OnboardingScreenDestination
 import com.ramcosta.composedestinations.generated.destinations.SearchSettingsScreenDestination
@@ -36,7 +38,15 @@ import de.ywegel.svenska.ui.common.VerticalSpacerXXS
 import de.ywegel.svenska.ui.theme.Spacings
 import de.ywegel.svenska.ui.theme.SvenskaTheme
 
-@Destination<SettingsNavGraph>(start = true, style = LateralTransition::class)
+@Destination<SettingsNavGraph>(
+    start = true,
+    style = LateralTransition::class,
+    deepLinks = [
+        DeepLink(
+            action = Intent.ACTION_APPLICATION_PREFERENCES, // "android.intent.action.APPLICATION_PREFERENCES",
+        ),
+    ],
+)
 @Composable
 fun SettingsScreen(navigator: DestinationsNavigator, viewModel: SettingsViewModel) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
