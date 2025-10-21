@@ -3,6 +3,7 @@
 package de.ywegel.svenska.ui.settings
 
 import android.content.Intent
+import androidx.activity.compose.LocalOnBackPressedDispatcherOwner
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
@@ -50,11 +51,15 @@ import de.ywegel.svenska.ui.theme.SvenskaTheme
 @Composable
 fun SettingsScreen(navigator: DestinationsNavigator, viewModel: SettingsViewModel) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+    val backDispatcher = LocalOnBackPressedDispatcherOwner.current
 
     SettingsScreen(
         uiState = uiState,
         callbacks = viewModel,
-        navigateUp = navigator::navigateUp,
+        navigateUp = {
+            // If we got here via the deep link, we can only get back to the OS-Settings via the back dispatcher.
+            backDispatcher?.onBackPressedDispatcher?.onBackPressed() ?: navigator.navigateUp()
+        },
         navigateToWordImporter = { navigator.navigate(WordImporterScreenDestination) },
         navigateToAboutLibraries = { navigator.navigate(AboutLibrariesScreenDestination) },
         navigateToOnboarding = { navigator.navigate(OnboardingScreenDestination) },
