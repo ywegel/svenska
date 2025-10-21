@@ -7,6 +7,7 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import de.ywegel.svenska.data.VocabularyRepository
 import de.ywegel.svenska.data.model.Vocabulary
 import de.ywegel.svenska.di.IoDispatcher
+import de.ywegel.svenska.domain.quiz.model.QuizMode
 import de.ywegel.svenska.domain.quiz.model.UserAnswer
 import de.ywegel.svenska.domain.quiz.strategies.OnlyEndingsQuizStrategy
 import de.ywegel.svenska.ui.quiz.BaseQuizViewModel
@@ -20,6 +21,7 @@ import kotlinx.coroutines.CoroutineDispatcher
 class OnlyEndingsQuizViewModel @AssistedInject constructor(
     repository: VocabularyRepository,
     @IoDispatcher ioDispatcher: CoroutineDispatcher,
+    @Assisted private val quizMode: QuizMode.OnlyEndings,
     @Assisted containerId: Int?,
 ) : BaseQuizViewModel<
     UserAnswer.OnlyEndingsAnswer,
@@ -33,6 +35,7 @@ class OnlyEndingsQuizViewModel @AssistedInject constructor(
     userInputControllerFactory = { OnlyEndingsController() },
     containerId = containerId,
 ) {
+    override val shuffleWords: Boolean = quizMode.shuffleWords
 
     override val renderer = OnlyEndingsRenderer()
 
@@ -42,6 +45,6 @@ class OnlyEndingsQuizViewModel @AssistedInject constructor(
 
     @AssistedFactory
     interface Factory {
-        fun create(containerId: Int?): OnlyEndingsQuizViewModel
+        fun create(quizMode: QuizMode.OnlyEndings, containerId: Int?): OnlyEndingsQuizViewModel
     }
 }

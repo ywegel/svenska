@@ -37,6 +37,7 @@ import de.ywegel.svenska.navigation.transitions.LateralTransition
 import de.ywegel.svenska.ui.common.HorizontalSpacerS
 import de.ywegel.svenska.ui.common.TopAppTextBar
 import de.ywegel.svenska.ui.common.VerticalSpacerM
+import de.ywegel.svenska.ui.common.VerticalSpacerXXS
 import de.ywegel.svenska.ui.theme.Spacings
 import de.ywegel.svenska.ui.theme.SvenskaTheme
 
@@ -71,8 +72,11 @@ private fun QuizConfigurationScreen(
     navigateToQuiz: () -> Unit,
     onNavigateUp: () -> Unit,
 ) {
-    Scaffold(topBar = { TopAppTextBar("Configure the Quiz", onNavigateUp) }) { padding ->
-        Column(Modifier.padding(padding)) {
+    Scaffold(topBar = { TopAppTextBar(stringResource(R.string.quiz_config_title), onNavigateUp) }) { padding ->
+        Column(
+            Modifier.padding(padding),
+            horizontalAlignment = Alignment.CenterHorizontally,
+        ) {
             Column(
                 Modifier
                     .fillMaxWidth()
@@ -82,7 +86,7 @@ private fun QuizConfigurationScreen(
                 verticalArrangement = Arrangement.Center,
             ) {
                 TranslationModeSelector(
-                    selectedMode = configState.selectedType,
+                    selectedMode = configState.selectedMode,
                     enabled = !configState.onlyEndings,
                     selectedModeChanged = callbacks::quizModeChanged,
                 )
@@ -92,7 +96,7 @@ private fun QuizConfigurationScreen(
                     // TODO: Add explanations to both switches. Either by description text or an info icon with popup bubble
                     // TODO: Additionally rework the switches. Maybe use the same ones, as for the Settings ans explain these switches in the description?
                     SwitchWithText(
-                        text = "Additionally test endings",
+                        text = stringResource(R.string.quiz_config_additionally_test_endings_description),
                         fillTextWidth = false,
                         switchChecked = configState.withEndings,
                         enabled = !configState.onlyEndings,
@@ -100,19 +104,27 @@ private fun QuizConfigurationScreen(
                     )
 
                     SwitchWithText(
-                        text = "Only test endings",
+                        text = stringResource(R.string.quiz_config_only_test_endings_description),
                         fillTextWidth = false,
                         switchChecked = configState.onlyEndings,
                         onSwitchChanged = callbacks::onlyEndingsChanged,
                     )
                 }
             }
+            VerticalSpacerM()
+            SwitchWithText(
+                text = stringResource(R.string.quiz_config_shuffle_words_description),
+                switchChecked = configState.shuffleWords,
+                fillTextWidth = false,
+                onSwitchChanged = callbacks::shuffleWordsChanged,
+            )
+            VerticalSpacerXXS()
             Button(
                 onClick = navigateToQuiz,
                 modifier = Modifier
-                    .padding(Spacings.m)
+                    .padding(start = Spacings.m, end = Spacings.m, bottom = Spacings.m)
                     .fillMaxWidth(),
-                enabled = configState.selectedType != null || configState.onlyEndings,
+                enabled = configState.selectedMode != null || configState.onlyEndings,
             ) { Text(stringResource(R.string.general_next)) }
         }
     }

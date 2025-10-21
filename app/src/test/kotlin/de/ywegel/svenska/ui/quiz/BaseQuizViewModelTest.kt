@@ -54,6 +54,7 @@ class BaseQuizViewModelTest {
         strategy: QuizStrategy<UserAnswer.TranslateWithoutEndingsAnswer, Boolean>,
         userInputControllerFactory: () -> QuizUserInputController<TestState, TestActions>,
         containerId: Int?,
+        override val shuffleWords: Boolean = true,
         override val renderer: QuizRenderer<UserAnswer.TranslateWithoutEndingsAnswer, TestState, TestActions, Boolean>,
     ) : BaseQuizViewModel<UserAnswer.TranslateWithoutEndingsAnswer, TestState, TestActions, Boolean>(
         repository,

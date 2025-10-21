@@ -8,6 +8,7 @@ class QuizManager<A : UserAnswer, AnswerResult : Any>(
     private val strategy: QuizStrategy<A, AnswerResult>,
     private val loadVocabularies: suspend (containerId: Int?) -> List<Vocabulary>,
     private val containerId: Int?,
+    private val shuffleWords: Boolean,
 ) {
     private val vocabularyList: MutableList<Vocabulary> = mutableListOf()
     private var currentIndex = 0
@@ -15,7 +16,11 @@ class QuizManager<A : UserAnswer, AnswerResult : Any>(
     suspend fun startQuiz() {
         vocabularyList.clear()
         vocabularyList.addAll(
-            loadVocabularies(containerId).shuffled(),
+            if (shuffleWords) {
+                loadVocabularies(containerId).shuffled()
+            } else {
+                loadVocabularies(containerId)
+            },
         )
         currentIndex = 0
     }

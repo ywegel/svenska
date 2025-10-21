@@ -23,6 +23,8 @@ abstract class BaseQuizViewModel<A : UserAnswer, S : QuizInputState<A>, AC : Any
     protected val containerId: Int?,
 ) : ViewModel(), QuizCallbacks<A> {
 
+    abstract val shuffleWords: Boolean
+
     abstract val renderer: QuizRenderer<A, S, AC, AR>
 
     abstract suspend fun loadVocabularies(containerId: Int?): List<Vocabulary>
@@ -38,6 +40,7 @@ abstract class BaseQuizViewModel<A : UserAnswer, S : QuizInputState<A>, AC : Any
         strategy = strategy,
         loadVocabularies = ::loadVocabularies,
         containerId = containerId,
+        shuffleWords = shuffleWords,
     )
 
     init {

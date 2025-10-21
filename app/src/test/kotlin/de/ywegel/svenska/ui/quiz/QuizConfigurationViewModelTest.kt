@@ -24,60 +24,69 @@ class QuizConfigurationViewModelTest {
         @JvmStatic
         private fun provideGenerateNavigationArgsTestData(): Stream<Pair<ConfigurationState, QuizMode?>> = Stream.of(
             Pair(
-                ConfigurationState(selectedType = TranslateMode.Random, withEndings = false, onlyEndings = false),
-                QuizMode.Translate(TranslateMode.Random),
+                ConfigurationState(selectedMode = TranslateMode.Random, withEndings = false, onlyEndings = false),
+                QuizMode.Translate(mode = TranslateMode.Random, shuffleWords = true),
             ),
             Pair(
                 ConfigurationState(
-                    selectedType = TranslateMode.SwedishToNative,
+                    selectedMode = TranslateMode.SwedishToNative,
                     withEndings = false,
                     onlyEndings = false,
                 ),
-                QuizMode.Translate(TranslateMode.SwedishToNative),
+                QuizMode.Translate(mode = TranslateMode.SwedishToNative, shuffleWords = true),
             ),
             Pair(
-                ConfigurationState(selectedType = null, withEndings = false, onlyEndings = false),
+                ConfigurationState(selectedMode = null, withEndings = false, onlyEndings = false),
                 null,
             ),
             Pair(
-                ConfigurationState(selectedType = TranslateMode.Random, withEndings = true, onlyEndings = false),
-                QuizMode.TranslateWithEndings(TranslateMode.Random),
+                ConfigurationState(selectedMode = TranslateMode.Random, withEndings = true, onlyEndings = false),
+                QuizMode.TranslateWithEndings(mode = TranslateMode.Random, shuffleWords = true),
             ),
             Pair(
                 ConfigurationState(
-                    selectedType = TranslateMode.SwedishToNative,
+                    selectedMode = TranslateMode.SwedishToNative,
                     withEndings = true,
                     onlyEndings = false,
                 ),
-                QuizMode.TranslateWithEndings(TranslateMode.SwedishToNative),
+                QuizMode.TranslateWithEndings(mode = TranslateMode.SwedishToNative, shuffleWords = true),
             ),
             Pair(
-                ConfigurationState(selectedType = null, withEndings = true, onlyEndings = false),
+                ConfigurationState(selectedMode = null, withEndings = true, onlyEndings = false),
                 null,
             ),
             Pair(
                 ConfigurationState(
-                    selectedType = TranslateMode.SwedishToNative,
+                    selectedMode = TranslateMode.SwedishToNative,
                     withEndings = true,
                     onlyEndings = true,
                 ),
-                QuizMode.OnlyEndings,
+                QuizMode.OnlyEndings(shuffleWords = true),
             ),
             Pair(
-                ConfigurationState(selectedType = TranslateMode.Random, withEndings = true, onlyEndings = true),
-                QuizMode.OnlyEndings,
+                ConfigurationState(selectedMode = TranslateMode.Random, withEndings = true, onlyEndings = true),
+                QuizMode.OnlyEndings(shuffleWords = true),
             ),
             Pair(
                 ConfigurationState(
-                    selectedType = TranslateMode.SwedishToNative,
+                    selectedMode = TranslateMode.SwedishToNative,
                     withEndings = false,
                     onlyEndings = true,
                 ),
-                QuizMode.OnlyEndings,
+                QuizMode.OnlyEndings(shuffleWords = true),
             ),
             Pair(
-                ConfigurationState(selectedType = null, withEndings = false, onlyEndings = true),
-                QuizMode.OnlyEndings,
+                ConfigurationState(selectedMode = null, withEndings = false, onlyEndings = true),
+                QuizMode.OnlyEndings(shuffleWords = true),
+            ),
+            Pair(
+                ConfigurationState(
+                    selectedMode = TranslateMode.Random,
+                    withEndings = false,
+                    onlyEndings = false,
+                    shuffleWords = false,
+                ),
+                QuizMode.Translate(mode = TranslateMode.Random, shuffleWords = false),
             ),
         )
     }

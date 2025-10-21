@@ -15,7 +15,7 @@ class QuizConfigurationViewModel(
 
     override fun quizModeChanged(mode: TranslateMode) {
         _configurationState.update {
-            it.copy(selectedType = mode)
+            it.copy(selectedMode = mode)
         }
     }
 
@@ -30,8 +30,16 @@ class QuizConfigurationViewModel(
             it.copy(
                 withEndings = true,
                 onlyEndings = onlyEndings,
-                selectedType = TranslateMode.NativeToSwedish,
+                selectedMode = TranslateMode.NativeToSwedish,
             ) // Only Native mode is supported
+        }
+    }
+
+    override fun shuffleWordsChanged(shuffleWords: Boolean) {
+        _configurationState.update {
+            it.copy(
+                shuffleWords = shuffleWords,
+            )
         }
     }
 
@@ -39,9 +47,17 @@ class QuizConfigurationViewModel(
         val state = configurationState.value
         return with(state) {
             when {
-                !withEndings && !onlyEndings && selectedType != null -> QuizMode.Translate(selectedType)
-                withEndings && !onlyEndings && selectedType != null -> QuizMode.TranslateWithEndings(selectedType)
-                onlyEndings -> QuizMode.OnlyEndings
+                !withEndings && !onlyEndings && selectedMode != null -> QuizMode.Translate(
+                    mode = selectedMode,
+                    shuffleWords = shuffleWords,
+                )
+
+                withEndings && !onlyEndings && selectedMode != null -> QuizMode.TranslateWithEndings(
+                    mode = selectedMode,
+                    shuffleWords = shuffleWords,
+                )
+
+                onlyEndings -> QuizMode.OnlyEndings(shuffleWords)
                 else -> null
             }
         }
@@ -49,7 +65,8 @@ class QuizConfigurationViewModel(
 }
 
 data class ConfigurationState(
-    val selectedType: TranslateMode? = null,
+    val selectedMode: TranslateMode? = null,
     val withEndings: Boolean = false,
     val onlyEndings: Boolean = false,
+    val shuffleWords: Boolean = true,
 )

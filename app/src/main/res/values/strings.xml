@@ -138,6 +138,12 @@
 
     <string name="addEdit_annotation_information_text">You can emphasize long pronunciations by surrounding the pronounced letters with two stars:\ne*ll*er -> </string>
 
+    <!-- # Quiz Configuration # -->
+    <string name="quiz_config_title">Configure the Quiz</string>
+    <string name="quiz_config_additionally_test_endings_description">Additionally test endings</string>
+    <string name="quiz_config_only_test_endings_description">Only test endings</string>
+    <string name="quiz_config_shuffle_words_description">Shuffle words</string>
+
     <!-- # Quiz # -->
     <string name="quiz_title">Quiz</string>
 

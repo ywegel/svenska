@@ -8,4 +8,5 @@ object QuizConfigurationCallbacksFake : QuizConfigurationCallbacks {
     override fun quizModeChanged(mode: TranslateMode) {}
     override fun withEndingsChanged(withEndings: Boolean) {}
     override fun onlyEndingsChanged(onlyEndings: Boolean) {}
+    override fun shuffleWordsChanged(shuffleWords: Boolean) {}
 }
