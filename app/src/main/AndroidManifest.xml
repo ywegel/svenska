@@ -38,6 +38,12 @@
                 <data android:scheme="content" />
                 <data android:scheme="file" />
             </intent-filter>
+
+        <!-- Deeplink to the settings, to link from the settings app to the svenska app settings -->
+        <intent-filter>
+            <action android:name="android.intent.action.APPLICATION_PREFERENCES" />
+            <category android:name="android.intent.category.DEFAULT" />
+        </intent-filter>
         </activity>
     </application>
 
