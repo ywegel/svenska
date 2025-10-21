@@ -37,7 +37,7 @@ fun QuizScreen(navArgs: QuizNavArgs, navigator: DestinationsNavigator) {
         is QuizMode.Translate -> {
             hiltViewModel<TranslateQuizViewModel, TranslateQuizViewModel.Factory>(
                 creationCallback = { factory: TranslateQuizViewModel.Factory ->
-                    factory.create(quizMode.mode, navArgs.containerId)
+                    factory.create(quizMode, navArgs.containerId)
                 },
             )
         }
@@ -45,7 +45,7 @@ fun QuizScreen(navArgs: QuizNavArgs, navigator: DestinationsNavigator) {
         is QuizMode.TranslateWithEndings -> {
             hiltViewModel<TranslateWithEndingsQuizViewModel, TranslateWithEndingsQuizViewModel.Factory>(
                 creationCallback = { factory: TranslateWithEndingsQuizViewModel.Factory ->
-                    factory.create(quizMode.mode, navArgs.containerId)
+                    factory.create(quizMode, navArgs.containerId)
                 },
             )
         }
@@ -53,7 +53,7 @@ fun QuizScreen(navArgs: QuizNavArgs, navigator: DestinationsNavigator) {
         is QuizMode.OnlyEndings -> {
             hiltViewModel<OnlyEndingsQuizViewModel, OnlyEndingsQuizViewModel.Factory>(
                 creationCallback = { factory: OnlyEndingsQuizViewModel.Factory ->
-                    factory.create(navArgs.containerId)
+                    factory.create(quizMode, navArgs.containerId)
                 },
             )
         }

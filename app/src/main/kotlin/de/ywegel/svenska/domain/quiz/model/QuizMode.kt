@@ -4,15 +4,14 @@ import android.os.Parcelable
 import kotlinx.parcelize.Parcelize
 
 sealed class QuizMode : Parcelable {
-    @Parcelize
-    data class Translate(val mode: TranslateMode) : QuizMode()
+    abstract val shuffleWords: Boolean
 
     @Parcelize
-    data class TranslateWithEndings(val mode: TranslateMode) : QuizMode()
+    data class Translate(val mode: TranslateMode, override val shuffleWords: Boolean) : QuizMode()
 
     @Parcelize
-    data object OnlyEndings : QuizMode()
+    data class TranslateWithEndings(val mode: TranslateMode, override val shuffleWords: Boolean) : QuizMode()
 
-    // @Parcelize
-    // data class Endings(val mode: EndingsMode) : QuizMode()
+    @Parcelize
+    data class OnlyEndings(override val shuffleWords: Boolean) : QuizMode()
 }

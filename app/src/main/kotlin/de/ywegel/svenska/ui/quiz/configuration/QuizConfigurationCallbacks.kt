@@ -9,4 +9,5 @@ interface QuizConfigurationCallbacks {
     fun quizModeChanged(mode: TranslateMode)
     fun withEndingsChanged(withEndings: Boolean)
     fun onlyEndingsChanged(onlyEndings: Boolean)
+    fun shuffleWordsChanged(shuffleWords: Boolean)
 }

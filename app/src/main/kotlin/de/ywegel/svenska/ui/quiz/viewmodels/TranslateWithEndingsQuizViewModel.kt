@@ -7,7 +7,7 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import de.ywegel.svenska.data.VocabularyRepository
 import de.ywegel.svenska.data.model.Vocabulary
 import de.ywegel.svenska.di.IoDispatcher
-import de.ywegel.svenska.domain.quiz.model.TranslateMode
+import de.ywegel.svenska.domain.quiz.model.QuizMode
 import de.ywegel.svenska.domain.quiz.model.UserAnswer
 import de.ywegel.svenska.domain.quiz.strategies.TranslationWithEndingsQuizStrategy
 import de.ywegel.svenska.ui.quiz.BaseQuizViewModel
@@ -22,7 +22,7 @@ import kotlinx.coroutines.CoroutineDispatcher
 class TranslateWithEndingsQuizViewModel @AssistedInject constructor(
     repository: VocabularyRepository,
     @IoDispatcher ioDispatcher: CoroutineDispatcher,
-    @Assisted private val translateMode: TranslateMode,
+    @Assisted private val quizMode: QuizMode.TranslateWithEndings,
     @Assisted containerId: Int?,
 ) : BaseQuizViewModel<
     UserAnswer.TranslateWithEndingsAnswer,
@@ -32,10 +32,11 @@ class TranslateWithEndingsQuizViewModel @AssistedInject constructor(
     >(
     repository,
     ioDispatcher,
-    TranslationWithEndingsQuizStrategy(translateMode),
+    TranslationWithEndingsQuizStrategy(quizMode.mode),
     { TranslateWithEndingsController() },
     containerId,
 ) {
+    override val shuffleWords: Boolean = quizMode.shuffleWords
 
     override val renderer = TranslateWithEndingsRenderer()
 
@@ -45,6 +46,6 @@ class TranslateWithEndingsQuizViewModel @AssistedInject constructor(
 
     @AssistedFactory
     interface Factory {
-        fun create(translateMode: TranslateMode, containerId: Int?): TranslateWithEndingsQuizViewModel
+        fun create(quizMode: QuizMode.TranslateWithEndings, containerId: Int?): TranslateWithEndingsQuizViewModel
     }
 }
