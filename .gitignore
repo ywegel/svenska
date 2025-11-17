@@ -7,8 +7,8 @@ app/release/
 
 # Scripts
 /scripts
-!scripts/rivstar_third_edition_wordlist_extractor.py
-!scripts/rivstar_wordlist_extractor_second_edition.py.py
+!scripts/rivstart_third_edition_wordlist_extractor.py
+!scripts/rivstart_wordlist_extractor_second_edition.py.py
 
 # Local configuration file (sdk path, etc)
 /local.properties
