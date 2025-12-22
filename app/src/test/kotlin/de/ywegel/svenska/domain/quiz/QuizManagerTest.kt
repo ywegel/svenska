@@ -28,4 +28,22 @@ class QuizManagerTest {
 
         expectThat(manager.vocabularyList).containsExactly(vocabularies.shuffled(Random(5)))
     }
+
+    @Test
+    fun `Non-shuffle QuizManager should not shuffle words`() {
+        val vocabularies = vocabularies()
+        val manager = QuizManager(
+            TranslationWithoutEndingsQuizStrategy(TranslateMode.NativeToSwedish),
+            loadVocabularies = {
+                vocabularies
+            },
+            containerId = 1,
+            shuffleWords = false,
+            random = Random(5),
+        )
+
+        runBlocking { manager.startQuiz() }
+
+        expectThat(manager.vocabularyList).containsExactly(vocabularies)
+    }
 }
