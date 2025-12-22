@@ -4,7 +4,6 @@ import android.util.Log
 import androidx.room.migration.Migration
 import androidx.sqlite.db.SupportSQLiteDatabase
 import de.ywegel.svenska.domain.wordImporter.WordExtractor.normalizePdfDashes
-import kotlinx.serialization.InternalSerializationApi
 
 private const val TAG = "Migrations"
 
@@ -57,7 +56,6 @@ val MIGRATION_1_2 = object : Migration(1, 2) {
 }
 
 @Suppress("detekt:MagicNumber", "detekt:NestedBlockDepth")
-@OptIn(InternalSerializationApi::class)
 val MIGRATION_2_3 = object : Migration(2, 3) {
     override fun migrate(db: SupportSQLiteDatabase) {
         Log.i(TAG, "migrate: Starting migration from 2 to 3...")

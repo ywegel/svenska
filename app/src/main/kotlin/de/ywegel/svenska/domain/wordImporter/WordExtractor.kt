@@ -22,7 +22,7 @@ object WordExtractor {
      * Replace the long dashes that are wrongly extracted from the pdf
      */
     fun String.normalizePdfDashes(): String {
-        return this.replace('\u2212', '-')
+        return this
             .replace('\u2212', '-')
             .replace('\u2013', '-')
             .replace('\u2014', '-')
