@@ -33,10 +33,9 @@ class TranslateQuizViewModel @AssistedInject constructor(
     ioDispatcher = ioDispatcher,
     strategy = TranslationWithoutEndingsQuizStrategy(quizMode.mode),
     userInputControllerFactory = { TranslateWithoutEndingsController() },
+    shuffleWords = quizMode.shuffleWords,
     containerId = containerId,
 ) {
-    override val shuffleWords: Boolean = quizMode.shuffleWords
-
     override val renderer = TranslateWithoutEndingsRenderer()
 
     override suspend fun loadVocabularies(containerId: Int?): List<Vocabulary> {

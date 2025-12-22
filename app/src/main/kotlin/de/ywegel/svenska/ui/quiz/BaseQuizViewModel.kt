@@ -20,11 +20,9 @@ abstract class BaseQuizViewModel<A : UserAnswer, S : QuizInputState<A>, AC : Any
     protected val ioDispatcher: CoroutineDispatcher,
     strategy: QuizStrategy<A, AR>,
     userInputControllerFactory: () -> QuizUserInputController<S, AC>,
+    val shuffleWords: Boolean,
     protected val containerId: Int?,
 ) : ViewModel(), QuizCallbacks<A> {
-
-    abstract val shuffleWords: Boolean
-
     abstract val renderer: QuizRenderer<A, S, AC, AR>
 
     abstract suspend fun loadVocabularies(containerId: Int?): List<Vocabulary>

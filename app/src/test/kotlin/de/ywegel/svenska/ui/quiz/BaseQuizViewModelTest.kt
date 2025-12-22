@@ -54,14 +54,14 @@ class BaseQuizViewModelTest {
         strategy: QuizStrategy<UserAnswer.TranslateWithoutEndingsAnswer, Boolean>,
         userInputControllerFactory: () -> QuizUserInputController<TestState, TestActions>,
         containerId: Int?,
-        override val shuffleWords: Boolean = true,
         override val renderer: QuizRenderer<UserAnswer.TranslateWithoutEndingsAnswer, TestState, TestActions, Boolean>,
     ) : BaseQuizViewModel<UserAnswer.TranslateWithoutEndingsAnswer, TestState, TestActions, Boolean>(
-        repository,
-        ioDispatcher,
-        strategy,
-        userInputControllerFactory,
-        containerId,
+        repository = repository,
+        ioDispatcher = ioDispatcher,
+        strategy = strategy,
+        userInputControllerFactory = userInputControllerFactory,
+        shuffleWords = true,
+        containerId = containerId,
     ) {
         override suspend fun loadVocabularies(containerId: Int?): List<Vocabulary> {
             return repository.getAllVocabulariesSnapshot(containerId)

@@ -33,10 +33,9 @@ class OnlyEndingsQuizViewModel @AssistedInject constructor(
     ioDispatcher = ioDispatcher,
     strategy = OnlyEndingsQuizStrategy(),
     userInputControllerFactory = { OnlyEndingsController() },
+    shuffleWords = quizMode.shuffleWords,
     containerId = containerId,
 ) {
-    override val shuffleWords: Boolean = quizMode.shuffleWords
-
     override val renderer = OnlyEndingsRenderer()
 
     override suspend fun loadVocabularies(containerId: Int?): List<Vocabulary> {
