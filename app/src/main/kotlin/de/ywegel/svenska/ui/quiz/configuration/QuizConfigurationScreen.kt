@@ -2,6 +2,7 @@
 
 package de.ywegel.svenska.ui.quiz.configuration
 
+import android.util.Log
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.IntrinsicSize
@@ -30,6 +31,7 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import com.ramcosta.composedestinations.annotation.Destination
 import com.ramcosta.composedestinations.generated.destinations.QuizScreenDestination
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
+import de.ywegel.svenska.BuildConfig
 import de.ywegel.svenska.R
 import de.ywegel.svenska.domain.quiz.model.TranslateMode
 import de.ywegel.svenska.navigation.QuizGraph
@@ -40,6 +42,8 @@ import de.ywegel.svenska.ui.common.VerticalSpacerM
 import de.ywegel.svenska.ui.common.VerticalSpacerXXS
 import de.ywegel.svenska.ui.theme.Spacings
 import de.ywegel.svenska.ui.theme.SvenskaTheme
+
+private const val TAG = "QuizConfigurationScreen"
 
 @Destination<QuizGraph>(style = LateralTransition::class, start = true)
 @Composable
@@ -53,6 +57,9 @@ fun QuizConfigurationScreen(navigator: DestinationsNavigator, containerId: Int?)
         navigateToQuiz = {
             viewModel.generateNavigationArgs()?.let { quizMode ->
                 // navigator.popBackStack() // TODO: maybe remove config screen from backstack after navigation?
+                if (BuildConfig.DEBUG) {
+                    Log.d(TAG, "QuizConfigurationScreen: Navigating to QuizScreen with navigation args: $quizMode")
+                }
                 navigator.navigate(
                     QuizScreenDestination(
                         quizMode = quizMode,
