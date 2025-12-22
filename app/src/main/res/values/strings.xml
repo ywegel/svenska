@@ -214,6 +214,10 @@
     <!-- ## Nouns ## -->
     <string name="nouns_tab">Nouns</string>
     <string name="noun_gender_title">Swedish Genders</string>
+    <string name="noun_gender_en_group">Ultra (en)</string>
+    <string name="noun_gender_en_group_rule">Nouns with the ultra gender use *en* for the indefinite singular</string>
+    <string name="noun_gender_ett_group">Neutra (ett)</string>
+    <string name="noun_gender_ett_group_rule">Nouns with the neuter gender use *ett* for the indefinite singular</string>
     <string name="nouns_title">Swedish Nouns</string>
     <string name="group_or">Group 1 (-or)</string>
     <string name="group_or_rule">En-words that end with *a*, use *-or* for the plural</string>
@@ -232,9 +236,11 @@
     <string name="group_n_example">ett kvitto → kvittot, *kvitton*, kvittona</string>
     <string name="group_unchanged">Group 6 (-)</string>
     <string name="group_unchanged_rule">Ett-words that end with a consonant, or certain en-words, use the indefinite singular for the indefinite plural</string>
-    <string name="group_unchanged_example">ett hus → huset, hus, husen; en lärare → läraren, lärare, lärarna</string>
+    <string name="group_unchanged_example">ett hus → huset, *hus*, husen; en lärare → läraren, *lärare*, lärarna</string>
+    <string name="group_special">Special words</string>
+    <string name="group_special_rule">Special words don\'t follow any of the rules above</string>
 
-    <string name="example_format">Example: %s</string>
+    <string name="example_format">Example: </string>
 
     <!-- # Settings # -->
     <string name="settings_title">Settings</string>
