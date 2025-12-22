@@ -10,7 +10,7 @@ interface WordParser {
 class WordParserImpl : WordParser {
 
     override fun parseWord(word: String?, translation: String?, containerId: Int): Vocabulary {
-        val (baseWord, endings) = WordGroupMatcher.extractWordAndEndings(word.orEmpty().trim())
+        val (baseWord, endings) = WordExtractor.extractWordAndEndings(word.orEmpty().trim())
         val wordGroup = WordGroupMatcher.determineWordGroup(baseWord, endings)
         val gender = WordGroupMatcher.determineGender(wordGroup, endings)
 

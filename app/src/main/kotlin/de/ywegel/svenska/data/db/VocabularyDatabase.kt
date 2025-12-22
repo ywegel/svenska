@@ -19,7 +19,7 @@ import javax.inject.Provider
 
 @Database(
     entities = [Vocabulary::class, VocabularyContainer::class],
-    version = 2,
+    version = 3,
     exportSchema = true,
 )
 abstract class VocabularyDatabase : RoomDatabase() {

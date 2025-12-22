@@ -4,18 +4,6 @@ import de.ywegel.svenska.data.model.Gender
 import de.ywegel.svenska.data.model.WordGroup
 
 object WordGroupMatcher {
-    fun extractWordAndEndings(word: String): Pair<String, List<String>> {
-        val regex = Regex("""(.+?)\s*\(([^)]+)\)""")
-        val matchResult = regex.find(word)
-        return if (matchResult != null) {
-            val baseWord = matchResult.groupValues[1]
-            val endings = matchResult.groupValues[2].split(",").map { it.trim() }
-            Pair(baseWord.trim(), endings)
-        } else {
-            Pair(word.trim(), emptyList())
-        }
-    }
-
     fun determineWordGroup(baseWord: String, endings: List<String>): WordGroup {
         return when {
             isAdjective(endings) -> WordGroup.Adjective
