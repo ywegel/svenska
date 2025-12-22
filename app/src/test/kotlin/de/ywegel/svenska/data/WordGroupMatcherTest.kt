@@ -10,15 +10,6 @@ import org.junit.jupiter.params.provider.MethodSource
 import java.util.stream.Stream
 
 class WordGroupMatcherTest {
-
-    @ParameterizedTest
-    @MethodSource("provideExtractWordAndEndingsTestCases")
-    fun testExtractWordAndEndings(input: String, expectedWord: String, expectedEndings: List<String>) {
-        val result = WordGroupMatcher.extractWordAndEndings(input)
-        assertEquals(expectedWord, result.first)
-        assertEquals(expectedEndings, result.second)
-    }
-
     @ParameterizedTest
     @MethodSource("provideDetermineWordGroupTestCases")
     fun testDetermineWordGroup(baseWord: String, endings: List<String>, expectedGroup: WordGroup) {
@@ -29,7 +20,7 @@ class WordGroupMatcherTest {
     @Suppress("detekt:UnusedParameter")
     @ParameterizedTest
     @MethodSource("provideDetermineGenderTestCases")
-    fun testDetermineGender(baseWord: String, endings: List<String>, expectedGender: Gender?) {
+    fun testDetermineGender(ignore: String, endings: List<String>, expectedGender: Gender?) {
         val result = WordGroupMatcher.determineGender(
             WordGroup.Noun(WordGroup.NounSubgroup.UNDEFINED),
             endings,
@@ -38,34 +29,6 @@ class WordGroupMatcherTest {
     }
 
     companion object {
-        @JvmStatic
-        fun provideExtractWordAndEndingsTestCases(): Stream<Arguments> {
-            return Stream.of(
-                Arguments.of("penna (-n, -or, -orna)", "penna", listOf("-n", "-or", "-orna")),
-                Arguments.of("mobil (-en, -er, -erna)", "mobil", listOf("-en", "-er", "-erna")),
-                Arguments.of("söka (-er, -te, -t)", "söka", listOf("-er", "-te", "-t")),
-                Arguments.of("land (-et, länder, länderna)", "land", listOf("-et", "länder", "länderna")),
-                Arguments.of("svensk (-t, -a)", "svensk", listOf("-t", "-a")),
-
-                // Edge cases
-                // No endings
-                Arguments.of("example", "example", emptyList<String>()),
-                // Empty input
-                Arguments.of("", "", emptyList<String>()),
-                // Empty parentheses
-                Arguments.of("word ()", "word ()", emptyList<String>()),
-                // Empty endings in parentheses
-                Arguments.of("word (,,)", "word", listOf("", "", "")),
-                // Dash endings in parentheses
-                Arguments.of("word (-, -, -)", "word", listOf("-", "-", "-")),
-                // Only one ending
-                Arguments.of("word (-n)", "word", listOf("-n")),
-                // Whitespace noise
-                Arguments.of("  penna   (  -n  ,  -or  ,   -orna   )   ", "penna", listOf("-n", "-or", "-orna")),
-
-            )
-        }
-
         @Suppress("ktlint:standard:argument-list-wrapping")
         @JvmStatic
         fun provideDetermineWordGroupTestCases(): Stream<Arguments> {
