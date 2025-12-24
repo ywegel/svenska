@@ -18,17 +18,20 @@ import dagger.hilt.components.SingletonComponent
 import de.ywegel.svenska.data.ContainerRepository
 import de.ywegel.svenska.data.FavoritesAndPronunciationsRepository
 import de.ywegel.svenska.data.FileRepository
+import de.ywegel.svenska.data.QuizRepository
 import de.ywegel.svenska.data.SearchRepository
 import de.ywegel.svenska.data.VocabularyRepository
 import de.ywegel.svenska.data.db.ContainerDao
 import de.ywegel.svenska.data.db.MIGRATION_1_2
 import de.ywegel.svenska.data.db.MIGRATION_2_3
+import de.ywegel.svenska.data.db.QuizDao
 import de.ywegel.svenska.data.db.SearchDao
 import de.ywegel.svenska.data.db.VocabularyDao
 import de.ywegel.svenska.data.db.VocabularyDatabase
 import de.ywegel.svenska.data.impl.ContainerRepositoryImpl
 import de.ywegel.svenska.data.impl.FavoritesAndPronunciationsRepositoryImpl
 import de.ywegel.svenska.data.impl.FileRepositoryImpl
+import de.ywegel.svenska.data.impl.QuizRepositoryImpl
 import de.ywegel.svenska.data.impl.SearchRepositoryImpl
 import de.ywegel.svenska.data.impl.VocabularyRepositoryImpl
 import de.ywegel.svenska.data.preferences.OVERVIEW_PREFERENCES_NAME
@@ -75,6 +78,10 @@ class SvenskaModule {
 
     @Singleton
     @Provides
+    fun provideQuizDao(db: VocabularyDatabase): QuizDao = db.quiz()
+
+    @Singleton
+    @Provides
     fun provideVocabularyRepository(dao: VocabularyDao): VocabularyRepository = VocabularyRepositoryImpl(dao)
 
     @Singleton
@@ -89,6 +96,10 @@ class SvenskaModule {
     @Provides
     fun provideFavoritesAndPronunciationsRepository(dao: VocabularyDao): FavoritesAndPronunciationsRepository =
         FavoritesAndPronunciationsRepositoryImpl(dao)
+
+    @Singleton
+    @Provides
+    fun provideQuizRepository(dao: QuizDao): QuizRepository = QuizRepositoryImpl(dao)
 
     @Singleton
     @Provides

@@ -166,6 +166,7 @@ dependencies {
     androidTestImplementation(platform(libs.compose.bom))
     testImplementation(libs.kotlinx.coroutines.test)
     testImplementation(libs.mockk)
+    androidTestImplementation(libs.mockk.android)
     testImplementation(libs.assertk)
     testImplementation(libs.turbine)
     testImplementation(libs.strikt)

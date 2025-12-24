@@ -66,6 +66,7 @@ splish-splash-screen = "androidx.core:core-splashscreen:1.0.1"
 espresso-core = { group = "androidx.test.espresso", name = "espresso-core", version.ref = "espresso-core" }
 kotlinx-coroutines-test = "org.jetbrains.kotlinx:kotlinx-coroutines-test:1.10.2"
 mockk = "io.mockk:mockk:1.14.4"
+mockk-android = "io.mockk:mockk-android:1.14.4"
 assertk = "com.willowtreeapps.assertk:assertk:0.26.1"
 turbine = "app.cash.turbine:turbine:1.2.1"
 

@@ -34,6 +34,7 @@ fun vocabulary(
     isFavorite: Boolean = false,
     irregularPronunciation: String? = null,
     notes: String = "",
+    wordGroup: WordGroup = WordGroup.Noun(WordGroup.NounSubgroup.UNDEFINED),
     lastEdited: Long = System.currentTimeMillis(),
     created: Long = System.currentTimeMillis(),
 ): Vocabulary = Vocabulary(
@@ -41,7 +42,7 @@ fun vocabulary(
     wordHighlights = listOf(1 to 2),
     translation = translation,
     notes = notes,
-    wordGroup = WordGroup.Noun(WordGroup.NounSubgroup.UNDEFINED),
+    wordGroup = wordGroup,
     gender = Gender.Ultra,
     ending = "n or orna",
     containerId = containerId,
