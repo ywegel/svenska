@@ -44,6 +44,7 @@ import com.ramcosta.composedestinations.generated.destinations.AddVocabularyScre
 import com.ramcosta.composedestinations.generated.destinations.EditVocabularyScreenDestination
 import com.ramcosta.composedestinations.generated.destinations.QuizConfigurationScreenDestinationNavArgs
 import com.ramcosta.composedestinations.generated.destinations.SearchScreenDestination
+import com.ramcosta.composedestinations.generated.destinations.WordGroupQuizScreenDestination
 import com.ramcosta.composedestinations.generated.destinations.WordGroupsScreenDestination
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
 import de.ywegel.svenska.R
@@ -74,9 +75,12 @@ fun OverviewScreen(navigator: DestinationsNavigator, navArgs: OverviewNavArgs) {
         containerName = navArgs.containerName,
         navigateToAdd = { navigator.navigate(AddVocabularyScreenDestination(viewModel.containerId)) },
         onQuizClick = {
-            navigator.navigate(
-                NavGraphs.quiz(QuizConfigurationScreenDestinationNavArgs(containerId = viewModel.containerId)),
-            )
+            val destination = if (uiState.useNewQuiz) {
+                WordGroupQuizScreenDestination(containerId = viewModel.containerId)
+            } else {
+                NavGraphs.quiz(QuizConfigurationScreenDestinationNavArgs(containerId = viewModel.containerId))
+            }
+            navigator.navigate(destination)
         },
         navigateToEdit = { item ->
             navigator.navigate(
@@ -123,7 +127,12 @@ private fun OverviewScreen(
                 },
             )
         },
-        floatingActionButton = { OverviewFab(navigateToAdd, onQuizClick = onQuizClick) },
+        floatingActionButton = {
+            OverviewFab(
+                onAddClick = navigateToAdd,
+                onQuizClick = onQuizClick,
+            )
+        },
     ) { contentPadding ->
         if (uiState.showCompactVocabularyItem) {
             LazyColumn(

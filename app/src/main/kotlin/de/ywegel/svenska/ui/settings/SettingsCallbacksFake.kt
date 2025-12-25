@@ -7,4 +7,5 @@ import org.jetbrains.annotations.VisibleForTesting
 object SettingsCallbacksFake : SettingsCallbacks {
     override fun toggleOverviewShowCompactVocabularyItem(showCompactVocabularyItem: Boolean) {}
     override fun onOnlineSearchTypeSelected(onlineSearchType: OnlineSearchType) {}
+    override fun toggleUseNewQuiz(useNewQuiz: Boolean) {}
 }

@@ -56,6 +56,7 @@ import com.ramcosta.composedestinations.generated.destinations.QuizConfiguration
 import com.ramcosta.composedestinations.generated.destinations.SearchScreenDestination
 import com.ramcosta.composedestinations.generated.destinations.SettingsScreenDestination
 import com.ramcosta.composedestinations.generated.destinations.SwedishNumbersScreenDestination
+import com.ramcosta.composedestinations.generated.destinations.WordGroupQuizScreenDestination
 import com.ramcosta.composedestinations.generated.destinations.WordGroupsScreenDestination
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
 import de.ywegel.svenska.R
@@ -100,8 +101,14 @@ fun ContainerScreen(navigator: DestinationsNavigator) {
                     FavoritesAndPronunciationScreenDestination(it),
                 )
 
-                BonusScreen.Quiz ->
-                    navigator.navigate(NavGraphs.quiz(QuizConfigurationScreenDestinationNavArgs(containerId = null)))
+                BonusScreen.Quiz -> {
+                    val destination = if (uiState.useNewQuiz) {
+                        WordGroupQuizScreenDestination(containerId = null)
+                    } else {
+                        NavGraphs.quiz(QuizConfigurationScreenDestinationNavArgs(containerId = null))
+                    }
+                    navigator.navigate(destination)
+                }
 
                 BonusScreen.WordGroups ->
                     navigator.navigate(WordGroupsScreenDestination)

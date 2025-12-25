@@ -44,6 +44,7 @@ data class SearchPreferences(
 
 data class AppPreferences(
     val hasCompletedOnboarding: Boolean,
+    val useNewQuiz: Boolean,
 )
 
 data class AddEditPreferences(
@@ -74,6 +75,8 @@ interface UserPreferencesManager {
     suspend fun updateOnlineRedirectType(type: OnlineSearchType)
 
     suspend fun updateHasCompletedOnboarding(hasCompleted: Boolean)
+
+    suspend fun toggleUsesNewQuiz(useNewQuiz: Boolean)
 }
 
 @Singleton
@@ -84,12 +87,22 @@ class UserPreferencesManagerImpl @Inject constructor(@ApplicationContext val con
         .fallbackToDefaultOnError()
         .map { preferences ->
             val hasCompletedOnboarding = preferences[PreferencesKeys.APP_HAS_COMPLETED_ONBOARDING] ?: false
-            AppPreferences(hasCompletedOnboarding)
+            val useNewQuiz = preferences[PreferencesKeys.APP_USES_NEW_QUIZ] ?: false
+            AppPreferences(
+                hasCompletedOnboarding = hasCompletedOnboarding,
+                useNewQuiz = useNewQuiz,
+            )
         }
 
     override suspend fun updateHasCompletedOnboarding(hasCompleted: Boolean) {
         context.dataStoreOverview.edit { preferences ->
             preferences[PreferencesKeys.APP_HAS_COMPLETED_ONBOARDING] = hasCompleted
+        }
+    }
+
+    override suspend fun toggleUsesNewQuiz(useNewQuiz: Boolean) {
+        context.dataStoreOverview.edit { preferences ->
+            preferences[PreferencesKeys.APP_USES_NEW_QUIZ] = useNewQuiz
         }
     }
 
@@ -190,6 +203,7 @@ class UserPreferencesManagerImpl @Inject constructor(@ApplicationContext val con
         val SEARCH_ONLINE_REDIRECT_TYPE = stringPreferencesKey("search_online_redirect_type")
 
         val APP_HAS_COMPLETED_ONBOARDING = booleanPreferencesKey("app_has_completed_onboarding")
+        val APP_USES_NEW_QUIZ = booleanPreferencesKey("app_uses_new_quiz")
     }
 }
 
