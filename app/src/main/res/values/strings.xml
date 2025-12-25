@@ -183,6 +183,18 @@
     <string name="quiz_error_error_message">Something went wrong. Please try again.</string>
     <string name="quiz_error_back_to_overview">Back</string>
 
+    <!-- WordGroup Quiz -->
+    <string name="groupQuiz_check">Check</string>
+    <string name="groupQuiz_correct">Correct!</string>
+    <string name="groupQuiz_wrong">Wrong</string>
+    <string name="groupQuiz_correct_answer_hint">Correct answer is:\u0020</string>
+    <string name="groupQuiz_prompt_translates_to">Translates to:\u0020</string>
+    <string name="groupQuiz_group_selection_unchanged">Unchanged</string>
+    <string name="groupQuiz_group_selection_special">Special / Undefined</string>
+    <string name="groupQuiz_empty_description">No Vocabularies found</string>
+    <string name="groupQuiz_navigate_up">Go back</string>
+    <string name="groupQuiz_fallback_title">Quiz</string>
+
     <!-- # Numbers # -->
     <string name="numbers_title">Swedish Numbers</string>
 

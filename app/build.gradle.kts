@@ -169,6 +169,7 @@ dependencies {
     androidTestImplementation(libs.mockk.android)
     testImplementation(libs.assertk)
     testImplementation(libs.turbine)
+    testImplementation(libs.robolectric)
     testImplementation(libs.strikt)
     androidTestImplementation(libs.strikt)
 
@@ -182,6 +183,8 @@ dependencies {
     testImplementation(libs.junit)
     testRuntimeOnly(libs.junit.vintage.engine)
     androidTestImplementation(libs.androidx.test.ext.junit)
+
+    testImplementation(libs.lifecycle.viewmodel.testing)
 }
 
 ksp {
