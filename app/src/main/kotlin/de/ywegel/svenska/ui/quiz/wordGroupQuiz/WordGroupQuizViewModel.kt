@@ -57,21 +57,23 @@ class WordGroupQuizViewModel @Inject constructor(
         } else {
             quizVocabularies = allVocabularies
                 .shuffled(Random(shuffleSeed))
-            loadItemForCurrentIndex()
+            loadItemForCurrentIndex(resetPreviousInput = false)
         }
     }
 
     fun selectSubgroup(subgroup: WordGroup.NounSubgroup) {
         val currentState = _uiState.value as? QuizItemState ?: return
+        savedStateHandle[USER_SELECTED_SUBGROUP_KEY] = subgroup
         _uiState.value = currentState.copy(selectedSubgroup = subgroup)
     }
 
     fun check() {
         val currentState = _uiState.value as? QuizItemState ?: return
+        val expectedSubGroup = (currentState.vocabulary.wordGroup as? WordGroup.Noun)?.subgroup
 
-        val answerIsCorrect =
-            currentState.selectedSubgroup == (currentState.vocabulary.wordGroup as? WordGroup.Noun)?.subgroup
+        val answerIsCorrect = currentState.selectedSubgroup == expectedSubGroup
 
+        savedStateHandle[USER_ANSWER_CORRECT_KEY] = answerIsCorrect
         _uiState.value = currentState.copy(userAnswerCorrect = answerIsCorrect)
     }
 
@@ -84,23 +86,38 @@ class WordGroupQuizViewModel @Inject constructor(
         }
     }
 
-    private fun loadItemForCurrentIndex() {
+    private fun loadItemForCurrentIndex(resetPreviousInput: Boolean = true) {
         val vocabulary = quizVocabularies[currentIndex]
         val correctSubgroup = (vocabulary.wordGroup as WordGroup.Noun).subgroup
 
-        _uiState.value = QuizItemState(
-            progress = currentIndex,
-            progressGoal = quizVocabularies.size,
-            vocabulary = vocabulary,
-            correctSubgroup = correctSubgroup,
-            selectedSubgroup = null,
-            userAnswerCorrect = null,
-        )
+        if (resetPreviousInput) {
+            savedStateHandle[USER_SELECTED_SUBGROUP_KEY] = null
+            savedStateHandle[USER_ANSWER_CORRECT_KEY] = null
+            _uiState.value = QuizItemState(
+                progress = currentIndex,
+                progressGoal = quizVocabularies.size,
+                vocabulary = vocabulary,
+                correctSubgroup = correctSubgroup,
+                selectedSubgroup = null,
+                userAnswerCorrect = null,
+            )
+        } else {
+            _uiState.value = QuizItemState(
+                progress = currentIndex,
+                progressGoal = quizVocabularies.size,
+                vocabulary = vocabulary,
+                correctSubgroup = correctSubgroup,
+                selectedSubgroup = savedStateHandle[USER_SELECTED_SUBGROUP_KEY],
+                userAnswerCorrect = savedStateHandle[USER_ANSWER_CORRECT_KEY],
+            )
+        }
     }
 }
 
 private const val SHUFFLE_SEED_KEY = "quiz_shuffle_seed"
 private const val CURRENT_INDEX_KEY = "quiz_current_index"
+private const val USER_SELECTED_SUBGROUP_KEY = "user_selected_subgroup"
+private const val USER_ANSWER_CORRECT_KEY = "user_answer_correct"
 
 sealed class WordGroupQuizUiState {
     data object Loading : WordGroupQuizUiState()
