@@ -2,6 +2,7 @@ package de.ywegel.svenska.ui.quiz.wordGroupQuiz
 
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.serialization.saved
 import androidx.lifecycle.viewModelScope
 import com.ramcosta.composedestinations.generated.navArgs
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -34,9 +35,7 @@ class WordGroupQuizViewModel @Inject constructor(
         seed
     }
 
-    private var currentIndex: Int
-        get() = savedStateHandle.get<Int>(CURRENT_INDEX_KEY) ?: 0
-        set(value) = savedStateHandle.set(CURRENT_INDEX_KEY, value)
+    private var currentIndex: Int by savedStateHandle.saved(CURRENT_INDEX_KEY) { 0 }
 
     private val _uiState = MutableStateFlow<WordGroupQuizUiState>(WordGroupQuizUiState.Loading)
     val uiState: StateFlow<WordGroupQuizUiState> = _uiState.asStateFlow()

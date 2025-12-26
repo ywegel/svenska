@@ -16,6 +16,7 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.hapticfeedback.HapticFeedbackType
 import androidx.compose.ui.platform.LocalHapticFeedback
@@ -108,7 +109,15 @@ private fun SheetContent(userSolutionCorrect: Boolean, vocabulary: Vocabulary, n
         }
         VerticalSpacerXXS()
 
-        Text(stringResource(R.string.groupQuiz_prompt_translates_to, vocabulary.translation))
+        val translation = remember(vocabulary) {
+            val subgroup = (vocabulary.wordGroup as WordGroup.Noun).subgroup
+            if (subgroup != WordGroup.NounSubgroup.SPECIAL && subgroup != WordGroup.NounSubgroup.UNDEFINED) {
+                vocabulary.translation
+            } else {
+                "${vocabulary.translation} (${vocabulary.ending})"
+            }
+        }
+        Text(stringResource(R.string.groupQuiz_prompt_translates_to, translation))
 
         VerticalSpacerXS()
 
@@ -142,6 +151,18 @@ private fun WrongPreview() {
         WordGroupQuizSolutionSheet(
             userSolutionCorrect = false,
             vocabulary = vocabulary(wordGroup = WordGroup.Noun(WordGroup.NounSubgroup.ER)),
+            navigateToNextQuestion = {},
+        )
+    }
+}
+
+@Preview
+@Composable
+private fun WrongWithEndingsPreview() {
+    SvenskaTheme {
+        WordGroupQuizSolutionSheet(
+            userSolutionCorrect = false,
+            vocabulary = vocabulary(wordGroup = WordGroup.Noun(WordGroup.NounSubgroup.SPECIAL)),
             navigateToNextQuestion = {},
         )
     }

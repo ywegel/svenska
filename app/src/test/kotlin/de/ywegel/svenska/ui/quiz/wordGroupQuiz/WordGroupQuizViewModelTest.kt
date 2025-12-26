@@ -103,7 +103,7 @@ class WordGroupQuizViewModelTest {
             vocabulary(id = 3, wordGroup = WordGroup.Noun(WordGroup.NounSubgroup.SPECIAL)),
             vocabulary(id = 4, wordGroup = WordGroup.Noun(WordGroup.NounSubgroup.R)),
         )
-        val mockedRandom = mockk<Random> {
+        val mockedRandom = mockk<Random.Default> {
             every { nextLong() } returns 123
         }
         val expectedShuffle = nouns.shuffled(Random(mockedRandom.nextLong()))
