@@ -108,12 +108,7 @@ private fun SheetContent(userSolutionCorrect: Boolean, vocabulary: Vocabulary, n
         }
         VerticalSpacerXXS()
 
-        Text(
-            buildAnnotatedString {
-                append(stringResource(R.string.groupQuiz_prompt_translates_to))
-                append(vocabulary.annotatedWord)
-            },
-        )
+        Text(stringResource(R.string.groupQuiz_prompt_translates_to, vocabulary.translation))
 
         VerticalSpacerXS()
 

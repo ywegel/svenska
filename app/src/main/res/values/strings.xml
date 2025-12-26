@@ -188,7 +188,7 @@
     <string name="groupQuiz_correct">Correct!</string>
     <string name="groupQuiz_wrong">Wrong</string>
     <string name="groupQuiz_correct_answer_hint">Correct answer is:\u0020</string>
-    <string name="groupQuiz_prompt_translates_to">Translates to:\u0020</string>
+    <string name="groupQuiz_prompt_translates_to">Translates to: %1$s</string>
     <string name="groupQuiz_group_selection_unchanged">Unchanged</string>
     <string name="groupQuiz_group_selection_special">Special / Undefined</string>
     <string name="groupQuiz_empty_description">No Vocabularies found</string>
