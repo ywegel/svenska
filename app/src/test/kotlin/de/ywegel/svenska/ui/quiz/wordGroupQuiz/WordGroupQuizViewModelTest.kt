@@ -4,7 +4,9 @@ package de.ywegel.svenska.ui.quiz.wordGroupQuiz
 
 import androidx.lifecycle.SavedStateHandle
 import app.cash.turbine.test
+import de.ywegel.svenska.common.streamOf
 import de.ywegel.svenska.data.impl.QuizRepositoryFake
+import de.ywegel.svenska.data.model.Vocabulary
 import de.ywegel.svenska.data.model.WordGroup
 import de.ywegel.svenska.data.model.vocabulary
 import io.mockk.clearAllMocks
@@ -21,12 +23,16 @@ import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
+import org.junit.jupiter.params.ParameterizedTest
+import org.junit.jupiter.params.provider.Arguments
+import org.junit.jupiter.params.provider.MethodSource
 import strikt.api.expect
 import strikt.api.expectThat
 import strikt.assertions.isEqualTo
 import strikt.assertions.isFalse
 import strikt.assertions.isNull
 import strikt.assertions.isTrue
+import java.util.stream.Stream
 import kotlin.random.Random
 
 class WordGroupQuizViewModelTest {
@@ -213,7 +219,7 @@ class WordGroupQuizViewModelTest {
     }
 
     @Test
-    fun `Completed state is reached, once all vocabularies where shown`() = runTest(testDispatcher) {
+    fun `Completed state is reached, once all vocabularies were shown`() = runTest(testDispatcher) {
         // Given
         val vocabulary = vocabulary()
         val repository = QuizRepositoryFake(initialNouns = listOf(vocabulary))
@@ -245,5 +251,63 @@ class WordGroupQuizViewModelTest {
             // Then
             assertEquals(WordGroupQuizUiState.Completed, awaitItem())
         }
+    }
+
+    @ParameterizedTest
+    @MethodSource("provideDataForSpecialAndUndefinedTest")
+    fun `Special and undefined word groups are treated as the same`(
+        vocabulary: Vocabulary,
+        selectedSubGroup: WordGroup.NounSubgroup,
+    ) = runTest {
+        // Given
+        val repository = QuizRepositoryFake(initialNouns = listOf(vocabulary))
+
+        val vm = WordGroupQuizViewModel(
+            savedStateHandle = SavedStateHandle(),
+            quizRepository = repository,
+            ioDispatcher = testDispatcher,
+        )
+        advanceUntilIdle()
+        vm.selectSubgroup(selectedSubGroup)
+
+        // When
+        vm.check()
+        advanceUntilIdle()
+
+        // Then
+        vm.uiState.test {
+            expectThat(awaitItem()).isEqualTo(
+                WordGroupQuizUiState.QuizItemState(
+                    0,
+                    1,
+                    vocabulary,
+                    correctSubgroup = (vocabulary.wordGroup as WordGroup.Noun).subgroup,
+                    selectedSubgroup = selectedSubGroup,
+                    userAnswerCorrect = true,
+                ),
+            )
+        }
+    }
+
+    companion object {
+        @JvmStatic
+        fun provideDataForSpecialAndUndefinedTest(): Stream<Arguments> = streamOf(
+            Arguments.of(
+                vocabulary(id = 1, wordGroup = WordGroup.Noun(WordGroup.NounSubgroup.SPECIAL)),
+                WordGroup.NounSubgroup.SPECIAL,
+            ),
+            Arguments.of(
+                vocabulary(id = 1, wordGroup = WordGroup.Noun(WordGroup.NounSubgroup.UNDEFINED)),
+                WordGroup.NounSubgroup.SPECIAL,
+            ),
+            Arguments.of(
+                vocabulary(id = 1, wordGroup = WordGroup.Noun(WordGroup.NounSubgroup.SPECIAL)),
+                WordGroup.NounSubgroup.UNDEFINED,
+            ),
+            Arguments.of(
+                vocabulary(id = 1, wordGroup = WordGroup.Noun(WordGroup.NounSubgroup.UNDEFINED)),
+                WordGroup.NounSubgroup.UNDEFINED,
+            ),
+        )
     }
 }

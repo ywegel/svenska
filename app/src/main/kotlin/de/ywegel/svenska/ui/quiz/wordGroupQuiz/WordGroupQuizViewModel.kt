@@ -70,7 +70,17 @@ class WordGroupQuizViewModel @Inject constructor(
         val currentState = _uiState.value as? QuizItemState ?: return
         val expectedSubGroup = (currentState.vocabulary.wordGroup as? WordGroup.Noun)?.subgroup
 
-        val answerIsCorrect = currentState.selectedSubgroup == expectedSubGroup
+        val answerIsCorrect =
+            when (expectedSubGroup) {
+                WordGroup.NounSubgroup.UNDEFINED, WordGroup.NounSubgroup.SPECIAL -> {
+                    currentState.selectedSubgroup == WordGroup.NounSubgroup.UNDEFINED ||
+                        currentState.selectedSubgroup == WordGroup.NounSubgroup.SPECIAL
+                }
+
+                else -> {
+                    currentState.selectedSubgroup == expectedSubGroup
+                }
+            }
 
         savedStateHandle[USER_ANSWER_CORRECT_KEY] = answerIsCorrect
         _uiState.value = currentState.copy(userAnswerCorrect = answerIsCorrect)
