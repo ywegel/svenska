@@ -259,6 +259,8 @@
 
     <string name="settings_overview_compact_vocabulary_item_title">Compact Item - Containers</string>
     <string name="settings_overview_compact_vocabulary_item_description">Show compact Vocabulary Item for containers</string>
+    <string name="settings_app_use_new_quiz_title">Use new Quiz</string>
+    <string name="settings_app_use_new_quiz_description">Try out the new Quiz. It replaces the old one and can be accessed over the previous Quiz buttons</string>
     <string name="settings_search_settings_title">Configure the search</string>
     <string name="settings_search_settings_description">Configure the search behaviour and appearance</string>
     <string name="settings_naviagate_word_importer_screen_title">Show word importer</string>

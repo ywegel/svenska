@@ -37,6 +37,7 @@ class OverviewViewModel @Inject constructor(
     val containerId: Int = savedStateHandle.navArgs<OverviewNavArgs>().containerId
 
     private val userPreferencesFlow = userPreferencesManager.preferencesOverviewFlow
+    private val appPreferencesFlow = userPreferencesManager.preferencesAppFlow
 
     private val _uiState = MutableStateFlow(OverviewUiState())
     val uiState: StateFlow<OverviewUiState> = _uiState.asStateFlow()
@@ -108,6 +109,13 @@ class OverviewViewModel @Inject constructor(
                 }
             }
         }
+        launch {
+            appPreferencesFlow.collectLatest { preferences ->
+                _uiState.update {
+                    it.copy(useNewQuiz = preferences.useNewQuiz)
+                }
+            }
+        }
     }
 
     override fun onVocabularyClick(
@@ -147,4 +155,5 @@ data class OverviewUiState(
     val showSortDialog: Boolean = false,
     val showCompactVocabularyItem: Boolean = false,
     val detailViewState: VocabularyDetailState = VocabularyDetailState.Hidden,
+    val useNewQuiz: Boolean = false,
 )

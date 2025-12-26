@@ -5,6 +5,7 @@ import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
 import de.ywegel.svenska.data.ContainerRepository
 import de.ywegel.svenska.data.model.VocabularyContainer
+import de.ywegel.svenska.data.preferences.UserPreferencesManager
 import de.ywegel.svenska.di.IoDispatcher
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -17,20 +18,34 @@ import javax.inject.Inject
 @HiltViewModel
 class ContainerViewModel @Inject constructor(
     private val containerRepository: ContainerRepository,
+    userPreferencesManager: UserPreferencesManager,
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(ContainerUiState())
     val uiState = _uiState.asStateFlow()
 
+    private val appPreferencesFlow = userPreferencesManager.preferencesAppFlow
+
     init {
         observerContainers()
+        observerPreferencesState()
     }
 
     private fun observerContainers() = viewModelScope.launch(ioDispatcher) {
         containerRepository.getAllContainers().collectLatest { containers ->
             _uiState.update {
                 it.copy(containers = containers)
+            }
+        }
+    }
+
+    private fun observerPreferencesState() = viewModelScope.launch {
+        launch {
+            appPreferencesFlow.collectLatest { preferences ->
+                _uiState.update {
+                    it.copy(useNewQuiz = preferences.useNewQuiz)
+                }
             }
         }
     }
@@ -63,4 +78,5 @@ class ContainerViewModel @Inject constructor(
 data class ContainerUiState(
     val containers: List<VocabularyContainer> = emptyList(),
     val isEditModeMode: Boolean = false,
+    val useNewQuiz: Boolean = false,
 )

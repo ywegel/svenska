@@ -17,6 +17,7 @@ class UserPreferencesManagerFake(
     initialSortOrder: SortOrder = SortOrder.default,
     initialRevert: Boolean = false,
     initialHasCompletedOnboarding: Boolean = false,
+    initialUseNewQuiz: Boolean = false,
 ) : UserPreferencesManager {
 
     private var currentOverviewPreferences = OverviewPreferences(
@@ -79,6 +80,7 @@ class UserPreferencesManagerFake(
 
     private val currentAppPreferences = AppPreferences(
         hasCompletedOnboarding = initialHasCompletedOnboarding,
+        useNewQuiz = initialUseNewQuiz,
     )
 
     private val _preferencesAppFlow = MutableStateFlow(currentAppPreferences)
@@ -88,6 +90,12 @@ class UserPreferencesManagerFake(
     override suspend fun updateHasCompletedOnboarding(hasCompleted: Boolean) {
         _preferencesAppFlow.update {
             it.copy(hasCompletedOnboarding = hasCompleted)
+        }
+    }
+
+    override suspend fun toggleUsesNewQuiz(useNewQuiz: Boolean) {
+        _preferencesAppFlow.update {
+            it.copy(useNewQuiz = useNewQuiz)
         }
     }
 

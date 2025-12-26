@@ -24,6 +24,7 @@ class SettingsViewModel @Inject constructor(
 
     private val userPreferencesFlow = preferencesManager.preferencesOverviewFlow
     private val searchPreferencesFlow = preferencesManager.preferencesSearchFlow
+    private val appPreferencesFlow = preferencesManager.preferencesAppFlow
 
     init {
         observerPreferencesState()
@@ -32,6 +33,12 @@ class SettingsViewModel @Inject constructor(
     override fun toggleOverviewShowCompactVocabularyItem(showCompactVocabularyItem: Boolean) {
         viewModelScope.launch(ioDispatcher) {
             preferencesManager.showCompactVocabularyItem(showCompactVocabularyItem)
+        }
+    }
+
+    override fun toggleUseNewQuiz(useNewQuiz: Boolean) {
+        viewModelScope.launch(ioDispatcher) {
+            preferencesManager.toggleUsesNewQuiz(useNewQuiz)
         }
     }
 
@@ -60,10 +67,18 @@ class SettingsViewModel @Inject constructor(
                 }
             }
         }
+        launch {
+            appPreferencesFlow.collectLatest { preferences ->
+                _uiState.update {
+                    it.copy(appUseNewQuiz = preferences.useNewQuiz)
+                }
+            }
+        }
     }
 }
 
 data class SettingsUiState(
     val overviewShowCompactVocabularyItem: Boolean = false,
+    val appUseNewQuiz: Boolean = false,
     val selectedOnlineSearchType: OnlineSearchType? = null,
 )

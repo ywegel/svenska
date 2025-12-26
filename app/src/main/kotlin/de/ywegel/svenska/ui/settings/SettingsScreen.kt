@@ -96,6 +96,15 @@ private fun SettingsScreen(
 
             VerticalSpacerXS()
 
+            SwitchWithText(
+                title = stringResource(R.string.settings_app_use_new_quiz_title),
+                description = stringResource(R.string.settings_app_use_new_quiz_description),
+                checked = uiState.appUseNewQuiz,
+                onCheckedChange = callbacks::toggleUseNewQuiz,
+            )
+
+            VerticalSpacerXS()
+
             ClickableText(
                 title = stringResource(R.string.settings_search_settings_title),
                 description = stringResource(R.string.settings_search_settings_description),
@@ -156,7 +165,11 @@ private fun AppInformationSection(navigateToAboutLibraries: () -> Unit) {
 private fun SettingsScreenPreview() {
     SvenskaTheme {
         SettingsScreen(
-            uiState = SettingsUiState(true, OnlineSearchType.Pons),
+            uiState = SettingsUiState(
+                overviewShowCompactVocabularyItem = true,
+                appUseNewQuiz = true,
+                selectedOnlineSearchType = OnlineSearchType.Pons,
+            ),
             callbacks = SettingsCallbacksFake,
             navigateUp = {},
             navigateToWordImporter = {},
