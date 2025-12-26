@@ -38,6 +38,9 @@ class WordGroupMatcherTest {
                 Arguments.of("svensk", listOf("-t", "-a"), WordGroup.Adjective),
                 Arguments.of("land", listOf("-et", "länder", "länderna"), WordGroup.Noun(WordGroup.NounSubgroup.ER)),
                 Arguments.of("bo", listOf("-r", "-dde", "-tt"), WordGroup.Verb(WordGroup.VerbSubgroup.GROUP_3)),
+                Arguments.of("sko", listOf("-n", "-r", "-rna"), WordGroup.Noun(WordGroup.NounSubgroup.R)),
+                Arguments.of("hus", listOf("-et", "-", "-en"), WordGroup.Noun(WordGroup.NounSubgroup.UNCHANGED_ETT)),
+                Arguments.of("hus", listOf("-et", "", "-en"), WordGroup.Noun(WordGroup.NounSubgroup.UNCHANGED_ETT)),
 
                 // Edge cases
                 // Unknown verb

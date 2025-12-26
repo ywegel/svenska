@@ -54,6 +54,11 @@ fun VerticalSpacerXL() {
 }
 
 @Composable
+fun VerticalSpacerXXL() {
+    VerticalSpacer(spacing = Spacings.xxl)
+}
+
+@Composable
 fun VerticalSpacerXXXXL() {
     VerticalSpacer(spacing = Spacings.xxxxl)
 }
@@ -91,6 +96,11 @@ fun HorizontalSpacerM() {
 @Composable
 fun HorizontalSpacerL() {
     HorizontalSpacer(spacing = Spacings.l)
+}
+
+@Composable
+fun HorizontalSpacerXL() {
+    HorizontalSpacer(spacing = Spacings.xl)
 }
 
 @Composable

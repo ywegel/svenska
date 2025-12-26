@@ -66,8 +66,10 @@ splish-splash-screen = "androidx.core:core-splashscreen:1.0.1"
 espresso-core = { group = "androidx.test.espresso", name = "espresso-core", version.ref = "espresso-core" }
 kotlinx-coroutines-test = "org.jetbrains.kotlinx:kotlinx-coroutines-test:1.10.2"
 mockk = "io.mockk:mockk:1.14.4"
+mockk-android = "io.mockk:mockk-android:1.14.4"
 assertk = "com.willowtreeapps.assertk:assertk:0.26.1"
 turbine = "app.cash.turbine:turbine:1.2.1"
+robolectric = "org.robolectric:robolectric:4.16"
 
 strikt = "io.strikt:strikt-core:0.35.1"
 
@@ -81,6 +83,7 @@ junit = { group = "junit", name = "junit", version.ref = "junit" }
 junit-vintage-engine = "org.junit.vintage:junit-vintage-engine:5.13.1"
 androidx-test-ext-junit = "androidx.test.ext:junit-ktx:1.3.0"
 
+lifecycle-viewmodel-testing = { module = "androidx.lifecycle:lifecycle-viewmodel-testing", version.ref = "lifecycle-runtime-ktx" }
 
 [plugins]
 com-android-application = { id = "com.android.application", version.ref = "agp" }

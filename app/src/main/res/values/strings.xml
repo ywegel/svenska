@@ -183,6 +183,18 @@
     <string name="quiz_error_error_message">Something went wrong. Please try again.</string>
     <string name="quiz_error_back_to_overview">Back</string>
 
+    <!-- WordGroup Quiz -->
+    <string name="groupQuiz_check">Check</string>
+    <string name="groupQuiz_correct">Correct!</string>
+    <string name="groupQuiz_wrong">Wrong</string>
+    <string name="groupQuiz_correct_answer_hint">Correct answer is:\u0020</string>
+    <string name="groupQuiz_prompt_translates_to">Translates to: %1$s</string>
+    <string name="groupQuiz_group_selection_unchanged">Unchanged</string>
+    <string name="groupQuiz_group_selection_special">Special / Undefined</string>
+    <string name="groupQuiz_empty_description">No vocabularies found</string>
+    <string name="groupQuiz_navigate_up">Go back</string>
+    <string name="groupQuiz_fallback_title">Quiz</string>
+
     <!-- # Numbers # -->
     <string name="numbers_title">Swedish Numbers</string>
 
@@ -214,27 +226,33 @@
     <!-- ## Nouns ## -->
     <string name="nouns_tab">Nouns</string>
     <string name="noun_gender_title">Swedish Genders</string>
+    <string name="noun_gender_en_group">Ultra (en)</string>
+    <string name="noun_gender_en_group_rule">Nouns with the ultra gender use *en* for the indefinite singular</string>
+    <string name="noun_gender_ett_group">Neutra (ett)</string>
+    <string name="noun_gender_ett_group_rule">Nouns with the neuter gender use *ett* for the indefinite singular</string>
     <string name="nouns_title">Swedish Nouns</string>
     <string name="group_or">Group 1 (-or)</string>
     <string name="group_or_rule">En-words that end with *a*, use *-or* for the plural</string>
-    <string name="group_or_example">en flicka → flickan, flickor, flickorna</string>
+    <string name="group_or_example">en kyrka → kyrkan, kyrk*or*, kyrkorna</string>
     <string name="group_ar">Group 2 (-ar)</string>
     <string name="group_ar_rule">En-words with unstressed *-e*, *-el*, *-er* or certain consonants, use *-ar* for the plural</string>
-    <string name="group_ar_example">en cykel → cyklar</string>
+    <string name="group_ar_example">en tävling → tävlingen, tävling*ar*, tävlingarna</string>
     <string name="group_er">Group 3 (-er)</string>
     <string name="group_er_rule">En-words with stress on the last syllable or certain endings, use *-er* for the plural</string>
-    <string name="group_er_example">en station → stationer</string>
+    <string name="group_er_example">en student → studenten, student*er*, studenterna</string>
     <string name="group_r">Group 4 (-r)</string>
     <string name="group_r_rule">One-syllable en-words that end with a stressed vowel, use *-r* for the plural</string>
-    <string name="group_r_example">en sko → skor</string>
+    <string name="group_r_example">en sko → sko, skon, *skor*, skorna</string>
     <string name="group_n">Group 5 (-n)</string>
     <string name="group_n_rule">Ett-words that end with a vowel, use *-n* for the plural</string>
-    <string name="group_n_example">ett kvitto → kvitton</string>
+    <string name="group_n_example">ett kvitto → kvittot, *kvitton*, kvittona</string>
     <string name="group_unchanged">Group 6 (-)</string>
-    <string name="group_unchanged_rule">Ett-words that end with a consonant, or certain en-words, use the indefinite singular for the plural</string>
-    <string name="group_unchanged_example">ett hus → hus, en lärare → lärare</string>
+    <string name="group_unchanged_rule">Ett-words that end with a consonant, or certain en-words, use the indefinite singular for the indefinite plural</string>
+    <string name="group_unchanged_example">ett hus → huset, *hus*, husen; en lärare → läraren, *lärare*, lärarna</string>
+    <string name="group_special">Special words</string>
+    <string name="group_special_rule">Special words don&#8217;t follow any of the rules above</string>
 
-    <string name="example_format">Example: %s</string>
+    <string name="example_format">Example: </string>
 
     <!-- # Settings # -->
     <string name="settings_title">Settings</string>

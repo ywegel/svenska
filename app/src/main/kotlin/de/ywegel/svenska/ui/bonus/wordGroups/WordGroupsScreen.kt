@@ -12,9 +12,13 @@ import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.ReadOnlyComposable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.AnnotatedString
+import androidx.compose.ui.text.SpanStyle
+import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
@@ -27,6 +31,7 @@ import de.ywegel.svenska.navigation.BonusGraph
 import de.ywegel.svenska.ui.common.HorizontalSpacerXXS
 import de.ywegel.svenska.ui.common.NavigationBarSpacer
 import de.ywegel.svenska.ui.common.TabsScaffold
+import de.ywegel.svenska.ui.common.vocabulary.HighlightUtils
 import de.ywegel.svenska.ui.common.vocabulary.abbreviation
 import de.ywegel.svenska.ui.common.vocabulary.mainGroupAbbreviation
 import de.ywegel.svenska.ui.common.vocabulary.subGroupAbbreviation
@@ -132,16 +137,16 @@ fun NounGroupsScreen() {
         // En words
         GrammarItem(
             mainGroup = Gender.Ultra.abbreviation(),
-            group = "Ultra (en)",
-            rule = "Nouns with the ultra gender use *en* for the indefinite singular",
+            group = stringResource(R.string.noun_gender_en_group),
+            rule = stringResource(R.string.noun_gender_en_group_rule),
             example = null,
         )
 
         // Ett words
         GrammarItem(
             mainGroup = Gender.Neutra.abbreviation(),
-            group = "Neutra (ett)",
-            rule = "Nouns with the neuter gender use *ett* for the indefinite singular",
+            group = stringResource(R.string.noun_gender_ett_group),
+            rule = stringResource(R.string.noun_gender_ett_group_rule),
             example = null,
         )
 
@@ -199,6 +204,14 @@ fun NounGroupsScreen() {
             example = stringResource(R.string.group_unchanged_example),
         )
 
+        // Special
+        GrammarItem(
+            wordGroup = WordGroup.Noun(WordGroup.NounSubgroup.SPECIAL),
+            group = stringResource(R.string.group_special),
+            rule = stringResource(R.string.group_special_rule),
+            example = null,
+        )
+
         NavigationBarSpacer()
     }
 }
@@ -234,17 +247,28 @@ fun GrammarItem(mainGroup: String, subGroup: String? = null, group: String, rule
                 )
             }
             Text(
-                text = rule,
+                text = HighlightUtils.buildAnnotatedWord(rule) ?: AnnotatedString(rule),
                 style = SvenskaTheme.typography.bodyMedium,
             )
             example?.let {
                 Text(
-                    text = stringResource(R.string.example_format, example),
+                    text = buildExampleString(
+                        HighlightUtils.buildAnnotatedWord(example) ?: AnnotatedString(example),
+                    ),
                     style = SvenskaTheme.typography.bodySmall,
-                    fontStyle = FontStyle.Italic,
                 )
             }
         }
+    }
+}
+
+@ReadOnlyComposable
+@Composable
+private fun buildExampleString(string: AnnotatedString): AnnotatedString {
+    return buildAnnotatedString {
+        append(stringResource(R.string.example_format))
+        pushStyle(SpanStyle(fontStyle = FontStyle.Italic))
+        append(string)
     }
 }
 
