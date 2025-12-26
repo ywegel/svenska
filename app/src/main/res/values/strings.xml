@@ -250,7 +250,7 @@
     <string name="group_unchanged_rule">Ett-words that end with a consonant, or certain en-words, use the indefinite singular for the indefinite plural</string>
     <string name="group_unchanged_example">ett hus → huset, *hus*, husen; en lärare → läraren, *lärare*, lärarna</string>
     <string name="group_special">Special words</string>
-    <string name="group_special_rule">Special words don\'t follow any of the rules above</string>
+    <string name="group_special_rule">Special words don&#8217;t follow any of the rules above</string>
 
     <string name="example_format">Example: </string>
 
