@@ -100,7 +100,7 @@ private fun SettingsScreen(
                 title = stringResource(R.string.settings_app_use_new_quiz_title),
                 description = stringResource(R.string.settings_app_use_new_quiz_description),
                 checked = uiState.appUseNewQuiz,
-                onCheckedChange = callbacks::toggleUseNewQuiz,
+                onCheckedChange = callbacks::updateUseNewQuiz,
             )
 
             VerticalSpacerXS()

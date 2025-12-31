@@ -36,7 +36,7 @@ class SettingsViewModel @Inject constructor(
         }
     }
 
-    override fun toggleUseNewQuiz(useNewQuiz: Boolean) {
+    override fun updateUseNewQuiz(useNewQuiz: Boolean) {
         viewModelScope.launch(ioDispatcher) {
             preferencesManager.toggleUsesNewQuiz(useNewQuiz)
         }

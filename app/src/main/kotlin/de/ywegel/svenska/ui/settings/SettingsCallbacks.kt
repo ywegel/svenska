@@ -7,6 +7,6 @@ import de.ywegel.svenska.domain.search.OnlineSearchType
  */
 interface SettingsCallbacks {
     fun toggleOverviewShowCompactVocabularyItem(showCompactVocabularyItem: Boolean)
-    fun toggleUseNewQuiz(useNewQuiz: Boolean)
+    fun updateUseNewQuiz(useNewQuiz: Boolean)
     fun onOnlineSearchTypeSelected(onlineSearchType: OnlineSearchType)
 }
