@@ -3,7 +3,9 @@ package de.ywegel.svenska.data.db
 import android.util.Log
 import androidx.room.migration.Migration
 import androidx.sqlite.db.SupportSQLiteDatabase
+import de.ywegel.svenska.data.model.WordGroup
 import de.ywegel.svenska.domain.wordImporter.WordExtractor.normalizePdfDashes
+import de.ywegel.svenska.domain.wordImporter.WordGroupMatcher
 
 private const val TAG = "Migrations"
 
@@ -60,36 +62,45 @@ val MIGRATION_2_3 = object : Migration(2, 3) {
     override fun migrate(db: SupportSQLiteDatabase) {
         Log.i(TAG, "migrate: Starting migration from 2 to 3...")
 
+        val dbWordGroupConverter = WordGroupConverter()
+
         db.beginTransaction()
         try {
             val cursor = db.query(
-                "SELECT id, ending FROM Vocabulary",
+                "SELECT id, word, ending FROM Vocabulary",
             )
 
-            val updates = mutableListOf<Pair<Int, String>>()
+            val updates = mutableListOf<Triple<Int, String, WordGroup>>()
 
             while (cursor.moveToNext()) {
                 val id = cursor.getInt(cursor.getColumnIndexOrThrow("id"))
+                val wordString = cursor.getString(cursor.getColumnIndexOrThrow("word")) ?: ""
                 val endingString = cursor.getString(cursor.getColumnIndexOrThrow("ending")) ?: ""
 
                 val normalizedEnding = endingString.normalizePdfDashes()
 
                 // Only collect if something actually changed
                 if (normalizedEnding != endingString) {
-                    updates.add(Pair(id, normalizedEnding))
+                    val redeterminedWordGroup = WordGroupMatcher.determineWordGroup(
+                        baseWord = wordString,
+                        endings = normalizedEnding.split(" "),
+                    )
+                    updates.add(Triple(id, normalizedEnding, redeterminedWordGroup))
                 }
             }
             cursor.close()
 
             if (updates.isNotEmpty()) {
                 val updateStmt = db.compileStatement(
-                    "UPDATE Vocabulary SET ending = ? WHERE id = ?",
+                    "UPDATE Vocabulary SET ending = ?, wordGroup = ? WHERE id = ?",
                 )
 
-                for ((id, normalizedEnding) in updates) {
+                for ((id, normalizedEnding, wordGroup) in updates) {
+                    val encodedWordGroup = dbWordGroupConverter.toString(wordGroup)
                     updateStmt.apply {
                         bindString(1, normalizedEnding)
-                        bindLong(2, id.toLong())
+                        bindString(2, encodedWordGroup)
+                        bindLong(3, id.toLong())
                         executeUpdateDelete()
                         clearBindings()
                     }
