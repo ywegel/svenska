@@ -34,7 +34,6 @@ fun WordGroupPage(navigateToWordGroupScreen: () -> Unit) {
         modifier = Modifier.verticalScroll(rememberScrollState()),
     ) {
         OnboardingDescriptionText(R.string.onboarding_page_content_word_groups_description)
-        OnboardingDescriptionText(R.string.onboarding_page_content_word_groups_description_extended)
         AnimatedBadgeExplanationRow()
         Box(Modifier.fillMaxWidth(), contentAlignment = Alignment.TopCenter) {
             Button(navigateToWordGroupScreen) {

@@ -33,11 +33,16 @@ fun OnboardingScreen(navigator: DestinationsNavigator) {
     OnboardingScreen(
         onOnboardingComplete = viewModel::completeOnboarding,
         navigateToWordGroupScreen = { navigator.navigate(WordGroupsScreenDestination) },
+        navigateToWordExtractorExplanationScreen = { },
     )
 }
 
 @Composable
-private fun OnboardingScreen(onOnboardingComplete: () -> Unit, navigateToWordGroupScreen: () -> Unit) {
+private fun OnboardingScreen(
+    onOnboardingComplete: () -> Unit,
+    navigateToWordGroupScreen: () -> Unit,
+    navigateToWordExtractorExplanationScreen: () -> Unit,
+) {
     Scaffold(
         topBar = {
             TopAppTextBar(
@@ -50,6 +55,7 @@ private fun OnboardingScreen(onOnboardingComplete: () -> Unit, navigateToWordGro
             innerPadding = innerPadding,
             onOnboardingComplete = onOnboardingComplete,
             navigateToWordGroupScreen = navigateToWordGroupScreen,
+            navigateToWordExtractorExplanationScreen = navigateToWordExtractorExplanationScreen,
         )
     }
 }

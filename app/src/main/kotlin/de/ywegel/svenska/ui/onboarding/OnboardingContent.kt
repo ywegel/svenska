@@ -28,6 +28,7 @@ import de.ywegel.svenska.ui.onboarding.pages.BonusPage
 import de.ywegel.svenska.ui.onboarding.pages.ImporterPage
 import de.ywegel.svenska.ui.onboarding.pages.OnboardingPage
 import de.ywegel.svenska.ui.onboarding.pages.OnboardingSimpleTextPage
+import de.ywegel.svenska.ui.onboarding.pages.WordExtractorPage
 import de.ywegel.svenska.ui.onboarding.pages.WordGroupPage
 import de.ywegel.svenska.ui.theme.Spacings
 import kotlinx.coroutines.launch
@@ -37,6 +38,7 @@ internal fun OnboardingContent(
     innerPadding: PaddingValues,
     onOnboardingComplete: () -> Unit,
     navigateToWordGroupScreen: () -> Unit,
+    navigateToWordExtractorExplanationScreen: () -> Unit,
 ) {
     val pagerState = rememberPagerState(pageCount = { OnboardingPage.COUNT })
 
@@ -65,6 +67,10 @@ internal fun OnboardingContent(
 
                     OnboardingPage.IMPORTER -> {
                         ImporterPage()
+                    }
+
+                    OnboardingPage.EXTRACT_WORDS -> {
+                        WordExtractorPage(navigateToWordExtractorExplanationScreen)
                     }
 
                     else -> {
