@@ -72,7 +72,7 @@ class EndingsNormalizationMigrationTest {
 
     /**
      * The word group does not get re-determined, if the word did not contain any unnormalized dashes.
-     * This is tested, by settings the wordGroup to "Other", even though the WordGroupMatcher would determine its word
+     * This is tested, by setting the wordGroup to "Other", even though the WordGroupMatcher would determine its word
      * group as WordGroup.Noun(WordGroup.NounSubgroup.AR)
      */
     @Test
