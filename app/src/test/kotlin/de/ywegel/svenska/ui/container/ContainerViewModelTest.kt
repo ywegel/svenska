@@ -6,6 +6,7 @@ import app.cash.turbine.test
 import de.ywegel.svenska.data.ContainerRepository
 import de.ywegel.svenska.data.model.VocabularyContainer
 import de.ywegel.svenska.data.model.containers
+import de.ywegel.svenska.fakes.UserPreferencesManagerFake
 import de.ywegel.svenska.fakes.VocabularyRepositoryFake
 import io.mockk.clearAllMocks
 import kotlinx.coroutines.CoroutineDispatcher
@@ -133,6 +134,7 @@ class ContainerViewModelTest {
         return ContainerViewModel(
             containerRepository = repository,
             ioDispatcher = dispatcher,
+            userPreferencesManager = UserPreferencesManagerFake(),
         )
     }
 }
