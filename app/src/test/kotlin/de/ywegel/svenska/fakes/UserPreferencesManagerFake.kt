@@ -3,6 +3,7 @@ package de.ywegel.svenska.fakes
 import de.ywegel.svenska.data.model.SortOrder
 import de.ywegel.svenska.data.preferences.AddEditPreferences
 import de.ywegel.svenska.data.preferences.AppPreferences
+import de.ywegel.svenska.data.preferences.LATEST_PRIVACY_VERSION
 import de.ywegel.svenska.data.preferences.OverviewPreferences
 import de.ywegel.svenska.data.preferences.SearchPreferences
 import de.ywegel.svenska.data.preferences.UserPreferencesManager
@@ -18,6 +19,7 @@ class UserPreferencesManagerFake(
     initialRevert: Boolean = false,
     initialHasCompletedOnboarding: Boolean = false,
     initialUseNewQuiz: Boolean = false,
+    initialAcceptedPrivacyVersion: Int = 0,
 ) : UserPreferencesManager {
 
     private var currentOverviewPreferences = OverviewPreferences(
@@ -81,6 +83,7 @@ class UserPreferencesManagerFake(
     private val currentAppPreferences = AppPreferences(
         hasCompletedOnboarding = initialHasCompletedOnboarding,
         useNewQuiz = initialUseNewQuiz,
+        acceptedPrivacyVersion = initialAcceptedPrivacyVersion,
     )
 
     private val _preferencesAppFlow = MutableStateFlow(currentAppPreferences)
@@ -96,6 +99,12 @@ class UserPreferencesManagerFake(
     override suspend fun toggleUsesNewQuiz(useNewQuiz: Boolean) {
         _preferencesAppFlow.update {
             it.copy(useNewQuiz = useNewQuiz)
+        }
+    }
+
+    override suspend fun acceptLatestPrivacyPolicy() {
+        _preferencesAppFlow.update {
+            it.copy(acceptedPrivacyVersion = LATEST_PRIVACY_VERSION)
         }
     }
 

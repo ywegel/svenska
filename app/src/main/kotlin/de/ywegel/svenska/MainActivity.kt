@@ -14,6 +14,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.ramcosta.composedestinations.generated.destinations.OnboardingScreenDestination
 import dagger.hilt.android.AndroidEntryPoint
 import de.ywegel.svenska.navigation.AppNavigation
+import de.ywegel.svenska.ui.sentryPrivacyPopUp.SentryPrivacyBottomSheet
 import de.ywegel.svenska.ui.theme.SvenskaTheme
 
 @AndroidEntryPoint
@@ -26,22 +27,29 @@ class MainActivity : ComponentActivity() {
 
         installSplashScreen().apply {
             setKeepOnScreenCondition {
-                viewModel.hasCompletedOnboarding.value == null
+                // Wait until the hasCompletedOnboarding Preference value was loaded
+                viewModel.mainUiState.value is MainUiState.Loading
             }
         }
 
         enableEdgeToEdge()
 
         setContent {
-            val onboardingCompleted by viewModel.hasCompletedOnboarding.collectAsStateWithLifecycle()
+            val state by viewModel.mainUiState.collectAsStateWithLifecycle()
 
-            if (onboardingCompleted != null) {
+            if (state is MainUiState.Ready) {
+                val readyState = state as MainUiState.Ready
+
                 SvenskaTheme {
+                    if (readyState.hasCompletedOnboarding && !readyState.isLatestPrivacyPolicyAccepted) {
+                        SentryPrivacyBottomSheet(onAccept = viewModel::onPrivacyPolicyAccepted)
+                    }
+
                     Surface(
                         modifier = Modifier.fillMaxSize(),
                         color = SvenskaTheme.colors.background,
                     ) {
-                        val startRoute = OnboardingScreenDestination.takeIf { onboardingCompleted != true }
+                        val startRoute = OnboardingScreenDestination.takeIf { !readyState.hasCompletedOnboarding }
 
                         AppNavigation(startRoute = startRoute)
                     }

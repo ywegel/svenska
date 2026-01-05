@@ -7,6 +7,7 @@ import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.booleanPreferencesKey
 import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.emptyPreferences
+import androidx.datastore.preferences.core.intPreferencesKey
 import androidx.datastore.preferences.core.stringPreferencesKey
 import androidx.datastore.preferences.preferencesDataStore
 import dagger.hilt.android.qualifiers.ApplicationContext
@@ -22,6 +23,8 @@ import javax.inject.Inject
 import javax.inject.Singleton
 
 private const val TAG = "UserPreferencesManager"
+
+const val LATEST_PRIVACY_VERSION = 2
 
 // TODO: Maybe have everything in one file? Or split it up?
 const val OVERVIEW_PREFERENCES_NAME = "user-preferences_overview"
@@ -44,6 +47,7 @@ data class SearchPreferences(
 
 data class AppPreferences(
     val hasCompletedOnboarding: Boolean,
+    val acceptedPrivacyVersion: Int,
     val useNewQuiz: Boolean,
 )
 
@@ -75,6 +79,7 @@ interface UserPreferencesManager {
     suspend fun updateOnlineRedirectType(type: OnlineSearchType)
 
     suspend fun updateHasCompletedOnboarding(hasCompleted: Boolean)
+    suspend fun acceptLatestPrivacyPolicy()
 
     suspend fun toggleUsesNewQuiz(useNewQuiz: Boolean)
 }
@@ -87,9 +92,11 @@ class UserPreferencesManagerImpl @Inject constructor(@ApplicationContext val con
         .fallbackToDefaultOnError()
         .map { preferences ->
             val hasCompletedOnboarding = preferences[PreferencesKeys.APP_HAS_COMPLETED_ONBOARDING] ?: false
+            val acceptedPrivacyVersion = preferences[PreferencesKeys.ACCEPTED_PRIVACY_VERSION] ?: 0
             val useNewQuiz = preferences[PreferencesKeys.APP_USES_NEW_QUIZ] ?: false
             AppPreferences(
                 hasCompletedOnboarding = hasCompletedOnboarding,
+                acceptedPrivacyVersion = acceptedPrivacyVersion,
                 useNewQuiz = useNewQuiz,
             )
         }
@@ -98,6 +105,10 @@ class UserPreferencesManagerImpl @Inject constructor(@ApplicationContext val con
         context.dataStoreOverview.edit { preferences ->
             preferences[PreferencesKeys.APP_HAS_COMPLETED_ONBOARDING] = hasCompleted
         }
+    }
+
+    override suspend fun acceptLatestPrivacyPolicy() {
+        context.dataStoreOverview.edit { it[PreferencesKeys.ACCEPTED_PRIVACY_VERSION] = LATEST_PRIVACY_VERSION }
     }
 
     override suspend fun toggleUsesNewQuiz(useNewQuiz: Boolean) {
@@ -203,6 +214,7 @@ class UserPreferencesManagerImpl @Inject constructor(@ApplicationContext val con
         val SEARCH_ONLINE_REDIRECT_TYPE = stringPreferencesKey("search_online_redirect_type")
 
         val APP_HAS_COMPLETED_ONBOARDING = booleanPreferencesKey("app_has_completed_onboarding")
+        val ACCEPTED_PRIVACY_VERSION = intPreferencesKey("app_accepted_privacy_version")
         val APP_USES_NEW_QUIZ = booleanPreferencesKey("app_uses_new_quiz")
     }
 }

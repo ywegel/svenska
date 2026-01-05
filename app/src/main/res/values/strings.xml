@@ -360,4 +360,10 @@
     <string name="vocabulary_detail_chip_gender">Gender: %1$s (%2$s)</string>
     <string name="vocabulary_detail_chip_endings">Endings: %1$s</string>
     <string name="vocabulary_detail_edit_btn">Edit</string>
+
+    <!-- # Sentry privacy pop up # -->
+    <string name="sentryPopUp_title">Privacy Policy Updated</string>
+    <string name="sentryPopUp_description">We now use Sentry to anonymously analyze crashes, errors, and technical logs. This helps us make the app more stable and reliable.</string>
+    <string name="sentryPopUp_link_text">Show full policy</string>
+    <string name="sentryPopUp_understood">Got it</string>
 </resources>

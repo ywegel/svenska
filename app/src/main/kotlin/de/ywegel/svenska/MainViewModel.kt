@@ -3,27 +3,44 @@ package de.ywegel.svenska
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
-import de.ywegel.svenska.data.preferences.UserPreferencesManager
+import de.ywegel.svenska.domain.main.AcceptLatestPrivacyPolicyUseCase
+import de.ywegel.svenska.domain.main.LoadInitialAppStateUseCase
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
 class MainViewModel @Inject constructor(
-    userPreferencesManager: UserPreferencesManager,
+    private val loadInitialAppState: LoadInitialAppStateUseCase,
+    private val acceptLatestPrivacyPolicy: AcceptLatestPrivacyPolicyUseCase,
 ) : ViewModel() {
 
-    private val _hasCompletedOnboarding = MutableStateFlow<Boolean?>(null)
-    val hasCompletedOnboarding: StateFlow<Boolean?> = _hasCompletedOnboarding.asStateFlow()
+    private val _mainUiState = MutableStateFlow<MainUiState>(MainUiState.Loading)
+    val mainUiState: StateFlow<MainUiState> = _mainUiState.asStateFlow()
 
     init {
         viewModelScope.launch {
-            userPreferencesManager.preferencesAppFlow
-                .map { it.hasCompletedOnboarding }
-                .collect { _hasCompletedOnboarding.value = it }
+            loadInitialAppState()
+                .collect { appState ->
+                    _mainUiState.value = MainUiState.Ready(
+                        hasCompletedOnboarding = appState.hasCompletedOnboarding,
+                        isLatestPrivacyPolicyAccepted = appState.isLatestPrivacyPolicyAccepted,
+                    )
+                }
         }
     }
+
+    fun onPrivacyPolicyAccepted() = viewModelScope.launch {
+        acceptLatestPrivacyPolicy()
+    }
+}
+
+sealed interface MainUiState {
+    data object Loading : MainUiState
+    data class Ready(
+        val hasCompletedOnboarding: Boolean,
+        val isLatestPrivacyPolicyAccepted: Boolean,
+    ) : MainUiState
 }

@@ -4,16 +4,12 @@ package de.ywegel.svenska.ui.quiz.wordGroupQuiz
 
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.BottomSheetDefaults
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.ModalBottomSheet
-import androidx.compose.material3.ModalBottomSheetProperties
 import androidx.compose.material3.Text
-import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.remember
@@ -28,6 +24,7 @@ import de.ywegel.svenska.R
 import de.ywegel.svenska.data.model.Vocabulary
 import de.ywegel.svenska.data.model.WordGroup
 import de.ywegel.svenska.data.model.vocabulary
+import de.ywegel.svenska.ui.common.FixedModalBottomSheet
 import de.ywegel.svenska.ui.common.VerticalSpacerS
 import de.ywegel.svenska.ui.common.VerticalSpacerXS
 import de.ywegel.svenska.ui.common.VerticalSpacerXXS
@@ -55,18 +52,7 @@ fun WordGroupQuizSolutionSheet(
     } else {
         SvenskaTheme.colors.errorContainer
     }
-    ModalBottomSheet(
-        onDismissRequest = { /* Modal should not be hideable */ },
-        dragHandle = {},
-        properties = ModalBottomSheetProperties(shouldDismissOnBackPress = false), // Modal should not be hideable
-        containerColor = containerColor,
-        sheetState = rememberModalBottomSheetState(
-            confirmValueChange = {
-                // Modal should not be hideable
-                false
-            },
-        ),
-    ) {
+    FixedModalBottomSheet(containerColor = containerColor) {
         SheetContent(
             userSolutionCorrect = userSolutionCorrect,
             vocabulary = vocabulary,
@@ -83,11 +69,7 @@ private fun SheetContent(userSolutionCorrect: Boolean, vocabulary: Vocabulary, n
         ButtonDefaults.buttonColors(containerColor = SvenskaTheme.colors.error)
     }
 
-    Column(
-        Modifier
-            .padding(horizontal = Spacings.xl, vertical = Spacings.s)
-            .navigationBarsPadding(),
-    ) {
+    Column(Modifier.padding(horizontal = Spacings.xl)) {
         VerticalSpacerS()
         Text(
             style = SvenskaTheme.typography.headlineMedium,
