@@ -263,9 +263,11 @@
     <string name="settings_app_use_new_quiz_description">Try out the new Quiz. It replaces the old one and can be accessed over the previous Quiz buttons</string>
     <string name="settings_search_settings_title">Configure the search</string>
     <string name="settings_search_settings_description">Configure the search behaviour and appearance</string>
-    <string name="settings_naviagate_word_importer_screen_title">Show word importer</string>
-    <string name="settings_naviagate_word_importer_screen_description">Import words from a file</string>
-    <string name="settings_naviagate_about_libraries_screen_title">Licenses</string>
+    <string name="settings_navigate_word_extractor_explanation_title">Extract words</string>
+    <string name="settings_navigate_word_extractor_explanation_description">Understand how to extract words from PDFs to import them</string>
+    <string name="settings_navigate_word_importer_screen_title">Show word importer</string>
+    <string name="settings_navigate_word_importer_screen_description">Import words from a file</string>
+    <string name="settings_navigate_about_libraries_screen_title">Licenses</string>
     <string name="settings_app_version">App Version: %1$s</string>
     <string name="settings_github_repository">Open Source on GitHub</string>
     <string name="settings_github_repository_url">https://github.com/ywegel/svenska</string>
@@ -286,14 +288,11 @@
     <string name="onboarding_button_start">Let&#8217;s go!</string>
 
     <string name="onboarding_page_title_introduction">Welcome</string>
-    <string name="onboarding_page_content_introduction">Svenska is a simple app to make learning swedish vocabulary easier.</string>
-
-    <string name="onboarding_page_title_container">Container</string>
-    <string name="onboarding_page_content_container">You can group words into containers, to separate them and make learning easier.</string>
+    <string name="onboarding_page_content_introduction">Svenska is a simple app to make learning Swedish vocabulary easier.</string>
+    <string name="onboarding_page_additional_content_introduction">Words can be grouped into containers and trained with the integrated Quiz.</string>
 
     <string name="onboarding_page_title_word_groups">Word Groups</string>
-    <string name="onboarding_page_content_word_groups_description">Each vocabulary can be assigned a WordGroup: Noun/Verb/Adjective/Other. Nouns and Verbs can be grouped into subgroups, which follow a pattern and make it easier to learn these words.</string>
-    <string name="onboarding_page_content_word_groups_description_extended">You can find out more about this below, by clicking on the info button in the quiz or in the bonus section.</string>
+    <string name="onboarding_page_content_word_groups_description">Each vocabulary can be assigned a WordGroup: Noun/Verb/Adjective/Other with more detailed subgroups.</string>
     <string name="onboarding_page_content_word_groups_badge_text">You can easily identify the word group by its badge.</string>
     <string name="onboarding_page_content_word_groups_find_out_more">Find out more here</string>
 
@@ -301,13 +300,54 @@
     <string name="onboarding_page_content_bonus_material">You can do more than just saving words. You can train the words in a quiz, categorize them into favorites and words with special pronunciation.</string>
     <string name="onboarding_page_content_bonus_material_extended">You can find all this below your containers, it looks like this:</string>
 
-    <string name="onboarding_page_title_quiz">Quiz</string>
-    <string name="onboarding_page_content_quiz">There is a quiz that helps you learn vocabulary with different configuration, e.g. just to learn the words or the word endings.</string>
-    <string name="onboarding_page_content_quiz_expanded"> You can train the words from a specific container, by starting the quiz inside the container. Starting it from the main screen, tests all words.</string>
+    <string name="onboarding_page_extractor_title">Extracting words</string>
+    <string name="onboarding_page_extractor_description">If you are using the Rivstart books, you can extract all words from the PDF-file and import them into the App.</string>
+    <string name="onboarding_page_extractor_disclaimer">Due to legal reasons, it is not possible to import the words directly. You have to extract them on your laptop into a special file and import that file into the app.</string>
+    <string name="onboarding_page_extractor_read_more">Find out more here</string>
 
     <string name="onboarding_page_importer_title">Vocabulary Importer</string>
-    <string name="onboarding_page_content_importer">There is a vocabulary importer that accepts .json files in a specific format.</string>
-    <string name="onboarding_page_content_importer_extended">You can either import words from the settings or by clicking on a .json file and selecting the app.</string>
+    <string name="onboarding_page_content_importer">Import extracted Rivstart words, backups or self written .json files.</string>
+    <string name="onboarding_page_content_importer_extended">You can either import words from the settings or by clicking on a .json file and selecting the app:</string>
+
+    <!-- # WordExtractorScreen # -->
+    <string name="wordExtractor_title">Word extractor</string>
+
+    <string name="wordExtractor_currently_only_rivstart">Currently, extraction scripts are only available for the Rivstart series. If you use another Swedish textbook, feel free to write your own extraction script and contribute it on GitHub.</string>
+
+    <string name="wordExtractor_important_legal_note">Important Legal Note</string>
+    <string name="wordExtractor_legal_copyright">Due to copyright restrictions, the app cannot include word lists from Rivstart books directly. You must extract the words yourself from your own legally obtained PDF files.</string>
+    <string name="wordExtractor_legal_disclaimer">The extraction scripts are provided as-is without any warranty. The developer assumes no liability for any damages, errors, or issues arising from downloading, running, or using these scripts. You use the scripts entirely at your own risk. Always ensure that you comply with applicable copyright laws and the terms of service of any websites or tools involved.</string>
+
+    <string name="wordExtractor_prerequisites">Prerequisites</string>
+    <string name="wordExtractor_prereq_python">A computer (laptop/desktop) with Python installed – download from\u0020</string>
+    <string name="wordExtractor_prereq_python_link">python.org/downloads</string>
+    <string name="wordExtractor_prereq_rivstart">The official Rivstart PDF files downloaded from\u0020</string>
+    <string name="wordExtractor_prereq_rivstart_link">nokportalen.se</string>
+    <string name="wordExtractor_prereq_scripts">The extraction scripts from the app&#8217;s GitHub repository (link below)</string>
+
+    <string name="wordExtractor_step1_title">Step 1: Install the Required Dependencies</string>
+    <string name="wordExtractor_step1_pymupdf">The scripts require the PyMuPDF library. Install it via pip:</string>
+    <string name="wordExtractor_step1_alternative_uv">Alternatively, use uv (a fast Python runner) to run the script without manual installation:</string>
+    <string name="wordExtractor_step1_uv_prefix">Install and learn more about\u0020</string>
+    <string name="wordExtractor_step1_uv_link">uv</string>
+    <string name="wordExtractor_step1_uv_suffix"> first if needed, then run:</string>
+
+    <string name="wordExtractor_step2_title">Step 2: Run the Extraction Script</string>
+    <string name="wordExtractor_step2_supported_books">Supported books:</string>
+    <string name="wordExtractor_step2_book_a1a2">Rivstart A1/A2 (2nd and 3rd edition)</string>
+    <string name="wordExtractor_step2_book_b1b2">Rivstart B1/B2 (2nd and 3rd edition)</string>
+    <string name="wordExtractor_step2_download_scripts">Download the scripts from the GitHub repository:</string>
+    <string name="wordExtractor_step2_repo_prefix">Open the\u0020</string>
+    <string name="wordExtractor_step2_repo_link">Svenska GitHub Repository</string>
+    <string name="wordExtractor_step2_download_py_files">Download the .py scripts into a folder on your computer</string>
+    <string name="wordExtractor_step2_place_pdf">Place the corresponding PDF file in the same folder as the script. Then run the appropriate script:</string>
+    <string name="wordExtractor_step2_edition_2nd">For 2nd edition:</string>
+    <string name="wordExtractor_step2_edition_3rd">For 3rd edition:</string>
+    <string name="wordExtractor_step2_prompt">The script will prompt you for the PDF filename and the desired output filename.</string>
+
+    <string name="wordExtractor_step3_title">Step 3: Transfer and Import</string>
+    <string name="wordExtractor_step3_transfer">Transfer the generated .json file to your Android device. Then open the app and use the &#8220;Word Importer&#8220; feature to import the file. Alternatively, click on the .json file and open it with the Svenska app.</string>
+    <string name="wordExtractor_step3_button">Or open the Word Importer now</string>
 
     <!-- # VocabularyDetailScreen # -->
     <string name="vocabulary_detail_section_pronunciation">Pronunciation</string>

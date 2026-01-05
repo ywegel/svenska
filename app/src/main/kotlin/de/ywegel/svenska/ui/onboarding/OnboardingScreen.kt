@@ -11,6 +11,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import com.ramcosta.composedestinations.annotation.Destination
 import com.ramcosta.composedestinations.generated.NavGraphs
 import com.ramcosta.composedestinations.generated.destinations.ContainerScreenDestination
+import com.ramcosta.composedestinations.generated.destinations.WordExtractorExplanationScreenDestination
 import com.ramcosta.composedestinations.generated.destinations.WordGroupsScreenDestination
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
 import de.ywegel.svenska.R
@@ -33,11 +34,16 @@ fun OnboardingScreen(navigator: DestinationsNavigator) {
     OnboardingScreen(
         onOnboardingComplete = viewModel::completeOnboarding,
         navigateToWordGroupScreen = { navigator.navigate(WordGroupsScreenDestination) },
+        navigateToWordExtractorExplanationScreen = { navigator.navigate(WordExtractorExplanationScreenDestination) },
     )
 }
 
 @Composable
-private fun OnboardingScreen(onOnboardingComplete: () -> Unit, navigateToWordGroupScreen: () -> Unit) {
+private fun OnboardingScreen(
+    onOnboardingComplete: () -> Unit,
+    navigateToWordGroupScreen: () -> Unit,
+    navigateToWordExtractorExplanationScreen: () -> Unit,
+) {
     Scaffold(
         topBar = {
             TopAppTextBar(
@@ -50,6 +56,7 @@ private fun OnboardingScreen(onOnboardingComplete: () -> Unit, navigateToWordGro
             innerPadding = innerPadding,
             onOnboardingComplete = onOnboardingComplete,
             navigateToWordGroupScreen = navigateToWordGroupScreen,
+            navigateToWordExtractorExplanationScreen = navigateToWordExtractorExplanationScreen,
         )
     }
 }

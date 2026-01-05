@@ -20,15 +20,14 @@ import de.ywegel.svenska.ui.theme.SvenskaTheme
  */
 enum class OnboardingPage {
     INTRODUCTION,
-    CONTAINERS,
     BONUS,
     WORD_GROUP,
-    QUIZ,
+    EXTRACT_WORDS,
     IMPORTER,
     ;
 
     companion object {
-        val entries = setOf(INTRODUCTION, CONTAINERS, BONUS, WORD_GROUP, QUIZ, IMPORTER)
+        val entries = setOf(INTRODUCTION, BONUS, WORD_GROUP, EXTRACT_WORDS, IMPORTER)
 
         val COUNT = entries.size
 
@@ -42,10 +41,9 @@ enum class OnboardingPage {
     fun getTitle(): String {
         val id = when (this) {
             INTRODUCTION -> R.string.onboarding_page_title_introduction
-            CONTAINERS -> R.string.onboarding_page_title_container
             BONUS -> R.string.onboarding_page_title_bonus_material
             WORD_GROUP -> R.string.onboarding_page_title_word_groups
-            QUIZ -> R.string.onboarding_page_title_quiz
+            EXTRACT_WORDS -> R.string.onboarding_page_extractor_title
             IMPORTER -> R.string.onboarding_page_importer_title
         }
         return stringResource(id)
@@ -56,10 +54,9 @@ enum class OnboardingPage {
     fun getContentText(): String {
         val id = when (this) {
             INTRODUCTION -> R.string.onboarding_page_content_introduction
-            CONTAINERS -> R.string.onboarding_page_content_container
             BONUS -> R.string.onboarding_page_content_bonus_material
             WORD_GROUP -> R.string.onboarding_page_content_word_groups_description
-            QUIZ -> R.string.onboarding_page_content_quiz
+            EXTRACT_WORDS -> R.string.onboarding_page_extractor_description
             IMPORTER -> R.string.onboarding_page_content_importer
         }
         return stringResource(id)
@@ -69,7 +66,7 @@ enum class OnboardingPage {
     @Composable
     fun getAdditionalContentText(): String? {
         val id = when (this) {
-            QUIZ -> R.string.onboarding_page_content_quiz_expanded
+            INTRODUCTION -> R.string.onboarding_page_additional_content_introduction
             else -> null
         }
         return id?.let { stringResource(it) }

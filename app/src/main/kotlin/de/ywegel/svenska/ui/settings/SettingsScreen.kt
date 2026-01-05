@@ -24,6 +24,7 @@ import com.ramcosta.composedestinations.annotation.parameters.DeepLink
 import com.ramcosta.composedestinations.generated.destinations.AboutLibrariesScreenDestination
 import com.ramcosta.composedestinations.generated.destinations.OnboardingScreenDestination
 import com.ramcosta.composedestinations.generated.destinations.SearchSettingsScreenDestination
+import com.ramcosta.composedestinations.generated.destinations.WordExtractorExplanationScreenDestination
 import com.ramcosta.composedestinations.generated.destinations.WordImporterScreenDestination
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
 import de.ywegel.svenska.BuildConfig
@@ -60,6 +61,7 @@ fun SettingsScreen(navigator: DestinationsNavigator, viewModel: SettingsViewMode
             // If we got here via the deep link, we can only get back to the OS-Settings via the back dispatcher.
             backDispatcher?.onBackPressedDispatcher?.onBackPressed() ?: navigator.navigateUp()
         },
+        navigateToWordExtractorExplanationScreen = { navigator.navigate(WordExtractorExplanationScreenDestination) },
         navigateToWordImporter = { navigator.navigate(WordImporterScreenDestination) },
         navigateToAboutLibraries = { navigator.navigate(AboutLibrariesScreenDestination) },
         navigateToOnboarding = { navigator.navigate(OnboardingScreenDestination) },
@@ -72,6 +74,7 @@ private fun SettingsScreen(
     uiState: SettingsUiState,
     callbacks: SettingsCallbacks,
     navigateUp: () -> Unit,
+    navigateToWordExtractorExplanationScreen: () -> Unit,
     navigateToWordImporter: () -> Unit,
     navigateToAboutLibraries: () -> Unit,
     navigateToOnboarding: () -> Unit,
@@ -114,8 +117,16 @@ private fun SettingsScreen(
             VerticalSpacerXS()
 
             ClickableText(
-                title = stringResource(R.string.settings_naviagate_word_importer_screen_title),
-                description = stringResource(R.string.settings_naviagate_word_importer_screen_description),
+                title = stringResource(R.string.settings_navigate_word_extractor_explanation_title),
+                description = stringResource(R.string.settings_navigate_word_extractor_explanation_description),
+                onClick = navigateToWordExtractorExplanationScreen,
+            )
+
+            VerticalSpacerXS()
+
+            ClickableText(
+                title = stringResource(R.string.settings_navigate_word_importer_screen_title),
+                description = stringResource(R.string.settings_navigate_word_importer_screen_description),
                 onClick = navigateToWordImporter,
             )
 
@@ -142,7 +153,7 @@ private fun AppInformationSection(navigateToAboutLibraries: () -> Unit) {
     val githubRepoUrl = stringResource(R.string.settings_github_repository_url)
 
     ClickableText(
-        title = stringResource(R.string.settings_naviagate_about_libraries_screen_title),
+        title = stringResource(R.string.settings_navigate_about_libraries_screen_title),
         onClick = navigateToAboutLibraries,
     )
 
@@ -172,6 +183,7 @@ private fun SettingsScreenPreview() {
             ),
             callbacks = SettingsCallbacksFake,
             navigateUp = {},
+            navigateToWordExtractorExplanationScreen = {},
             navigateToWordImporter = {},
             navigateToAboutLibraries = {},
             navigateToOnboarding = {},

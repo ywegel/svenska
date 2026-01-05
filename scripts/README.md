@@ -11,7 +11,12 @@ Both scripts for these books require pymupdf:
 pip install pymupdf
 ```
 
+Run the scripts with python:
+```bash
+python3 rivstart_second_edition_wordlist_extractor.py
+```
+
 You can also use [uv](https://docs.astral.sh/uv/) to run the scripts without having to install the dependencies manually:
 ```bash
-cd scripts && uv run rivstart_second_edition_wordlist_extractor.py
+uv run rivstart_second_edition_wordlist_extractor.py
 ```
