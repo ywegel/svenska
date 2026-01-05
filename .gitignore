@@ -42,3 +42,6 @@ google-services.json
 *.hprof
 
 .DS_Store
+
+# Sentry Config File
+sentry.properties

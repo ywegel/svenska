@@ -14,6 +14,7 @@ plugins {
     alias(libs.plugins.detekt)
     alias(libs.plugins.room)
     alias(libs.plugins.kotlinx.kover)
+    alias(libs.plugins.sentry.io)
     id("kotlin-parcelize")
 }
 
@@ -240,4 +241,18 @@ kover {
             }
         }
     }
+}
+
+sentry {
+    org.set("ywegel")
+    projectName.set("svenska")
+    ignoredBuildTypes.set(listOf("debug"))
+
+    includeSourceContext = true
+    includeNativeSources = true
+    includeProguardMapping = true
+    uploadNativeSymbols = true
+    autoUploadProguardMapping = true
+    autoUploadNativeSymbols = true
+    autoUploadSourceContext = true
 }
