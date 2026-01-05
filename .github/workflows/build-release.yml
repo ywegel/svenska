@@ -45,6 +45,16 @@ jobs:
           draft: false
           prerelease: false
 
+      - name: Create Sentry release
+        uses: getsentry/action-release@v3
+        env:
+          SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }}
+          SENTRY_ORG: ${{ secrets.SENTRY_ORG }}
+          SENTRY_PROJECT: ${{ secrets.SENTRY_PROJECT }}
+        with:
+          environment: production
+          version: ${{ github.ref }}
+
       - name: Upload APK
         uses: actions/upload-release-asset@v1
         env:
