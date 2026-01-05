@@ -33,6 +33,7 @@ import com.ramcosta.composedestinations.annotation.Destination
 import com.ramcosta.composedestinations.generated.destinations.WordImporterScreenDestination
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
 import de.ywegel.svenska.R
+import de.ywegel.svenska.domain.SharedUrlConstants
 import de.ywegel.svenska.navigation.SvenskaGraph
 import de.ywegel.svenska.ui.common.TopAppTextBar
 import de.ywegel.svenska.ui.common.VerticalSpacerM
@@ -86,12 +87,12 @@ private fun WordExtractorExplanationScreen(navigateUp: () -> Unit, navigateToWor
                     BulletPointWithLink(
                         prefix = stringResource(R.string.wordExtractor_prereq_python),
                         linkText = stringResource(R.string.wordExtractor_prereq_python_link),
-                        url = LinkUrls.PYTHON,
+                        url = SharedUrlConstants.PYTHON,
                     )
                     BulletPointWithLink(
                         prefix = stringResource(R.string.wordExtractor_prereq_rivstart),
                         linkText = stringResource(R.string.wordExtractor_prereq_rivstart_link),
-                        url = LinkUrls.RIVSTART,
+                        url = SharedUrlConstants.RIVSTART,
                     )
                     BulletPointText(stringResource(R.string.wordExtractor_prereq_scripts))
                 }
@@ -107,7 +108,7 @@ private fun WordExtractorExplanationScreen(navigateUp: () -> Unit, navigateToWor
                     BulletPointWithLink(
                         prefix = stringResource(R.string.wordExtractor_step1_uv_prefix),
                         linkText = stringResource(R.string.wordExtractor_step1_uv_link),
-                        url = LinkUrls.UV,
+                        url = SharedUrlConstants.UV,
                         suffix = stringResource(R.string.wordExtractor_step1_uv_suffix),
                     )
                 }
@@ -126,7 +127,7 @@ private fun WordExtractorExplanationScreen(navigateUp: () -> Unit, navigateToWor
                     BulletPointWithLink(
                         prefix = stringResource(R.string.wordExtractor_step2_repo_prefix),
                         linkText = stringResource(R.string.wordExtractor_step2_repo_link),
-                        url = LinkUrls.SVENSKA_REPOSITORY,
+                        url = SharedUrlConstants.SVENSKA_REPOSITORY_SCRIPTS,
                     )
                     BulletPointText(stringResource(R.string.wordExtractor_step2_download_py_files))
                 }
@@ -240,13 +241,6 @@ private fun CodeBlock(code: String) {
             modifier = Modifier.padding(Spacings.s),
         )
     }
-}
-
-private object LinkUrls {
-    const val RIVSTART = "https://nokportalen.se/"
-    const val SVENSKA_REPOSITORY = "https://github.com/ywegel/svenska/tree/main/scripts"
-    const val PYTHON = "https://www.python.org/downloads/"
-    const val UV = "https://docs.astral.sh/uv/"
 }
 
 @Preview

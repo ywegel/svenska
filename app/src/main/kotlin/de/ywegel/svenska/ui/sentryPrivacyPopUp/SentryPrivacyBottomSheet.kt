@@ -20,6 +20,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import de.ywegel.svenska.R
+import de.ywegel.svenska.domain.SharedUrlConstants
 import de.ywegel.svenska.ui.common.FixedModalBottomSheet
 import de.ywegel.svenska.ui.common.HorizontalSpacerXXS
 import de.ywegel.svenska.ui.common.VerticalSpacerS
@@ -56,7 +57,7 @@ fun SentryPrivacyBottomSheet(onAccept: () -> Unit) {
             VerticalSpacerXS()
             TextButton(
                 onClick = {
-                    uriHandler.openUri("https://ywegel.de/privacy")
+                    uriHandler.openUri(SharedUrlConstants.SVENSKA_PRIVACY_POLICY)
                 },
                 modifier = Modifier.fillMaxWidth(),
             ) {

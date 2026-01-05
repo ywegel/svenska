@@ -268,6 +268,7 @@
     <string name="settings_navigate_word_importer_screen_title">Show word importer</string>
     <string name="settings_navigate_word_importer_screen_description">Import words from a file</string>
     <string name="settings_navigate_about_libraries_screen_title">Licenses</string>
+    <string name="settings_navigate_privacy_policy_title">Privacy Policy</string>
     <string name="settings_app_version">App Version: %1$s</string>
     <string name="settings_github_repository">Open Source on GitHub</string>
     <string name="settings_github_repository_url">https://github.com/ywegel/svenska</string>
