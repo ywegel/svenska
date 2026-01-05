@@ -288,7 +288,7 @@
     <string name="onboarding_button_start">Let&#8217;s go!</string>
 
     <string name="onboarding_page_title_introduction">Welcome</string>
-    <string name="onboarding_page_content_introduction">Svenska is a simple app to make learning swedish vocabulary easier.</string>
+    <string name="onboarding_page_content_introduction">Svenska is a simple app to make learning Swedish vocabulary easier.</string>
     <string name="onboarding_page_additional_content_introduction">Words can be grouped into containers and trained with the integrated Quiz.</string>
 
     <string name="onboarding_page_title_word_groups">Word Groups</string>
@@ -323,7 +323,7 @@
     <string name="wordExtractor_prereq_python_link">python.org/downloads</string>
     <string name="wordExtractor_prereq_rivstart">The official Rivstart PDF files downloaded from\u0020</string>
     <string name="wordExtractor_prereq_rivstart_link">nokportalen.se</string>
-    <string name="wordExtractor_prereq_scripts">The extraction scripts from the app\'s GitHub repository (link below)</string>
+    <string name="wordExtractor_prereq_scripts">The extraction scripts from the app&#8217;s GitHub repository (link below)</string>
 
     <string name="wordExtractor_step1_title">Step 1: Install the Required Dependencies</string>
     <string name="wordExtractor_step1_pymupdf">The scripts require the PyMuPDF library. Install it via pip:</string>
@@ -343,7 +343,7 @@
     <string name="wordExtractor_step2_place_pdf">Place the corresponding PDF file in the same folder as the script. Then run the appropriate script:</string>
     <string name="wordExtractor_step2_edition_2nd">For 2nd edition:</string>
     <string name="wordExtractor_step2_edition_3rd">For 3rd edition:</string>
-    <string name="wordExtractor_step2_prompt">The script will prompt you for the PDF filename and the desired output filename</string>
+    <string name="wordExtractor_step2_prompt">The script will prompt you for the PDF filename and the desired output filename.</string>
 
     <string name="wordExtractor_step3_title">Step 3: Transfer and Import</string>
     <string name="wordExtractor_step3_transfer">Transfer the generated .json file to your Android device. Then open the app and use the \"Word Importer\" feature to import the file. Alternatively, click on the .json file and open it with the Svenska app.</string>

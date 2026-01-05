@@ -4,7 +4,6 @@ package de.ywegel.svenska.ui.wordImporter
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -66,10 +65,10 @@ private fun WordExtractorExplanationScreen(navigateUp: () -> Unit, navigateToWor
         LazyColumn(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(innerPadding)
+                .padding(horizontal = Spacings.m)
                 .nestedScroll(scrollBehavior.nestedScrollConnection),
             verticalArrangement = Arrangement.spacedBy(Spacings.m),
-            contentPadding = PaddingValues(bottom = Spacings.m, start = Spacings.xs, end = Spacings.m),
+            contentPadding = innerPadding,
         ) {
             item {
                 Body(R.string.wordExtractor_currently_only_rivstart)
@@ -112,7 +111,7 @@ private fun WordExtractorExplanationScreen(navigateUp: () -> Unit, navigateToWor
                         suffix = stringResource(R.string.wordExtractor_step1_uv_suffix),
                     )
                 }
-                CodeBlock("uv run rivstart_second_edition_wordlist_extractor.py")
+                CodeBlock("uv run <your_rivstart_wordlist_extractor_script>.py")
             }
 
             item {
@@ -175,7 +174,7 @@ interface BulletPointListScope
 private object BulletPointListScopeInstance : BulletPointListScope
 
 @Composable
-fun BulletPointList(modifier: Modifier = Modifier, content: @Composable BulletPointListScope.() -> Unit) {
+private fun BulletPointList(modifier: Modifier = Modifier, content: @Composable BulletPointListScope.() -> Unit) {
     Column(
         Modifier
             .padding(vertical = Spacings.xs)
