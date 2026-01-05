@@ -346,7 +346,7 @@
     <string name="wordExtractor_step2_prompt">The script will prompt you for the PDF filename and the desired output filename.</string>
 
     <string name="wordExtractor_step3_title">Step 3: Transfer and Import</string>
-    <string name="wordExtractor_step3_transfer">Transfer the generated .json file to your Android device. Then open the app and use the \"Word Importer\" feature to import the file. Alternatively, click on the .json file and open it with the Svenska app.</string>
+    <string name="wordExtractor_step3_transfer">Transfer the generated .json file to your Android device. Then open the app and use the &#8220;Word Importer&#8220; feature to import the file. Alternatively, click on the .json file and open it with the Svenska app.</string>
     <string name="wordExtractor_step3_button">Or open the Word Importer now</string>
 
     <!-- # VocabularyDetailScreen # -->
