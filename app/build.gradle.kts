@@ -22,11 +22,14 @@ plugins {
 
 object LocalPropertiesManager {
     private fun getKey(project: Project, keyName: String): String? {
-        val props =
-            Properties().apply {
+        try {
+            val props = Properties().apply {
                 load(FileInputStream(project.rootProject.file("local.properties")))
             }
-        return props.getProperty(keyName, null)
+            return props.getProperty(keyName, null)
+        } catch (e: Exception) {
+            return null
+        }
     }
 
     fun getSentryDsn(project: Project): String? {
@@ -88,6 +91,7 @@ android {
                 "proguard-rules.pro",
             )
             signingConfig = signingConfigs.getByName("debug")
+            manifestPlaceholders["sentryDsn"] = ""
         }
     }
     sourceSets {
