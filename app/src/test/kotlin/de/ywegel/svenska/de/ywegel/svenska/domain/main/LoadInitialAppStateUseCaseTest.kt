@@ -39,9 +39,9 @@ class LoadInitialAppStateUseCaseTest {
     fun `hasCompletedOnboarding is correctly reflected in AppState`() = runTest(testDispatcher) {
         val fakePreferencesManager =
             UserPreferencesManagerFake(initialHasCompletedOnboarding = false, initialAcceptedPrivacyVersion = -1)
-        val userCase = LoadInitialAppStateUseCaseImpl(fakePreferencesManager)
+        val useCase = LoadInitialAppStateUseCaseImpl(fakePreferencesManager)
 
-        userCase().test {
+        useCase().test {
             expectThat(awaitItem()).isEqualTo(
                 InitialAppState(
                     hasCompletedOnboarding = false,
@@ -64,9 +64,9 @@ class LoadInitialAppStateUseCaseTest {
     fun `isLatestPrivacyPolicyAccepted is correctly determined`() = runTest(testDispatcher) {
         val fakePreferencesManager =
             UserPreferencesManagerFake(initialHasCompletedOnboarding = false, initialAcceptedPrivacyVersion = -1)
-        val userCase = LoadInitialAppStateUseCaseImpl(fakePreferencesManager)
+        val useCase = LoadInitialAppStateUseCaseImpl(fakePreferencesManager)
 
-        userCase().test {
+        useCase().test {
             expectThat(awaitItem()).isEqualTo(
                 InitialAppState(
                     hasCompletedOnboarding = false,
@@ -91,9 +91,9 @@ class LoadInitialAppStateUseCaseTest {
             initialHasCompletedOnboarding = false,
             initialAcceptedPrivacyVersion = LATEST_PRIVACY_VERSION,
         )
-        val userCase = LoadInitialAppStateUseCaseImpl(fakePreferencesManager)
+        val useCase = LoadInitialAppStateUseCaseImpl(fakePreferencesManager)
 
-        userCase().test {
+        useCase().test {
             expectThat(awaitItem()).isEqualTo(
                 InitialAppState(
                     hasCompletedOnboarding = false,

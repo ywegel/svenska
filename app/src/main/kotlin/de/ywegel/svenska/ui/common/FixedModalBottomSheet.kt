@@ -38,10 +38,9 @@ fun FixedModalBottomSheet(
     ) {
         Column(
             Modifier
-                .padding(vertical = Spacings.s)
+                .padding(top = Spacings.xl, bottom = Spacings.s)
                 .navigationBarsPadding(),
         ) {
-            VerticalSpacerS()
             content()
         }
     }

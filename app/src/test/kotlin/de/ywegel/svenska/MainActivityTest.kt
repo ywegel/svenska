@@ -103,8 +103,8 @@ class MainActivityTest {
     }
 
     // Helper function to simulate the logic in MainActivity
-    private fun determineStartRoute(onboardingCompleted: MainUiState): Direction {
-        val onboardingCompleted = (onboardingCompleted as MainUiState.Ready).hasCompletedOnboarding
+    private fun determineStartRoute(state: MainUiState): Direction {
+        val onboardingCompleted = (state as MainUiState.Ready).hasCompletedOnboarding
         return if (!onboardingCompleted) {
             OnboardingScreenDestination
         } else {

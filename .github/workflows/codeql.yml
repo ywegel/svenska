@@ -21,6 +21,9 @@ on:
     - cron: '25 15 * * 3'
   workflow_dispatch:
 
+env:
+  SENTRY_DSN: ""
+
 jobs:
   analyze:
     name: Analyze (${{ matrix.language }})
