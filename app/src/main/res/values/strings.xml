@@ -268,6 +268,7 @@
     <string name="settings_navigate_word_importer_screen_title">Show word importer</string>
     <string name="settings_navigate_word_importer_screen_description">Import words from a file</string>
     <string name="settings_navigate_about_libraries_screen_title">Licenses</string>
+    <string name="settings_navigate_privacy_policy_title">Privacy Policy</string>
     <string name="settings_app_version">App Version: %1$s</string>
     <string name="settings_github_repository">Open Source on GitHub</string>
     <string name="settings_github_repository_url">https://github.com/ywegel/svenska</string>
@@ -360,4 +361,10 @@
     <string name="vocabulary_detail_chip_gender">Gender: %1$s (%2$s)</string>
     <string name="vocabulary_detail_chip_endings">Endings: %1$s</string>
     <string name="vocabulary_detail_edit_btn">Edit</string>
+
+    <!-- # Sentry privacy pop up # -->
+    <string name="sentryPopUp_title">Privacy Policy Updated</string>
+    <string name="sentryPopUp_description">We now use Sentry to anonymously analyze crashes, errors, and technical logs. This helps us make the app more stable and reliable.</string>
+    <string name="sentryPopUp_link_text">Show full policy</string>
+    <string name="sentryPopUp_understood">Got it</string>
 </resources>

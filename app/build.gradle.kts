@@ -1,5 +1,7 @@
 import io.gitlab.arturbosch.detekt.Detekt
 import org.jlleitschuh.gradle.ktlint.reporter.ReporterType
+import java.io.FileInputStream
+import java.util.Properties
 
 plugins {
     alias(libs.plugins.com.android.application)
@@ -14,7 +16,25 @@ plugins {
     alias(libs.plugins.detekt)
     alias(libs.plugins.room)
     alias(libs.plugins.kotlinx.kover)
+    alias(libs.plugins.sentry.io)
     id("kotlin-parcelize")
+}
+
+object LocalPropertiesManager {
+    private fun getKey(project: Project, keyName: String): String? {
+        try {
+            val props = Properties().apply {
+                load(FileInputStream(project.rootProject.file("local.properties")))
+            }
+            return props.getProperty(keyName, null)
+        } catch (e: Exception) {
+            return null
+        }
+    }
+
+    fun getSentryDsn(project: Project): String? {
+        return getKey(project, "sentryDsn")
+    }
 }
 
 android {
@@ -47,6 +67,7 @@ android {
         debug {
             applicationIdSuffix = ".debug"
             versionNameSuffix = "-debug"
+            manifestPlaceholders["sentryDsn"] = ""
         }
         release {
             signingConfig = signingConfigs.getByName("release")
@@ -55,6 +76,8 @@ android {
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro",
             )
+            manifestPlaceholders["sentryDsn"] = LocalPropertiesManager.getSentryDsn(rootProject)
+                ?: System.getenv("SENTRY_DSN")
         }
         create("beta") {
             applicationIdSuffix = ".beta"
@@ -68,6 +91,7 @@ android {
                 "proguard-rules.pro",
             )
             signingConfig = signingConfigs.getByName("debug")
+            manifestPlaceholders["sentryDsn"] = ""
         }
     }
     sourceSets {
@@ -240,4 +264,18 @@ kover {
             }
         }
     }
+}
+
+sentry {
+    org.set("ywegel")
+    projectName.set("svenska")
+    ignoredBuildTypes.set(listOf("debug"))
+
+    includeSourceContext = true
+    includeNativeSources = true
+    includeProguardMapping = true
+    uploadNativeSymbols = true
+    autoUploadProguardMapping = true
+    autoUploadNativeSymbols = true
+    autoUploadSourceContext = true
 }
