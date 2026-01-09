@@ -1,3 +1,6 @@
+@file:OptIn(ExperimentalRoborazziApi::class)
+
+import com.github.takahirom.roborazzi.ExperimentalRoborazziApi
 import io.gitlab.arturbosch.detekt.Detekt
 import org.jlleitschuh.gradle.ktlint.reporter.ReporterType
 
@@ -14,6 +17,7 @@ plugins {
     alias(libs.plugins.detekt)
     alias(libs.plugins.room)
     alias(libs.plugins.kotlinx.kover)
+    alias(libs.plugins.roborazzi)
     id("kotlin-parcelize")
 }
 
@@ -112,6 +116,14 @@ android {
         )
         checkGeneratedSources = false
     }
+    testOptions {
+        unitTests {
+            isIncludeAndroidResources = true
+            all {
+                it.systemProperties["robolectric.pixelCopyRenderMode"] = "hardware"
+            }
+        }
+    }
 }
 
 dependencies {
@@ -172,6 +184,11 @@ dependencies {
     testImplementation(libs.robolectric)
     testImplementation(libs.strikt)
     androidTestImplementation(libs.strikt)
+    testImplementation(libs.roborazzi)
+    testImplementation(libs.roborazzi.compose)
+    testImplementation(libs.roborazzi.compose.scanner)
+    testImplementation(libs.roborazzi.compose.scanner.sergio.dependency)
+    testImplementation(libs.androidx.compose.ui.test.junit4)
 
     // junit5
     testImplementation(libs.junit5.api)
@@ -239,5 +256,17 @@ kover {
                 )
             }
         }
+    }
+}
+
+roborazzi {
+    generateComposePreviewRobolectricTests {
+        enable = true
+        packages = listOf("de.ywegel.svenska")
+        includePrivatePreviews = true
+        robolectricConfig = mapOf(
+            "sdk" to "[32]",
+            "qualifiers" to "RobolectricDeviceQualifiers.Pixel5",
+        )
     }
 }

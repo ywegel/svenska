@@ -16,6 +16,7 @@ androidx-hilt = "1.2.0"
 compose-destinations = "2.2.0"
 junit5 = "5.11.2"
 about-libraries = "12.1.2"
+roborazzi-version = "1.55.0"
 
 [libraries]
 core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "core-ktx" }
@@ -71,6 +72,13 @@ assertk = "com.willowtreeapps.assertk:assertk:0.26.1"
 turbine = "app.cash.turbine:turbine:1.2.1"
 robolectric = "org.robolectric:robolectric:4.16"
 
+# Snapshot testing
+roborazzi = { module = "io.github.takahirom.roborazzi:roborazzi", version.ref = "roborazzi-version" }
+roborazzi-compose = { module = "io.github.takahirom.roborazzi:roborazzi-compose", version.ref = "roborazzi-version" }
+roborazzi-compose-scanner = { module = "io.github.takahirom.roborazzi:roborazzi-compose-preview-scanner-support", version.ref = "roborazzi-version" }
+roborazzi-compose-scanner-sergio-dependency = "io.github.sergio-sastre.ComposablePreviewScanner:android:0.8.1"
+androidx-compose-ui-test-junit4 = "androidx.compose.ui:ui-test-junit4:1.4.1"
+
 strikt = "io.strikt:strikt-core:0.35.1"
 
 # junit5 https://github.com/mannodermaus/android-junit5
@@ -98,5 +106,6 @@ detekt = "io.gitlab.arturbosch.detekt:1.23.8"
 room = { id = "androidx.room", version.ref = "room-version" }
 about-libraries = { id = "com.mikepenz.aboutlibraries.plugin", version.ref = "about-libraries" }
 kotlinx-kover = "org.jetbrains.kotlinx.kover:0.9.1"
+roborazzi = { id = "io.github.takahirom.roborazzi", version.ref = "roborazzi-version" }
 
 [bundles]
