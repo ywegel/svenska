@@ -1,3 +1,6 @@
+@file:OptIn(ExperimentalRoborazziApi::class)
+
+import com.github.takahirom.roborazzi.ExperimentalRoborazziApi
 import io.gitlab.arturbosch.detekt.Detekt
 import io.sentry.android.gradle.instrumentation.logcat.LogcatLevel
 import org.jlleitschuh.gradle.ktlint.reporter.ReporterType
@@ -17,6 +20,7 @@ plugins {
     alias(libs.plugins.room)
     alias(libs.plugins.kotlinx.kover)
     alias(libs.plugins.sentry.io)
+    alias(libs.plugins.roborazzi)
     id("kotlin-parcelize")
 }
 
@@ -145,6 +149,11 @@ android {
         )
         checkGeneratedSources = false
     }
+    testOptions {
+        unitTests {
+            isIncludeAndroidResources = true
+        }
+    }
 }
 
 dependencies {
@@ -206,6 +215,11 @@ dependencies {
     testImplementation(libs.strikt)
     androidTestImplementation(libs.strikt)
     testImplementation(libs.konsist)
+    testImplementation(libs.roborazzi)
+    testImplementation(libs.roborazzi.compose)
+    testImplementation(libs.roborazzi.compose.scanner)
+    testImplementation(libs.roborazzi.compose.scanner.sergio.dependency)
+    testImplementation(libs.androidx.compose.ui.test.junit4)
 
     // junit5
     testImplementation(libs.junit5.api)
@@ -307,5 +321,17 @@ tasks.matching { it.name == "processReleaseManifest" }.configureEach {
             "SENTRY_DSN is missing for the release build. Set 'sentryDsn' in local.properties or the " +
                 "SENTRY_DSN environment variable before building a release artifact."
         }
+    }
+}
+
+roborazzi {
+    generateComposePreviewRobolectricTests {
+        enable = true
+        packages = listOf("de.ywegel.svenska")
+        includePrivatePreviews = true
+        robolectricConfig = mapOf(
+            "sdk" to "[32]",
+            "qualifiers" to "RobolectricDeviceQualifiers.Pixel5",
+        )
     }
 }
