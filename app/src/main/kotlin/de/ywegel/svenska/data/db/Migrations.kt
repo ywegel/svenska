@@ -3,9 +3,8 @@ package de.ywegel.svenska.data.db
 import android.util.Log
 import androidx.room.migration.Migration
 import androidx.sqlite.db.SupportSQLiteDatabase
+import de.ywegel.svenska.data.model.Gender
 import de.ywegel.svenska.data.model.WordGroup
-import de.ywegel.svenska.domain.wordImporter.WordExtractor.normalizePdfDashes
-import de.ywegel.svenska.domain.wordImporter.WordGroupMatcher
 
 private const val TAG = "Migrations"
 
@@ -77,11 +76,11 @@ val MIGRATION_2_3 = object : Migration(2, 3) {
                 val wordString = cursor.getString(cursor.getColumnIndexOrThrow("word")) ?: ""
                 val endingString = cursor.getString(cursor.getColumnIndexOrThrow("ending")) ?: ""
 
-                val normalizedEnding = endingString.normalizePdfDashes()
+                val normalizedEnding = endingString.normalizePdfDashesAtV2ToV3()
 
                 // Only collect if something actually changed
                 if (normalizedEnding != endingString) {
-                    val redeterminedWordGroup = WordGroupMatcher.determineWordGroup(
+                    val redeterminedWordGroup = FrozenWordGroupMatcherAtV2ToV3.determineWordGroup(
                         baseWord = wordString,
                         endings = normalizedEnding.split(" "),
                     )
@@ -116,4 +115,116 @@ val MIGRATION_2_3 = object : Migration(2, 3) {
             Log.i(TAG, "migrate: Migration from 2 to 3 finished")
         }
     }
+}
+
+/**
+ * Frozen snapshot of [de.ywegel.svenska.domain.wordImporter.WordExtractor.normalizePdfDashes]. Migrations must keep
+ * reproducing the exact transformation.
+ */
+private fun String.normalizePdfDashesAtV2ToV3(): String {
+    return this
+        .replace('\u2212', '-')
+        .replace('\u2013', '-')
+        .replace('\u2014', '-')
+        .replace('\u2010', '-')
+}
+
+/**
+ * Frozen snapshot of [de.ywegel.svenska.domain.wordImporter.WordGroupMatcher]. Migrations must keep reproducing the
+ * exact transformation.
+ */
+private object FrozenWordGroupMatcherAtV2ToV3 {
+    fun determineWordGroup(baseWord: String, endings: List<String>): WordGroup {
+        return when {
+            isAdjective(endings) -> WordGroup.Adjective
+            isNoun(endings) -> determineNounSubgroup(endings)
+            isVerb(endings) -> determineVerbSubgroup(baseWord, endings)
+            else -> WordGroup.Other
+        }
+    }
+
+    private fun isAdjective(endings: List<String>): Boolean {
+        // Adjectives always only have 2 endings (mostly "-t", "-a")
+        return endings.size == ADJECTIVE_ENDINGS
+    }
+
+    private fun isNoun(endings: List<String>): Boolean {
+        // Nouns always have 3 endings and the first ending is -n/-en/-t/-et
+        return endings.size == NOUN_ENDINGS && endings[0].removePrefix("-") in nounIndicatorEndings
+    }
+
+    private fun isVerb(endings: List<String>): Boolean {
+        // Verbs always have 3 endings
+        return endings.size == VERB_ENDINGS
+    }
+
+    private fun determineNounSubgroup(endings: List<String>): WordGroup.Noun {
+        val pluralEnding = endings[1]
+        val lazyGender by lazy { determineGender(WordGroup.Noun(WordGroup.NounSubgroup.UNDEFINED), endings) }
+
+        return when {
+            pluralEnding.endsWith("or") -> WordGroup.Noun(WordGroup.NounSubgroup.OR)
+            pluralEnding.endsWith("ar") -> WordGroup.Noun(WordGroup.NounSubgroup.AR)
+            pluralEnding.endsWith("er") -> WordGroup.Noun(WordGroup.NounSubgroup.ER)
+            pluralEnding.endsWith("r") -> WordGroup.Noun(WordGroup.NounSubgroup.R)
+            pluralEnding.endsWith("n") -> WordGroup.Noun(WordGroup.NounSubgroup.N)
+            pluralEnding.endsWith("") && lazyGender == Gender.Neutra -> WordGroup.Noun(
+                WordGroup.NounSubgroup.UNCHANGED_ETT,
+            )
+
+            pluralEnding.endsWith("") && lazyGender == Gender.Ultra -> WordGroup.Noun(
+                WordGroup.NounSubgroup.UNCHANGED_EN,
+            )
+
+            else -> WordGroup.Noun(WordGroup.NounSubgroup.UNDEFINED)
+        }
+    }
+
+    @Suppress("detekt:CyclomaticComplexMethod")
+    private fun determineVerbSubgroup(baseWord: String, endings: List<String>): WordGroup.Verb {
+        val present = endings[0]
+        val past = endings[1]
+        return when {
+            baseWord.endsWith("a") && present.endsWith("ar") && past.endsWith("ade") -> WordGroup.Verb(
+                WordGroup.VerbSubgroup.GROUP_1,
+            )
+
+            baseWord.endsWith("a") && present.endsWith("r") && past.endsWith("de") -> WordGroup.Verb(
+                WordGroup.VerbSubgroup.GROUP_1,
+            )
+
+            baseWord.endsWith("a") && present.endsWith("er") && past.endsWith("de") -> WordGroup.Verb(
+                WordGroup.VerbSubgroup.GROUP_2A,
+            )
+
+            baseWord.endsWith("a") && present.endsWith("er") && past.endsWith("te") -> WordGroup.Verb(
+                WordGroup.VerbSubgroup.GROUP_2B,
+            )
+
+            baseWord.last() in setOf('a', 'e', 'i', 'o', 'u', 'y') &&
+                present.endsWith("r") &&
+                past.endsWith("dde")
+            -> WordGroup.Verb(WordGroup.VerbSubgroup.GROUP_3)
+
+            else -> WordGroup.Verb(WordGroup.VerbSubgroup.GROUP_4_SPECIAL)
+        }
+    }
+
+    fun determineGender(wordGroup: WordGroup, endings: List<String>): Gender? {
+        if (endings.isEmpty()) return null
+        if (wordGroup !is WordGroup.Noun) return null
+
+        val firstEnding = endings[0].removePrefix("-")
+
+        return when {
+            firstEnding == "n" || firstEnding == "en" -> Gender.Ultra // En-word
+            firstEnding == "t" || firstEnding == "et" -> Gender.Neutra // Ett-word
+            else -> null // Unknown
+        }
+    }
+
+    private val nounIndicatorEndings = setOf("n", "en", "t", "et")
+    const val NOUN_ENDINGS = 3
+    const val VERB_ENDINGS = 3
+    const val ADJECTIVE_ENDINGS = 2
 }
