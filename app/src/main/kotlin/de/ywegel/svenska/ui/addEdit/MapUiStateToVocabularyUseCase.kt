@@ -4,6 +4,7 @@ import de.ywegel.svenska.data.model.Gender
 import de.ywegel.svenska.data.model.Vocabulary
 import de.ywegel.svenska.ui.addEdit.models.ViewWordGroup
 import de.ywegel.svenska.ui.common.vocabulary.HighlightUtils
+import javax.inject.Inject
 
 /**
  * Maps a [AddEditUiState] and optional [initialVocabulary] into a [Vocabulary] object.
@@ -29,7 +30,7 @@ import de.ywegel.svenska.ui.common.vocabulary.HighlightUtils
  * This allows the ViewModel to signal validation errors and block saving if required fields are missing.
  */
 
-class MapUiStateToVocabularyUseCase {
+class MapUiStateToVocabularyUseCase @Inject constructor() {
 
     operator fun invoke(snapshot: AddEditUiState, initialVocabulary: Vocabulary?, containerId: Int): Vocabulary? {
         val viewWordGroup = snapshot.selectedWordGroup ?: return null

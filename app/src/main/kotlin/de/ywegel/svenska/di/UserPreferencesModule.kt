@@ -10,7 +10,7 @@ import javax.inject.Singleton
 
 @Module
 @InstallIn(SingletonComponent::class)
-abstract class UserPreferencesBindModule {
+abstract class UserPreferencesModule {
     @Binds
     @Singleton
     abstract fun bindUserPreferencesManager(impl: UserPreferencesManagerImpl): UserPreferencesManager
