@@ -9,8 +9,6 @@ package de.ywegel.svenska.data.model
 
 import androidx.annotation.VisibleForTesting
 
-// TODO: create annotation VisibleForTestingAndPreviews
-
 object GeneratorConstants {
     @VisibleForTesting
     const val LONG_STRING: String =

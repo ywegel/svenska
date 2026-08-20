@@ -2,12 +2,13 @@ package de.ywegel.svenska.domain.wordImporter
 
 import de.ywegel.svenska.data.model.Vocabulary
 import de.ywegel.svenska.data.model.WordGroup
+import javax.inject.Inject
 
 interface WordParser {
     fun parseWord(word: String?, translation: String?, containerId: Int): Vocabulary
 }
 
-class WordParserImpl : WordParser {
+class WordParserImpl @Inject constructor() : WordParser {
 
     override fun parseWord(word: String?, translation: String?, containerId: Int): Vocabulary {
         val (baseWord, endings) = WordExtractor.extractWordAndEndings(word.orEmpty().trim())
