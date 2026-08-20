@@ -1,6 +1,6 @@
 package de.ywegel.svenska.ui.settings
 
-import de.ywegel.svenska.domain.search.OnlineSearchType
+import de.ywegel.svenska.data.model.OnlineSearchType
 import org.jetbrains.annotations.VisibleForTesting
 
 @VisibleForTesting
