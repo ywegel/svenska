@@ -76,7 +76,7 @@ val MIGRATION_2_3 = object : Migration(2, 3) {
                 val wordString = cursor.getString(cursor.getColumnIndexOrThrow("word")) ?: ""
                 val endingString = cursor.getString(cursor.getColumnIndexOrThrow("ending")) ?: ""
 
-                val normalizedEnding = endingString.normalizePdfDashesAtV2ToV3()
+                val normalizedEnding = FrozenDashNormalizerAtV2ToV3.normalize(endingString)
 
                 // Only collect if something actually changed
                 if (normalizedEnding != endingString) {
@@ -121,12 +121,14 @@ val MIGRATION_2_3 = object : Migration(2, 3) {
  * Frozen snapshot of [de.ywegel.svenska.domain.wordImporter.WordExtractor.normalizePdfDashes]. Migrations must keep
  * reproducing the exact transformation.
  */
-private fun String.normalizePdfDashesAtV2ToV3(): String {
-    return this
-        .replace('\u2212', '-')
-        .replace('\u2013', '-')
-        .replace('\u2014', '-')
-        .replace('\u2010', '-')
+private object FrozenDashNormalizerAtV2ToV3 {
+    fun normalize(input: String): String {
+        return input
+            .replace('\u2212', '-')
+            .replace('\u2013', '-')
+            .replace('\u2014', '-')
+            .replace('\u2010', '-')
+    }
 }
 
 /**

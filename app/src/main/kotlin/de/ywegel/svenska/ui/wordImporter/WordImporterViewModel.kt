@@ -39,7 +39,7 @@ sealed class ImporterError {
     data class Unknown(val cause: Throwable) : ImporterError()
 }
 
-private fun FileParseException.toImporterError(): ImporterError = when (this) {
+fun FileParseException.toImporterError(): ImporterError = when (this) {
     is FileParseException.FileNotFound -> ImporterError.FileNotFound
     is FileParseException.InvalidFormat -> ImporterError.InvalidFileFormat
     is FileParseException.Unexpected -> ImporterError.Unknown(originalCause)
