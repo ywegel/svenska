@@ -23,11 +23,11 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.withStyle
 import de.ywegel.svenska.R
 import de.ywegel.svenska.domain.quiz.model.QuizQuestion
+import de.ywegel.svenska.domain.quiz.model.TranslateWithEndingsResult
 import de.ywegel.svenska.domain.quiz.model.UserAnswer
 import de.ywegel.svenska.ui.common.VerticalSpacerXXS
 import de.ywegel.svenska.ui.quiz.QuizRenderer
 import de.ywegel.svenska.ui.quiz.controller.TranslateWithEndingsActions
-import de.ywegel.svenska.ui.quiz.controller.TranslateWithEndingsResult
 import de.ywegel.svenska.ui.quiz.controller.TranslateWithEndingsState
 import de.ywegel.svenska.ui.theme.Spacings
 import de.ywegel.svenska.ui.theme.SvenskaTheme
