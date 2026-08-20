@@ -2,7 +2,7 @@ package de.ywegel.svenska.fakes
 
 import android.net.Uri
 import de.ywegel.svenska.data.FileRepository
-import de.ywegel.svenska.ui.wordImporter.ImporterChapter
+import de.ywegel.svenska.data.model.ImporterChapter
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow

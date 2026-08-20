@@ -7,8 +7,8 @@ import assertk.assertions.isFalse
 import assertk.assertions.isInstanceOf
 import assertk.assertions.isNotNull
 import assertk.assertions.isTrue
+import de.ywegel.svenska.data.model.ImporterChapter
 import de.ywegel.svenska.fakes.FileRepositoryFake
-import de.ywegel.svenska.ui.wordImporter.ImporterChapter
 import de.ywegel.svenska.ui.wordImporter.ImporterError
 import de.ywegel.svenska.ui.wordImporter.ImporterState
 import de.ywegel.svenska.ui.wordImporter.WordImporterViewModel

@@ -1,4 +1,4 @@
-package de.ywegel.svenska.ui.wordImporter
+package de.ywegel.svenska.data.model
 
 import kotlinx.serialization.Serializable
 

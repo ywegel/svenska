@@ -6,10 +6,10 @@ import android.util.Log
 import de.ywegel.svenska.data.ContainerRepository
 import de.ywegel.svenska.data.FileRepository
 import de.ywegel.svenska.data.VocabularyRepository
+import de.ywegel.svenska.data.model.ImporterChapter
 import de.ywegel.svenska.data.model.VocabularyContainer
 import de.ywegel.svenska.domain.wordImporter.WordParser
 import de.ywegel.svenska.jsonConfig
-import de.ywegel.svenska.ui.wordImporter.ImporterChapter
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.flow.Flow

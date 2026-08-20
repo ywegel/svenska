@@ -1,7 +1,7 @@
 package de.ywegel.svenska.data
 
 import android.net.Uri
-import de.ywegel.svenska.ui.wordImporter.ImporterChapter
+import de.ywegel.svenska.data.model.ImporterChapter
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.flow.Flow
 
