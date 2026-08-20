@@ -44,7 +44,7 @@ class FileRepositoryTest {
     }
 
     @Test
-    fun `parseFile should return list of entries when stream is valid`() = runTest {
+    fun `parseFile should return list of entries when stream is valid`() = runTest(testDispatcher) {
         val expected = listOf(
             ImporterChapter(
                 "Kapitel 1",
@@ -90,7 +90,7 @@ class FileRepositoryTest {
     }
 
     @Test
-    fun `parseFile should fail with FileNotFound when stream cannot be opened`() = runTest {
+    fun `parseFile should fail with FileNotFound when stream cannot be opened`() = runTest(testDispatcher) {
         // Given
         val uri = mockk<Uri>()
         every { contentResolver.openInputStream(uri) } returns null
@@ -104,7 +104,7 @@ class FileRepositoryTest {
     }
 
     @Test
-    fun `parseFile should fail with InvalidFormat when JSON is invalid`() = runTest {
+    fun `parseFile should fail with InvalidFormat when JSON is invalid`() = runTest(testDispatcher) {
         // Given
         val uri = mockk<Uri>()
         val invalidJson = """{invalid json]"""

@@ -9,8 +9,8 @@ import de.ywegel.svenska.ui.bonus.favorites.FavoritesAndPronunciationViewModel
 import de.ywegel.svenska.ui.bonus.favorites.FavoritesUiState
 import de.ywegel.svenska.ui.container.BonusScreen
 import io.mockk.clearAllMocks
+import io.mockk.coEvery
 import io.mockk.coVerify
-import io.mockk.every
 import io.mockk.spyk
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -128,7 +128,7 @@ class FavoritesAndPronunciationViewModelTest {
     @Test
     fun `Given repository throws, When ViewModel loads, Then emit Error state`() = runTest(testDispatcher) {
         val throwingRepository = spyk(repository) {
-            every { getFavorites(any()) } throws RuntimeException("Fetch failed")
+            coEvery { getFavorites(any()) } throws RuntimeException("Fetch failed")
         }
 
         val savedStateHandle = SavedStateHandle(mapOf("screenType" to BonusScreen.Favorites))

@@ -109,11 +109,11 @@ class VocabularyRepositoryFake(
         containersFlow.emit(containers)
     }
 
-    override fun getFavorites(containerId: Int?): List<Vocabulary> {
+    override suspend fun getFavorites(containerId: Int?): List<Vocabulary> {
         return vocabulary.filter { it.isFavorite }
     }
 
-    override fun getPronunciations(containerId: Int?): List<Vocabulary> {
+    override suspend fun getPronunciations(containerId: Int?): List<Vocabulary> {
         return vocabulary.filter { it.irregularPronunciation != null }
     }
 

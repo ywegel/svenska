@@ -1,3 +1,5 @@
+@file:OptIn(ExperimentalCoroutinesApi::class)
+
 package de.ywegel.svenska.data.impl
 
 import app.cash.turbine.test
@@ -10,9 +12,13 @@ import io.mockk.coVerify
 import io.mockk.every
 import io.mockk.mockk
 import io.mockk.verify
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flowOf
+import kotlinx.coroutines.test.StandardTestDispatcher
 import kotlinx.coroutines.test.runTest
+import kotlinx.coroutines.test.setMain
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.params.ParameterizedTest
@@ -24,6 +30,7 @@ import java.util.stream.Stream
 class VocabularyRepositoryImplTest {
     private lateinit var dao: VocabularyDao
     private lateinit var repository: VocabularyRepository
+    private val testDispatcher = StandardTestDispatcher()
 
     private val containerId = 1
     private val vocabularies = listOf(
@@ -32,8 +39,9 @@ class VocabularyRepositoryImplTest {
 
     @BeforeEach
     fun setUp() {
+        Dispatchers.setMain(testDispatcher)
         dao = mockk()
-        repository = VocabularyRepositoryImpl(dao)
+        repository = VocabularyRepositoryImpl(dao, testDispatcher)
     }
 
     data class SortTestCase(
@@ -122,7 +130,7 @@ class VocabularyRepositoryImplTest {
     @ParameterizedTest(name = "{0}")
     @MethodSource("sortTestCases")
     fun `Verify that the correct dao function is called for all parameters of getVocabularies`(testCase: SortTestCase) =
-        runTest {
+        runTest(testDispatcher) {
             // Given
             stubDaoMethod(testCase.expectedDaoMethod)
 
@@ -136,42 +144,43 @@ class VocabularyRepositoryImplTest {
         }
 
     @Test
-    fun `Snapshot all vocabularies if no container is specified`() = runTest {
+    fun `Snapshot all vocabularies if no container is specified`() = runTest(testDispatcher) {
         val daoMock = mockk<VocabularyDao>(relaxed = true)
 
-        VocabularyRepositoryImpl(daoMock).getAllVocabulariesSnapshot(null)
+        VocabularyRepositoryImpl(daoMock, testDispatcher).getAllVocabulariesSnapshot(null)
 
         coVerify(exactly = 1) { daoMock.getAllVocabulariesSnapshot() }
         coVerify(exactly = 0) { daoMock.getAllVocabulariesSnapshot(any()) }
     }
 
     @Test
-    fun `Snapshot vocabularies in the specific container if container was specified`() = runTest {
+    fun `Snapshot vocabularies in the specific container if container was specified`() = runTest(testDispatcher) {
         val daoMock = mockk<VocabularyDao>(relaxed = true)
 
-        VocabularyRepositoryImpl(daoMock).getAllVocabulariesSnapshot(1)
+        VocabularyRepositoryImpl(daoMock, testDispatcher).getAllVocabulariesSnapshot(1)
 
         coVerify(exactly = 1) { daoMock.getAllVocabulariesSnapshot(1) }
         coVerify(exactly = 0) { daoMock.getAllVocabulariesSnapshot() }
     }
 
     @Test
-    fun `Get all vocabularies with endings if no container is specified`() = runTest {
+    fun `Get all vocabularies with endings if no container is specified`() = runTest(testDispatcher) {
         val daoMock = mockk<VocabularyDao>(relaxed = true)
 
-        VocabularyRepositoryImpl(daoMock).getAllVocabulariesWithEndings(null)
+        VocabularyRepositoryImpl(daoMock, testDispatcher).getAllVocabulariesWithEndings(null)
 
         coVerify(exactly = 1) { daoMock.getAllVocabulariesWithEndings() }
         coVerify(exactly = 0) { daoMock.getAllVocabulariesWithEndings(any()) }
     }
 
     @Test
-    fun `Get vocabularies with endings in the specific container if container was specified`() = runTest {
-        val daoMock = mockk<VocabularyDao>(relaxed = true)
+    fun `Get vocabularies with endings in the specific container if container was specified`() =
+        runTest(testDispatcher) {
+            val daoMock = mockk<VocabularyDao>(relaxed = true)
 
-        VocabularyRepositoryImpl(daoMock).getAllVocabulariesWithEndings(1)
+            VocabularyRepositoryImpl(daoMock, testDispatcher).getAllVocabulariesWithEndings(1)
 
-        coVerify(exactly = 1) { daoMock.getAllVocabulariesWithEndings(1) }
-        coVerify(exactly = 0) { daoMock.getAllVocabulariesWithEndings() }
-    }
+            coVerify(exactly = 1) { daoMock.getAllVocabulariesWithEndings(1) }
+            coVerify(exactly = 0) { daoMock.getAllVocabulariesWithEndings() }
+        }
 }
