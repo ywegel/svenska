@@ -57,15 +57,21 @@ class WordImporterViewModel @Inject constructor(
     private val _importerState = MutableStateFlow<ImporterState>(ImporterState.Idle)
     val importerState = _importerState.asStateFlow()
 
-    private var loadedChapters: List<ImporterChapter>? = null
-    private var loadedChaptersWordCount: Int? = null
+    private data class LoadedImport(val chapters: List<ImporterChapter>) {
+        val wordCount: Int = chapters.sumOf { it.words.size }
+    }
+
+    private var loadedImport: LoadedImport? = null
+
+    private fun failedState(error: ImporterError) =
+        ImporterState.Finished(wordCount = 0, success = false, error = error)
 
     init {
-        // Reset "loadedWords" to avoid an invalid state
+        // Reset "loadedImport" to avoid an invalid state
         viewModelScope.launch {
             importerState.collect { state ->
                 if (state is ImporterState.Finished || state is ImporterState.Idle) {
-                    loadedChapters = null
+                    loadedImport = null
                 }
             }
         }
@@ -76,21 +82,17 @@ class WordImporterViewModel @Inject constructor(
 
         fileRepository.parseFile(pickedFile)
             .onSuccess { entries ->
-                val sumOfWords = entries.sumOf { c -> c.words.size }
-
-                loadedChapters = entries
-                loadedChaptersWordCount = sumOfWords
+                val newLoadedImport = LoadedImport(chapters = entries)
+                loadedImport = newLoadedImport
 
                 _importerState.value = ImporterState.Parsed(
-                    words = sumOfWords,
+                    words = newLoadedImport.wordCount,
                     chapters = entries.size,
                 )
             }.onFailure { error ->
                 Log.e(TAG, "onFilePicked: failed to parse picked file", error)
-                _importerState.value = ImporterState.Finished(
-                    wordCount = 0,
-                    success = false,
-                    error = (error as? FileParseException)?.toImporterError() ?: ImporterError.Unknown(error),
+                _importerState.value = failedState(
+                    (error as? FileParseException)?.toImporterError() ?: ImporterError.Unknown(error),
                 )
             }
 
@@ -99,46 +101,34 @@ class WordImporterViewModel @Inject constructor(
 
     @Suppress("detekt:TooGenericExceptionCaught")
     fun saveWords() = viewModelScope.launch {
-        val loadedChapters = loadedChapters
-        val loadedChaptersWordCount = loadedChaptersWordCount
+        val loadedImport = loadedImport
 
-        val noWordsLoaded =
-            loadedChapters.isNullOrEmpty() || loadedChaptersWordCount == null || loadedChaptersWordCount == 0
-
-        if (noWordsLoaded) {
-            _importerState.value = ImporterState.Finished(
-                wordCount = 0,
-                success = false,
-                error = ImporterError.NoWordsLoaded,
-            )
+        if (loadedImport == null || loadedImport.wordCount == 0) {
+            _importerState.value = failedState(ImporterError.NoWordsLoaded)
             return@launch
         }
 
         try {
-            importChapters(loadedChapters)
+            importChapters(loadedImport.chapters)
                 .onStart { _importerState.value = ImporterState.Importing(0f) }
-                .map { processed -> processed.toFloat() / loadedChaptersWordCount }
+                .map { processed -> processed.toFloat() / loadedImport.wordCount }
                 .distinctUntilChanged()
                 .collect { percentage ->
                     _importerState.update { ImporterState.Importing(percentage) }
                 }
 
-            _importerState.value = ImporterState.Finished(wordCount = loadedChaptersWordCount, success = true)
+            _importerState.value = ImporterState.Finished(wordCount = loadedImport.wordCount, success = true)
         } catch (e: CancellationException) {
             // The ViewModel being cleared mid-import is not an import failure.
             throw e
         } catch (e: Exception) {
             Log.e(TAG, "saveWords: failed to import loaded chapters", e)
-            _importerState.value = ImporterState.Finished(
-                wordCount = 0,
-                success = false,
-                error = ImporterError.SaveFailed(e),
-            )
+            _importerState.value = failedState(ImporterError.SaveFailed(e))
         }
     }
 
     fun onRestartClicked() {
         _importerState.value = ImporterState.Idle
-        loadedChapters = null
+        loadedImport = null
     }
 }
