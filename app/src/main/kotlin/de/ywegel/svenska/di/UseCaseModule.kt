@@ -6,7 +6,7 @@ import dagger.hilt.InstallIn
 import dagger.hilt.android.components.ViewModelComponent
 import de.ywegel.svenska.data.VocabularyRepository
 import de.ywegel.svenska.domain.ToggleVocabularyFavoriteUseCase
-import de.ywegel.svenska.domain.addEdit.MapUiStateToVocabularyUseCase
+import de.ywegel.svenska.ui.addEdit.MapUiStateToVocabularyUseCase
 import kotlinx.coroutines.CoroutineDispatcher
 
 @Module

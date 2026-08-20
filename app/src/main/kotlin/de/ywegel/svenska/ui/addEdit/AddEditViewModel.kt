@@ -11,7 +11,6 @@ import de.ywegel.svenska.data.model.Vocabulary
 import de.ywegel.svenska.data.preferences.UserPreferencesManager
 import de.ywegel.svenska.di.ImmediateDispatcher
 import de.ywegel.svenska.di.IoDispatcher
-import de.ywegel.svenska.domain.addEdit.MapUiStateToVocabularyUseCase
 import de.ywegel.svenska.ui.addEdit.models.ViewWordGroup
 import de.ywegel.svenska.ui.addEdit.models.ViewWordSubGroup
 import de.ywegel.svenska.ui.common.vocabulary.HighlightUtils
