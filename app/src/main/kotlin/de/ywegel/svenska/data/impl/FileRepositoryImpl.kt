@@ -3,83 +3,44 @@ package de.ywegel.svenska.data.impl
 import android.content.ContentResolver
 import android.net.Uri
 import android.util.Log
-import de.ywegel.svenska.data.ContainerRepository
+import de.ywegel.svenska.data.FileParseException
 import de.ywegel.svenska.data.FileRepository
-import de.ywegel.svenska.data.VocabularyRepository
 import de.ywegel.svenska.data.model.ImporterChapter
-import de.ywegel.svenska.data.model.VocabularyContainer
-import de.ywegel.svenska.domain.wordImporter.WordParser
+import de.ywegel.svenska.di.IoDispatcher
 import de.ywegel.svenska.jsonConfig
 import kotlinx.coroutines.CoroutineDispatcher
-import kotlinx.coroutines.FlowPreview
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.asFlow
-import kotlinx.coroutines.flow.flow
-import kotlinx.coroutines.flow.onEach
-import kotlinx.coroutines.flow.sample
 import kotlinx.coroutines.withContext
 import kotlinx.serialization.ExperimentalSerializationApi
+import kotlinx.serialization.SerializationException
 import kotlinx.serialization.json.decodeFromStream
+import java.io.IOException
 import javax.inject.Inject
 
 private const val TAG = "FileRepository"
 
 class FileRepositoryImpl @Inject constructor(
     private val contentResolver: ContentResolver,
-    private val vocabularyRepository: VocabularyRepository,
-    private val containerRepository: ContainerRepository,
-    private val wordParser: WordParser,
+    @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
 ) : FileRepository {
 
     @Suppress("detekt:TooGenericExceptionCaught")
     @OptIn(ExperimentalSerializationApi::class)
-    override suspend fun parseFile(
-        uri: Uri,
-        ioDispatcher: CoroutineDispatcher,
-    ): Result<Pair<Int, List<ImporterChapter>>> = withContext(ioDispatcher) {
-        return@withContext try {
-            contentResolver.openInputStream(uri)?.use { inputStream ->
-                val entries: List<ImporterChapter> = jsonConfig.decodeFromStream(inputStream)
-                val entryCount = entries.fold(0) { count, chapter ->
-                    count + chapter.words.size
-                }
+    override suspend fun parseFile(uri: Uri): Result<List<ImporterChapter>> = withContext(ioDispatcher) {
+        try {
+            val entries = contentResolver.openInputStream(uri)?.use { inputStream ->
+                jsonConfig.decodeFromStream<List<ImporterChapter>>(inputStream)
+            } ?: return@withContext Result.failure(FileParseException.FileNotFound())
 
-                Result.success(Pair(entryCount, entries))
-            } ?: throw IllegalArgumentException("Unable to open InputStream for URI: $uri")
+            Result.success(entries)
+        } catch (e: IOException) {
+            Log.e(TAG, "parseFile: failed to open picked file", e)
+            Result.failure(FileParseException.FileNotFound())
+        } catch (e: SerializationException) {
+            Log.e(TAG, "parseFile: picked file is not valid json for the expected format", e)
+            Result.failure(FileParseException.InvalidFormat(e))
         } catch (e: Exception) {
-            Log.e(TAG, "parseFile: failed to parse file", e)
-            Result.failure(e)
+            Log.e(TAG, "parseFile: unexpected failure while parsing file", e)
+            Result.failure(FileParseException.Unexpected(e))
         }
     }
-
-    @OptIn(FlowPreview::class)
-    override fun parseAndSaveEntriesToDbWithProgress(entries: List<ImporterChapter>, containerId: Int?): Flow<Int> =
-        flow {
-            // TODO: containerId is ignored rn, because the importer only supports importing chapters at the moment
-            // When no longer ignoring containerId, we need to adjust the test as well
-            var lastChapterWordSize = 0
-
-            entries.forEach { chapter ->
-                val newContainerId =
-                    containerRepository.upsertContainer(VocabularyContainer(name = chapter.chapter))
-
-                chapter.words.asFlow()
-                    .onEach { wordPair ->
-                        val newVocabulary = wordParser.parseWord(
-                            word = wordPair.getOrNull(0),
-                            translation = wordPair.getOrNull(1),
-                            containerId = newContainerId.toInt(),
-                        )
-
-                        vocabularyRepository.upsertVocabulary(newVocabulary)
-                        lastChapterWordSize++
-                    }
-                    .sample(100)
-                    .collect { _ ->
-                        emit(lastChapterWordSize)
-                    }
-
-                emit(lastChapterWordSize)
-            }
-        }
 }

@@ -5,15 +5,15 @@ import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
+import de.ywegel.svenska.data.FileParseException
 import de.ywegel.svenska.data.FileRepository
 import de.ywegel.svenska.data.model.ImporterChapter
-import de.ywegel.svenska.di.IoDispatcher
-import kotlinx.coroutines.CoroutineDispatcher
+import de.ywegel.svenska.domain.wordImporter.ImportChaptersUseCase
+import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.map
-import kotlinx.coroutines.flow.onCompletion
 import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
@@ -28,19 +28,26 @@ sealed class ImporterState {
     data class Finished(val wordCount: Int, val success: Boolean, val error: ImporterError? = null) : ImporterState()
 }
 
-sealed class ImporterError(val message: String) {
-    // TODO: move strings to ressources and map in view
-    object FileNotFound : ImporterError("File not found or cannot be opened.")
-    object InvalidJsonFormat : ImporterError("Invalid file format. Please upload a valid file.")
-    object EmptyOrCorruptFileError : ImporterError("The file contains no words or is corrupted.")
-    object DatabaseError : ImporterError("Database operation failed.")
-    data class UnknownError(val throwable: Throwable) :
-        ImporterError("An unknown error occurred: ${throwable.localizedMessage}")
+/**
+ * UI-facing import failure.  [WordImporterScreen] maps each case to a user facing error string.
+ */
+sealed class ImporterError {
+    data object FileNotFound : ImporterError()
+    data object InvalidFileFormat : ImporterError()
+    data object NoWordsLoaded : ImporterError()
+    data class SaveFailed(val cause: Throwable) : ImporterError()
+    data class Unknown(val cause: Throwable) : ImporterError()
+}
+
+private fun FileParseException.toImporterError(): ImporterError = when (this) {
+    is FileParseException.FileNotFound -> ImporterError.FileNotFound
+    is FileParseException.InvalidFormat -> ImporterError.InvalidFileFormat
+    is FileParseException.Unexpected -> ImporterError.Unknown(originalCause)
 }
 
 @HiltViewModel
 class WordImporterViewModel @Inject constructor(
-    @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
+    private val importChapters: ImportChaptersUseCase,
     private val fileRepository: FileRepository,
 ) : ViewModel() {
 
@@ -50,84 +57,88 @@ class WordImporterViewModel @Inject constructor(
     private val _importerState = MutableStateFlow<ImporterState>(ImporterState.Idle)
     val importerState = _importerState.asStateFlow()
 
-    private var loadedWords: Pair<Int, List<ImporterChapter>>? = null
+    private var loadedChapters: List<ImporterChapter>? = null
+    private var loadedChaptersWordCount: Int? = null
 
     init {
         // Reset "loadedWords" to avoid an invalid state
         viewModelScope.launch {
             importerState.collect { state ->
                 if (state is ImporterState.Finished || state is ImporterState.Idle) {
-                    loadedWords = null
+                    loadedChapters = null
                 }
             }
         }
     }
 
-    fun onFilePicked(pickedFile: Uri) {
+    fun onFilePicked(pickedFile: Uri) = viewModelScope.launch {
         _isLoading.value = true
 
-        viewModelScope.launch(ioDispatcher) {
-            val result = fileRepository.parseFile(pickedFile, ioDispatcher)
-            result.onSuccess { entries ->
-                loadedWords = entries
+        fileRepository.parseFile(pickedFile)
+            .onSuccess { entries ->
+                val sumOfWords = entries.sumOf { c -> c.words.size }
+
+                loadedChapters = entries
+                loadedChaptersWordCount = sumOfWords
+
                 _importerState.value = ImporterState.Parsed(
-                    words = entries.first,
-                    chapters = entries.second.size,
+                    words = sumOfWords,
+                    chapters = entries.size,
                 )
             }.onFailure { error ->
-                val importerError = error as? ImporterError ?: ImporterError.UnknownError(error)
+                Log.e(TAG, "onFilePicked: failed to parse picked file", error)
                 _importerState.value = ImporterState.Finished(
                     wordCount = 0,
                     success = false,
-                    error = importerError,
+                    error = (error as? FileParseException)?.toImporterError() ?: ImporterError.Unknown(error),
                 )
             }
-        }
 
         _isLoading.value = false
     }
 
-    fun saveWords() = viewModelScope.launch(ioDispatcher) {
-        loadedWords.let { loadedWords ->
-            if (loadedWords == null || loadedWords.second.isEmpty() || loadedWords.first == 0) {
-                _importerState.value = ImporterState.Finished(
-                    wordCount = 0,
-                    success = false,
-                    // TODO: Move to string resource and return an error object instead, that gets mapped in the view
-                    error = ImporterError.EmptyOrCorruptFileError,
-                )
-                return@launch
-            }
-            val (wordCount, importerChapters) = loadedWords
+    @Suppress("detekt:TooGenericExceptionCaught")
+    fun saveWords() = viewModelScope.launch {
+        val loadedChapters = loadedChapters
+        val loadedChaptersWordCount = loadedChaptersWordCount
 
-            fileRepository
-                .parseAndSaveEntriesToDbWithProgress(importerChapters, null)
+        val noWordsLoaded =
+            loadedChapters.isNullOrEmpty() || loadedChaptersWordCount == null || loadedChaptersWordCount == 0
+
+        if (noWordsLoaded) {
+            _importerState.value = ImporterState.Finished(
+                wordCount = 0,
+                success = false,
+                error = ImporterError.NoWordsLoaded,
+            )
+            return@launch
+        }
+
+        try {
+            importChapters(loadedChapters)
                 .onStart { _importerState.value = ImporterState.Importing(0f) }
-                .map { processed -> processed.toFloat() / wordCount }
+                .map { processed -> processed.toFloat() / loadedChaptersWordCount }
                 .distinctUntilChanged()
-                .onCompletion { cause ->
-                    cause?.let {
-                        Log.e(TAG, "saveWords: Error in parseAndSaveEntriesToDbWithProgress flow", cause)
-                        _importerState.value = ImporterState.Finished(
-                            wordCount = 0,
-                            success = false,
-                            error = ImporterError.UnknownError(cause),
-                        )
-                    } ?: run {
-                        _importerState.value = ImporterState.Finished(
-                            wordCount = wordCount,
-                            success = true,
-                        )
-                    }
-                }
                 .collect { percentage ->
                     _importerState.update { ImporterState.Importing(percentage) }
                 }
+
+            _importerState.value = ImporterState.Finished(wordCount = loadedChaptersWordCount, success = true)
+        } catch (e: CancellationException) {
+            // The ViewModel being cleared mid-import is not an import failure.
+            throw e
+        } catch (e: Exception) {
+            Log.e(TAG, "saveWords: failed to import loaded chapters", e)
+            _importerState.value = ImporterState.Finished(
+                wordCount = 0,
+                success = false,
+                error = ImporterError.SaveFailed(e),
+            )
         }
     }
 
     fun onRestartClicked() {
         _importerState.value = ImporterState.Idle
-        loadedWords = null
+        loadedChapters = null
     }
 }

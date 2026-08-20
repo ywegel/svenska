@@ -125,21 +125,12 @@ class SvenskaModule {
         return WordParserImpl()
     }
 
-    @Provides
     @Singleton
+    @Provides
     fun provideFileRepository(
         contentResolver: ContentResolver,
-        vocabularyRepository: VocabularyRepository,
-        containerRepository: ContainerRepository,
-        wordParser: WordParser,
-    ): FileRepository {
-        return FileRepositoryImpl(
-            contentResolver = contentResolver,
-            vocabularyRepository = vocabularyRepository,
-            containerRepository = containerRepository,
-            wordParser = wordParser,
-        )
-    }
+        @IoDispatcher ioDispatcher: CoroutineDispatcher,
+    ): FileRepository = FileRepositoryImpl(contentResolver, ioDispatcher)
 
     @DefaultDispatcher
     @Provides

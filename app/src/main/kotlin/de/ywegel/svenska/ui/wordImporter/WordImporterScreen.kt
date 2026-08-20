@@ -27,13 +27,16 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.ramcosta.composedestinations.annotation.Destination
 import com.ramcosta.composedestinations.annotation.parameters.DeepLink
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
+import de.ywegel.svenska.R
 import de.ywegel.svenska.navigation.SettingsNavGraph
 import de.ywegel.svenska.ui.common.VerticalSpacerM
+import de.ywegel.svenska.ui.theme.SvenskaTheme
 
 @Destination<SettingsNavGraph>(
     deepLinks = [
@@ -133,9 +136,20 @@ fun ImportingScreen(state: ImporterState.Importing) {
 
 @Composable
 fun FinishedScreen(state: ImporterState.Finished, onRestartClicked: () -> Unit, onNavigateUp: () -> Unit) {
-    state.error?.let {
-        Text("An error occurred: $it")
-    } ?: Text("${state.wordCount} words imported!")
+    if (state.error != null) {
+        Text(state.error.toDisplayMessage())
+        val technicalDetail = state.error.technicalDetail()
+        if (technicalDetail != null) {
+            VerticalSpacerM()
+            Text(
+                text = technicalDetail,
+                style = SvenskaTheme.typography.bodySmall,
+                color = SvenskaTheme.colors.onSurface.copy(alpha = 0.6f),
+            )
+        }
+    } else {
+        Text("${state.wordCount} words imported!")
+    }
     VerticalSpacerM()
     Button(onRestartClicked) {
         Text(text = state.error?.let { "Retry" } ?: "Import again")
@@ -143,6 +157,21 @@ fun FinishedScreen(state: ImporterState.Finished, onRestartClicked: () -> Unit, 
     OutlinedButton(onNavigateUp) {
         Text(text = "Exit")
     }
+}
+
+@Composable
+private fun ImporterError.toDisplayMessage(): String = when (this) {
+    ImporterError.FileNotFound -> stringResource(R.string.wordImporter_error_fileNotFound)
+    ImporterError.InvalidFileFormat -> stringResource(R.string.wordImporter_error_invalidFileFormat)
+    ImporterError.NoWordsLoaded -> stringResource(R.string.wordImporter_error_noWordsLoaded)
+    is ImporterError.SaveFailed -> stringResource(R.string.wordImporter_error_saveFailed)
+    is ImporterError.Unknown -> stringResource(R.string.wordImporter_error_unknown)
+}
+
+private fun ImporterError.technicalDetail(): String? = when (this) {
+    is ImporterError.SaveFailed -> cause.localizedMessage ?: cause.toString()
+    is ImporterError.Unknown -> cause.localizedMessage ?: cause.toString()
+    ImporterError.FileNotFound, ImporterError.InvalidFileFormat, ImporterError.NoWordsLoaded -> null
 }
 
 @ReadOnlyComposable

@@ -8,27 +8,17 @@ import assertk.assertThat
 import assertk.assertions.isEqualTo
 import de.ywegel.svenska.data.impl.FileRepositoryImpl
 import de.ywegel.svenska.data.model.ImporterChapter
-import de.ywegel.svenska.data.model.importerChapter
-import de.ywegel.svenska.fakes.VocabularyRepositoryFake
-import de.ywegel.svenska.fakes.WordParserFake
 import io.mockk.clearAllMocks
-import io.mockk.coEvery
-import io.mockk.coVerify
 import io.mockk.every
 import io.mockk.mockk
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.flow.collect
-import kotlinx.coroutines.flow.toList
-import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.test.StandardTestDispatcher
 import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
 import org.junit.jupiter.api.AfterEach
-import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertNotNull
-import org.junit.jupiter.api.Assertions.assertThrows
 import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -38,15 +28,13 @@ class FileRepositoryTest {
 
     private lateinit var repository: FileRepository
     private lateinit var contentResolver: ContentResolver
-    private lateinit var vocRepository: VocabularyRepositoryFake
     private val testDispatcher = StandardTestDispatcher()
 
     @BeforeEach
     fun setUp() {
         Dispatchers.setMain(testDispatcher)
         contentResolver = mockk()
-        vocRepository = mockk(relaxUnitFun = true, relaxed = true)
-        repository = FileRepositoryImpl(contentResolver, vocRepository, vocRepository, WordParserFake())
+        repository = FileRepositoryImpl(contentResolver, testDispatcher)
     }
 
     @AfterEach
@@ -92,31 +80,31 @@ class FileRepositoryTest {
         every { contentResolver.openInputStream(uri) } returns inputStream
 
         // When
-        val result = repository.parseFile(uri, testDispatcher)
+        val result = repository.parseFile(uri)
 
         // Then
         assertTrue(result.isSuccess)
         val entries = result.getOrNull()
         assertNotNull(entries)
-        assertThat(expected).isEqualTo(entries?.second)
+        assertThat(expected).isEqualTo(entries)
     }
 
     @Test
-    fun `parseFile should return failure when stream cannot be opened`() = runTest {
+    fun `parseFile should fail with FileNotFound when stream cannot be opened`() = runTest {
         // Given
         val uri = mockk<Uri>()
         every { contentResolver.openInputStream(uri) } returns null
 
         // When
-        val result = repository.parseFile(uri, testDispatcher)
+        val result = repository.parseFile(uri)
 
         // Then
         assertTrue(result.isFailure)
-        assertTrue(result.exceptionOrNull() is IllegalArgumentException)
+        assertTrue(result.exceptionOrNull() is FileParseException.FileNotFound)
     }
 
     @Test
-    fun `parseFile should return failure when JSON is invalid`() = runTest {
+    fun `parseFile should fail with InvalidFormat when JSON is invalid`() = runTest {
         // Given
         val uri = mockk<Uri>()
         val invalidJson = """{invalid json]"""
@@ -125,47 +113,10 @@ class FileRepositoryTest {
         every { contentResolver.openInputStream(uri) } returns inputStream
 
         // When
-        val result = repository.parseFile(uri, testDispatcher)
+        val result = repository.parseFile(uri)
 
         // Then
         assertTrue(result.isFailure)
-        assertTrue(result.exceptionOrNull() is kotlinx.serialization.SerializationException)
-    }
-
-    @Test
-    fun `parseAndSaveEntriesToDbWithProgress should emit progress correctly`() = runTest {
-        // Given
-        val entries = listOf(
-            importerChapter(1),
-        )
-
-        coEvery { vocRepository.upsertVocabulary(any()) } returns 1L
-
-        // When
-        val progressFlow = repository.parseAndSaveEntriesToDbWithProgress(entries, 0)
-        val progressValues = progressFlow.toList()
-
-        // Then
-        assertThat(progressValues.last()).isEqualTo(2)
-        coVerify(exactly = 2) { vocRepository.upsertVocabulary(any()) }
-    }
-
-    @Test
-    fun `parseAndSaveEntriesToDbWithProgress should throw exception on save error`() = runTest {
-        // Given
-        val entries = listOf(
-            importerChapter(1),
-        )
-
-        coEvery { vocRepository.upsertVocabulary(any()) } throws RuntimeException("Save error")
-
-        // When & Assert
-        val exception = assertThrows(RuntimeException::class.java) {
-            runBlocking {
-                repository.parseAndSaveEntriesToDbWithProgress(entries, 0).collect()
-            }
-        }
-
-        assertEquals("Save error", exception.message)
+        assertTrue(result.exceptionOrNull() is FileParseException.InvalidFormat)
     }
 }
