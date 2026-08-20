@@ -172,6 +172,7 @@ dependencies {
     testImplementation(libs.robolectric)
     testImplementation(libs.strikt)
     androidTestImplementation(libs.strikt)
+    testImplementation(libs.konsist)
 
     // junit5
     testImplementation(libs.junit5.api)

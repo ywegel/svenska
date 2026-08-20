@@ -597,8 +597,13 @@ style:
       #  value: 'TODO:'
     allowedPatterns: ''
   ForbiddenImport:
-    active: false
-    imports: [ ]
+    active: true
+    includes:
+      - '**/src/main/kotlin/de/ywegel/svenska/data/**'
+      - '**/src/main/kotlin/de/ywegel/svenska/domain/**'
+    imports:
+      - reason: 'data/ and domain/ must not depend on the ui/ layer. Move the shared type down into data/model or domain/.'
+        value: 'de.ywegel.svenska.ui.**'
     forbiddenPatterns: ''
   ForbiddenMethodCall:
     active: false
