@@ -6,8 +6,8 @@ import de.ywegel.svenska.data.model.WordGroup
 import de.ywegel.svenska.domain.quiz.model.AdditionalInfo
 import de.ywegel.svenska.domain.quiz.model.QuizQuestion
 import de.ywegel.svenska.domain.quiz.model.TranslateMode
+import de.ywegel.svenska.domain.quiz.model.TranslateWithEndingsResult
 import de.ywegel.svenska.domain.quiz.model.UserAnswer
-import de.ywegel.svenska.ui.quiz.controller.TranslateWithEndingsResult
 import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test

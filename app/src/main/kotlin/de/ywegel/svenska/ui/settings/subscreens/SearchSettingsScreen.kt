@@ -31,7 +31,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.ramcosta.composedestinations.annotation.Destination
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
 import de.ywegel.svenska.R
-import de.ywegel.svenska.domain.search.OnlineSearchType
+import de.ywegel.svenska.data.model.OnlineSearchType
 import de.ywegel.svenska.navigation.SettingsNavGraph
 import de.ywegel.svenska.ui.common.HorizontalSpacerM
 import de.ywegel.svenska.ui.common.TopAppTextBar

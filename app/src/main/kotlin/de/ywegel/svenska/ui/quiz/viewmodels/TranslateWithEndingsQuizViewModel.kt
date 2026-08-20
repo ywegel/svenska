@@ -8,12 +8,12 @@ import de.ywegel.svenska.data.VocabularyRepository
 import de.ywegel.svenska.data.model.Vocabulary
 import de.ywegel.svenska.di.IoDispatcher
 import de.ywegel.svenska.domain.quiz.model.QuizMode
+import de.ywegel.svenska.domain.quiz.model.TranslateWithEndingsResult
 import de.ywegel.svenska.domain.quiz.model.UserAnswer
 import de.ywegel.svenska.domain.quiz.strategies.TranslationWithEndingsQuizStrategy
 import de.ywegel.svenska.ui.quiz.BaseQuizViewModel
 import de.ywegel.svenska.ui.quiz.controller.TranslateWithEndingsActions
 import de.ywegel.svenska.ui.quiz.controller.TranslateWithEndingsController
-import de.ywegel.svenska.ui.quiz.controller.TranslateWithEndingsResult
 import de.ywegel.svenska.ui.quiz.controller.TranslateWithEndingsState
 import de.ywegel.svenska.ui.quiz.renderers.TranslateWithEndingsRenderer
 import kotlinx.coroutines.CoroutineDispatcher

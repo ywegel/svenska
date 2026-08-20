@@ -29,7 +29,7 @@ import com.ramcosta.composedestinations.generated.destinations.WordImporterScree
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
 import de.ywegel.svenska.BuildConfig
 import de.ywegel.svenska.R
-import de.ywegel.svenska.domain.search.OnlineSearchType
+import de.ywegel.svenska.data.model.OnlineSearchType
 import de.ywegel.svenska.navigation.SettingsNavGraph
 import de.ywegel.svenska.navigation.transitions.LateralTransition
 import de.ywegel.svenska.ui.common.ClickableText

@@ -1,6 +1,6 @@
 package de.ywegel.svenska.ui.settings
 
-import de.ywegel.svenska.domain.search.OnlineSearchType
+import de.ywegel.svenska.data.model.OnlineSearchType
 
 /**
  * A callback interface to shorten the SettingsScreen parameter list

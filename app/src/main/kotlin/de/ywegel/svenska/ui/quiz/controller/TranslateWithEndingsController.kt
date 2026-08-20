@@ -37,8 +37,3 @@ data class TranslateWithEndingsActions(
     val onTranslationChanged: (String) -> Unit,
     val onEndingChanged: (String) -> Unit,
 )
-
-data class TranslateWithEndingsResult(
-    val translationCorrect: Boolean,
-    val endingsCorrect: Boolean,
-)

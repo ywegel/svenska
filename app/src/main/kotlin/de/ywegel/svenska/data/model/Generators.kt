@@ -8,7 +8,6 @@
 package de.ywegel.svenska.data.model
 
 import androidx.annotation.VisibleForTesting
-import de.ywegel.svenska.ui.wordImporter.ImporterChapter
 
 // TODO: create annotation VisibleForTestingAndPreviews
 

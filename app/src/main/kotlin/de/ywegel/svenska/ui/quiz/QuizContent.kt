@@ -30,6 +30,7 @@ import de.ywegel.svenska.data.model.Gender
 import de.ywegel.svenska.data.model.WordGroup
 import de.ywegel.svenska.domain.quiz.model.AdditionalInfo
 import de.ywegel.svenska.domain.quiz.model.QuizQuestion
+import de.ywegel.svenska.domain.quiz.model.TranslateWithEndingsResult
 import de.ywegel.svenska.domain.quiz.model.UserAnswer
 import de.ywegel.svenska.ui.common.HorizontalSpacerXXS
 import de.ywegel.svenska.ui.common.HorizontalSpacerXXXS
@@ -41,7 +42,6 @@ import de.ywegel.svenska.ui.common.vocabulary.mainGroupAbbreviation
 import de.ywegel.svenska.ui.common.vocabulary.subGroupAbbreviation
 import de.ywegel.svenska.ui.common.vocabulary.wordGroupBadge.StaticWordGroupBadgeExtended
 import de.ywegel.svenska.ui.quiz.controller.TranslateWithEndingsActions
-import de.ywegel.svenska.ui.quiz.controller.TranslateWithEndingsResult
 import de.ywegel.svenska.ui.quiz.controller.TranslateWithEndingsState
 import de.ywegel.svenska.ui.quiz.controller.TranslateWithoutEndingsActions
 import de.ywegel.svenska.ui.quiz.controller.TranslateWithoutEndingsState

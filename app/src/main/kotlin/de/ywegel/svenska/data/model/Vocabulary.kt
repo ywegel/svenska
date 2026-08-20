@@ -1,14 +1,11 @@
 package de.ywegel.svenska.data.model
 
 import android.os.Parcelable
-import androidx.compose.ui.text.AnnotatedString
 import androidx.room.Entity
 import androidx.room.PrimaryKey
 import androidx.room.TypeConverters
 import de.ywegel.svenska.data.db.HighlightConverter
 import de.ywegel.svenska.data.db.WordGroupConverter
-import de.ywegel.svenska.ui.common.vocabulary.HighlightUtils
-import kotlinx.parcelize.IgnoredOnParcel
 import kotlinx.parcelize.Parcelize
 import java.text.DateFormat
 
@@ -32,11 +29,6 @@ data class Vocabulary(
     val created: Long = System.currentTimeMillis(),
     @PrimaryKey(autoGenerate = true) val id: Int = 0,
 ) : Parcelable {
-
-    @IgnoredOnParcel
-    val annotatedWord: AnnotatedString by lazy {
-        HighlightUtils.buildAnnotatedWord(word, wordHighlights)
-    }
 
     val createdDateFormatted: String
         get() = DateFormat.getDateTimeInstance().format(created)

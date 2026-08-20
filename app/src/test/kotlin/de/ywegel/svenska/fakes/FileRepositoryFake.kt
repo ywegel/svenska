@@ -2,30 +2,16 @@ package de.ywegel.svenska.fakes
 
 import android.net.Uri
 import de.ywegel.svenska.data.FileRepository
-import de.ywegel.svenska.ui.wordImporter.ImporterChapter
-import kotlinx.coroutines.CoroutineDispatcher
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.flow
+import de.ywegel.svenska.data.model.ImporterChapter
 
 class FileRepositoryFake : FileRepository {
-    private var parseResult: Result<Pair<Int, List<ImporterChapter>>> = Result.success(Pair(0, emptyList()))
+    private var parseResult: Result<List<ImporterChapter>> = Result.success(emptyList())
 
-    fun setParseResult(result: Result<Pair<Int, List<ImporterChapter>>>) {
+    fun setParseResult(result: Result<List<ImporterChapter>>) {
         this.parseResult = result
     }
 
-    override suspend fun parseFile(
-        uri: Uri,
-        ioDispatcher: CoroutineDispatcher,
-    ): Result<Pair<Int, List<ImporterChapter>>> {
+    override suspend fun parseFile(uri: Uri): Result<List<ImporterChapter>> {
         return parseResult
-    }
-
-    override fun parseAndSaveEntriesToDbWithProgress(entries: List<ImporterChapter>, ignore: Int?): Flow<Int> {
-        return flow {
-            entries.forEachIndexed { index, _ ->
-                emit(index + 1)
-            }
-        }
     }
 }

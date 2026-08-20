@@ -1,8 +1,7 @@
-package de.ywegel.svenska.domain.addEdit
+package de.ywegel.svenska.ui.addEdit
 
 import de.ywegel.svenska.data.model.Gender
 import de.ywegel.svenska.data.model.Vocabulary
-import de.ywegel.svenska.ui.addEdit.AddEditUiState
 import de.ywegel.svenska.ui.addEdit.models.ViewWordGroup
 import de.ywegel.svenska.ui.common.vocabulary.HighlightUtils
 

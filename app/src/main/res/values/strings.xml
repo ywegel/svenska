@@ -309,6 +309,13 @@
     <string name="onboarding_page_content_importer">Import extracted Rivstart words, backups or self written .json files.</string>
     <string name="onboarding_page_content_importer_extended">You can either import words from the settings or by clicking on a .json file and selecting the app:</string>
 
+    <!-- # WordImporterScreen # -->
+    <string name="wordImporter_error_fileNotFound">The file could not be opened. Please pick it again.</string>
+    <string name="wordImporter_error_invalidFileFormat">This is not a valid word importer file.</string>
+    <string name="wordImporter_error_noWordsLoaded">The file contains no words to import.</string>
+    <string name="wordImporter_error_saveFailed">Saving the imported words failed.</string>
+    <string name="wordImporter_error_unknown">An unexpected error occurred.</string>
+
     <!-- # WordExtractorScreen # -->
     <string name="wordExtractor_title">Word extractor</string>
 

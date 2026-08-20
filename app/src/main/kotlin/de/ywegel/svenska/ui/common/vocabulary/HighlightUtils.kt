@@ -5,6 +5,7 @@ import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
+import de.ywegel.svenska.data.model.Vocabulary
 
 object HighlightUtils {
 
@@ -97,6 +98,9 @@ fun String.parseHighlights(): Result<Pair<String, List<Pair<Int, Int>>>> = Highl
 
 fun Pair<String, List<Pair<Int, Int>>>.toAnnotatedWord(): AnnotatedString =
     HighlightUtils.buildAnnotatedWord(first, second)
+
+val Vocabulary.annotatedWord: AnnotatedString
+    get() = HighlightUtils.buildAnnotatedWord(word, wordHighlights)
 
 /**
  * Thrown when the input string has an odd number of '*' delimiters, indicating unbalanced highlights.

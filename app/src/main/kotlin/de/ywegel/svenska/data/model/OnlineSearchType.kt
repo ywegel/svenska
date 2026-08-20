@@ -1,4 +1,4 @@
-package de.ywegel.svenska.domain.search
+package de.ywegel.svenska.data.model
 
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
