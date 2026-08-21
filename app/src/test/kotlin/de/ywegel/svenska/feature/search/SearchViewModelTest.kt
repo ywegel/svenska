@@ -10,6 +10,8 @@ import assertk.assertions.doesNotContain
 import assertk.assertions.hasSize
 import assertk.assertions.isEqualTo
 import de.ywegel.svenska.data.model.Vocabulary
+import de.ywegel.svenska.data.preferences.keys.SearchPreferenceKeys
+import de.ywegel.svenska.data.preferences.keys.addLastSearchedItem
 import de.ywegel.svenska.domain.ToggleVocabularyFavoriteUseCase
 import de.ywegel.svenska.fakes.UserPreferencesManagerFake
 import de.ywegel.svenska.fakes.VocabularyRepositoryFake
@@ -98,7 +100,7 @@ class SearchViewModelTest {
     fun `onSearch saves last searched items in preferences`() = runTest(testDispatcher) {
         val testQuery = "katt"
 
-        fakePrefs.preferencesSearchFlow.test {
+        fakePrefs.flow(SearchPreferenceKeys.LastSearchedItems).test {
             skipItems(1) // initial state
 
             viewModel.onSearch(testQuery)
@@ -106,7 +108,7 @@ class SearchViewModelTest {
 
             val updated = awaitItem()
 
-            assertThat(updated.lastSearchedItems).containsExactlyInAnyOrder("katt")
+            assertThat(updated).containsExactlyInAnyOrder("katt")
         }
     }
 

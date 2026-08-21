@@ -9,6 +9,8 @@ import de.ywegel.svenska.data.VocabularyRepository
 import de.ywegel.svenska.data.model.SortOrder
 import de.ywegel.svenska.data.model.Vocabulary
 import de.ywegel.svenska.data.preferences.UserPreferencesManager
+import de.ywegel.svenska.data.preferences.keys.AppPreferenceKeys
+import de.ywegel.svenska.data.preferences.keys.OverviewPreferenceKeys
 import de.ywegel.svenska.di.IoDispatcher
 import de.ywegel.svenska.domain.ToggleVocabularyFavoriteUseCase
 import de.ywegel.svenska.ui.common.vocabulary.VocabularyListCallbacks
@@ -19,6 +21,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.flow.update
@@ -30,14 +33,11 @@ class OverviewViewModel @Inject constructor(
     savedStateHandle: SavedStateHandle,
     private val repository: VocabularyRepository,
     private val toggleVocabularyFavoriteUseCase: ToggleVocabularyFavoriteUseCase,
-    userPreferencesManager: UserPreferencesManager,
+    private val userPreferencesManager: UserPreferencesManager,
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
 ) : ViewModel(), VocabularyListCallbacks {
 
     val containerId: Int = savedStateHandle.navArgs<OverviewNavArgs>().containerId
-
-    private val userPreferencesFlow = userPreferencesManager.preferencesOverviewFlow
-    private val appPreferencesFlow = userPreferencesManager.preferencesAppFlow
 
     private val _uiState = MutableStateFlow(OverviewUiState())
     val uiState: StateFlow<OverviewUiState> = _uiState.asStateFlow()
@@ -75,19 +75,25 @@ class OverviewViewModel @Inject constructor(
 //            }
 //    }
 
+    private val sortSettings = combine(
+        userPreferencesManager.flow(OverviewPreferenceKeys.SortOrder),
+        userPreferencesManager.flow(OverviewPreferenceKeys.Revert),
+        ::Pair,
+    )
+
     @OptIn(ExperimentalCoroutinesApi::class)
     private fun observeVocabularyState() = viewModelScope.launch(ioDispatcher) {
-        userPreferencesFlow
+        sortSettings
             .onStart {
                 _uiState.update {
                     it.copy(vocabulary = emptyList(), isLoading = true)
                 }
             }
-            .flatMapLatest { preferences ->
+            .flatMapLatest { (sortOrder, revert) ->
                 repository.getVocabularies(
                     containerId = containerId,
-                    sortOrder = preferences.sortOrder,
-                    reverse = preferences.revert,
+                    sortOrder = sortOrder,
+                    reverse = revert,
                 )
             }
             .collectLatest { emergencies ->
@@ -99,20 +105,23 @@ class OverviewViewModel @Inject constructor(
 
     private fun observerPreferencesState() = viewModelScope.launch {
         launch {
-            userPreferencesFlow.collectLatest { preferences ->
+            sortSettings.collect { (sortOrder, revert) ->
                 _uiState.update {
-                    it.copy(
-                        sortOrder = preferences.sortOrder,
-                        isReverseSort = preferences.revert,
-                        showCompactVocabularyItem = preferences.showCompactVocabularyItem,
-                    )
+                    it.copy(sortOrder = sortOrder, isReverseSort = revert)
                 }
             }
         }
         launch {
-            appPreferencesFlow.collectLatest { preferences ->
+            userPreferencesManager.flow(OverviewPreferenceKeys.ShowCompactVocabularyItem).collect { value ->
                 _uiState.update {
-                    it.copy(useNewQuiz = preferences.useNewQuiz)
+                    it.copy(showCompactVocabularyItem = value)
+                }
+            }
+        }
+        launch {
+            userPreferencesManager.flow(AppPreferenceKeys.UseNewQuiz).collect { value ->
+                _uiState.update {
+                    it.copy(useNewQuiz = value)
                 }
             }
         }

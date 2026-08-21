@@ -4,6 +4,8 @@ package de.ywegel.svenska
 
 import com.ramcosta.composedestinations.generated.destinations.ContainerScreenDestination
 import com.ramcosta.composedestinations.generated.destinations.OnboardingScreenDestination
+import de.ywegel.svenska.data.preferences.keys.AppPreferenceKeys
+import de.ywegel.svenska.data.preferences.set
 import de.ywegel.svenska.fakes.UserPreferencesManagerFake
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -37,7 +39,7 @@ class MainActivityTest {
     @Test
     fun `splash screen condition is true until preferences are loaded`() = runTest(testDispatcher) {
         // Given
-        val preferencesManager = UserPreferencesManagerFake(initialHasCompletedOnboarding = false)
+        val preferencesManager = UserPreferencesManagerFake()
         val viewModel = MainViewModel(preferencesManager)
 
         // Simulate the splash screen condition in MainActivity
@@ -56,7 +58,7 @@ class MainActivityTest {
     @Test
     fun `start route is set to OnboardingScreen when onboarding is not completed`() = runTest(testDispatcher) {
         // Given
-        val preferencesManager = UserPreferencesManagerFake(initialHasCompletedOnboarding = false)
+        val preferencesManager = UserPreferencesManagerFake()
         val viewModel = MainViewModel(preferencesManager)
         advanceUntilIdle() // Allow preferences to load
 
@@ -68,7 +70,7 @@ class MainActivityTest {
     @Test
     fun `start route is set to ContainerScreen when onboarding is completed`() = runTest(testDispatcher) {
         // Given
-        val preferencesManager = UserPreferencesManagerFake(initialHasCompletedOnboarding = true)
+        val preferencesManager = UserPreferencesManagerFake { set(AppPreferenceKeys.HasCompletedOnboarding, true) }
         val viewModel = MainViewModel(preferencesManager)
         advanceUntilIdle() // Allow preferences to load
 

@@ -9,6 +9,8 @@ import de.ywegel.svenska.data.ContainerRepository
 import de.ywegel.svenska.data.SearchRepository
 import de.ywegel.svenska.data.model.Vocabulary
 import de.ywegel.svenska.data.preferences.UserPreferencesManager
+import de.ywegel.svenska.data.preferences.keys.SearchPreferenceKeys
+import de.ywegel.svenska.data.preferences.keys.addLastSearchedItem
 import de.ywegel.svenska.di.IoDispatcher
 import de.ywegel.svenska.domain.ToggleVocabularyFavoriteUseCase
 import de.ywegel.svenska.ui.common.vocabulary.VocabularyListCallbacks
@@ -18,7 +20,6 @@ import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
@@ -42,8 +43,6 @@ class SearchViewModel @Inject constructor(
 
     private val _searchQuery = MutableStateFlow("")
     val searchQuery = _searchQuery.asStateFlow()
-
-    private val preferencesSearchFlow = userPreferencesManager.preferencesSearchFlow
 
     @OptIn(ExperimentalCoroutinesApi::class)
     val vocabularyFlow = _searchQuery.flatMapLatest {
@@ -119,12 +118,16 @@ class SearchViewModel @Inject constructor(
 
     private fun observePreferences() = viewModelScope.launch(ioDispatcher) {
         launch {
-            preferencesSearchFlow.collectLatest { preferences ->
+            userPreferencesManager.flow(SearchPreferenceKeys.LastSearchedItems).collect { value ->
                 _uiState.update {
-                    it.copy(
-                        lastSearchedItems = preferences.lastSearchedItems,
-                        onlineRedirectUrl = preferences.onlineRedirectType.toUrl(),
-                    )
+                    it.copy(lastSearchedItems = value)
+                }
+            }
+        }
+        launch {
+            userPreferencesManager.flow(SearchPreferenceKeys.OnlineRedirectType).collect { value ->
+                _uiState.update {
+                    it.copy(onlineRedirectUrl = value.toUrl())
                 }
             }
         }

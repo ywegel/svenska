@@ -1,11 +1,15 @@
 package de.ywegel.svenska.data.preferences
 
-fun <T> ArrayDeque<T>.addToFrontAndLimit(item: T, limit: Int = LAST_SEARCHED_LIMIT) {
-    this.remove(item)
-    this.addFirst(item)
-    while (this.size > limit) {
-        this.removeLast()
+/**
+ * Returns a copy with [item] moved to the front, deduplicated, capped at [limit] entries.
+ */
+fun <T> ArrayDeque<T>.addedToFrontAndLimited(item: T, limit: Int = LAST_SEARCHED_LIMIT): ArrayDeque<T> =
+    ArrayDeque(this).apply {
+        remove(item)
+        addFirst(item)
+        while (size > limit) {
+            removeLast()
+        }
     }
-}
 
 private const val LAST_SEARCHED_LIMIT = 8

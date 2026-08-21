@@ -3,6 +3,8 @@
 package de.ywegel.svenska
 
 import app.cash.turbine.test
+import de.ywegel.svenska.data.preferences.keys.AppPreferenceKeys
+import de.ywegel.svenska.data.preferences.set
 import de.ywegel.svenska.fakes.UserPreferencesManagerFake
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -35,7 +37,7 @@ class MainViewModelTest {
     @Test
     fun `hasCompletedOnboarding is initially null`() = runTest(testDispatcher) {
         // Given
-        val preferencesManager = UserPreferencesManagerFake(initialHasCompletedOnboarding = false)
+        val preferencesManager = UserPreferencesManagerFake()
 
         // When
         val viewModel = MainViewModel(preferencesManager)
@@ -47,7 +49,7 @@ class MainViewModelTest {
     @Test
     fun `hasCompletedOnboarding is updated when preferences are loaded`() = runTest(testDispatcher) {
         // Given
-        val preferencesManager = UserPreferencesManagerFake(initialHasCompletedOnboarding = true)
+        val preferencesManager = UserPreferencesManagerFake { set(AppPreferenceKeys.HasCompletedOnboarding, true) }
 
         // When
         val viewModel = MainViewModel(preferencesManager)
@@ -62,7 +64,7 @@ class MainViewModelTest {
     @Test
     fun `hasCompletedOnboarding reflects changes to preferences`() = runTest(testDispatcher) {
         // Given
-        val preferencesManager = UserPreferencesManagerFake(initialHasCompletedOnboarding = false)
+        val preferencesManager = UserPreferencesManagerFake()
         val viewModel = MainViewModel(preferencesManager)
         advanceUntilIdle() // Allow initial flow collection
 
@@ -71,7 +73,7 @@ class MainViewModelTest {
             expectThat(awaitItem()).isEqualTo(false)
 
             // Update preferences
-            preferencesManager.updateHasCompletedOnboarding(true)
+            preferencesManager.update(AppPreferenceKeys.HasCompletedOnboarding, true)
             advanceUntilIdle()
 
             expectThat(awaitItem()).isEqualTo(true)

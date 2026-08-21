@@ -6,6 +6,7 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import de.ywegel.svenska.data.ContainerRepository
 import de.ywegel.svenska.data.model.VocabularyContainer
 import de.ywegel.svenska.data.preferences.UserPreferencesManager
+import de.ywegel.svenska.data.preferences.keys.AppPreferenceKeys
 import de.ywegel.svenska.di.IoDispatcher
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -18,14 +19,12 @@ import javax.inject.Inject
 @HiltViewModel
 class ContainerViewModel @Inject constructor(
     private val containerRepository: ContainerRepository,
-    userPreferencesManager: UserPreferencesManager,
+    private val userPreferencesManager: UserPreferencesManager,
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(ContainerUiState())
     val uiState = _uiState.asStateFlow()
-
-    private val appPreferencesFlow = userPreferencesManager.preferencesAppFlow
 
     init {
         observerContainers()
@@ -42,9 +41,9 @@ class ContainerViewModel @Inject constructor(
 
     private fun observerPreferencesState() = viewModelScope.launch {
         launch {
-            appPreferencesFlow.collectLatest { preferences ->
+            userPreferencesManager.flow(AppPreferenceKeys.UseNewQuiz).collect { value ->
                 _uiState.update {
-                    it.copy(useNewQuiz = preferences.useNewQuiz)
+                    it.copy(useNewQuiz = value)
                 }
             }
         }

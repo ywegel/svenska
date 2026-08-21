@@ -9,6 +9,7 @@ import de.ywegel.svenska.data.VocabularyRepository
 import de.ywegel.svenska.data.model.Gender
 import de.ywegel.svenska.data.model.Vocabulary
 import de.ywegel.svenska.data.preferences.UserPreferencesManager
+import de.ywegel.svenska.data.preferences.keys.AddEditPreferenceKeys
 import de.ywegel.svenska.di.ImmediateDispatcher
 import de.ywegel.svenska.di.IoDispatcher
 import de.ywegel.svenska.ui.addEdit.models.ViewWordGroup
@@ -18,7 +19,6 @@ import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
@@ -46,10 +46,10 @@ class AddEditViewModel @Inject constructor(
 
     init {
         viewModelScope.launch {
-            userPreferencesManager.preferencesAddEditFlow
-                .collectLatest { preferences ->
+            userPreferencesManager.flow(AddEditPreferenceKeys.AnnotationInformationHidden)
+                .collect { value ->
                     _uiState.update {
-                        it.copy(annotationInformationHidden = preferences.annotationInformationHidden)
+                        it.copy(annotationInformationHidden = value)
                     }
                 }
         }
@@ -150,7 +150,7 @@ class AddEditViewModel @Inject constructor(
             it.copy(annotationInformationHidden = true)
         }
         viewModelScope.launch(ioDispatcher) {
-            userPreferencesManager.setAnnotationInformationHidden()
+            userPreferencesManager.update(AddEditPreferenceKeys.AnnotationInformationHidden, true)
         }
     }
 

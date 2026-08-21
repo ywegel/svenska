@@ -1,79 +1,26 @@
 package de.ywegel.svenska.data.preferences
 
-import android.util.Log
 import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
-import androidx.datastore.preferences.core.booleanPreferencesKey
 import androidx.datastore.preferences.core.edit
-import androidx.datastore.preferences.core.emptyPreferences
-import androidx.datastore.preferences.core.stringPreferencesKey
-import de.ywegel.svenska.data.model.OnlineSearchType
-import de.ywegel.svenska.data.model.SortOrder
 import de.ywegel.svenska.di.AddEditDataStore
 import de.ywegel.svenska.di.OverviewDataStore
-import de.ywegel.svenska.jsonConfig
-import de.ywegel.svenska.serializers.ArrayDequeSerializer
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.catch
+import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.map
-import java.io.IOException
 import javax.inject.Inject
 import javax.inject.Singleton
 
-private const val TAG = "UserPreferencesManager"
-
-// TODO: Maybe have everything in one file? Or split it up?
 const val OVERVIEW_PREFERENCES_NAME = "user-preferences_overview"
 
 const val ADD_EDIT_PREFERENCES_NAME = "user-preferences_add-edit"
 
-data class OverviewPreferences(
-    val sortOrder: SortOrder,
-    val revert: Boolean,
-    val showCompactVocabularyItem: Boolean,
-)
-
-data class SearchPreferences(
-    val lastSearchedItems: ArrayDeque<String>,
-    val showOnlineRedirectFirst: Boolean,
-    val onlineRedirectType: OnlineSearchType,
-)
-
-data class AppPreferences(
-    val hasCompletedOnboarding: Boolean,
-    val useNewQuiz: Boolean,
-)
-
-data class AddEditPreferences(
-    val annotationInformationHidden: Boolean,
-)
-
 interface UserPreferencesManager {
-    val preferencesOverviewFlow: Flow<OverviewPreferences>
+    fun <S, V> flow(key: PreferenceKey<S, V>): Flow<V>
 
-    val preferencesAddEditFlow: Flow<AddEditPreferences>
+    suspend fun <S, V> update(key: PreferenceKey<S, V>, value: V)
 
-    val preferencesSearchFlow: Flow<SearchPreferences>
-
-    val preferencesAppFlow: Flow<AppPreferences>
-
-    suspend fun updateOverviewSortOrder(sortOrder: SortOrder)
-
-    suspend fun updateOverviewSortOrderRevert(revert: Boolean)
-
-    suspend fun showCompactVocabularyItem(showCompactVocabularyItem: Boolean)
-
-    suspend fun setAnnotationInformationHidden()
-
-    suspend fun addLastSearchedItem(item: String)
-
-    suspend fun updateOnlineRedirectPosition(first: Boolean)
-
-    suspend fun updateOnlineRedirectType(type: OnlineSearchType)
-
-    suspend fun updateHasCompletedOnboarding(hasCompleted: Boolean)
-
-    suspend fun toggleUsesNewQuiz(useNewQuiz: Boolean)
+    suspend fun <S, V> edit(key: PreferenceKey<S, V>, transform: (V) -> V)
 }
 
 @Singleton
@@ -82,137 +29,21 @@ class UserPreferencesManagerImpl @Inject constructor(
     @AddEditDataStore private val addEdit: DataStore<Preferences>,
 ) : UserPreferencesManager {
 
-    override val preferencesAppFlow = overview.data
+    override fun <S, V> flow(key: PreferenceKey<S, V>): Flow<V> = storeFor(key).data
         .fallbackToDefaultOnError()
-        .map { preferences ->
-            val hasCompletedOnboarding = preferences[PreferencesKeys.APP_HAS_COMPLETED_ONBOARDING] ?: false
-            val useNewQuiz = preferences[PreferencesKeys.APP_USES_NEW_QUIZ] ?: false
-            AppPreferences(
-                hasCompletedOnboarding = hasCompletedOnboarding,
-                useNewQuiz = useNewQuiz,
-            )
-        }
+        .map { it[key] }
+        .distinctUntilChanged()
 
-    override suspend fun updateHasCompletedOnboarding(hasCompleted: Boolean) {
-        overview.edit { preferences ->
-            preferences[PreferencesKeys.APP_HAS_COMPLETED_ONBOARDING] = hasCompleted
-        }
+    override suspend fun <S, V> update(key: PreferenceKey<S, V>, value: V) {
+        storeFor(key).edit { it[key] = value }
     }
 
-    override suspend fun toggleUsesNewQuiz(useNewQuiz: Boolean) {
-        overview.edit { preferences ->
-            preferences[PreferencesKeys.APP_USES_NEW_QUIZ] = useNewQuiz
-        }
+    override suspend fun <S, V> edit(key: PreferenceKey<S, V>, transform: (V) -> V) {
+        storeFor(key).edit { it[key] = transform(it[key]) }
     }
 
-    override val preferencesAddEditFlow: Flow<AddEditPreferences> = addEdit.data
-        .fallbackToDefaultOnError()
-        .map { preferences ->
-            val annotationInformationHidden =
-                preferences[PreferencesKeys.ADD_EDIT_ANNOTATION_INFORMATION_HIDDEN] ?: false
-            AddEditPreferences(annotationInformationHidden)
-        }
-
-    override suspend fun setAnnotationInformationHidden() {
-        addEdit.edit { preferences ->
-            preferences[PreferencesKeys.ADD_EDIT_ANNOTATION_INFORMATION_HIDDEN] = true
-        }
-    }
-
-    override val preferencesOverviewFlow = overview.data
-        .fallbackToDefaultOnError()
-        .map { preferences ->
-            val sortOrder = SortOrder.valueOf(
-                preferences[PreferencesKeys.OVERVIEW_SORT_ORDER] ?: SortOrder.default.name,
-            )
-            val revert = preferences[PreferencesKeys.OVERVIEW_SORT_ORDER_REVERT] ?: false
-            val showCompactVocabularyItem: Boolean =
-                preferences[PreferencesKeys.OVERVIEW_SHOW_COMPACT_VOCABULARY_ITEM] ?: false
-            OverviewPreferences(sortOrder, revert, showCompactVocabularyItem)
-        }
-
-    override suspend fun updateOverviewSortOrder(sortOrder: SortOrder) {
-        overview.edit { preferences ->
-            preferences[PreferencesKeys.OVERVIEW_SORT_ORDER] = sortOrder.name
-        }
-    }
-
-    override suspend fun updateOverviewSortOrderRevert(revert: Boolean) {
-        overview.edit { preferences ->
-            preferences[PreferencesKeys.OVERVIEW_SORT_ORDER_REVERT] = revert
-        }
-    }
-
-    override suspend fun showCompactVocabularyItem(showCompactVocabularyItem: Boolean) {
-        overview.edit { preferences ->
-            preferences[PreferencesKeys.OVERVIEW_SHOW_COMPACT_VOCABULARY_ITEM] = showCompactVocabularyItem
-        }
-    }
-
-    override val preferencesSearchFlow: Flow<SearchPreferences> = overview.data
-        .fallbackToDefaultOnError()
-        .map { preferences ->
-            val lastSearchedItems: ArrayDeque<String> =
-                preferences[PreferencesKeys.SEARCH_SORT_LAST_SEARCHED_ITEMS]?.let {
-                    jsonConfig.decodeFromString(ArrayDequeSerializer, it)
-                } ?: ArrayDeque()
-
-            val showOnlineRedirectFirst = preferences[PreferencesKeys.SEARCH_ONLINE_REDIRECT_POSITION] ?: false
-            val onlineRedirectUrl = preferences[PreferencesKeys.SEARCH_ONLINE_REDIRECT_TYPE]?.let {
-                jsonConfig.decodeFromString<OnlineSearchType>(it)
-            } ?: OnlineSearchType.DictCC
-
-            SearchPreferences(lastSearchedItems, showOnlineRedirectFirst, onlineRedirectUrl)
-        }
-
-    override suspend fun addLastSearchedItem(item: String) {
-        overview.edit { preferences ->
-            val currentDeque: ArrayDeque<String> = preferences[PreferencesKeys.SEARCH_SORT_LAST_SEARCHED_ITEMS]?.let {
-                jsonConfig.decodeFromString(ArrayDequeSerializer, it)
-            } ?: ArrayDeque()
-
-            currentDeque.addToFrontAndLimit(item)
-
-            preferences[PreferencesKeys.SEARCH_SORT_LAST_SEARCHED_ITEMS] =
-                jsonConfig.encodeToString(ArrayDequeSerializer, currentDeque)
-        }
-    }
-
-    override suspend fun updateOnlineRedirectPosition(first: Boolean) {
-        overview.edit { preferences ->
-            preferences[PreferencesKeys.SEARCH_ONLINE_REDIRECT_POSITION] = first
-        }
-    }
-
-    override suspend fun updateOnlineRedirectType(type: OnlineSearchType) {
-        overview.edit { preferences ->
-            preferences[PreferencesKeys.SEARCH_ONLINE_REDIRECT_TYPE] = jsonConfig.encodeToString(type)
-        }
-    }
-
-    private object PreferencesKeys {
-        val OVERVIEW_SORT_ORDER = stringPreferencesKey("overview_sort_order")
-        val OVERVIEW_SORT_ORDER_REVERT = booleanPreferencesKey("overview_sort_order_revert")
-        val OVERVIEW_SHOW_COMPACT_VOCABULARY_ITEM = booleanPreferencesKey("overview_show_compact_vocabulary_item")
-
-        val ADD_EDIT_ANNOTATION_INFORMATION_HIDDEN = booleanPreferencesKey("add_edit_annotation_information_hidden")
-
-        val SEARCH_SORT_LAST_SEARCHED_ITEMS = stringPreferencesKey("search_sort_last_searched_items")
-        val SEARCH_ONLINE_REDIRECT_POSITION = booleanPreferencesKey("search_online_redirect_position")
-        val SEARCH_ONLINE_REDIRECT_TYPE = stringPreferencesKey("search_online_redirect_type")
-
-        val APP_HAS_COMPLETED_ONBOARDING = booleanPreferencesKey("app_has_completed_onboarding")
-        val APP_USES_NEW_QUIZ = booleanPreferencesKey("app_uses_new_quiz")
-    }
-}
-
-fun Flow<Preferences>.fallbackToDefaultOnError(): Flow<Preferences> {
-    return this.catch { exception ->
-        if (exception is IOException) {
-            Log.e(TAG, "Error reading preferences", exception)
-            emit(emptyPreferences())
-        } else {
-            throw exception
-        }
+    private fun storeFor(key: PreferenceKey<*, *>) = when (key.store) {
+        PreferenceStore.Overview -> overview
+        PreferenceStore.AddEdit -> addEdit
     }
 }

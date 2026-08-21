@@ -5,6 +5,8 @@ package de.ywegel.svenska
 import com.ramcosta.composedestinations.generated.destinations.ContainerScreenDestination
 import com.ramcosta.composedestinations.generated.destinations.OnboardingScreenDestination
 import com.ramcosta.composedestinations.spec.Direction
+import de.ywegel.svenska.data.preferences.keys.AppPreferenceKeys
+import de.ywegel.svenska.data.preferences.set
 import de.ywegel.svenska.fakes.UserPreferencesManagerFake
 import de.ywegel.svenska.ui.onboarding.OnboardingViewModel
 import kotlinx.coroutines.Dispatchers
@@ -37,7 +39,7 @@ class MainActivityNavigationTest {
     @Test
     fun `app navigates to OnboardingScreen when onboarding is not completed`() = runTest(testDispatcher) {
         // Given
-        val preferencesManager = UserPreferencesManagerFake(initialHasCompletedOnboarding = false)
+        val preferencesManager = UserPreferencesManagerFake()
         val viewModel = MainViewModel(preferencesManager)
         advanceUntilIdle() // Allow preferences to load
 
@@ -51,7 +53,7 @@ class MainActivityNavigationTest {
     @Test
     fun `app navigates to ContainerScreen when onboarding is completed`() = runTest(testDispatcher) {
         // Given
-        val preferencesManager = UserPreferencesManagerFake(initialHasCompletedOnboarding = true)
+        val preferencesManager = UserPreferencesManagerFake { set(AppPreferenceKeys.HasCompletedOnboarding, true) }
         val viewModel = MainViewModel(preferencesManager)
         advanceUntilIdle() // Allow preferences to load
 
@@ -65,7 +67,7 @@ class MainActivityNavigationTest {
     @Test
     fun `app navigates to ContainerScreen after completing onboarding`() = runTest(testDispatcher) {
         // Given
-        val preferencesManager = UserPreferencesManagerFake(initialHasCompletedOnboarding = false)
+        val preferencesManager = UserPreferencesManagerFake()
         val mainViewModel = MainViewModel(preferencesManager)
         val onboardingViewModel = OnboardingViewModel(preferencesManager, testDispatcher)
         advanceUntilIdle() // Allow preferences to load

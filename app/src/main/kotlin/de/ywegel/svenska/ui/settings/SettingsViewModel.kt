@@ -4,13 +4,17 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
 import de.ywegel.svenska.data.model.OnlineSearchType
+import de.ywegel.svenska.data.preferences.PreferenceKey
 import de.ywegel.svenska.data.preferences.UserPreferencesManager
+import de.ywegel.svenska.data.preferences.keys.AppPreferenceKeys
+import de.ywegel.svenska.data.preferences.keys.OverviewPreferenceKeys
+import de.ywegel.svenska.data.preferences.keys.SearchPreferenceKeys
 import de.ywegel.svenska.di.IoDispatcher
 import kotlinx.coroutines.CoroutineDispatcher
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.collectLatest
-import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -19,61 +23,33 @@ class SettingsViewModel @Inject constructor(
     private val preferencesManager: UserPreferencesManager,
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
 ) : ViewModel(), SettingsCallbacks {
-    private val _uiState = MutableStateFlow(SettingsUiState())
-    val uiState = _uiState.asStateFlow()
 
-    private val userPreferencesFlow = preferencesManager.preferencesOverviewFlow
-    private val searchPreferencesFlow = preferencesManager.preferencesSearchFlow
-    private val appPreferencesFlow = preferencesManager.preferencesAppFlow
-
-    init {
-        observerPreferencesState()
-    }
+    val uiState: StateFlow<SettingsUiState> = combine(
+        preferencesManager.flow(OverviewPreferenceKeys.ShowCompactVocabularyItem),
+        preferencesManager.flow(AppPreferenceKeys.UseNewQuiz),
+        preferencesManager.flow(SearchPreferenceKeys.OnlineRedirectType),
+    ) { showCompactVocabularyItem, useNewQuiz, onlineSearchType ->
+        SettingsUiState(
+            overviewShowCompactVocabularyItem = showCompactVocabularyItem,
+            appUseNewQuiz = useNewQuiz,
+            selectedOnlineSearchType = onlineSearchType,
+        )
+    }.stateIn(viewModelScope, SharingStarted.Eagerly, SettingsUiState())
 
     override fun toggleOverviewShowCompactVocabularyItem(showCompactVocabularyItem: Boolean) {
-        viewModelScope.launch(ioDispatcher) {
-            preferencesManager.showCompactVocabularyItem(showCompactVocabularyItem)
-        }
+        set(OverviewPreferenceKeys.ShowCompactVocabularyItem, showCompactVocabularyItem)
     }
 
     override fun updateUseNewQuiz(useNewQuiz: Boolean) {
-        viewModelScope.launch(ioDispatcher) {
-            preferencesManager.toggleUsesNewQuiz(useNewQuiz)
-        }
+        set(AppPreferenceKeys.UseNewQuiz, useNewQuiz)
     }
 
     override fun onOnlineSearchTypeSelected(onlineSearchType: OnlineSearchType) {
-        viewModelScope.launch(ioDispatcher) {
-            preferencesManager.updateOnlineRedirectType(onlineSearchType)
-        }
+        set(SearchPreferenceKeys.OnlineRedirectType, onlineSearchType)
     }
 
-    private fun observerPreferencesState() = viewModelScope.launch {
-        launch {
-            userPreferencesFlow.collectLatest { preferences ->
-                _uiState.update {
-                    it.copy(
-                        overviewShowCompactVocabularyItem = preferences.showCompactVocabularyItem,
-                    )
-                }
-            }
-        }
-        launch {
-            searchPreferencesFlow.collectLatest { preferences ->
-                _uiState.update {
-                    it.copy(
-                        selectedOnlineSearchType = preferences.onlineRedirectType,
-                    )
-                }
-            }
-        }
-        launch {
-            appPreferencesFlow.collectLatest { preferences ->
-                _uiState.update {
-                    it.copy(appUseNewQuiz = preferences.useNewQuiz)
-                }
-            }
-        }
+    private fun <S, V> set(key: PreferenceKey<S, V>, value: V) = viewModelScope.launch(ioDispatcher) {
+        preferencesManager.update(key, value)
     }
 }
 
