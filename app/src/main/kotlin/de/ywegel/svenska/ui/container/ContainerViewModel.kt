@@ -10,49 +10,38 @@ import de.ywegel.svenska.data.preferences.keys.AppPreferenceKeys
 import de.ywegel.svenska.di.IoDispatcher
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.collectLatest
-import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.flowOn
+import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
 class ContainerViewModel @Inject constructor(
     private val containerRepository: ContainerRepository,
-    private val userPreferencesManager: UserPreferencesManager,
+    userPreferencesManager: UserPreferencesManager,
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
 ) : ViewModel() {
 
-    private val _uiState = MutableStateFlow(ContainerUiState())
-    val uiState = _uiState.asStateFlow()
+    private val isEditMode = MutableStateFlow(false)
 
-    init {
-        observerContainers()
-        observerPreferencesState()
+    val uiState: StateFlow<ContainerUiState> = combine(
+        containerRepository.getAllContainers().flowOn(ioDispatcher),
+        userPreferencesManager.flow(AppPreferenceKeys.UseNewQuiz),
+        isEditMode,
+    ) { containers, useNewQuiz, editMode ->
+        ContainerUiState(
+            containers = containers,
+            isEditModeMode = editMode,
+            useNewQuiz = useNewQuiz,
+        )
     }
-
-    private fun observerContainers() = viewModelScope.launch(ioDispatcher) {
-        containerRepository.getAllContainers().collectLatest { containers ->
-            _uiState.update {
-                it.copy(containers = containers)
-            }
-        }
-    }
-
-    private fun observerPreferencesState() = viewModelScope.launch {
-        launch {
-            userPreferencesManager.flow(AppPreferenceKeys.UseNewQuiz).collect { value ->
-                _uiState.update {
-                    it.copy(useNewQuiz = value)
-                }
-            }
-        }
-    }
+        .stateIn(viewModelScope, SharingStarted.Eagerly, ContainerUiState())
 
     fun updateIsEditMode(isEnabled: Boolean) {
-        _uiState.update {
-            it.copy(isEditModeMode = isEnabled)
-        }
+        isEditMode.value = isEnabled
     }
 
     fun deleteContainer(container: VocabularyContainer) = viewModelScope.launch(ioDispatcher) {
