@@ -1,6 +1,5 @@
 package de.ywegel.svenska.data.preferences
 
-import android.content.Context
 import android.util.Log
 import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
@@ -8,10 +7,10 @@ import androidx.datastore.preferences.core.booleanPreferencesKey
 import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.emptyPreferences
 import androidx.datastore.preferences.core.stringPreferencesKey
-import androidx.datastore.preferences.preferencesDataStore
-import dagger.hilt.android.qualifiers.ApplicationContext
 import de.ywegel.svenska.data.model.OnlineSearchType
 import de.ywegel.svenska.data.model.SortOrder
+import de.ywegel.svenska.di.AddEditDataStore
+import de.ywegel.svenska.di.OverviewDataStore
 import de.ywegel.svenska.jsonConfig
 import de.ywegel.svenska.serializers.ArrayDequeSerializer
 import kotlinx.coroutines.flow.Flow
@@ -25,10 +24,8 @@ private const val TAG = "UserPreferencesManager"
 
 // TODO: Maybe have everything in one file? Or split it up?
 const val OVERVIEW_PREFERENCES_NAME = "user-preferences_overview"
-val Context.dataStoreOverview: DataStore<Preferences> by preferencesDataStore(name = OVERVIEW_PREFERENCES_NAME)
 
 const val ADD_EDIT_PREFERENCES_NAME = "user-preferences_add-edit"
-val Context.dataStoreAddEdit: DataStore<Preferences> by preferencesDataStore(name = ADD_EDIT_PREFERENCES_NAME)
 
 data class OverviewPreferences(
     val sortOrder: SortOrder,
@@ -80,10 +77,12 @@ interface UserPreferencesManager {
 }
 
 @Singleton
-class UserPreferencesManagerImpl @Inject constructor(@ApplicationContext val context: Context) :
-    UserPreferencesManager {
+class UserPreferencesManagerImpl @Inject constructor(
+    @OverviewDataStore private val overview: DataStore<Preferences>,
+    @AddEditDataStore private val addEdit: DataStore<Preferences>,
+) : UserPreferencesManager {
 
-    override val preferencesAppFlow = context.dataStoreOverview.data
+    override val preferencesAppFlow = overview.data
         .fallbackToDefaultOnError()
         .map { preferences ->
             val hasCompletedOnboarding = preferences[PreferencesKeys.APP_HAS_COMPLETED_ONBOARDING] ?: false
@@ -95,18 +94,18 @@ class UserPreferencesManagerImpl @Inject constructor(@ApplicationContext val con
         }
 
     override suspend fun updateHasCompletedOnboarding(hasCompleted: Boolean) {
-        context.dataStoreOverview.edit { preferences ->
+        overview.edit { preferences ->
             preferences[PreferencesKeys.APP_HAS_COMPLETED_ONBOARDING] = hasCompleted
         }
     }
 
     override suspend fun toggleUsesNewQuiz(useNewQuiz: Boolean) {
-        context.dataStoreOverview.edit { preferences ->
+        overview.edit { preferences ->
             preferences[PreferencesKeys.APP_USES_NEW_QUIZ] = useNewQuiz
         }
     }
 
-    override val preferencesAddEditFlow: Flow<AddEditPreferences> = context.dataStoreAddEdit.data
+    override val preferencesAddEditFlow: Flow<AddEditPreferences> = addEdit.data
         .fallbackToDefaultOnError()
         .map { preferences ->
             val annotationInformationHidden =
@@ -115,12 +114,12 @@ class UserPreferencesManagerImpl @Inject constructor(@ApplicationContext val con
         }
 
     override suspend fun setAnnotationInformationHidden() {
-        context.dataStoreAddEdit.edit { preferences ->
+        addEdit.edit { preferences ->
             preferences[PreferencesKeys.ADD_EDIT_ANNOTATION_INFORMATION_HIDDEN] = true
         }
     }
 
-    override val preferencesOverviewFlow = context.dataStoreOverview.data
+    override val preferencesOverviewFlow = overview.data
         .fallbackToDefaultOnError()
         .map { preferences ->
             val sortOrder = SortOrder.valueOf(
@@ -133,24 +132,24 @@ class UserPreferencesManagerImpl @Inject constructor(@ApplicationContext val con
         }
 
     override suspend fun updateOverviewSortOrder(sortOrder: SortOrder) {
-        context.dataStoreOverview.edit { preferences ->
+        overview.edit { preferences ->
             preferences[PreferencesKeys.OVERVIEW_SORT_ORDER] = sortOrder.name
         }
     }
 
     override suspend fun updateOverviewSortOrderRevert(revert: Boolean) {
-        context.dataStoreOverview.edit { preferences ->
+        overview.edit { preferences ->
             preferences[PreferencesKeys.OVERVIEW_SORT_ORDER_REVERT] = revert
         }
     }
 
     override suspend fun showCompactVocabularyItem(showCompactVocabularyItem: Boolean) {
-        context.dataStoreOverview.edit { preferences ->
+        overview.edit { preferences ->
             preferences[PreferencesKeys.OVERVIEW_SHOW_COMPACT_VOCABULARY_ITEM] = showCompactVocabularyItem
         }
     }
 
-    override val preferencesSearchFlow: Flow<SearchPreferences> = context.dataStoreOverview.data
+    override val preferencesSearchFlow: Flow<SearchPreferences> = overview.data
         .fallbackToDefaultOnError()
         .map { preferences ->
             val lastSearchedItems: ArrayDeque<String> =
@@ -167,7 +166,7 @@ class UserPreferencesManagerImpl @Inject constructor(@ApplicationContext val con
         }
 
     override suspend fun addLastSearchedItem(item: String) {
-        context.dataStoreOverview.edit { preferences ->
+        overview.edit { preferences ->
             val currentDeque: ArrayDeque<String> = preferences[PreferencesKeys.SEARCH_SORT_LAST_SEARCHED_ITEMS]?.let {
                 jsonConfig.decodeFromString(ArrayDequeSerializer, it)
             } ?: ArrayDeque()
@@ -180,13 +179,13 @@ class UserPreferencesManagerImpl @Inject constructor(@ApplicationContext val con
     }
 
     override suspend fun updateOnlineRedirectPosition(first: Boolean) {
-        context.dataStoreOverview.edit { preferences ->
+        overview.edit { preferences ->
             preferences[PreferencesKeys.SEARCH_ONLINE_REDIRECT_POSITION] = first
         }
     }
 
     override suspend fun updateOnlineRedirectType(type: OnlineSearchType) {
-        context.dataStoreOverview.edit { preferences ->
+        overview.edit { preferences ->
             preferences[PreferencesKeys.SEARCH_ONLINE_REDIRECT_TYPE] = jsonConfig.encodeToString(type)
         }
     }
