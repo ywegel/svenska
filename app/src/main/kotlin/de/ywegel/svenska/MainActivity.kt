@@ -11,7 +11,9 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.ramcosta.composedestinations.generated.destinations.ContainerScreenDestination
 import com.ramcosta.composedestinations.generated.destinations.OnboardingScreenDestination
+import com.ramcosta.composedestinations.spec.Direction
 import dagger.hilt.android.AndroidEntryPoint
 import de.ywegel.svenska.navigation.AppNavigation
 import de.ywegel.svenska.ui.theme.SvenskaTheme
@@ -35,19 +37,22 @@ class MainActivity : ComponentActivity() {
         setContent {
             val onboardingState by viewModel.onboardingState.collectAsStateWithLifecycle()
 
-            if (onboardingState != OnboardingState.Loading) {
+            startRouteFor(onboardingState)?.let { startRoute ->
                 SvenskaTheme {
                     Surface(
                         modifier = Modifier.fillMaxSize(),
                         color = SvenskaTheme.colors.background,
                     ) {
-                        val startRoute = OnboardingScreenDestination.takeIf {
-                            onboardingState == OnboardingState.NotCompleted
-                        }
                         AppNavigation(startRoute = startRoute)
                     }
                 }
             }
         }
     }
+}
+
+internal fun startRouteFor(onboardingState: OnboardingState): Direction? = when (onboardingState) {
+    OnboardingState.Loading -> null
+    OnboardingState.NotCompleted -> OnboardingScreenDestination
+    OnboardingState.Completed -> ContainerScreenDestination
 }

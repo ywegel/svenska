@@ -20,6 +20,7 @@ import org.junit.jupiter.api.Test
 import strikt.api.expectThat
 import strikt.assertions.isEqualTo
 import strikt.assertions.isFalse
+import strikt.assertions.isNull
 import strikt.assertions.isTrue
 
 class MainActivityTest {
@@ -47,6 +48,7 @@ class MainActivityTest {
 
         // Then - splash screen should be kept on screen initially
         expectThat(keepOnScreenCondition()).isTrue()
+        expectThat(startRouteFor(viewModel.onboardingState.value)).isNull()
 
         // When - simulate preferences loading
         advanceUntilIdle()
@@ -64,7 +66,7 @@ class MainActivityTest {
 
         // When & Then
         expectThat(viewModel.onboardingState.value).isEqualTo(OnboardingState.NotCompleted)
-        expectThat(getStartRoute(viewModel.onboardingState.value)).isEqualTo(OnboardingScreenDestination)
+        expectThat(startRouteFor(viewModel.onboardingState.value)).isEqualTo(OnboardingScreenDestination)
     }
 
     @Test
@@ -76,15 +78,6 @@ class MainActivityTest {
 
         // When & Then
         expectThat(viewModel.onboardingState.value).isEqualTo(OnboardingState.Completed)
-        expectThat(getStartRoute(viewModel.onboardingState.value)).isEqualTo(ContainerScreenDestination)
-    }
-
-    // Helper function to simulate the logic in MainActivity
-    private fun getStartRoute(onboardingState: OnboardingState): Any? {
-        return if (onboardingState != OnboardingState.Completed) {
-            OnboardingScreenDestination
-        } else {
-            ContainerScreenDestination
-        }
+        expectThat(startRouteFor(viewModel.onboardingState.value)).isEqualTo(ContainerScreenDestination)
     }
 }

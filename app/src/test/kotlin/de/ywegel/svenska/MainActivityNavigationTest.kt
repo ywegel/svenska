@@ -4,7 +4,6 @@ package de.ywegel.svenska
 
 import com.ramcosta.composedestinations.generated.destinations.ContainerScreenDestination
 import com.ramcosta.composedestinations.generated.destinations.OnboardingScreenDestination
-import com.ramcosta.composedestinations.spec.Direction
 import de.ywegel.svenska.data.preferences.keys.OnboardingPreferenceKeys
 import de.ywegel.svenska.data.preferences.set
 import de.ywegel.svenska.fakes.UserPreferencesManagerFake
@@ -44,7 +43,7 @@ class MainActivityNavigationTest {
         advanceUntilIdle() // Allow preferences to load
 
         // When
-        val startRoute = determineStartRoute(viewModel.onboardingState.value)
+        val startRoute = startRouteFor(viewModel.onboardingState.value)
 
         // Then
         expectThat(startRoute).isEqualTo(OnboardingScreenDestination)
@@ -58,7 +57,7 @@ class MainActivityNavigationTest {
         advanceUntilIdle() // Allow preferences to load
 
         // When
-        val startRoute = determineStartRoute(viewModel.onboardingState.value)
+        val startRoute = startRouteFor(viewModel.onboardingState.value)
 
         // Then
         expectThat(startRoute).isEqualTo(ContainerScreenDestination)
@@ -78,16 +77,7 @@ class MainActivityNavigationTest {
 
         // Then
         expectThat(mainViewModel.onboardingState.value).isEqualTo(OnboardingState.Completed)
-        expectThat(determineStartRoute(mainViewModel.onboardingState.value))
+        expectThat(startRouteFor(mainViewModel.onboardingState.value))
             .isEqualTo(ContainerScreenDestination)
-    }
-
-    // Helper function to simulate the logic in MainActivity
-    private fun determineStartRoute(onboardingState: OnboardingState): Direction {
-        return if (onboardingState != OnboardingState.Completed) {
-            OnboardingScreenDestination
-        } else {
-            ContainerScreenDestination
-        }
     }
 }
