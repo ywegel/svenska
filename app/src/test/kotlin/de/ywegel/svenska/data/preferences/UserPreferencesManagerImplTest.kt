@@ -78,7 +78,6 @@ class UserPreferencesManagerImplTest {
         expectThat(subject.flow(OverviewPreferenceKeys.Revert).first()).isEqualTo(false)
         expectThat(subject.flow(OverviewPreferenceKeys.ShowCompactVocabularyItem).first()).isEqualTo(false)
         expectThat(subject.flow(SearchPreferenceKeys.LastSearchedItems).first()).isEqualTo(ArrayDeque())
-        expectThat(subject.flow(SearchPreferenceKeys.OnlineRedirectPosition).first()).isEqualTo(false)
         expectThat(subject.flow(SearchPreferenceKeys.OnlineRedirectType).first()).isEqualTo(OnlineSearchType.DictCC)
         expectThat(subject.flow(OnboardingPreferenceKeys.HasCompleted).first()).isEqualTo(false)
         expectThat(subject.flow(AppPreferenceKeys.UseNewQuiz).first()).isEqualTo(false)

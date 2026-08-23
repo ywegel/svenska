@@ -42,6 +42,12 @@ class OverviewViewModel @Inject constructor(
     private val _uiState = MutableStateFlow(OverviewUiState())
     val uiState: StateFlow<OverviewUiState> = _uiState.asStateFlow()
 
+    private val sortSettings = combine(
+        userPreferencesManager.flow(OverviewPreferenceKeys.SortOrder),
+        userPreferencesManager.flow(OverviewPreferenceKeys.Revert),
+        ::Pair,
+    )
+
     init {
         observeVocabularyState()
         observerPreferencesState()
@@ -74,12 +80,6 @@ class OverviewViewModel @Inject constructor(
 //                }
 //            }
 //    }
-
-    private val sortSettings = combine(
-        userPreferencesManager.flow(OverviewPreferenceKeys.SortOrder),
-        userPreferencesManager.flow(OverviewPreferenceKeys.Revert),
-        ::Pair,
-    )
 
     @OptIn(ExperimentalCoroutinesApi::class)
     private fun observeVocabularyState() = viewModelScope.launch(ioDispatcher) {

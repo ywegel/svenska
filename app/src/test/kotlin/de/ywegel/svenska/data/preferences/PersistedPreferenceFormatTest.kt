@@ -33,7 +33,6 @@ class PersistedPreferenceFormatTest {
         "OverviewPreferenceKeys.Revert" to "Overview/overview_sort_order_revert",
         "OverviewPreferenceKeys.ShowCompactVocabularyItem" to "Overview/overview_show_compact_vocabulary_item",
         "SearchPreferenceKeys.LastSearchedItems" to "Overview/search_sort_last_searched_items",
-        "SearchPreferenceKeys.OnlineRedirectPosition" to "Overview/search_online_redirect_position",
         "SearchPreferenceKeys.OnlineRedirectType" to "Overview/search_online_redirect_type",
         "OnboardingPreferenceKeys.HasCompleted" to "Overview/app_has_completed_onboarding",
         "AppPreferenceKeys.UseNewQuiz" to "Overview/app_uses_new_quiz",
