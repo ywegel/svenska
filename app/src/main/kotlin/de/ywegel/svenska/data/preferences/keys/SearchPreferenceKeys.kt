@@ -5,14 +5,15 @@ import de.ywegel.svenska.data.preferences.PreferenceStore.Overview
 import de.ywegel.svenska.data.preferences.UserPreferencesManager
 import de.ywegel.svenska.data.preferences.addedToFrontAndLimited
 import de.ywegel.svenska.data.preferences.jsonPreference
-import de.ywegel.svenska.serializers.ArrayDequeSerializer
+import kotlinx.serialization.builtins.ListSerializer
+import kotlinx.serialization.builtins.serializer
 
 object SearchPreferenceKeys {
     val LastSearchedItems = jsonPreference(
         store = Overview,
         name = "search_sort_last_searched_items",
-        default = ArrayDeque<String>(),
-        serializer = ArrayDequeSerializer,
+        default = emptyList(),
+        serializer = ListSerializer(String.serializer()),
     )
 
     val OnlineRedirectType = jsonPreference(

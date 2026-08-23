@@ -7,39 +7,39 @@ import strikt.assertions.containsExactly
 class LastSearchExtensionsTest {
 
     @Test
-    fun `adds new element to empty deque`() {
-        val result = ArrayDeque<String>().addedToFrontAndLimited("a", 3)
-        expectThat(result.toList()).containsExactly("a")
+    fun `adds new element to empty list`() {
+        val result = emptyList<String>().addedToFrontAndLimited("a", 3)
+        expectThat(result).containsExactly("a")
     }
 
     @Test
     fun `adds new element to front if not present`() {
-        val result = ArrayDeque(listOf("b", "c")).addedToFrontAndLimited("a", 3)
-        expectThat(result.toList()).containsExactly(listOf("a", "b", "c"))
+        val result = listOf("b", "c").addedToFrontAndLimited("a", 3)
+        expectThat(result).containsExactly(listOf("a", "b", "c"))
     }
 
     @Test
     fun `moves existing element to front`() {
-        val result = ArrayDeque(listOf("a", "b")).addedToFrontAndLimited("b", 3)
-        expectThat(result.toList()).containsExactly(listOf("b", "a"))
+        val result = listOf("a", "b").addedToFrontAndLimited("b", 3)
+        expectThat(result).containsExactly(listOf("b", "a"))
     }
 
     @Test
     fun `removes oldest element when limit exceeded`() {
-        val result = ArrayDeque(listOf("a", "b", "c")).addedToFrontAndLimited("d", 3)
-        expectThat(result.toList()).containsExactly(listOf("d", "a", "b"))
+        val result = listOf("a", "b", "c").addedToFrontAndLimited("d", 3)
+        expectThat(result).containsExactly(listOf("d", "a", "b"))
     }
 
     @Test
     fun `existing element moved to front without exceeding limit`() {
-        val result = ArrayDeque(listOf("a", "b", "c")).addedToFrontAndLimited("b", 3)
-        expectThat(result.toList()).containsExactly(listOf("b", "a", "c"))
+        val result = listOf("a", "b", "c").addedToFrontAndLimited("b", 3)
+        expectThat(result).containsExactly(listOf("b", "a", "c"))
     }
 
     @Test
-    fun `leaves the original deque untouched`() {
-        val original = ArrayDeque(listOf("a", "b"))
+    fun `leaves the original list untouched`() {
+        val original = listOf("a", "b")
         original.addedToFrontAndLimited("c", 3)
-        expectThat(original.toList()).containsExactly(listOf("a", "b"))
+        expectThat(original).containsExactly(listOf("a", "b"))
     }
 }

@@ -135,7 +135,7 @@ class SearchViewModel @Inject constructor(
 }
 
 data class SearchUiState(
-    val lastSearchedItems: ArrayDeque<String> = ArrayDeque(),
+    val lastSearchedItems: List<String> = emptyList(),
     val showOnlineRedirectFirst: Boolean = false,
     val onlineRedirectUrl: String? = null,
     val detailViewState: VocabularyDetailState = VocabularyDetailState.Hidden,

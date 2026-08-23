@@ -77,7 +77,7 @@ class UserPreferencesManagerImplTest {
         expectThat(subject.flow(OverviewPreferenceKeys.SortOrder).first()).isEqualTo(SortOrder.default)
         expectThat(subject.flow(OverviewPreferenceKeys.Revert).first()).isEqualTo(false)
         expectThat(subject.flow(OverviewPreferenceKeys.ShowCompactVocabularyItem).first()).isEqualTo(false)
-        expectThat(subject.flow(SearchPreferenceKeys.LastSearchedItems).first()).isEqualTo(ArrayDeque())
+        expectThat(subject.flow(SearchPreferenceKeys.LastSearchedItems).first()).isEqualTo(emptyList())
         expectThat(subject.flow(SearchPreferenceKeys.OnlineRedirectType).first()).isEqualTo(OnlineSearchType.DictCC)
         expectThat(subject.flow(OnboardingPreferenceKeys.HasCompleted).first()).isEqualTo(false)
         expectThat(subject.flow(AppPreferenceKeys.UseNewQuiz).first()).isEqualTo(false)
@@ -125,10 +125,10 @@ class UserPreferencesManagerImplTest {
     }
 
     @Test
-    fun `json preference round trips through update - last searched deque`() = runTest(testDispatcher) {
+    fun `json preference round trips through update - last searched items`() = runTest(testDispatcher) {
         // Given
         val subject = manager(this)
-        val items = ArrayDeque(listOf("hund", "katt"))
+        val items = listOf("hund", "katt")
 
         // When
         subject.update(SearchPreferenceKeys.LastSearchedItems, items)
@@ -154,14 +154,14 @@ class UserPreferencesManagerImplTest {
     }
 
     @Test
-    fun `last searched deque is persisted under its exact JSON format`() = runTest(testDispatcher) {
+    fun `last searched items are persisted under their exact JSON format`() = runTest(testDispatcher) {
         // Given
         val overview = overviewStore(this)
         val subject = UserPreferencesManagerImpl(overview = overview, addEdit = addEditStore(this))
         val rawKey = stringPreferencesKey("search_sort_last_searched_items")
 
         // When
-        subject.update(SearchPreferenceKeys.LastSearchedItems, ArrayDeque(listOf("a", "b", "c")))
+        subject.update(SearchPreferenceKeys.LastSearchedItems, listOf("a", "b", "c"))
         advanceUntilIdle()
 
         // Then
@@ -234,9 +234,7 @@ class UserPreferencesManagerImplTest {
         advanceUntilIdle()
 
         // Then
-        val expected = ArrayDeque(
-            listOf("word9", "word3", "word8", "word7", "word6", "word5", "word4", "word2"),
-        )
+        val expected = listOf("word9", "word3", "word8", "word7", "word6", "word5", "word4", "word2")
         val items = subject.flow(SearchPreferenceKeys.LastSearchedItems).first()
         expectThat(items).isEqualTo(expected)
     }
