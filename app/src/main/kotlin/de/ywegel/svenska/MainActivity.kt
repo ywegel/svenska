@@ -26,23 +26,24 @@ class MainActivity : ComponentActivity() {
 
         installSplashScreen().apply {
             setKeepOnScreenCondition {
-                viewModel.hasCompletedOnboarding.value == null
+                viewModel.onboardingState.value is OnboardingState.Loading
             }
         }
 
         enableEdgeToEdge()
 
         setContent {
-            val onboardingCompleted by viewModel.hasCompletedOnboarding.collectAsStateWithLifecycle()
+            val onboardingState by viewModel.onboardingState.collectAsStateWithLifecycle()
 
-            if (onboardingCompleted != null) {
+            if (onboardingState != OnboardingState.Loading) {
                 SvenskaTheme {
                     Surface(
                         modifier = Modifier.fillMaxSize(),
                         color = SvenskaTheme.colors.background,
                     ) {
-                        val startRoute = OnboardingScreenDestination.takeIf { onboardingCompleted != true }
-
+                        val startRoute = OnboardingScreenDestination.takeIf {
+                            onboardingState == OnboardingState.NotCompleted
+                        }
                         AppNavigation(startRoute = startRoute)
                     }
                 }

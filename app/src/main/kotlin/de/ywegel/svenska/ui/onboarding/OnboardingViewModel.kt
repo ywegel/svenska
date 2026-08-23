@@ -4,7 +4,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
 import de.ywegel.svenska.data.preferences.UserPreferencesManager
-import de.ywegel.svenska.data.preferences.keys.AppPreferenceKeys
+import de.ywegel.svenska.data.preferences.keys.OnboardingPreferenceKeys
 import de.ywegel.svenska.di.IoDispatcher
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.flow.MutableSharedFlow
@@ -24,7 +24,7 @@ class OnboardingViewModel @Inject constructor(
 
     fun completeOnboarding() {
         viewModelScope.launch(ioDispatcher) {
-            userPreferencesManager.update(AppPreferenceKeys.HasCompletedOnboarding, true)
+            userPreferencesManager.update(OnboardingPreferenceKeys.HasCompleted, true)
             _navigationEvent.emit(NavigationEvent.NavigateToMain)
         }
     }

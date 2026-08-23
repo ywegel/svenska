@@ -3,6 +3,7 @@ package de.ywegel.svenska.data.preferences
 import de.ywegel.svenska.data.model.SortOrder
 import de.ywegel.svenska.data.preferences.keys.AddEditPreferenceKeys
 import de.ywegel.svenska.data.preferences.keys.AppPreferenceKeys
+import de.ywegel.svenska.data.preferences.keys.OnboardingPreferenceKeys
 import de.ywegel.svenska.data.preferences.keys.OverviewPreferenceKeys
 import de.ywegel.svenska.data.preferences.keys.SearchPreferenceKeys
 import org.junit.jupiter.api.Test
@@ -34,7 +35,7 @@ class PersistedPreferenceFormatTest {
         "SearchPreferenceKeys.LastSearchedItems" to "Overview/search_sort_last_searched_items",
         "SearchPreferenceKeys.OnlineRedirectPosition" to "Overview/search_online_redirect_position",
         "SearchPreferenceKeys.OnlineRedirectType" to "Overview/search_online_redirect_type",
-        "AppPreferenceKeys.HasCompletedOnboarding" to "Overview/app_has_completed_onboarding",
+        "OnboardingPreferenceKeys.HasCompleted" to "Overview/app_has_completed_onboarding",
         "AppPreferenceKeys.UseNewQuiz" to "Overview/app_uses_new_quiz",
         "AddEditPreferenceKeys.AnnotationInformationHidden" to "AddEdit/add_edit_annotation_information_hidden",
     )
@@ -98,6 +99,7 @@ class PersistedPreferenceFormatTest {
         SearchPreferenceKeys,
         AppPreferenceKeys,
         AddEditPreferenceKeys,
+        OnboardingPreferenceKeys,
     ).flatMap { holder ->
         holder::class.java.declaredFields
             .filter { PreferenceKey::class.java.isAssignableFrom(it.type) }

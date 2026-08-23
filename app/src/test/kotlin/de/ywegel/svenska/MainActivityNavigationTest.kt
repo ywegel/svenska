@@ -5,7 +5,7 @@ package de.ywegel.svenska
 import com.ramcosta.composedestinations.generated.destinations.ContainerScreenDestination
 import com.ramcosta.composedestinations.generated.destinations.OnboardingScreenDestination
 import com.ramcosta.composedestinations.spec.Direction
-import de.ywegel.svenska.data.preferences.keys.AppPreferenceKeys
+import de.ywegel.svenska.data.preferences.keys.OnboardingPreferenceKeys
 import de.ywegel.svenska.data.preferences.set
 import de.ywegel.svenska.fakes.UserPreferencesManagerFake
 import de.ywegel.svenska.ui.onboarding.OnboardingViewModel
@@ -44,7 +44,7 @@ class MainActivityNavigationTest {
         advanceUntilIdle() // Allow preferences to load
 
         // When
-        val startRoute = determineStartRoute(viewModel.hasCompletedOnboarding.value)
+        val startRoute = determineStartRoute(viewModel.onboardingState.value)
 
         // Then
         expectThat(startRoute).isEqualTo(OnboardingScreenDestination)
@@ -53,12 +53,12 @@ class MainActivityNavigationTest {
     @Test
     fun `app navigates to ContainerScreen when onboarding is completed`() = runTest(testDispatcher) {
         // Given
-        val preferencesManager = UserPreferencesManagerFake { set(AppPreferenceKeys.HasCompletedOnboarding, true) }
+        val preferencesManager = UserPreferencesManagerFake { set(OnboardingPreferenceKeys.HasCompleted, true) }
         val viewModel = MainViewModel(preferencesManager)
         advanceUntilIdle() // Allow preferences to load
 
         // When
-        val startRoute = determineStartRoute(viewModel.hasCompletedOnboarding.value)
+        val startRoute = determineStartRoute(viewModel.onboardingState.value)
 
         // Then
         expectThat(startRoute).isEqualTo(ContainerScreenDestination)
@@ -77,14 +77,14 @@ class MainActivityNavigationTest {
         advanceUntilIdle() // Allow preferences to update
 
         // Then
-        expectThat(mainViewModel.hasCompletedOnboarding.value).isEqualTo(true)
-        expectThat(determineStartRoute(mainViewModel.hasCompletedOnboarding.value))
+        expectThat(mainViewModel.onboardingState.value).isEqualTo(OnboardingState.Completed)
+        expectThat(determineStartRoute(mainViewModel.onboardingState.value))
             .isEqualTo(ContainerScreenDestination)
     }
 
     // Helper function to simulate the logic in MainActivity
-    private fun determineStartRoute(onboardingCompleted: Boolean?): Direction {
-        return if (onboardingCompleted != true) {
+    private fun determineStartRoute(onboardingState: OnboardingState): Direction {
+        return if (onboardingState != OnboardingState.Completed) {
             OnboardingScreenDestination
         } else {
             ContainerScreenDestination
