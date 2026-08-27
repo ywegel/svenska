@@ -4,6 +4,8 @@ package de.ywegel.svenska
 
 import com.ramcosta.composedestinations.generated.destinations.ContainerScreenDestination
 import com.ramcosta.composedestinations.generated.destinations.OnboardingScreenDestination
+import de.ywegel.svenska.data.preferences.keys.OnboardingPreferenceKeys
+import de.ywegel.svenska.data.preferences.set
 import de.ywegel.svenska.fakes.UserPreferencesManagerFake
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -18,6 +20,7 @@ import org.junit.jupiter.api.Test
 import strikt.api.expectThat
 import strikt.assertions.isEqualTo
 import strikt.assertions.isFalse
+import strikt.assertions.isNull
 import strikt.assertions.isTrue
 
 class MainActivityTest {
@@ -37,14 +40,15 @@ class MainActivityTest {
     @Test
     fun `splash screen condition is true until preferences are loaded`() = runTest(testDispatcher) {
         // Given
-        val preferencesManager = UserPreferencesManagerFake(initialHasCompletedOnboarding = false)
+        val preferencesManager = UserPreferencesManagerFake()
         val viewModel = MainViewModel(preferencesManager)
 
         // Simulate the splash screen condition in MainActivity
-        val keepOnScreenCondition = { viewModel.hasCompletedOnboarding.value == null }
+        val keepOnScreenCondition = { viewModel.onboardingState.value is OnboardingState.Loading }
 
         // Then - splash screen should be kept on screen initially
         expectThat(keepOnScreenCondition()).isTrue()
+        expectThat(startRouteFor(viewModel.onboardingState.value)).isNull()
 
         // When - simulate preferences loading
         advanceUntilIdle()
@@ -56,33 +60,24 @@ class MainActivityTest {
     @Test
     fun `start route is set to OnboardingScreen when onboarding is not completed`() = runTest(testDispatcher) {
         // Given
-        val preferencesManager = UserPreferencesManagerFake(initialHasCompletedOnboarding = false)
+        val preferencesManager = UserPreferencesManagerFake()
         val viewModel = MainViewModel(preferencesManager)
         advanceUntilIdle() // Allow preferences to load
 
         // When & Then
-        expectThat(viewModel.hasCompletedOnboarding.value).isEqualTo(false)
-        expectThat(getStartRoute(viewModel.hasCompletedOnboarding.value)).isEqualTo(OnboardingScreenDestination)
+        expectThat(viewModel.onboardingState.value).isEqualTo(OnboardingState.NotCompleted)
+        expectThat(startRouteFor(viewModel.onboardingState.value)).isEqualTo(OnboardingScreenDestination)
     }
 
     @Test
     fun `start route is set to ContainerScreen when onboarding is completed`() = runTest(testDispatcher) {
         // Given
-        val preferencesManager = UserPreferencesManagerFake(initialHasCompletedOnboarding = true)
+        val preferencesManager = UserPreferencesManagerFake { set(OnboardingPreferenceKeys.HasCompleted, true) }
         val viewModel = MainViewModel(preferencesManager)
         advanceUntilIdle() // Allow preferences to load
 
         // When & Then
-        expectThat(viewModel.hasCompletedOnboarding.value).isEqualTo(true)
-        expectThat(getStartRoute(viewModel.hasCompletedOnboarding.value)).isEqualTo(ContainerScreenDestination)
-    }
-
-    // Helper function to simulate the logic in MainActivity
-    private fun getStartRoute(onboardingCompleted: Boolean?): Any? {
-        return if (onboardingCompleted != true) {
-            OnboardingScreenDestination
-        } else {
-            ContainerScreenDestination
-        }
+        expectThat(viewModel.onboardingState.value).isEqualTo(OnboardingState.Completed)
+        expectThat(startRouteFor(viewModel.onboardingState.value)).isEqualTo(ContainerScreenDestination)
     }
 }

@@ -390,7 +390,7 @@ private fun SearchScreenPreviewEmpty() {
     SvenskaTheme {
         SearchScreen(
             uiState = SearchUiState(
-                lastSearchedItems = ArrayDeque(listOf("abc", "def", "ghi")),
+                lastSearchedItems = listOf("abc", "def", "ghi"),
             ),
             vocabulary = emptyList(),
             currentSearchQuery = "",

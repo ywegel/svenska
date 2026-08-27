@@ -3,6 +3,8 @@
 package de.ywegel.svenska
 
 import app.cash.turbine.test
+import de.ywegel.svenska.data.preferences.keys.OnboardingPreferenceKeys
+import de.ywegel.svenska.data.preferences.set
 import de.ywegel.svenska.fakes.UserPreferencesManagerFake
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -16,7 +18,6 @@ import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import strikt.api.expectThat
 import strikt.assertions.isEqualTo
-import strikt.assertions.isNull
 
 class MainViewModelTest {
 
@@ -33,48 +34,48 @@ class MainViewModelTest {
     }
 
     @Test
-    fun `hasCompletedOnboarding is initially null`() = runTest(testDispatcher) {
+    fun `onboardingState is initially Loading`() = runTest(testDispatcher) {
         // Given
-        val preferencesManager = UserPreferencesManagerFake(initialHasCompletedOnboarding = false)
+        val preferencesManager = UserPreferencesManagerFake()
 
         // When
         val viewModel = MainViewModel(preferencesManager)
 
         // Then
-        expectThat(viewModel.hasCompletedOnboarding.value).isNull()
+        expectThat(viewModel.onboardingState.value).isEqualTo(OnboardingState.Loading)
     }
 
     @Test
-    fun `hasCompletedOnboarding is updated when preferences are loaded`() = runTest(testDispatcher) {
+    fun `onboardingState is updated when preferences are loaded`() = runTest(testDispatcher) {
         // Given
-        val preferencesManager = UserPreferencesManagerFake(initialHasCompletedOnboarding = true)
+        val preferencesManager = UserPreferencesManagerFake { set(OnboardingPreferenceKeys.HasCompleted, true) }
 
         // When
         val viewModel = MainViewModel(preferencesManager)
         advanceUntilIdle() // Allow the flow collection to complete
 
         // Then
-        viewModel.hasCompletedOnboarding.test {
-            expectThat(awaitItem()).isEqualTo(true)
+        viewModel.onboardingState.test {
+            expectThat(awaitItem()).isEqualTo(OnboardingState.Completed)
         }
     }
 
     @Test
-    fun `hasCompletedOnboarding reflects changes to preferences`() = runTest(testDispatcher) {
+    fun `onboardingState reflects changes to preferences`() = runTest(testDispatcher) {
         // Given
-        val preferencesManager = UserPreferencesManagerFake(initialHasCompletedOnboarding = false)
+        val preferencesManager = UserPreferencesManagerFake()
         val viewModel = MainViewModel(preferencesManager)
         advanceUntilIdle() // Allow initial flow collection
 
         // When & Then
-        viewModel.hasCompletedOnboarding.test {
-            expectThat(awaitItem()).isEqualTo(false)
+        viewModel.onboardingState.test {
+            expectThat(awaitItem()).isEqualTo(OnboardingState.NotCompleted)
 
             // Update preferences
-            preferencesManager.updateHasCompletedOnboarding(true)
+            preferencesManager.update(OnboardingPreferenceKeys.HasCompleted, true)
             advanceUntilIdle()
 
-            expectThat(awaitItem()).isEqualTo(true)
+            expectThat(awaitItem()).isEqualTo(OnboardingState.Completed)
         }
     }
 }

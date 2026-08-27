@@ -25,6 +25,8 @@ import strikt.assertions.contains
 import strikt.assertions.containsExactlyInAnyOrder
 import strikt.assertions.doesNotContain
 import strikt.assertions.isEqualTo
+import strikt.assertions.isFalse
+import strikt.assertions.isTrue
 
 class ContainerViewModelTest {
     private val testDispatcher = StandardTestDispatcher()
@@ -124,6 +126,54 @@ class ContainerViewModelTest {
         // Then
         viewModel.uiState.test {
             expectThat(awaitItem().containers).isEqualTo(containers())
+        }
+    }
+
+    @Test
+    fun `updateIsEditMode is reflected in the uiState`() = runTest(testDispatcher) {
+        // Given
+        val viewModel = setupViewModel()
+        advanceUntilIdle()
+
+        viewModel.uiState.test {
+            expectThat(awaitItem().isEditModeMode).isFalse()
+
+            // When
+            viewModel.updateIsEditMode(true)
+            advanceUntilIdle()
+
+            // Then
+            expectThat(awaitItem().isEditModeMode).isTrue()
+
+            // When
+            viewModel.updateIsEditMode(false)
+            advanceUntilIdle()
+
+            // Then
+            expectThat(awaitItem().isEditModeMode).isFalse()
+        }
+    }
+
+    @Test
+    fun `updateIsEditMode keeps the loaded containers`() = runTest(testDispatcher) {
+        // Given
+        val viewModel = setupViewModel(
+            repository = VocabularyRepositoryFake(
+                initialVocabulary = emptyList(),
+                initialContainers = containers(),
+            ),
+        )
+        advanceUntilIdle()
+
+        // When
+        viewModel.updateIsEditMode(true)
+        advanceUntilIdle()
+
+        // Then
+        viewModel.uiState.test {
+            val state = awaitItem()
+            expectThat(state.isEditModeMode).isTrue()
+            expectThat(state.containers).containsExactlyInAnyOrder(containers())
         }
     }
 

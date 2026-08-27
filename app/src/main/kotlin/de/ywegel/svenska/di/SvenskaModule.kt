@@ -12,9 +12,10 @@ import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
+import de.ywegel.svenska.data.preferences.ADD_EDIT_PREFERENCES_NAME
 import de.ywegel.svenska.data.preferences.OVERVIEW_PREFERENCES_NAME
+import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
 import javax.inject.Qualifier
 import javax.inject.Singleton
@@ -28,18 +29,29 @@ class SvenskaModule {
     @Singleton
     fun provideApplicationScope() = CoroutineScope(SupervisorJob())
 
-    @Singleton
     @Provides
-    fun provideUserPreferencesDatastore(@ApplicationContext appContext: Context): DataStore<Preferences> {
-        return PreferenceDataStoreFactory.create(
-            corruptionHandler = ReplaceFileCorruptionHandler(
-                // TODO maybe warn user about corrupted data? Possibly by setting a corruption flag
-                produceNewData = { emptyPreferences() },
-            ),
-            scope = CoroutineScope(Dispatchers.IO + SupervisorJob()),
-            produceFile = { appContext.preferencesDataStoreFile(OVERVIEW_PREFERENCES_NAME) },
-        )
-    }
+    @Singleton
+    @OverviewDataStore
+    fun provideOverviewDataStore(
+        @ApplicationContext context: Context,
+        @IoDispatcher dispatcher: CoroutineDispatcher,
+    ): DataStore<Preferences> = PreferenceDataStoreFactory.create(
+        corruptionHandler = ReplaceFileCorruptionHandler { emptyPreferences() },
+        scope = CoroutineScope(dispatcher + SupervisorJob()),
+        produceFile = { context.preferencesDataStoreFile(OVERVIEW_PREFERENCES_NAME) },
+    )
+
+    @Provides
+    @Singleton
+    @AddEditDataStore
+    fun provideAddEditDataStore(
+        @ApplicationContext context: Context,
+        @IoDispatcher dispatcher: CoroutineDispatcher,
+    ): DataStore<Preferences> = PreferenceDataStoreFactory.create(
+        corruptionHandler = ReplaceFileCorruptionHandler { emptyPreferences() },
+        scope = CoroutineScope(dispatcher + SupervisorJob()),
+        produceFile = { context.preferencesDataStoreFile(ADD_EDIT_PREFERENCES_NAME) },
+    )
 }
 
 @Retention(AnnotationRetention.RUNTIME)

@@ -4,26 +4,26 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
 import de.ywegel.svenska.data.preferences.UserPreferencesManager
-import kotlinx.coroutines.flow.MutableStateFlow
+import de.ywegel.svenska.data.preferences.keys.OnboardingPreferenceKeys
+import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.map
-import kotlinx.coroutines.launch
+import kotlinx.coroutines.flow.stateIn
 import javax.inject.Inject
 
 @HiltViewModel
 class MainViewModel @Inject constructor(
-    userPreferencesManager: UserPreferencesManager,
+    preferences: UserPreferencesManager,
 ) : ViewModel() {
 
-    private val _hasCompletedOnboarding = MutableStateFlow<Boolean?>(null)
-    val hasCompletedOnboarding: StateFlow<Boolean?> = _hasCompletedOnboarding.asStateFlow()
+    val onboardingState: StateFlow<OnboardingState> =
+        preferences.flow(OnboardingPreferenceKeys.HasCompleted)
+            .map { if (it) OnboardingState.Completed else OnboardingState.NotCompleted }
+            .stateIn(viewModelScope, SharingStarted.Eagerly, OnboardingState.Loading)
+}
 
-    init {
-        viewModelScope.launch {
-            userPreferencesManager.preferencesAppFlow
-                .map { it.hasCompletedOnboarding }
-                .collect { _hasCompletedOnboarding.value = it }
-        }
-    }
+sealed interface OnboardingState {
+    data object Loading : OnboardingState
+    data object Completed : OnboardingState
+    data object NotCompleted : OnboardingState
 }

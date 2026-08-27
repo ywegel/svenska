@@ -11,6 +11,7 @@ import de.ywegel.svenska.data.model.Vocabulary
 import de.ywegel.svenska.data.model.WordGroup
 import de.ywegel.svenska.data.model.vocabulary
 import de.ywegel.svenska.data.preferences.UserPreferencesManager
+import de.ywegel.svenska.data.preferences.keys.AddEditPreferenceKeys
 import de.ywegel.svenska.fakes.UserPreferencesManagerFake
 import de.ywegel.svenska.fakes.VocabularyRepositoryFake
 import de.ywegel.svenska.ui.addEdit.models.ViewWordGroup
@@ -259,8 +260,8 @@ class AddEditViewModelTest {
     @Test
     fun `hideAnnotationInfo sets the annotation information to hidden in the preferences`() = runTest(testDispatcher) {
         // Given
-        val mockedPreferences = mockk<UserPreferencesManager>(relaxed = true)
-        val viewModel = setupViewModel(userPreferencesManager = mockedPreferences)
+        val fakePreferences = UserPreferencesManagerFake()
+        val viewModel = setupViewModel(userPreferencesManager = fakePreferences)
 
         // When
         viewModel.hideAnnotationInfo()
@@ -272,7 +273,9 @@ class AddEditViewModelTest {
             expectThat(awaitItem().annotationInformationHidden).isTrue()
         }
 
-        coVerify(exactly = 1) { mockedPreferences.setAnnotationInformationHidden() }
+        fakePreferences.flow(AddEditPreferenceKeys.AnnotationInformationHidden).test {
+            expectThat(awaitItem()).isTrue()
+        }
     }
 
     private fun setupViewModel(
