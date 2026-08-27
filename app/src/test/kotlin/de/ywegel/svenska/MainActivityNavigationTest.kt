@@ -43,7 +43,7 @@ class MainActivityNavigationTest {
         advanceUntilIdle() // Allow preferences to load
 
         // When
-        val startRoute = startRouteFor(viewModel.onboardingState.value)
+        val startRoute = startRouteFor(viewModel.mainUiState.value)
 
         // Then
         expectThat(startRoute).isEqualTo(OnboardingScreenDestination)
@@ -57,7 +57,7 @@ class MainActivityNavigationTest {
         advanceUntilIdle() // Allow preferences to load
 
         // When
-        val startRoute = startRouteFor(viewModel.onboardingState.value)
+        val startRoute = startRouteFor(viewModel.mainUiState.value)
 
         // Then
         expectThat(startRoute).isEqualTo(ContainerScreenDestination)
@@ -76,8 +76,10 @@ class MainActivityNavigationTest {
         advanceUntilIdle() // Allow preferences to update
 
         // Then
-        expectThat(mainViewModel.onboardingState.value).isEqualTo(OnboardingState.Completed)
-        expectThat(startRouteFor(mainViewModel.onboardingState.value))
+        expectThat(mainViewModel.mainUiState.value).isEqualTo(
+            MainUiState.Ready(hasCompletedOnboarding = true, isLatestPrivacyPolicyAccepted = false),
+        )
+        expectThat(startRouteFor(mainViewModel.mainUiState.value))
             .isEqualTo(ContainerScreenDestination)
     }
 }

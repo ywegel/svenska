@@ -3,6 +3,7 @@
 package de.ywegel.svenska
 
 import app.cash.turbine.test
+import de.ywegel.svenska.data.preferences.keys.LegalPreferenceKeys
 import de.ywegel.svenska.data.preferences.keys.OnboardingPreferenceKeys
 import de.ywegel.svenska.data.preferences.set
 import de.ywegel.svenska.fakes.UserPreferencesManagerFake
@@ -34,7 +35,7 @@ class MainViewModelTest {
     }
 
     @Test
-    fun `onboardingState is initially Loading`() = runTest(testDispatcher) {
+    fun `mainUiState is initially Loading`() = runTest(testDispatcher) {
         // Given
         val preferencesManager = UserPreferencesManagerFake()
 
@@ -42,40 +43,104 @@ class MainViewModelTest {
         val viewModel = MainViewModel(preferencesManager)
 
         // Then
-        expectThat(viewModel.onboardingState.value).isEqualTo(OnboardingState.Loading)
+        expectThat(viewModel.mainUiState.value).isEqualTo(MainUiState.Loading)
     }
 
     @Test
-    fun `onboardingState is updated when preferences are loaded`() = runTest(testDispatcher) {
+    fun `mainUiState is Ready with defaults when preferences are loaded`() = runTest(testDispatcher) {
+        // Given
+        val preferencesManager = UserPreferencesManagerFake()
+
+        // When
+        val viewModel = MainViewModel(preferencesManager)
+        advanceUntilIdle()
+
+        // Then
+        viewModel.mainUiState.test {
+            expectThat(awaitItem()).isEqualTo(
+                MainUiState.Ready(hasCompletedOnboarding = false, isLatestPrivacyPolicyAccepted = false),
+            )
+        }
+    }
+
+    @Test
+    fun `mainUiState reflects completed onboarding`() = runTest(testDispatcher) {
         // Given
         val preferencesManager = UserPreferencesManagerFake { set(OnboardingPreferenceKeys.HasCompleted, true) }
 
         // When
         val viewModel = MainViewModel(preferencesManager)
-        advanceUntilIdle() // Allow the flow collection to complete
+        advanceUntilIdle()
 
         // Then
-        viewModel.onboardingState.test {
-            expectThat(awaitItem()).isEqualTo(OnboardingState.Completed)
+        viewModel.mainUiState.test {
+            expectThat(awaitItem()).isEqualTo(
+                MainUiState.Ready(hasCompletedOnboarding = true, isLatestPrivacyPolicyAccepted = false),
+            )
         }
     }
 
     @Test
-    fun `onboardingState reflects changes to preferences`() = runTest(testDispatcher) {
+    fun `mainUiState reflects an already accepted privacy policy`() = runTest(testDispatcher) {
+        // Given
+        val preferencesManager = UserPreferencesManagerFake {
+            set(LegalPreferenceKeys.isLatestPrivacyPolicyAccepted, LegalPreferenceKeys.LATEST_PRIVACY_VERSION)
+        }
+
+        // When
+        val viewModel = MainViewModel(preferencesManager)
+        advanceUntilIdle()
+
+        // Then
+        viewModel.mainUiState.test {
+            expectThat(awaitItem()).isEqualTo(
+                MainUiState.Ready(hasCompletedOnboarding = false, isLatestPrivacyPolicyAccepted = true),
+            )
+        }
+    }
+
+    @Test
+    fun `mainUiState reflects changes to preferences`() = runTest(testDispatcher) {
         // Given
         val preferencesManager = UserPreferencesManagerFake()
         val viewModel = MainViewModel(preferencesManager)
         advanceUntilIdle() // Allow initial flow collection
 
         // When & Then
-        viewModel.onboardingState.test {
-            expectThat(awaitItem()).isEqualTo(OnboardingState.NotCompleted)
+        viewModel.mainUiState.test {
+            expectThat(awaitItem()).isEqualTo(
+                MainUiState.Ready(hasCompletedOnboarding = false, isLatestPrivacyPolicyAccepted = false),
+            )
 
             // Update preferences
             preferencesManager.update(OnboardingPreferenceKeys.HasCompleted, true)
             advanceUntilIdle()
 
-            expectThat(awaitItem()).isEqualTo(OnboardingState.Completed)
+            expectThat(awaitItem()).isEqualTo(
+                MainUiState.Ready(hasCompletedOnboarding = true, isLatestPrivacyPolicyAccepted = false),
+            )
+        }
+    }
+
+    @Test
+    fun `onPrivacyPolicyAccepted stores the latest privacy policy version`() = runTest(testDispatcher) {
+        // Given
+        val preferencesManager = UserPreferencesManagerFake { set(OnboardingPreferenceKeys.HasCompleted, true) }
+        val viewModel = MainViewModel(preferencesManager)
+        advanceUntilIdle()
+
+        // When & Then
+        viewModel.mainUiState.test {
+            expectThat(awaitItem()).isEqualTo(
+                MainUiState.Ready(hasCompletedOnboarding = true, isLatestPrivacyPolicyAccepted = false),
+            )
+
+            viewModel.onPrivacyPolicyAccepted()
+            advanceUntilIdle()
+
+            expectThat(awaitItem()).isEqualTo(
+                MainUiState.Ready(hasCompletedOnboarding = true, isLatestPrivacyPolicyAccepted = true),
+            )
         }
     }
 }

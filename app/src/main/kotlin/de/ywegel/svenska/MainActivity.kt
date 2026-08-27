@@ -16,6 +16,7 @@ import com.ramcosta.composedestinations.generated.destinations.OnboardingScreenD
 import com.ramcosta.composedestinations.spec.Direction
 import dagger.hilt.android.AndroidEntryPoint
 import de.ywegel.svenska.navigation.AppNavigation
+import de.ywegel.svenska.ui.sentryPrivacyPopUp.SentryPrivacyBottomSheet
 import de.ywegel.svenska.ui.theme.SvenskaTheme
 
 @AndroidEntryPoint
@@ -28,17 +29,20 @@ class MainActivity : ComponentActivity() {
 
         installSplashScreen().apply {
             setKeepOnScreenCondition {
-                viewModel.onboardingState.value is OnboardingState.Loading
+                viewModel.mainUiState.value is MainUiState.Loading
             }
         }
 
         enableEdgeToEdge()
 
         setContent {
-            val onboardingState by viewModel.onboardingState.collectAsStateWithLifecycle()
+            val state by viewModel.mainUiState.collectAsStateWithLifecycle()
 
-            startRouteFor(onboardingState)?.let { startRoute ->
+            startRouteFor(state)?.let { startRoute ->
                 SvenskaTheme {
+                    if (shouldShowPrivacyPolicyBottomSheet(state)) {
+                        SentryPrivacyBottomSheet(onAccept = viewModel::onPrivacyPolicyAccepted)
+                    }
                     Surface(
                         modifier = Modifier.fillMaxSize(),
                         color = SvenskaTheme.colors.background,
@@ -51,8 +55,14 @@ class MainActivity : ComponentActivity() {
     }
 }
 
-internal fun startRouteFor(onboardingState: OnboardingState): Direction? = when (onboardingState) {
-    OnboardingState.Loading -> null
-    OnboardingState.NotCompleted -> OnboardingScreenDestination
-    OnboardingState.Completed -> ContainerScreenDestination
+internal fun startRouteFor(state: MainUiState): Direction? = when (state) {
+    MainUiState.Loading -> null
+    is MainUiState.Ready -> if (state.hasCompletedOnboarding) {
+        ContainerScreenDestination
+    } else {
+        OnboardingScreenDestination
+    }
 }
+
+internal fun shouldShowPrivacyPolicyBottomSheet(state: MainUiState): Boolean =
+    state is MainUiState.Ready && state.hasCompletedOnboarding && !state.isLatestPrivacyPolicyAccepted

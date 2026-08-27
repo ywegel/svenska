@@ -5,6 +5,7 @@ import androidx.datastore.preferences.core.MutablePreferences
 import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.booleanPreferencesKey
 import androidx.datastore.preferences.core.emptyPreferences
+import androidx.datastore.preferences.core.intPreferencesKey
 import androidx.datastore.preferences.core.stringPreferencesKey
 import de.ywegel.svenska.jsonConfig
 import kotlinx.coroutines.flow.Flow
@@ -36,6 +37,14 @@ fun booleanPreference(store: PreferenceStore, name: String, default: Boolean): P
         decode = { it },
         encode = { it },
     )
+
+fun intPreference(store: PreferenceStore, name: String, default: Int): PreferenceKey<Int, Int> = PreferenceKey(
+    store = store,
+    key = intPreferencesKey(name),
+    default = default,
+    decode = { it },
+    encode = { it },
+)
 
 fun stringPreference(store: PreferenceStore, name: String, default: String): PreferenceKey<String, String> =
     PreferenceKey(

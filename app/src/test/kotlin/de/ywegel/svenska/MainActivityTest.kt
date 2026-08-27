@@ -44,11 +44,11 @@ class MainActivityTest {
         val viewModel = MainViewModel(preferencesManager)
 
         // Simulate the splash screen condition in MainActivity
-        val keepOnScreenCondition = { viewModel.onboardingState.value is OnboardingState.Loading }
+        val keepOnScreenCondition = { viewModel.mainUiState.value is MainUiState.Loading }
 
         // Then - splash screen should be kept on screen initially
         expectThat(keepOnScreenCondition()).isTrue()
-        expectThat(startRouteFor(viewModel.onboardingState.value)).isNull()
+        expectThat(startRouteFor(viewModel.mainUiState.value)).isNull()
 
         // When - simulate preferences loading
         advanceUntilIdle()
@@ -65,8 +65,10 @@ class MainActivityTest {
         advanceUntilIdle() // Allow preferences to load
 
         // When & Then
-        expectThat(viewModel.onboardingState.value).isEqualTo(OnboardingState.NotCompleted)
-        expectThat(startRouteFor(viewModel.onboardingState.value)).isEqualTo(OnboardingScreenDestination)
+        expectThat(viewModel.mainUiState.value).isEqualTo(
+            MainUiState.Ready(hasCompletedOnboarding = false, isLatestPrivacyPolicyAccepted = false),
+        )
+        expectThat(startRouteFor(viewModel.mainUiState.value)).isEqualTo(OnboardingScreenDestination)
     }
 
     @Test
@@ -77,7 +79,62 @@ class MainActivityTest {
         advanceUntilIdle() // Allow preferences to load
 
         // When & Then
-        expectThat(viewModel.onboardingState.value).isEqualTo(OnboardingState.Completed)
-        expectThat(startRouteFor(viewModel.onboardingState.value)).isEqualTo(ContainerScreenDestination)
+        expectThat(viewModel.mainUiState.value).isEqualTo(
+            MainUiState.Ready(hasCompletedOnboarding = true, isLatestPrivacyPolicyAccepted = false),
+        )
+        expectThat(startRouteFor(viewModel.mainUiState.value)).isEqualTo(ContainerScreenDestination)
+    }
+
+    @Test
+    fun `start route is set to ContainerScreen regardless of privacy policy acceptance`() = runTest(testDispatcher) {
+        // Given
+        val preferencesManager = UserPreferencesManagerFake { set(OnboardingPreferenceKeys.HasCompleted, true) }
+        val viewModel = MainViewModel(preferencesManager)
+        advanceUntilIdle()
+
+        // When & Then
+        expectThat(startRouteFor(viewModel.mainUiState.value)).isEqualTo(ContainerScreenDestination)
+    }
+
+    @Test
+    fun `privacy policy bottom sheet is hidden while loading`() {
+        expectThat(shouldShowPrivacyPolicyBottomSheet(MainUiState.Loading)).isFalse()
+    }
+
+    @Test
+    fun `privacy policy bottom sheet is hidden before onboarding is completed`() {
+        val state = MainUiState.Ready(hasCompletedOnboarding = false, isLatestPrivacyPolicyAccepted = false)
+
+        expectThat(shouldShowPrivacyPolicyBottomSheet(state)).isFalse()
+    }
+
+    @Test
+    fun `privacy policy bottom sheet is shown after onboarding when policy is not accepted`() {
+        val state = MainUiState.Ready(hasCompletedOnboarding = true, isLatestPrivacyPolicyAccepted = false)
+
+        expectThat(shouldShowPrivacyPolicyBottomSheet(state)).isTrue()
+    }
+
+    @Test
+    fun `privacy policy bottom sheet is hidden once the policy is accepted`() {
+        val state = MainUiState.Ready(hasCompletedOnboarding = true, isLatestPrivacyPolicyAccepted = true)
+
+        expectThat(shouldShowPrivacyPolicyBottomSheet(state)).isFalse()
+    }
+
+    @Test
+    fun `accepting the privacy policy hides the bottom sheet`() = runTest(testDispatcher) {
+        // Given
+        val preferencesManager = UserPreferencesManagerFake { set(OnboardingPreferenceKeys.HasCompleted, true) }
+        val viewModel = MainViewModel(preferencesManager)
+        advanceUntilIdle()
+        expectThat(shouldShowPrivacyPolicyBottomSheet(viewModel.mainUiState.value)).isTrue()
+
+        // When
+        viewModel.onPrivacyPolicyAccepted()
+        advanceUntilIdle()
+
+        // Then
+        expectThat(shouldShowPrivacyPolicyBottomSheet(viewModel.mainUiState.value)).isFalse()
     }
 }
