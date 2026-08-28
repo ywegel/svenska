@@ -15,7 +15,7 @@ import java.io.IOException
 
 private const val TAG = "UserPreferencesManager"
 
-enum class PreferenceStore { Overview, AddEdit }
+enum class PreferenceStore { Overview, AddEdit, Settings }
 
 /**
  * Describes a single preference: where it is stored, how it is persisted ([S]) and how it is

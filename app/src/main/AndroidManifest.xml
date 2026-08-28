@@ -51,6 +51,11 @@
             android:name="io.sentry.dsn"
             android:value="${sentryDsn}" />
 
+        <!-- Sentry: initialization starts after the user gave consent -->
+        <meta-data
+            android:name="io.sentry.auto-init"
+            android:value="false" />
+
         <!-- Sentry: We don't want to collect sensitive data, like request headers, user ip address and device name, see https://docs.sentry.io/platforms/android/data-management/data-collected/ for more info -->
         <meta-data
             android:name="io.sentry.send-default-pii"

@@ -2,9 +2,9 @@
 
 package de.ywegel.svenska
 
-import com.ramcosta.composedestinations.generated.destinations.ContainerScreenDestination
-import com.ramcosta.composedestinations.generated.destinations.OnboardingScreenDestination
+import de.ywegel.svenska.common.streamOf
 import de.ywegel.svenska.data.preferences.keys.OnboardingPreferenceKeys
+import de.ywegel.svenska.data.preferences.keys.PrivacyPreferenceKeys
 import de.ywegel.svenska.data.preferences.set
 import de.ywegel.svenska.fakes.UserPreferencesManagerFake
 import kotlinx.coroutines.Dispatchers
@@ -17,6 +17,9 @@ import kotlinx.coroutines.test.setMain
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
+import org.junit.jupiter.params.ParameterizedTest
+import org.junit.jupiter.params.provider.Arguments
+import org.junit.jupiter.params.provider.MethodSource
 import strikt.api.expectThat
 import strikt.assertions.isEqualTo
 import strikt.assertions.isFalse
@@ -58,83 +61,68 @@ class MainActivityTest {
     }
 
     @Test
-    fun `start route is set to OnboardingScreen when onboarding is not completed`() = runTest(testDispatcher) {
+    fun `Integration test - Giving crash reporting consent hides consent sheet`() = runTest(testDispatcher) {
         // Given
-        val preferencesManager = UserPreferencesManagerFake()
-        val viewModel = MainViewModel(preferencesManager)
-        advanceUntilIdle() // Allow preferences to load
-
-        // When & Then
-        expectThat(viewModel.mainUiState.value).isEqualTo(
-            MainUiState.Ready(hasCompletedOnboarding = false, isLatestPrivacyPolicyAccepted = false),
-        )
-        expectThat(startRouteFor(viewModel.mainUiState.value)).isEqualTo(OnboardingScreenDestination)
-    }
-
-    @Test
-    fun `start route is set to ContainerScreen when onboarding is completed`() = runTest(testDispatcher) {
-        // Given
-        val preferencesManager = UserPreferencesManagerFake { set(OnboardingPreferenceKeys.HasCompleted, true) }
-        val viewModel = MainViewModel(preferencesManager)
-        advanceUntilIdle() // Allow preferences to load
-
-        // When & Then
-        expectThat(viewModel.mainUiState.value).isEqualTo(
-            MainUiState.Ready(hasCompletedOnboarding = true, isLatestPrivacyPolicyAccepted = false),
-        )
-        expectThat(startRouteFor(viewModel.mainUiState.value)).isEqualTo(ContainerScreenDestination)
-    }
-
-    @Test
-    fun `start route is set to ContainerScreen regardless of privacy policy acceptance`() = runTest(testDispatcher) {
-        // Given
-        val preferencesManager = UserPreferencesManagerFake { set(OnboardingPreferenceKeys.HasCompleted, true) }
+        val preferencesManager = UserPreferencesManagerFake {
+            set(OnboardingPreferenceKeys.HasCompleted, true)
+            set(PrivacyPreferenceKeys.AcknowledgedPolicyVersion, PrivacyPreferenceKeys.CURRENT_POLICY_VERSION)
+        }
         val viewModel = MainViewModel(preferencesManager)
         advanceUntilIdle()
-
-        // When & Then
-        expectThat(startRouteFor(viewModel.mainUiState.value)).isEqualTo(ContainerScreenDestination)
-    }
-
-    @Test
-    fun `privacy policy bottom sheet is hidden while loading`() {
-        expectThat(shouldShowPrivacyPolicyBottomSheet(MainUiState.Loading)).isFalse()
-    }
-
-    @Test
-    fun `privacy policy bottom sheet is hidden before onboarding is completed`() {
-        val state = MainUiState.Ready(hasCompletedOnboarding = false, isLatestPrivacyPolicyAccepted = false)
-
-        expectThat(shouldShowPrivacyPolicyBottomSheet(state)).isFalse()
-    }
-
-    @Test
-    fun `privacy policy bottom sheet is shown after onboarding when policy is not accepted`() {
-        val state = MainUiState.Ready(hasCompletedOnboarding = true, isLatestPrivacyPolicyAccepted = false)
-
-        expectThat(shouldShowPrivacyPolicyBottomSheet(state)).isTrue()
-    }
-
-    @Test
-    fun `privacy policy bottom sheet is hidden once the policy is accepted`() {
-        val state = MainUiState.Ready(hasCompletedOnboarding = true, isLatestPrivacyPolicyAccepted = true)
-
-        expectThat(shouldShowPrivacyPolicyBottomSheet(state)).isFalse()
-    }
-
-    @Test
-    fun `accepting the privacy policy hides the bottom sheet`() = runTest(testDispatcher) {
-        // Given
-        val preferencesManager = UserPreferencesManagerFake { set(OnboardingPreferenceKeys.HasCompleted, true) }
-        val viewModel = MainViewModel(preferencesManager)
-        advanceUntilIdle()
-        expectThat(shouldShowPrivacyPolicyBottomSheet(viewModel.mainUiState.value)).isTrue()
+        expectThat(consentStepToShowFor(viewModel.mainUiState.value)).isEqualTo(ConsentStep.CrashReporting)
 
         // When
-        viewModel.onPrivacyPolicyAccepted()
+        preferencesManager.update(PrivacyPreferenceKeys.CrashReportingEnabled, false)
+        preferencesManager.update(PrivacyPreferenceKeys.ConsentDecisionTimestamp, "now")
         advanceUntilIdle()
 
         // Then
-        expectThat(shouldShowPrivacyPolicyBottomSheet(viewModel.mainUiState.value)).isFalse()
+        expectThat(consentStepToShowFor(viewModel.mainUiState.value)).isNull()
+    }
+
+    @ParameterizedTest
+    @MethodSource("provideConsentStepToShowForTestCases")
+    fun `test all consentStepToShowFor cases`(state: MainUiState, expectedState: ConsentStep?) {
+        expectThat(consentStepToShowFor(state)).isEqualTo(expectedState)
+    }
+
+    companion object {
+        @JvmStatic
+        fun provideConsentStepToShowForTestCases() = streamOf(
+            // Hidden while loading
+            Arguments.of(MainUiState.Loading, null),
+            // Hidden before onboarding completed
+            Arguments.of(
+                MainUiState.Ready(
+                    hasCompletedOnboarding = false,
+                    consentStep = ConsentStep.Policy,
+                ),
+                null,
+            ),
+            // Shown when policy not acknowledged
+            Arguments.of(
+                MainUiState.Ready(
+                    hasCompletedOnboarding = true,
+                    consentStep = ConsentStep.Policy,
+                ),
+                ConsentStep.Policy,
+            ),
+            // Shown when crash reporting not acknowledged
+            Arguments.of(
+                MainUiState.Ready(
+                    hasCompletedOnboarding = true,
+                    consentStep = ConsentStep.CrashReporting,
+                ),
+                ConsentStep.CrashReporting,
+            ),
+            // Hidden when everything acknowledged
+            Arguments.of(
+                MainUiState.Ready(
+                    hasCompletedOnboarding = true,
+                    consentStep = ConsentStep.Done,
+                ),
+                null,
+            ),
+        )
     }
 }

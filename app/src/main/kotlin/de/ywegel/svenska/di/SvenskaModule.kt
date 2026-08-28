@@ -14,6 +14,7 @@ import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
 import de.ywegel.svenska.data.preferences.ADD_EDIT_PREFERENCES_NAME
 import de.ywegel.svenska.data.preferences.OVERVIEW_PREFERENCES_NAME
+import de.ywegel.svenska.data.preferences.SETTINGS_PREFERENCES_NAME
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.SupervisorJob
@@ -51,6 +52,18 @@ class SvenskaModule {
         corruptionHandler = ReplaceFileCorruptionHandler { emptyPreferences() },
         scope = CoroutineScope(dispatcher + SupervisorJob()),
         produceFile = { context.preferencesDataStoreFile(ADD_EDIT_PREFERENCES_NAME) },
+    )
+
+    @Provides
+    @Singleton
+    @SettingsDataStore
+    fun provideSettingsDataStore(
+        @ApplicationContext context: Context,
+        @IoDispatcher dispatcher: CoroutineDispatcher,
+    ): DataStore<Preferences> = PreferenceDataStoreFactory.create(
+        corruptionHandler = ReplaceFileCorruptionHandler { emptyPreferences() },
+        scope = CoroutineScope(dispatcher + SupervisorJob()),
+        produceFile = { context.preferencesDataStoreFile(SETTINGS_PREFERENCES_NAME) },
     )
 }
 

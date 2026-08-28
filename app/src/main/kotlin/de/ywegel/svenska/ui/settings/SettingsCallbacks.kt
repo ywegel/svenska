@@ -9,4 +9,5 @@ interface SettingsCallbacks {
     fun toggleOverviewShowCompactVocabularyItem(showCompactVocabularyItem: Boolean)
     fun updateUseNewQuiz(useNewQuiz: Boolean)
     fun onOnlineSearchTypeSelected(onlineSearchType: OnlineSearchType)
+    fun updateCrashReportingEnabled(enabled: Boolean)
 }

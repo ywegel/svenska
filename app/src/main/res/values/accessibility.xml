@@ -27,4 +27,9 @@
     <!-- # VocabularyDetailScreen # -->
     <string name="vocabulary_detail_remove_favorite">Remove from favorites</string>
     <string name="vocabulary_detail_add_favorite">Add to favorites</string>
+
+    <!-- # Settings # -->
+
+    <!-- ## Privacy Settings ## -->
+    <string name="settings_privacy_what_data_is_collected_expand_content_description">Expand data collection information</string>
 </resources>

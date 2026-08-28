@@ -4,6 +4,7 @@ import androidx.datastore.preferences.core.MutablePreferences
 import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.emptyPreferences
 import de.ywegel.svenska.data.preferences.PreferenceKey
+import de.ywegel.svenska.data.preferences.PreferenceStore
 import de.ywegel.svenska.data.preferences.UserPreferencesManager
 import de.ywegel.svenska.data.preferences.get
 import de.ywegel.svenska.data.preferences.set
@@ -28,6 +29,12 @@ class UserPreferencesManagerFake(
     override suspend fun <S, V> edit(key: PreferenceKey<S, V>, transform: (V) -> V) {
         prefs.update { current ->
             current.toMutablePreferences().apply { set(key, transform(current[key])) }
+        }
+    }
+
+    override suspend fun editTransaction(store: PreferenceStore, block: MutablePreferences.() -> Unit) {
+        prefs.update { current ->
+            current.toMutablePreferences().apply(block)
         }
     }
 }

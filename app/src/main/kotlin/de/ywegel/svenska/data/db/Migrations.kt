@@ -8,6 +8,7 @@ import de.ywegel.svenska.data.model.WordGroup
 
 private const val TAG = "Migrations"
 
+@Suppress("detekt:TooGenericExceptionCaught")
 val MIGRATION_1_2 = object : Migration(1, 2) {
     override fun migrate(db: SupportSQLiteDatabase) {
         Log.i(TAG, "migrate: Starting migration from 1 to 2...")
@@ -56,7 +57,7 @@ val MIGRATION_1_2 = object : Migration(1, 2) {
     }
 }
 
-@Suppress("detekt:MagicNumber", "detekt:NestedBlockDepth")
+@Suppress("detekt:MagicNumber", "detekt:NestedBlockDepth", "detekt:TooGenericExceptionCaught")
 val MIGRATION_2_3 = object : Migration(2, 3) {
     override fun migrate(db: SupportSQLiteDatabase) {
         Log.i(TAG, "migrate: Starting migration from 2 to 3...")

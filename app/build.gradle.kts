@@ -1,7 +1,6 @@
 import io.gitlab.arturbosch.detekt.Detekt
 import io.sentry.android.gradle.instrumentation.logcat.LogcatLevel
 import org.jlleitschuh.gradle.ktlint.reporter.ReporterType
-import java.io.FileInputStream
 import java.util.Properties
 
 plugins {
@@ -25,7 +24,9 @@ object LocalPropertiesManager {
     private fun getKey(project: Project, keyName: String): String? {
         try {
             val props = Properties().apply {
-                load(FileInputStream(project.rootProject.file("local.properties")))
+                project.rootProject.file("local.properties").inputStream().use {
+                    load(it)
+                }
             }
             return props.getProperty(keyName, null)
         } catch (e: Exception) {
@@ -40,7 +41,8 @@ object LocalPropertiesManager {
 
 // Resolved once at configuration time so the manifest placeholder (below) and the
 // release guard (bottom of this file) agree on the same value.
-val releaseSentryDsn: String? = LocalPropertiesManager.getSentryDsn(rootProject) ?: System.getenv("SENTRY_DSN")
+val releaseSentryDsn: String? = LocalPropertiesManager
+    .getSentryDsn(rootProject)?.takeIf { it.isNotBlank() } ?: System.getenv("SENTRY_DSN")
 
 android {
     namespace = "de.ywegel.svenska"
@@ -303,7 +305,7 @@ tasks.matching { it.name == "processReleaseManifest" }.configureEach {
     doFirst {
         check(!releaseSentryDsn.isNullOrBlank()) {
             "SENTRY_DSN is missing for the release build. Set 'sentryDsn' in local.properties or the " +
-                    "SENTRY_DSN environment variable before building a release artifact."
+                "SENTRY_DSN environment variable before building a release artifact."
         }
     }
 }

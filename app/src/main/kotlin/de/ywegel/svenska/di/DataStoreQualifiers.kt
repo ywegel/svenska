@@ -9,3 +9,7 @@ annotation class OverviewDataStore
 @Retention(AnnotationRetention.RUNTIME)
 @Qualifier
 annotation class AddEditDataStore
+
+@Retention(AnnotationRetention.RUNTIME)
+@Qualifier
+annotation class SettingsDataStore

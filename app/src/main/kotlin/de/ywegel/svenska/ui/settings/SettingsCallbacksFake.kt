@@ -8,4 +8,5 @@ object SettingsCallbacksFake : SettingsCallbacks {
     override fun toggleOverviewShowCompactVocabularyItem(showCompactVocabularyItem: Boolean) {}
     override fun onOnlineSearchTypeSelected(onlineSearchType: OnlineSearchType) {}
     override fun updateUseNewQuiz(useNewQuiz: Boolean) {}
+    override fun updateCrashReportingEnabled(enabled: Boolean) {}
 }

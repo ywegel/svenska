@@ -6,15 +6,19 @@ import android.content.Intent
 import androidx.activity.compose.LocalOnBackPressedDispatcherOwner
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
+import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.platform.LocalUriHandler
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
@@ -23,6 +27,7 @@ import com.ramcosta.composedestinations.annotation.Destination
 import com.ramcosta.composedestinations.annotation.parameters.DeepLink
 import com.ramcosta.composedestinations.generated.destinations.AboutLibrariesScreenDestination
 import com.ramcosta.composedestinations.generated.destinations.OnboardingScreenDestination
+import com.ramcosta.composedestinations.generated.destinations.PrivacySettingsScreenDestination
 import com.ramcosta.composedestinations.generated.destinations.SearchSettingsScreenDestination
 import com.ramcosta.composedestinations.generated.destinations.WordExtractorExplanationScreenDestination
 import com.ramcosta.composedestinations.generated.destinations.WordImporterScreenDestination
@@ -38,6 +43,7 @@ import de.ywegel.svenska.ui.common.SwitchWithText
 import de.ywegel.svenska.ui.common.TopAppTextBar
 import de.ywegel.svenska.ui.common.VerticalSpacerXS
 import de.ywegel.svenska.ui.common.VerticalSpacerXXS
+import de.ywegel.svenska.ui.common.rememberColumnScaffoldInsets
 import de.ywegel.svenska.ui.theme.Spacings
 import de.ywegel.svenska.ui.theme.SvenskaTheme
 
@@ -67,6 +73,7 @@ fun SettingsScreen(navigator: DestinationsNavigator, viewModel: SettingsViewMode
         navigateToAboutLibraries = { navigator.navigate(AboutLibrariesScreenDestination) },
         navigateToOnboarding = { navigator.navigate(OnboardingScreenDestination) },
         navigateToSearchSettings = { navigator.navigate(SearchSettingsScreenDestination) },
+        navigateToPrivacy = { navigator.navigate(PrivacySettingsScreenDestination) },
     )
 }
 
@@ -80,17 +87,28 @@ private fun SettingsScreen(
     navigateToAboutLibraries: () -> Unit,
     navigateToOnboarding: () -> Unit,
     navigateToSearchSettings: () -> Unit,
+    navigateToPrivacy: () -> Unit,
 ) {
+    val scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior()
+
     Scaffold(
         topBar = {
             TopAppTextBar(
                 title = stringResource(R.string.settings_title),
                 onNavigateUp = navigateUp,
                 navigationIcon = Icons.AutoMirrored.Default.ArrowBack,
+                scrollBehavior = scrollBehavior,
             )
         },
     ) { innerPadding ->
-        Column(Modifier.padding(innerPadding)) {
+        val paddings = rememberColumnScaffoldInsets(innerPadding)
+
+        Column(
+            Modifier
+                .padding(paddings)
+                .nestedScroll(scrollBehavior.nestedScrollConnection)
+                .verticalScroll(rememberScrollState()),
+        ) {
             SwitchWithText(
                 title = stringResource(R.string.settings_overview_compact_vocabulary_item_title),
                 description = stringResource(R.string.settings_overview_compact_vocabulary_item_description),
@@ -137,6 +155,14 @@ private fun SettingsScreen(
                 title = stringResource(R.string.settings_show_onboarding_title),
                 description = stringResource(R.string.settings_show_onboarding_description),
                 onClick = navigateToOnboarding,
+            )
+
+            VerticalSpacerXS()
+
+            ClickableText(
+                title = stringResource(R.string.settings_navigate_privacy_screen_title),
+                description = stringResource(R.string.settings_navigate_privacy_screen_description),
+                onClick = navigateToPrivacy,
             )
 
             VerticalSpacerXXS()
@@ -186,6 +212,7 @@ private fun SettingsScreenPreview() {
                 overviewShowCompactVocabularyItem = true,
                 appUseNewQuiz = true,
                 selectedOnlineSearchType = OnlineSearchType.Pons,
+                crashReportingEnabled = true,
             ),
             callbacks = SettingsCallbacksFake,
             navigateUp = {},
@@ -194,6 +221,7 @@ private fun SettingsScreenPreview() {
             navigateToAboutLibraries = {},
             navigateToOnboarding = {},
             navigateToSearchSettings = {},
+            navigateToPrivacy = {},
         )
     }
 }

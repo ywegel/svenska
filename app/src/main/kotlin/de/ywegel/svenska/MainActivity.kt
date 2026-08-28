@@ -16,7 +16,7 @@ import com.ramcosta.composedestinations.generated.destinations.OnboardingScreenD
 import com.ramcosta.composedestinations.spec.Direction
 import dagger.hilt.android.AndroidEntryPoint
 import de.ywegel.svenska.navigation.AppNavigation
-import de.ywegel.svenska.ui.sentryPrivacyPopUp.SentryPrivacyBottomSheet
+import de.ywegel.svenska.ui.privacy.PrivacyConsentSheet
 import de.ywegel.svenska.ui.theme.SvenskaTheme
 
 @AndroidEntryPoint
@@ -40,8 +40,8 @@ class MainActivity : ComponentActivity() {
 
             startRouteFor(state)?.let { startRoute ->
                 SvenskaTheme {
-                    if (shouldShowPrivacyPolicyBottomSheet(state)) {
-                        SentryPrivacyBottomSheet(onAccept = viewModel::onPrivacyPolicyAccepted)
+                    consentStepToShowFor(state)?.let { step ->
+                        PrivacyConsentSheet(step = step)
                     }
                     Surface(
                         modifier = Modifier.fillMaxSize(),
@@ -64,5 +64,12 @@ internal fun startRouteFor(state: MainUiState): Direction? = when (state) {
     }
 }
 
-internal fun shouldShowPrivacyPolicyBottomSheet(state: MainUiState): Boolean =
-    state is MainUiState.Ready && state.hasCompletedOnboarding && !state.isLatestPrivacyPolicyAccepted
+/**
+ * Onboarding takes precedence: a brand-new user finishes onboarding first, then sees the consent
+ * sheet. Returns null whenever the sheet should not be shown, e.g. while loading, during
+ * onboarding, or once the user has already made their crash-reporting decision.
+ */
+internal fun consentStepToShowFor(state: MainUiState): ConsentStep? {
+    if (state !is MainUiState.Ready || !state.hasCompletedOnboarding) return null
+    return state.consentStep.takeIf { it != ConsentStep.Done }
+}

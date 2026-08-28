@@ -85,7 +85,7 @@ fun ContainerScreen(navigator: DestinationsNavigator) {
     ContainerScreen(
         uiState = uiState,
         onContainerClick = {
-            navigator.navigate(OverviewScreenDestination(it.id, it.name))
+            navigator.navigate(OverviewScreenDestination(it.id))
         },
         toggleIsEditMode = viewModel::updateIsEditMode,
         onDeleteClick = viewModel::deleteContainer,

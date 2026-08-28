@@ -269,6 +269,8 @@
     <string name="settings_navigate_word_importer_screen_description">Import words from a file</string>
     <string name="settings_navigate_about_libraries_screen_title">Licenses</string>
     <string name="settings_navigate_privacy_policy_title">Privacy Policy</string>
+    <string name="settings_navigate_privacy_screen_title">Privacy</string>
+    <string name="settings_navigate_privacy_screen_description">Crash reporting and privacy policy</string>
     <string name="settings_app_version">App Version: %1$s</string>
     <string name="settings_github_repository">Open Source on GitHub</string>
     <string name="settings_github_repository_url">https://github.com/ywegel/svenska</string>
@@ -278,6 +280,18 @@
 
     <!-- ## About libraries ## -->
     <string name="settings_about_libraries_title">Licenses</string>
+
+    <!-- ## Privacy Settings ## -->
+    <string name="settings_privacy_title">Privacy</string>
+    <string name="settings_privacy_diagnostics_section">Diagnostics</string>
+    <string name="settings_crash_reporting_title">Send crash reports</string>
+    <string name="settings_crash_reporting_description">Technical error reports only. No personal data.</string>
+    <string name="settings_privacy_consent_enabled">Consent given %1$s. Turning this off stops all reporting immediately and doesn&#8217;t affect anything you&#8217;ve already used.</string>
+    <string name="settings_privacy_consent_disabled">Declined %1$s. Turning this on starts crash reporting immediately.</string>
+    <string name="settings_privacy_consent_undecided">You haven&#8217;t made a choice yet.</string>
+    <string name="settings_privacy_disclosure_policy_prefix">"For the exact list of what we collect, see the "</string>
+    <string name="settings_privacy_disclosure_policy_suffix">.</string>
+    <string name="settings_privacy_what_data_is_collected_title">What data is collected</string>
 
     <!-- ##  ## -->
     <string name="settings_search_online_redirect_title">Configure the url for the online search</string>
@@ -369,9 +383,20 @@
     <string name="vocabulary_detail_chip_endings">Endings: %1$s</string>
     <string name="vocabulary_detail_edit_btn">Edit</string>
 
-    <!-- # Sentry privacy pop up # -->
-    <string name="sentryPopUp_title">Privacy Policy Updated</string>
-    <string name="sentryPopUp_description">We now use Sentry to anonymously analyze crashes, errors, and technical logs. This helps us make the app more stable and reliable.</string>
-    <string name="sentryPopUp_link_text">Show full policy</string>
-    <string name="sentryPopUp_understood">Got it</string>
+    <!-- # Privacy consent sheet # -->
+    <string name="privacy_policy_title">Privacy policy update</string>
+    <string name="privacy_policy_body">We&#8217;ve updated our privacy policy. It now describes optional crash reporting, what is processed and how long it is kept.</string>
+    <string name="privacy_policy_link">Read the privacy policy</string>
+    <string name="privacy_policy_continue">Continue</string>
+    <string name="privacy_policy_footnote">Next: one question about crash reports.</string>
+
+    <string name="privacy_crash_title">Send crash reports?</string>
+    <string name="privacy_crash_body">This is optional. Svenska works exactly the same either way.</string>
+    <string name="privacy_crash_collected_title">If you allow it, we receive</string>
+    <string name="privacy_crash_collected_body">The error, screens and buttons used just before it, screen layout at that moment, sometimes load times, and your device model, Android and app version.</string>
+    <string name="privacy_crash_never_title">Never</string>
+    <string name="privacy_crash_never_body">Your name, email, IP address, device name or screenshots.</string>
+    <string name="privacy_crash_decline">No, thanks</string>
+    <string name="privacy_crash_accept">Yes, send reports</string>
+    <string name="privacy_crash_footnote">Change this any time in Settings > Privacy.</string>
 </resources>

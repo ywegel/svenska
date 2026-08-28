@@ -27,9 +27,10 @@ fun FixedModalBottomSheet(
     ModalBottomSheet(
         containerColor = containerColor,
         onDismissRequest = { /* Modal should not be hideable */ },
-        dragHandle = {},
+        dragHandle = null,
         properties = ModalBottomSheetProperties(shouldDismissOnBackPress = false), // Modal should not be hideable
         sheetState = rememberModalBottomSheetState(
+            skipPartiallyExpanded = true,
             confirmValueChange = {
                 // Modal should not be hideable
                 false
