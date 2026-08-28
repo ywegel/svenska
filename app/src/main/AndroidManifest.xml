@@ -5,16 +5,16 @@
     <application
         android:name=".Application"
         android:allowBackup="true"
+        android:enableOnBackInvokedCallback="true"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.App.Starting"
-        android:enableOnBackInvokedCallback="true"
-        tools:targetApi="31"
-        tools:ignore="UnusedAttribute">
+        tools:ignore="UnusedAttribute"
+        tools:targetApi="31">
 
-    <activity
+        <activity
             android:name=".MainActivity"
             android:exported="true"
             android:theme="@style/Theme.App.Starting"
@@ -39,29 +39,47 @@
                 <data android:scheme="file" />
             </intent-filter>
 
-        <!-- Deeplink to the settings, to link from the settings app to the svenska app settings -->
-        <intent-filter>
-            <action android:name="android.intent.action.APPLICATION_PREFERENCES" />
-            <category android:name="android.intent.category.DEFAULT" />
-        </intent-filter>
+            <!-- Deeplink to the settings, to link from the settings app to the svenska app settings -->
+            <intent-filter>
+                <action android:name="android.intent.action.APPLICATION_PREFERENCES" />
+                <category android:name="android.intent.category.DEFAULT" />
+            </intent-filter>
         </activity>
 
-    <!-- Required: set your sentry.io project identifier (DSN) -->
-    <meta-data android:name="io.sentry.dsn" android:value="${sentryDsn}" />
-    <!-- Add data like request headers, user ip address and device name, see https://docs.sentry.io/platforms/android/data-management/data-collected/ for more info -->
-    <meta-data android:name="io.sentry.send-default-pii" android:value="false" />
+        <!-- Sentry: project identifier (DSN) -->
+        <meta-data
+            android:name="io.sentry.dsn"
+            android:value="${sentryDsn}" />
 
-    <!-- enable automatic breadcrumbs for user interactions (clicks, swipes, scrolls) -->
-    <meta-data android:name="io.sentry.traces.user-interaction.enable" android:value="true" />
-    <!-- enable screenshot for crashes (could contain sensitive/PII data) -->
-    <meta-data android:name="io.sentry.attach-screenshot" android:value="true" />
-    <!-- enable view hierarchy for crashes -->
-    <meta-data android:name="io.sentry.attach-view-hierarchy" android:value="true" />
+        <!-- Sentry: We don't want to collect sensitive data, like request headers, user ip address and device name, see https://docs.sentry.io/platforms/android/data-management/data-collected/ for more info -->
+        <meta-data
+            android:name="io.sentry.send-default-pii"
+            android:value="false" />
 
-    <!-- enable the performance API by setting a sample-rate, adjust in production env -->
-    <meta-data android:name="io.sentry.traces.sample-rate" android:value="1.0" />
-    <!-- enable Sentry Logs -->
-    <meta-data android:name="io.sentry.logs.enabled" android:value="true" />
-</application>
+        <!-- Sentry: enable automatic User Interaction Instrumentation -->
+        <meta-data
+            android:name="io.sentry.traces.user-interaction.enable"
+            android:value="true" />
+
+        <!-- Sentry: disable screenshot for crashes (could contain sensitive/PII data) -->
+        <meta-data
+            android:name="io.sentry.attach-screenshot"
+            android:value="false" />
+
+        <!-- Sentry: enable view hierarchy for crashes -->
+        <meta-data
+            android:name="io.sentry.attach-view-hierarchy"
+            android:value="true" />
+
+        <!-- Sentry: enable the performance API by setting a sample-rate-->
+        <meta-data
+            android:name="io.sentry.traces.sample-rate"
+            android:value="0.08" />
+
+        <!-- Sentry: error sampling; 1 means that all errors are collected -->
+        <meta-data
+            android:name="io.sentry.sample-rate"
+            android:value="1.00" />
+    </application>
 
 </manifest>

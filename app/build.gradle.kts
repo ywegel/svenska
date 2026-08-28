@@ -1,4 +1,5 @@
 import io.gitlab.arturbosch.detekt.Detekt
+import io.sentry.android.gradle.instrumentation.logcat.LogcatLevel
 import org.jlleitschuh.gradle.ktlint.reporter.ReporterType
 import java.io.FileInputStream
 import java.util.Properties
@@ -285,6 +286,13 @@ sentry {
     autoUploadProguardMapping = true
     autoUploadNativeSymbols = true
     autoUploadSourceContext = true
+
+    tracingInstrumentation {
+        logcat {
+            enabled = true
+            minLevel = LogcatLevel.INFO
+        }
+    }
 }
 
 // Fail loudly if a release artifact gets built without a Sentry DSN, e.g. because a CI secret was
@@ -295,7 +303,7 @@ tasks.matching { it.name == "processReleaseManifest" }.configureEach {
     doFirst {
         check(!releaseSentryDsn.isNullOrBlank()) {
             "SENTRY_DSN is missing for the release build. Set 'sentryDsn' in local.properties or the " +
-                "SENTRY_DSN environment variable before building a release artifact."
+                    "SENTRY_DSN environment variable before building a release artifact."
         }
     }
 }
