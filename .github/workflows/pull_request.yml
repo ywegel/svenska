@@ -10,7 +10,7 @@ concurrency:
   cancel-in-progress: true
 
 env:
-  SENTRY_DSN: ""
+  SENTRY_DSN: ${{ secrets.SENTRY_DSN }}
 
 jobs:
   ktlint:

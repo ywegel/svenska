@@ -22,7 +22,7 @@ on:
   workflow_dispatch:
 
 env:
-  SENTRY_DSN: ""
+  SENTRY_DSN: ${{ secrets.SENTRY_DSN }}
 
 jobs:
   analyze:

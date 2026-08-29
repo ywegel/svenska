@@ -8,6 +8,9 @@ on:
 permissions:
   contents: write
 
+env:
+  SENTRY_DSN: ${{ secrets.SENTRY_DSN }}
+
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -31,6 +34,7 @@ jobs:
           KEY_ALIAS: ${{ secrets.KEY_ALIAS }}
           KEY_PASSWORD: ${{ secrets.KEY_PASSWORD }}
           SENTRY_DSN: ${{ secrets.SENTRY_DSN }}
+          SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }}
         run: |
           ./gradlew assembleRelease
           ./gradlew bundleRelease
