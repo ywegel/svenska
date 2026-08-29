@@ -5,6 +5,7 @@ import androidx.room.migration.Migration
 import androidx.sqlite.db.SupportSQLiteDatabase
 import de.ywegel.svenska.data.model.Gender
 import de.ywegel.svenska.data.model.WordGroup
+import io.sentry.Sentry
 
 private const val TAG = "Migrations"
 
@@ -50,10 +51,14 @@ val MIGRATION_1_2 = object : Migration(1, 2) {
             cursor.close()
             statement.close()
             db.setTransactionSuccessful()
+        } catch (t: Throwable) {
+            Sentry.captureException(t)
+            Log.e(TAG, "migrate: Migration from 1 to 2 failed", t)
+            throw t
         } finally {
             db.endTransaction()
-            Log.i(TAG, "migrate: Migration from 1 to 2 finished")
         }
+        Log.i(TAG, "migrate: Migration from 1 to 2 finished successfully")
     }
 }
 
@@ -111,10 +116,14 @@ val MIGRATION_2_3 = object : Migration(2, 3) {
                 Log.i(TAG, "migrate: All dashes are already normalized")
             }
             db.setTransactionSuccessful()
+        } catch (t: Throwable) {
+            Sentry.captureException(t)
+            Log.e(TAG, "migrate: Migration from 2 to 3 failed", t)
+            throw t
         } finally {
             db.endTransaction()
-            Log.i(TAG, "migrate: Migration from 2 to 3 finished")
         }
+        Log.i(TAG, "migrate: Migration from 2 to 3 finished")
     }
 }
 

@@ -8,6 +8,7 @@ import androidx.datastore.preferences.core.emptyPreferences
 import androidx.datastore.preferences.core.intPreferencesKey
 import androidx.datastore.preferences.core.stringPreferencesKey
 import de.ywegel.svenska.jsonConfig
+import io.sentry.Sentry
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.catch
 import kotlinx.serialization.KSerializer
@@ -95,6 +96,7 @@ operator fun <S, V> MutablePreferences.set(key: PreferenceKey<S, V>, value: V) {
 fun Flow<Preferences>.fallbackToDefaultOnError(): Flow<Preferences> {
     return this.catch { exception ->
         if (exception is IOException) {
+            Sentry.captureException(exception)
             Log.e(TAG, "Error reading preferences", exception)
             emit(emptyPreferences())
         } else {
