@@ -2,8 +2,11 @@ package de.ywegel.svenska.ui.privacy
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
@@ -40,26 +43,34 @@ fun PrivacyCrashReportingStep(onDecision: (enabled: Boolean) -> Unit, modifier: 
         PrivacyDisclosureCard(modifier = Modifier.fillMaxWidth())
         VerticalSpacerXXL()
         Row(
-            modifier = Modifier.fillMaxWidth(),
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(IntrinsicSize.Min),
             horizontalArrangement = Arrangement.spacedBy(Spacings.xs),
         ) {
             OutlinedButton(
                 onClick = { onDecision(false) },
-                modifier = Modifier.weight(1f),
+                modifier = Modifier
+                    .weight(1f)
+                    .fillMaxHeight(),
             ) {
                 Text(
                     text = stringResource(R.string.privacy_crash_decline),
-                    maxLines = 1,
+                    textAlign = TextAlign.Center,
+                    maxLines = 2,
                     overflow = TextOverflow.Ellipsis,
                 )
             }
             Button(
                 onClick = { onDecision(true) },
-                modifier = Modifier.weight(1f),
+                modifier = Modifier
+                    .weight(1f)
+                    .fillMaxHeight(),
             ) {
                 Text(
                     text = stringResource(R.string.privacy_crash_accept),
-                    maxLines = 1,
+                    textAlign = TextAlign.Center,
+                    maxLines = 2,
                     overflow = TextOverflow.Ellipsis,
                 )
             }
