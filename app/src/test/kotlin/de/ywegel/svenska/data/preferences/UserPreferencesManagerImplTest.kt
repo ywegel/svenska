@@ -62,11 +62,17 @@ class UserPreferencesManagerImplTest {
         produceFile = { tmp.resolve("add_edit.preferences_pb") },
     )
 
+    private fun settingsStore(scope: TestScope): DataStore<Preferences> = PreferenceDataStoreFactory.create(
+        scope = scope,
+        produceFile = { tmp.resolve("settings.preferences_pb") },
+    )
+
     private fun manager(
         scope: TestScope,
         overview: DataStore<Preferences> = overviewStore(scope),
         addEdit: DataStore<Preferences> = addEditStore(scope),
-    ) = UserPreferencesManagerImpl(overview = overview, addEdit = addEdit)
+        settings: DataStore<Preferences> = settingsStore(scope),
+    ) = UserPreferencesManagerImpl(overview = overview, addEdit = addEdit, settings = settings)
 
     @Test
     fun `every key returns its declared default on an empty store`() = runTest(testDispatcher) {
@@ -142,7 +148,7 @@ class UserPreferencesManagerImplTest {
     fun `OnlineSearchType is persisted under its exact JSON format`() = runTest(testDispatcher) {
         // Given
         val overview = overviewStore(this)
-        val subject = UserPreferencesManagerImpl(overview = overview, addEdit = addEditStore(this))
+        val subject = manager(this, overview = overview)
         val rawKey = stringPreferencesKey("search_online_redirect_type")
 
         // When
@@ -157,7 +163,7 @@ class UserPreferencesManagerImplTest {
     fun `last searched items are persisted under their exact JSON format`() = runTest(testDispatcher) {
         // Given
         val overview = overviewStore(this)
-        val subject = UserPreferencesManagerImpl(overview = overview, addEdit = addEditStore(this))
+        val subject = manager(this, overview = overview)
         val rawKey = stringPreferencesKey("search_sort_last_searched_items")
 
         // When
@@ -173,7 +179,7 @@ class UserPreferencesManagerImplTest {
         // Given
         val overview = overviewStore(this)
         val addEdit = addEditStore(this)
-        val subject = UserPreferencesManagerImpl(overview = overview, addEdit = addEdit)
+        val subject = manager(this, overview = overview, addEdit = addEdit)
         val rawKey = booleanPreferencesKey("add_edit_annotation_information_hidden")
 
         // When
@@ -189,7 +195,7 @@ class UserPreferencesManagerImplTest {
     fun `a garbage persisted enum value falls back to the default instead of throwing`() = runTest(testDispatcher) {
         // Given
         val overview = overviewStore(this)
-        val subject = UserPreferencesManagerImpl(overview = overview, addEdit = addEditStore(this))
+        val subject = manager(this, overview = overview)
         val rawKey = stringPreferencesKey("overview_sort_order")
 
         // When

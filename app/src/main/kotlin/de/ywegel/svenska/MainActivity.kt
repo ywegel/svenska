@@ -16,6 +16,7 @@ import com.ramcosta.composedestinations.generated.destinations.OnboardingScreenD
 import com.ramcosta.composedestinations.spec.Direction
 import dagger.hilt.android.AndroidEntryPoint
 import de.ywegel.svenska.navigation.AppNavigation
+import de.ywegel.svenska.ui.privacy.PrivacyConsentSheet
 import de.ywegel.svenska.ui.theme.SvenskaTheme
 
 @AndroidEntryPoint
@@ -28,17 +29,20 @@ class MainActivity : ComponentActivity() {
 
         installSplashScreen().apply {
             setKeepOnScreenCondition {
-                viewModel.onboardingState.value is OnboardingState.Loading
+                viewModel.mainUiState.value is MainUiState.Loading
             }
         }
 
         enableEdgeToEdge()
 
         setContent {
-            val onboardingState by viewModel.onboardingState.collectAsStateWithLifecycle()
+            val state by viewModel.mainUiState.collectAsStateWithLifecycle()
 
-            startRouteFor(onboardingState)?.let { startRoute ->
+            startRouteFor(state)?.let { startRoute ->
                 SvenskaTheme {
+                    consentStepToShowFor(state)?.let { step ->
+                        PrivacyConsentSheet(step = step)
+                    }
                     Surface(
                         modifier = Modifier.fillMaxSize(),
                         color = SvenskaTheme.colors.background,
@@ -51,8 +55,21 @@ class MainActivity : ComponentActivity() {
     }
 }
 
-internal fun startRouteFor(onboardingState: OnboardingState): Direction? = when (onboardingState) {
-    OnboardingState.Loading -> null
-    OnboardingState.NotCompleted -> OnboardingScreenDestination
-    OnboardingState.Completed -> ContainerScreenDestination
+internal fun startRouteFor(state: MainUiState): Direction? = when (state) {
+    MainUiState.Loading -> null
+    is MainUiState.Ready -> if (state.hasCompletedOnboarding) {
+        ContainerScreenDestination
+    } else {
+        OnboardingScreenDestination
+    }
+}
+
+/**
+ * Onboarding takes precedence: a brand-new user finishes onboarding first, then sees the consent
+ * sheet. Returns null whenever the sheet should not be shown, e.g. while loading, during
+ * onboarding, or once the user has already made their crash-reporting decision.
+ */
+internal fun consentStepToShowFor(state: MainUiState): ConsentStep? {
+    if (state !is MainUiState.Ready || !state.hasCompletedOnboarding) return null
+    return state.consentStep.takeIf { it != ConsentStep.Done }
 }

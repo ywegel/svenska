@@ -8,6 +8,8 @@ import de.ywegel.svenska.domain.quiz.QuizManager
 import de.ywegel.svenska.domain.quiz.QuizStrategy
 import de.ywegel.svenska.domain.quiz.model.QuizQuestion
 import de.ywegel.svenska.domain.quiz.model.UserAnswer
+import io.sentry.Sentry
+import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -117,7 +119,10 @@ abstract class BaseQuizViewModel<A : UserAnswer, S : QuizInputState<A>, AC : Any
         viewModelScope.launch(ioDispatcher) {
             try {
                 block()
+            } catch (e: CancellationException) {
+                throw e
             } catch (e: Exception) {
+                Sentry.captureException(e)
                 _uiState.value = QuizUiState.Error(e) {
                     launchSafely(block)
                 }

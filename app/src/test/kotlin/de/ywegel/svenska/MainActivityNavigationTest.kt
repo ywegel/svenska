@@ -4,8 +4,6 @@ package de.ywegel.svenska
 
 import com.ramcosta.composedestinations.generated.destinations.ContainerScreenDestination
 import com.ramcosta.composedestinations.generated.destinations.OnboardingScreenDestination
-import de.ywegel.svenska.data.preferences.keys.OnboardingPreferenceKeys
-import de.ywegel.svenska.data.preferences.set
 import de.ywegel.svenska.fakes.UserPreferencesManagerFake
 import de.ywegel.svenska.ui.onboarding.OnboardingViewModel
 import kotlinx.coroutines.Dispatchers
@@ -20,6 +18,7 @@ import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import strikt.api.expectThat
 import strikt.assertions.isEqualTo
+import strikt.assertions.isNull
 
 class MainActivityNavigationTest {
 
@@ -36,31 +35,25 @@ class MainActivityNavigationTest {
     }
 
     @Test
-    fun `app navigates to OnboardingScreen when onboarding is not completed`() = runTest(testDispatcher) {
-        // Given
-        val preferencesManager = UserPreferencesManagerFake()
-        val viewModel = MainViewModel(preferencesManager)
-        advanceUntilIdle() // Allow preferences to load
-
-        // When
-        val startRoute = startRouteFor(viewModel.onboardingState.value)
-
-        // Then
-        expectThat(startRoute).isEqualTo(OnboardingScreenDestination)
+    fun `app navigates nowhere while loading`() {
+        expectThat(startRouteFor(MainUiState.Loading)).isNull()
     }
 
     @Test
-    fun `app navigates to ContainerScreen when onboarding is completed`() = runTest(testDispatcher) {
-        // Given
-        val preferencesManager = UserPreferencesManagerFake { set(OnboardingPreferenceKeys.HasCompleted, true) }
-        val viewModel = MainViewModel(preferencesManager)
-        advanceUntilIdle() // Allow preferences to load
+    fun `app navigates to OnboardingScreen when onboarding is not completed`() {
+        val destination =
+            startRouteFor(MainUiState.Ready(hasCompletedOnboarding = false, consentStep = ConsentStep.Policy))
+        expectThat(destination)
+            .isEqualTo(OnboardingScreenDestination)
+    }
 
-        // When
-        val startRoute = startRouteFor(viewModel.onboardingState.value)
-
-        // Then
-        expectThat(startRoute).isEqualTo(ContainerScreenDestination)
+    @Test
+    fun `app navigates to ContainerScreen when onboarding is completed`() {
+        // We navigate, even if consents are not given. They are shown in the modal overlapping the ContainerScreen
+        val destination =
+            startRouteFor(MainUiState.Ready(hasCompletedOnboarding = true, consentStep = ConsentStep.Policy))
+        expectThat(destination)
+            .isEqualTo(ContainerScreenDestination)
     }
 
     @Test
@@ -69,15 +62,17 @@ class MainActivityNavigationTest {
         val preferencesManager = UserPreferencesManagerFake()
         val mainViewModel = MainViewModel(preferencesManager)
         val onboardingViewModel = OnboardingViewModel(preferencesManager, testDispatcher)
-        advanceUntilIdle() // Allow preferences to load
+        advanceUntilIdle()
 
-        // When - simulate completing onboarding
+        // When
         onboardingViewModel.completeOnboarding()
-        advanceUntilIdle() // Allow preferences to update
+        advanceUntilIdle()
 
         // Then
-        expectThat(mainViewModel.onboardingState.value).isEqualTo(OnboardingState.Completed)
-        expectThat(startRouteFor(mainViewModel.onboardingState.value))
+        expectThat(mainViewModel.mainUiState.value).isEqualTo(
+            MainUiState.Ready(hasCompletedOnboarding = true, consentStep = ConsentStep.Policy),
+        )
+        expectThat(startRouteFor(mainViewModel.mainUiState.value))
             .isEqualTo(ContainerScreenDestination)
     }
 }

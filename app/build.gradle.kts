@@ -1,5 +1,7 @@
 import io.gitlab.arturbosch.detekt.Detekt
+import io.sentry.android.gradle.instrumentation.logcat.LogcatLevel
 import org.jlleitschuh.gradle.ktlint.reporter.ReporterType
+import java.util.Properties
 
 plugins {
     alias(libs.plugins.com.android.application)
@@ -14,8 +16,33 @@ plugins {
     alias(libs.plugins.detekt)
     alias(libs.plugins.room)
     alias(libs.plugins.kotlinx.kover)
+    alias(libs.plugins.sentry.io)
     id("kotlin-parcelize")
 }
+
+object LocalPropertiesManager {
+    private fun getKey(project: Project, keyName: String): String? {
+        try {
+            val props = Properties().apply {
+                project.rootProject.file("local.properties").inputStream().use {
+                    load(it)
+                }
+            }
+            return props.getProperty(keyName, null)
+        } catch (e: Exception) {
+            return null
+        }
+    }
+
+    fun getSentryDsn(project: Project): String? {
+        return getKey(project, "sentryDsn")
+    }
+}
+
+// Resolved once at configuration time so the manifest placeholder (below) and the
+// release guard (bottom of this file) agree on the same value.
+val releaseSentryDsn: String? = LocalPropertiesManager
+    .getSentryDsn(rootProject)?.takeIf { it.isNotBlank() } ?: System.getenv("SENTRY_DSN")
 
 android {
     namespace = "de.ywegel.svenska"
@@ -47,6 +74,7 @@ android {
         debug {
             applicationIdSuffix = ".debug"
             versionNameSuffix = "-debug"
+            manifestPlaceholders["sentryDsn"] = ""
         }
         release {
             signingConfig = signingConfigs.getByName("release")
@@ -55,6 +83,10 @@ android {
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro",
             )
+            // Empty is a safe default here: this only feeds the manifest placeholder, evaluated for every
+            // build type on every sync. A missing DSN is caught for real by the guard at the bottom of this
+            // file, which only runs when a release artifact is actually assembled.
+            manifestPlaceholders["sentryDsn"] = releaseSentryDsn ?: ""
         }
         create("beta") {
             applicationIdSuffix = ".beta"
@@ -68,6 +100,7 @@ android {
                 "proguard-rules.pro",
             )
             signingConfig = signingConfigs.getByName("debug")
+            manifestPlaceholders["sentryDsn"] = ""
         }
     }
     sourceSets {
@@ -239,6 +272,40 @@ kover {
                     "*_HiltModules*",
                 )
             }
+        }
+    }
+}
+
+sentry {
+    org.set("ywegel")
+    projectName.set("svenska")
+    ignoredBuildTypes.set(listOf("debug"))
+
+    includeSourceContext = true
+    includeNativeSources = true
+    includeProguardMapping = true
+    uploadNativeSymbols = true
+    autoUploadProguardMapping = true
+    autoUploadNativeSymbols = true
+    autoUploadSourceContext = true
+
+    tracingInstrumentation {
+        logcat {
+            enabled = true
+            minLevel = LogcatLevel.INFO
+        }
+    }
+}
+
+// Fail loudly if a release artifact gets built without a Sentry DSN, e.g. because a CI secret was
+// renamed or dropped. Hooked into manifest processing specifically (not assembleRelease/bundleRelease)
+// so it fails before compilation/signing/packaging do any work, and never affects sync or the
+// debug/beta variants.
+tasks.matching { it.name == "processReleaseManifest" }.configureEach {
+    doFirst {
+        check(!releaseSentryDsn.isNullOrBlank()) {
+            "SENTRY_DSN is missing for the release build. Set 'sentryDsn' in local.properties or the " +
+                "SENTRY_DSN environment variable before building a release artifact."
         }
     }
 }

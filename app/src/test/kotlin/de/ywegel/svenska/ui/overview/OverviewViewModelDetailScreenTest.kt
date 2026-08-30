@@ -4,7 +4,7 @@ package de.ywegel.svenska.ui.overview
 
 import androidx.lifecycle.SavedStateHandle
 import app.cash.turbine.test
-import de.ywegel.svenska.data.VocabularyRepository
+import de.ywegel.svenska.data.ContainerRepository
 import de.ywegel.svenska.data.model.vocabulary
 import de.ywegel.svenska.data.preferences.UserPreferencesManager
 import de.ywegel.svenska.domain.ToggleVocabularyFavoriteUseCase
@@ -103,21 +103,22 @@ class OverviewViewModelDetailScreenTest {
     }
 
     private fun setupViewModel(
-        repository: VocabularyRepository = VocabularyRepositoryFake(),
+        vocabularyRepository: VocabularyRepositoryFake = VocabularyRepositoryFake(),
+        containerRepository: ContainerRepository = vocabularyRepository,
         savedState: SavedStateHandle = SavedStateHandle(
             initialState = mapOf(
                 "containerId" to 1,
-                "containerName" to "name",
             ),
         ),
         dispatcher: CoroutineDispatcher = testDispatcher,
     ): OverviewViewModel {
         return OverviewViewModel(
             savedStateHandle = savedState,
-            repository = repository,
+            vocabularyRepository = vocabularyRepository,
+            containerRepository = containerRepository,
             userPreferencesManager = userPreferencesManager,
             ioDispatcher = dispatcher,
-            toggleVocabularyFavoriteUseCase = ToggleVocabularyFavoriteUseCase(repository, testDispatcher),
+            toggleVocabularyFavoriteUseCase = ToggleVocabularyFavoriteUseCase(vocabularyRepository, testDispatcher),
         )
     }
 }

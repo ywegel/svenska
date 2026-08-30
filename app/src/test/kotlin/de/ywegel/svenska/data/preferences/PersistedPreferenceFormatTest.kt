@@ -5,6 +5,7 @@ import de.ywegel.svenska.data.preferences.keys.AddEditPreferenceKeys
 import de.ywegel.svenska.data.preferences.keys.AppPreferenceKeys
 import de.ywegel.svenska.data.preferences.keys.OnboardingPreferenceKeys
 import de.ywegel.svenska.data.preferences.keys.OverviewPreferenceKeys
+import de.ywegel.svenska.data.preferences.keys.PrivacyPreferenceKeys
 import de.ywegel.svenska.data.preferences.keys.SearchPreferenceKeys
 import org.junit.jupiter.api.Test
 import strikt.api.expectThat
@@ -37,6 +38,9 @@ class PersistedPreferenceFormatTest {
         "OnboardingPreferenceKeys.HasCompleted" to "Overview/app_has_completed_onboarding",
         "AppPreferenceKeys.UseNewQuiz" to "Overview/app_uses_new_quiz",
         "AddEditPreferenceKeys.AnnotationInformationHidden" to "AddEdit/add_edit_annotation_information_hidden",
+        "PrivacyPreferenceKeys.AcknowledgedPolicyVersion" to "Settings/privacy_acknowledged_policy_version",
+        "PrivacyPreferenceKeys.CrashReportingEnabled" to "Settings/privacy_crash_reporting_enabled",
+        "PrivacyPreferenceKeys.ConsentDecisionTimestamp" to "Settings/privacy_consent_decision_timestamp",
     )
 
     private val coveredEnumPreferences = setOf("OverviewPreferenceKeys.SortOrder")
@@ -99,6 +103,7 @@ class PersistedPreferenceFormatTest {
         AppPreferenceKeys,
         AddEditPreferenceKeys,
         OnboardingPreferenceKeys,
+        PrivacyPreferenceKeys,
     ).flatMap { holder ->
         holder::class.java.declaredFields
             .filter { PreferenceKey::class.java.isAssignableFrom(it.type) }

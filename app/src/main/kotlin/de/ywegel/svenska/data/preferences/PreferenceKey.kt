@@ -5,8 +5,10 @@ import androidx.datastore.preferences.core.MutablePreferences
 import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.booleanPreferencesKey
 import androidx.datastore.preferences.core.emptyPreferences
+import androidx.datastore.preferences.core.intPreferencesKey
 import androidx.datastore.preferences.core.stringPreferencesKey
 import de.ywegel.svenska.jsonConfig
+import io.sentry.Sentry
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.catch
 import kotlinx.serialization.KSerializer
@@ -14,7 +16,7 @@ import java.io.IOException
 
 private const val TAG = "UserPreferencesManager"
 
-enum class PreferenceStore { Overview, AddEdit }
+enum class PreferenceStore { Overview, AddEdit, Settings }
 
 /**
  * Describes a single preference: where it is stored, how it is persisted ([S]) and how it is
@@ -36,6 +38,14 @@ fun booleanPreference(store: PreferenceStore, name: String, default: Boolean): P
         decode = { it },
         encode = { it },
     )
+
+fun intPreference(store: PreferenceStore, name: String, default: Int): PreferenceKey<Int, Int> = PreferenceKey(
+    store = store,
+    key = intPreferencesKey(name),
+    default = default,
+    decode = { it },
+    encode = { it },
+)
 
 fun stringPreference(store: PreferenceStore, name: String, default: String): PreferenceKey<String, String> =
     PreferenceKey(
@@ -86,6 +96,7 @@ operator fun <S, V> MutablePreferences.set(key: PreferenceKey<S, V>, value: V) {
 fun Flow<Preferences>.fallbackToDefaultOnError(): Flow<Preferences> {
     return this.catch { exception ->
         if (exception is IOException) {
+            Sentry.captureException(exception)
             Log.e(TAG, "Error reading preferences", exception)
             emit(emptyPreferences())
         } else {

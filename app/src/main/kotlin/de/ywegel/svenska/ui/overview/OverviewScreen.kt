@@ -65,14 +65,13 @@ import kotlinx.coroutines.delay
 
 @Destination<SvenskaGraph>(navArgs = OverviewNavArgs::class)
 @Composable
-fun OverviewScreen(navigator: DestinationsNavigator, navArgs: OverviewNavArgs) {
+fun OverviewScreen(navigator: DestinationsNavigator) {
     val viewModel: OverviewViewModel = hiltViewModel()
 
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
 
     OverviewScreen(
         uiState = uiState,
-        containerName = navArgs.containerName,
         navigateToAdd = { navigator.navigate(AddVocabularyScreenDestination(viewModel.containerId)) },
         onQuizClick = {
             val destination = if (uiState.useNewQuiz) {
@@ -100,7 +99,6 @@ fun OverviewScreen(navigator: DestinationsNavigator, navArgs: OverviewNavArgs) {
 @Composable
 private fun OverviewScreen(
     uiState: OverviewUiState,
-    containerName: String,
     navigateToAdd: () -> Unit,
     onQuizClick: () -> Unit,
     navigateToSearch: () -> Unit,
@@ -114,7 +112,7 @@ private fun OverviewScreen(
     Scaffold(
         topBar = {
             TopAppTextBar(
-                title = containerName,
+                title = uiState.containerName,
                 onNavigateUp = navigateUp,
                 navigationIcon = Icons.AutoMirrored.Default.ArrowBack,
                 scrollBehavior = scrollBehavior,
@@ -165,7 +163,6 @@ private fun OverviewScreen(
 
 data class OverviewNavArgs(
     val containerId: Int,
-    val containerName: String,
 )
 
 @Composable
@@ -231,8 +228,7 @@ private const val ANIMATION_DURATION_MS = 800
 private fun OverviewPreview() {
     SvenskaTheme {
         OverviewScreen(
-            uiState = OverviewUiState(vocabulary = vocabularies()),
-            containerName = "Test container",
+            uiState = OverviewUiState(vocabulary = vocabularies(), containerName = "Test container"),
             navigateToAdd = {},
             onQuizClick = {},
             navigateToEdit = {},

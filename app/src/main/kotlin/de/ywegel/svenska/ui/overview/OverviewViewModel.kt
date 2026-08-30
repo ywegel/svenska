@@ -5,6 +5,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.ramcosta.composedestinations.generated.navArgs
 import dagger.hilt.android.lifecycle.HiltViewModel
+import de.ywegel.svenska.data.ContainerRepository
 import de.ywegel.svenska.data.VocabularyRepository
 import de.ywegel.svenska.data.model.SortOrder
 import de.ywegel.svenska.data.model.Vocabulary
@@ -31,7 +32,8 @@ import javax.inject.Inject
 @HiltViewModel
 class OverviewViewModel @Inject constructor(
     savedStateHandle: SavedStateHandle,
-    private val repository: VocabularyRepository,
+    private val vocabularyRepository: VocabularyRepository,
+    private val containerRepository: ContainerRepository,
     private val toggleVocabularyFavoriteUseCase: ToggleVocabularyFavoriteUseCase,
     private val userPreferencesManager: UserPreferencesManager,
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
@@ -51,6 +53,12 @@ class OverviewViewModel @Inject constructor(
     init {
         observeVocabularyState()
         observerPreferencesState()
+        loadContainerName()
+    }
+
+    private fun loadContainerName() = viewModelScope.launch {
+        val name = containerRepository.getContainerById(containerId)?.name.orEmpty()
+        _uiState.update { it.copy(containerName = name) }
     }
 
 //    @OptIn(ExperimentalCoroutinesApi::class)
@@ -90,7 +98,7 @@ class OverviewViewModel @Inject constructor(
                 }
             }
             .flatMapLatest { (sortOrder, revert) ->
-                repository.getVocabularies(
+                vocabularyRepository.getVocabularies(
                     containerId = containerId,
                     sortOrder = sortOrder,
                     reverse = revert,
@@ -158,6 +166,7 @@ class OverviewViewModel @Inject constructor(
 
 data class OverviewUiState(
     val vocabulary: List<Vocabulary> = emptyList(),
+    val containerName: String = "...",
     val isLoading: Boolean = true,
     val sortOrder: SortOrder = SortOrder.default,
     val isReverseSort: Boolean = false,

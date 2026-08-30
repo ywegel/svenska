@@ -8,6 +8,9 @@ on:
 permissions:
   contents: write
 
+env:
+  SENTRY_DSN: ${{ secrets.SENTRY_DSN }}
+
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -30,6 +33,8 @@ jobs:
           KEYSTORE_PASSWORD: ${{ secrets.KEYSTORE_PASSWORD }}
           KEY_ALIAS: ${{ secrets.KEY_ALIAS }}
           KEY_PASSWORD: ${{ secrets.KEY_PASSWORD }}
+          SENTRY_DSN: ${{ secrets.SENTRY_DSN }}
+          SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }}
         run: |
           ./gradlew assembleRelease
           ./gradlew bundleRelease
@@ -44,6 +49,28 @@ jobs:
           release_name: Release ${{ github.ref }}
           draft: false
           prerelease: false
+
+      - name: Compute Sentry release name
+        id: sentry_release
+        run: |
+          NAME=$(grep '^app-version-name' gradle/libs.versions.toml | sed 's/.*"\(.*\)".*/\1/')
+          CODE=$(grep '^app-version-code' gradle/libs.versions.toml | sed 's/.*"\(.*\)".*/\1/')
+          echo "release=de.ywegel.svenska@${NAME}+${CODE}" >> "$GITHUB_OUTPUT"
+          echo "dist=${CODE}" >> "$GITHUB_OUTPUT"
+
+      - name: Create Sentry release
+        uses: getsentry/action-release@v3
+        env:
+          SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }}
+          SENTRY_ORG: ${{ secrets.SENTRY_ORG }}
+          SENTRY_PROJECT: ${{ secrets.SENTRY_PROJECT }}
+        with:
+          environment: production
+          version: ${{ steps.sentry_release.outputs.release }}
+          dist: ${{ steps.sentry_release.outputs.dist }}
+          set_commits: auto
+          finalize: true
+
 
       - name: Upload APK
         uses: actions/upload-release-asset@v1
