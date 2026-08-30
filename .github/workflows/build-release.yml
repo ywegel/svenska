@@ -72,6 +72,7 @@ jobs:
           dist: ${{ steps.sentry_release.outputs.dist }}
           set_commits: auto
           finalize: true
+          ignore_missing: true
 
 
       - name: Upload APK
