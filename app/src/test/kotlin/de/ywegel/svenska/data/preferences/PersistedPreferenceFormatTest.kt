@@ -41,6 +41,7 @@ class PersistedPreferenceFormatTest {
         "PrivacyPreferenceKeys.AcknowledgedPolicyVersion" to "Settings/privacy_acknowledged_policy_version",
         "PrivacyPreferenceKeys.CrashReportingEnabled" to "Settings/privacy_crash_reporting_enabled",
         "PrivacyPreferenceKeys.ConsentDecisionTimestamp" to "Settings/privacy_consent_decision_timestamp",
+        "PrivacyPreferenceKeys.CrashReportingId" to "Settings/privacy_crash_reporting_id",
     )
 
     private val coveredEnumPreferences = setOf("OverviewPreferenceKeys.SortOrder")

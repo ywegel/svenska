@@ -27,19 +27,31 @@ class SettingsViewModel @Inject constructor(
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
 ) : ViewModel(), SettingsCallbacks {
 
+    private val privacyState = combine(
+        preferencesManager.flow(PrivacyPreferenceKeys.CrashReportingEnabled),
+        preferencesManager.flow(PrivacyPreferenceKeys.ConsentDecisionTimestamp),
+        preferencesManager.flow(PrivacyPreferenceKeys.CrashReportingId),
+    ) { enabled, consentTimestamp, crashReportingId ->
+        PrivacyState(
+            crashReportingEnabled = enabled,
+            consentTimestamp = consentTimestamp.toLongOrNull(),
+            crashReportingId = crashReportingId,
+        )
+    }
+
     val uiState: StateFlow<SettingsUiState> = combine(
         preferencesManager.flow(OverviewPreferenceKeys.ShowCompactVocabularyItem),
         preferencesManager.flow(AppPreferenceKeys.UseNewQuiz),
         preferencesManager.flow(SearchPreferenceKeys.OnlineRedirectType),
-        preferencesManager.flow(PrivacyPreferenceKeys.CrashReportingEnabled),
-        preferencesManager.flow(PrivacyPreferenceKeys.ConsentDecisionTimestamp),
-    ) { showCompactVocabularyItem, useNewQuiz, onlineSearchType, crashReportingEnabled, consentTimestamp ->
+        privacyState,
+    ) { showCompactVocabularyItem, useNewQuiz, onlineSearchType, privacy ->
         SettingsUiState(
             overviewShowCompactVocabularyItem = showCompactVocabularyItem,
             appUseNewQuiz = useNewQuiz,
             selectedOnlineSearchType = onlineSearchType,
-            crashReportingEnabled = crashReportingEnabled,
-            crashReportingConsentTimestamp = consentTimestamp.toLongOrNull(),
+            crashReportingEnabled = privacy.crashReportingEnabled,
+            crashReportingConsentTimestamp = privacy.consentTimestamp,
+            crashReportingId = privacy.crashReportingId,
         )
     }.stateIn(viewModelScope, SharingStarted.Eagerly, SettingsUiState())
 
@@ -64,10 +76,18 @@ class SettingsViewModel @Inject constructor(
     }
 }
 
+private data class PrivacyState(
+    val crashReportingEnabled: Boolean,
+    val consentTimestamp: Long?,
+    val crashReportingId: String,
+)
+
 data class SettingsUiState(
     val overviewShowCompactVocabularyItem: Boolean = false,
     val appUseNewQuiz: Boolean = false,
     val selectedOnlineSearchType: OnlineSearchType? = null,
     val crashReportingEnabled: Boolean = false,
     val crashReportingConsentTimestamp: Long? = null,
+    /** Empty until the user has enabled crash reporting at least once. */
+    val crashReportingId: String = "",
 )

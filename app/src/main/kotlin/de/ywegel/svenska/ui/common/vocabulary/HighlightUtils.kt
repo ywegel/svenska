@@ -54,9 +54,11 @@ object HighlightUtils {
         val result = StringBuilder(word)
         highlightRanges.reversed().forEach { (start, end) ->
             if (start < 0 || end < start || end > word.length) {
+                // Never log user data. That is why word is redacted with #'s
                 Log.w(
                     TAG,
-                    "Skipping invalid highlight range: start=$start, end=$end for word='$word' (length=${word.length})",
+                    "Skipping invalid highlight range: start=$start, end=$end " +
+                        "for word='${"#".repeat(word.length)}' (length=${word.length})",
                 )
                 return@forEach // Skip invalid range
             }

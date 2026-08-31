@@ -2,6 +2,8 @@
 
 package de.ywegel.svenska.ui.settings.subscreens
 
+import android.content.ClipData
+import android.os.Build
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
@@ -13,25 +15,32 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.outlined.ArrowDropDown
 import androidx.compose.material.icons.outlined.ArrowDropUp
+import androidx.compose.material.icons.outlined.ContentCopy
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.nestedscroll.nestedScroll
+import androidx.compose.ui.platform.ClipEntry
+import androidx.compose.ui.platform.LocalClipboard
 import androidx.compose.ui.platform.LocalUriHandler
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.LinkAnnotation
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.TextLinkStyles
 import androidx.compose.ui.text.buildAnnotatedString
+import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.text.withLink
 import androidx.compose.ui.tooling.preview.Preview
@@ -57,6 +66,7 @@ import de.ywegel.svenska.ui.settings.SettingsViewModel
 import de.ywegel.svenska.ui.theme.Spacings
 import de.ywegel.svenska.ui.theme.SvenskaIcons
 import de.ywegel.svenska.ui.theme.SvenskaTheme
+import kotlinx.coroutines.launch
 import java.text.DateFormat
 import java.util.Date
 
@@ -77,9 +87,10 @@ private fun PrivacySettingsScreen(
     uiState: SettingsUiState,
     callbacks: SettingsCallbacks,
     navigateUp: () -> Unit = {},
+    snackbarHostState: SnackbarHostState = remember { SnackbarHostState() },
 ) {
-    val uriHandler = LocalUriHandler.current
     val scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior()
+    val confirmCopy = rememberCopyConfirmation(snackbarHostState)
 
     Scaffold(
         topBar = {
@@ -90,6 +101,7 @@ private fun PrivacySettingsScreen(
                 scrollBehavior = scrollBehavior,
             )
         },
+        snackbarHost = { SnackbarHost(hostState = snackbarHostState) },
     ) { innerPadding ->
         val paddings = rememberColumnScaffoldInsets(innerPadding)
 
@@ -127,14 +139,92 @@ private fun PrivacySettingsScreen(
 
             ExpandablePrivacyDisclosureCard()
 
-            HorizontalDivider()
-            VerticalSpacerXXS()
+            if (uiState.crashReportingId.isNotEmpty()) {
+                HorizontalDivider()
+                VerticalSpacerXXS()
+                CrashReportingIdRow(
+                    crashReportingId = uiState.crashReportingId,
+                    onCopied = confirmCopy,
+                )
+            }
 
-            ClickableText(
-                title = stringResource(R.string.settings_navigate_privacy_policy_title),
-                onClick = { uriHandler.openUri(SharedUrlConstants.SVENSKA_PRIVACY_POLICY) },
-            )
+            PrivacyLinks()
         }
+    }
+}
+
+@Composable
+private fun rememberCopyConfirmation(snackbarHostState: SnackbarHostState): () -> Unit {
+    val coroutineScope = rememberCoroutineScope()
+    val message = stringResource(R.string.settings_privacy_crash_reporting_id_copied)
+
+    return remember(snackbarHostState, coroutineScope, message) {
+        {
+            // Android 13 shows its own clipboard confirmation, so ours would only duplicate it.
+            if (Build.VERSION.SDK_INT < Build.VERSION_CODES.TIRAMISU) {
+                coroutineScope.launch {
+                    snackbarHostState.currentSnackbarData?.dismiss()
+                    snackbarHostState.showSnackbar(message)
+                }
+            }
+        }
+    }
+}
+
+@Composable
+private fun PrivacyLinks() {
+    val uriHandler = LocalUriHandler.current
+
+    HorizontalDivider()
+    VerticalSpacerXXS()
+
+    ClickableText(
+        title = stringResource(R.string.settings_privacy_request_deletion_title),
+        description = stringResource(R.string.settings_privacy_request_deletion_description),
+        onClick = { uriHandler.openUri(SharedUrlConstants.SVENSKA_DATA_DELETION) },
+    )
+
+    ClickableText(
+        title = stringResource(R.string.settings_navigate_privacy_policy_title),
+        onClick = { uriHandler.openUri(SharedUrlConstants.SVENSKA_PRIVACY_POLICY) },
+    )
+}
+
+@Composable
+private fun CrashReportingIdRow(crashReportingId: String, modifier: Modifier = Modifier, onCopied: () -> Unit = {}) {
+    val clipboard = LocalClipboard.current
+    val coroutineScope = rememberCoroutineScope()
+    val title = stringResource(R.string.settings_privacy_crash_reporting_id_title)
+
+    Column(modifier.padding(horizontal = Spacings.m, vertical = Spacings.s)) {
+        Row(verticalAlignment = Alignment.CenterVertically) {
+            Column(Modifier.weight(1f)) {
+                Text(text = title, style = SvenskaTheme.typography.bodyLarge)
+                Text(
+                    text = crashReportingId,
+                    style = SvenskaTheme.typography.bodySmall,
+                    fontFamily = FontFamily.Monospace,
+                    color = SvenskaTheme.colors.onSurfaceVariant,
+                )
+            }
+            IconButton(
+                icon = SvenskaIcons.ContentCopy,
+                contentDescription = stringResource(
+                    R.string.settings_privacy_crash_reporting_id_copy_content_description,
+                ),
+            ) {
+                coroutineScope.launch {
+                    clipboard.setClipEntry(ClipEntry(ClipData.newPlainText(title, crashReportingId)))
+                    onCopied()
+                }
+            }
+        }
+        VerticalSpacerXXS()
+        Text(
+            text = stringResource(R.string.settings_privacy_crash_reporting_id_description),
+            style = SvenskaTheme.typography.bodySmall,
+            color = SvenskaTheme.colors.onSurfaceVariant,
+        )
     }
 }
 
@@ -216,6 +306,7 @@ private fun PrivacySettingsScreenEnabledPreview() {
             uiState = SettingsUiState(
                 crashReportingEnabled = true,
                 crashReportingConsentTimestamp = 1_756_339_200_000,
+                crashReportingId = "svenska-0f8b3c1e-2d4a-4f6b-9c8d-1e2f3a4b5c6d",
             ),
             callbacks = SettingsCallbacksFake,
         )
@@ -249,5 +340,13 @@ private fun ExpandablePrivacyDisclosureCardPreview() {
 private fun ExpandablePrivacyDisclosureCardExpandedPreview() {
     SvenskaTheme {
         ExpandablePrivacyDisclosureCard(initialExpansionState = true)
+    }
+}
+
+@Preview
+@Composable
+private fun CrashReportingIdRowPreview() {
+    SvenskaTheme {
+        CrashReportingIdRow(crashReportingId = "svenska-0f8b3c1e-2d4a-4f6b-9c8d-1e2f3a4b5c6d")
     }
 }

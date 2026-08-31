@@ -3,12 +3,12 @@ package de.ywegel.svenska.data.impl
 import android.content.ContentResolver
 import android.net.Uri
 import android.util.Log
+import de.ywegel.svenska.analytics.captureExceptionWithoutMessage
 import de.ywegel.svenska.data.FileParseException
 import de.ywegel.svenska.data.FileRepository
 import de.ywegel.svenska.data.model.ImporterChapter
 import de.ywegel.svenska.di.IoDispatcher
 import de.ywegel.svenska.jsonConfig
-import io.sentry.Sentry
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.withContext
@@ -35,15 +35,20 @@ class FileRepositoryImpl @Inject constructor(
 
             Result.success(entries)
         } catch (e: IOException) {
-            Log.e(TAG, "parseFile: failed to open picked file", e)
+            Log.e(TAG, "parseFile: failed to open picked file (${e.javaClass.simpleName})", e)
             Result.failure(FileParseException.FileNotFound())
         } catch (e: SerializationException) {
-            Log.e(TAG, "parseFile: picked file is not valid json for the expected format", e)
+            Log.e(
+                TAG,
+                "parseFile: picked file is not valid json for the expected format " +
+                    "(${e.javaClass.simpleName})",
+                e,
+            )
             Result.failure(FileParseException.InvalidFormat(e))
         } catch (e: CancellationException) {
             throw e
         } catch (e: Exception) {
-            Sentry.captureException(e)
+            captureExceptionWithoutMessage(e)
             Log.e(TAG, "parseFile: unexpected failure while parsing file", e)
             Result.failure(FileParseException.Unexpected(e))
         }
