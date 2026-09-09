@@ -2,8 +2,8 @@ package de.ywegel.svenska
 
 import android.app.Application
 import dagger.hilt.android.HiltAndroidApp
-import de.ywegel.svenska.analytics.SentryConsentObserver
 import de.ywegel.svenska.di.ApplicationScope
+import de.ywegel.svenska.diagnostics.SentryConsentObserver
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.serialization.json.Json
 import javax.inject.Inject

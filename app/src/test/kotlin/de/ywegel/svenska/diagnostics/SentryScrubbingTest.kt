@@ -1,4 +1,4 @@
-package de.ywegel.svenska.analytics
+package de.ywegel.svenska.diagnostics
 
 import io.sentry.Breadcrumb
 import io.sentry.SentryEvent

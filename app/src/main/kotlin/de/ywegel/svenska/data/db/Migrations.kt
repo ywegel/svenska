@@ -3,9 +3,9 @@ package de.ywegel.svenska.data.db
 import android.util.Log
 import androidx.room.migration.Migration
 import androidx.sqlite.db.SupportSQLiteDatabase
-import de.ywegel.svenska.analytics.captureExceptionWithoutMessage
 import de.ywegel.svenska.data.model.Gender
 import de.ywegel.svenska.data.model.WordGroup
+import de.ywegel.svenska.diagnostics.captureExceptionWithoutMessage
 
 private const val TAG = "Migrations"
 

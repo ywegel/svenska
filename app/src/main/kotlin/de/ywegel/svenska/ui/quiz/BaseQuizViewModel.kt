@@ -2,9 +2,9 @@ package de.ywegel.svenska.ui.quiz
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import de.ywegel.svenska.analytics.captureExceptionWithoutMessage
 import de.ywegel.svenska.data.VocabularyRepository
 import de.ywegel.svenska.data.model.Vocabulary
+import de.ywegel.svenska.diagnostics.captureExceptionWithoutMessage
 import de.ywegel.svenska.domain.quiz.QuizManager
 import de.ywegel.svenska.domain.quiz.QuizStrategy
 import de.ywegel.svenska.domain.quiz.model.QuizQuestion

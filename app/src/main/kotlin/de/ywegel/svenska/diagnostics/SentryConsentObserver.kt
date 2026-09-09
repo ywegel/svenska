@@ -1,4 +1,4 @@
-package de.ywegel.svenska.analytics
+package de.ywegel.svenska.diagnostics
 
 import de.ywegel.svenska.data.preferences.UserPreferencesManager
 import de.ywegel.svenska.data.preferences.keys.PrivacyPreferenceKeys

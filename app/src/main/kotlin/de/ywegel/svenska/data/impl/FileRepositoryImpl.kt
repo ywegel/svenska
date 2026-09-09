@@ -3,11 +3,11 @@ package de.ywegel.svenska.data.impl
 import android.content.ContentResolver
 import android.net.Uri
 import android.util.Log
-import de.ywegel.svenska.analytics.captureExceptionWithoutMessage
 import de.ywegel.svenska.data.FileParseException
 import de.ywegel.svenska.data.FileRepository
 import de.ywegel.svenska.data.model.ImporterChapter
 import de.ywegel.svenska.di.IoDispatcher
+import de.ywegel.svenska.diagnostics.captureExceptionWithoutMessage
 import de.ywegel.svenska.jsonConfig
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.CoroutineDispatcher

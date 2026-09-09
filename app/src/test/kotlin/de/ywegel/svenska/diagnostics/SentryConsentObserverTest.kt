@@ -1,6 +1,6 @@
 @file:OptIn(ExperimentalCoroutinesApi::class)
 
-package de.ywegel.svenska.analytics
+package de.ywegel.svenska.diagnostics
 
 import de.ywegel.svenska.data.preferences.PreferenceKey
 import de.ywegel.svenska.data.preferences.UserPreferencesManager

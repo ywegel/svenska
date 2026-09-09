@@ -5,10 +5,10 @@ import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
-import de.ywegel.svenska.analytics.captureExceptionWithoutMessage
 import de.ywegel.svenska.data.FileParseException
 import de.ywegel.svenska.data.FileRepository
 import de.ywegel.svenska.data.model.ImporterChapter
+import de.ywegel.svenska.diagnostics.captureExceptionWithoutMessage
 import de.ywegel.svenska.domain.wordImporter.ImportChaptersUseCase
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.flow.MutableStateFlow
