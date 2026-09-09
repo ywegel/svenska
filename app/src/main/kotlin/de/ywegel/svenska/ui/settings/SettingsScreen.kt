@@ -190,6 +190,11 @@ private fun AppInformationSection(navigateToAboutLibraries: () -> Unit) {
     )
 
     ClickableText(
+        title = stringResource(R.string.settings_navigate_imprint_title),
+        onClick = { uriHandler.openUri(SharedUrlConstants.IMPRINT) },
+    )
+
+    ClickableText(
         title = stringResource(R.string.settings_github_repository),
         onClick = {
             uriHandler.openUri(githubRepoUrl)

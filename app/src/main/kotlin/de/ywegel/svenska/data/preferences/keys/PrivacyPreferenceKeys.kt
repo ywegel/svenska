@@ -33,6 +33,16 @@ object PrivacyPreferenceKeys {
     )
 
     /**
+     * Replaces the Sentry SDK's own installation id. We need this, to show it to the user, if he wants to delete his
+     * data. Is kept even after disabling crash reporting, so that earlier reports can be deleted as well.
+     */
+    val CrashReportingId = stringPreference(
+        store = Settings,
+        name = "privacy_crash_reporting_id",
+        default = "",
+    )
+
+    /**
      * Only raise this, if the privacy policy changed. This automatically prompts the user.
      */
     const val CURRENT_POLICY_VERSION = "2026-08-2"

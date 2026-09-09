@@ -5,7 +5,7 @@ import androidx.room.migration.Migration
 import androidx.sqlite.db.SupportSQLiteDatabase
 import de.ywegel.svenska.data.model.Gender
 import de.ywegel.svenska.data.model.WordGroup
-import io.sentry.Sentry
+import de.ywegel.svenska.diagnostics.captureExceptionWithoutMessage
 
 private const val TAG = "Migrations"
 
@@ -52,7 +52,7 @@ val MIGRATION_1_2 = object : Migration(1, 2) {
             statement.close()
             db.setTransactionSuccessful()
         } catch (t: Throwable) {
-            Sentry.captureException(t)
+            captureExceptionWithoutMessage(t)
             Log.e(TAG, "migrate: Migration from 1 to 2 failed", t)
             throw t
         } finally {
@@ -117,7 +117,7 @@ val MIGRATION_2_3 = object : Migration(2, 3) {
             }
             db.setTransactionSuccessful()
         } catch (t: Throwable) {
-            Sentry.captureException(t)
+            captureExceptionWithoutMessage(t)
             Log.e(TAG, "migrate: Migration from 2 to 3 failed", t)
             throw t
         } finally {
@@ -128,8 +128,11 @@ val MIGRATION_2_3 = object : Migration(2, 3) {
 }
 
 /**
- * Frozen snapshot of [de.ywegel.svenska.domain.wordImporter.WordExtractor.normalizePdfDashes]. Migrations must keep
- * reproducing the exact transformation.
+ * Frozen snapshot of `WordExtractor.normalizePdfDashes` in `domain/wordImporter`. Migrations must keep reproducing
+ * the exact transformation, so this copy deliberately does not call it.
+ *
+ * Named in backticks rather than as a KDoc link: resolving the link makes the IDE add a `domain` import here, which
+ * ArchitectureTest rejects.
  */
 private object FrozenDashNormalizerAtV2ToV3 {
     fun normalize(input: String): String {

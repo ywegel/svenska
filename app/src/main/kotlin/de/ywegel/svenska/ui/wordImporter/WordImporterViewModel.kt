@@ -8,8 +8,8 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import de.ywegel.svenska.data.FileParseException
 import de.ywegel.svenska.data.FileRepository
 import de.ywegel.svenska.data.model.ImporterChapter
+import de.ywegel.svenska.diagnostics.captureExceptionWithoutMessage
 import de.ywegel.svenska.domain.wordImporter.ImportChaptersUseCase
-import io.sentry.Sentry
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -91,7 +91,7 @@ class WordImporterViewModel @Inject constructor(
                     chapters = entries.size,
                 )
             }.onFailure { error ->
-                Log.e(TAG, "onFilePicked: failed to parse picked file", error)
+                Log.e(TAG, "onFilePicked: failed to parse picked file (${error.javaClass.simpleName})", error)
                 _importerState.value = failedState(
                     (error as? FileParseException)?.toImporterError() ?: ImporterError.Unknown(error),
                 )
@@ -125,7 +125,7 @@ class WordImporterViewModel @Inject constructor(
         } catch (e: Exception) {
             Log.e(TAG, "saveWords: failed to import loaded chapters", e)
             _importerState.value = failedState(ImporterError.SaveFailed(e))
-            Sentry.captureException(e)
+            captureExceptionWithoutMessage(e)
         }
     }
 

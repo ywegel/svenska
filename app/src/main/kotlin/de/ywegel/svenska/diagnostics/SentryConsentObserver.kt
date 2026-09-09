@@ -1,7 +1,8 @@
-package de.ywegel.svenska.analytics
+package de.ywegel.svenska.diagnostics
 
 import de.ywegel.svenska.data.preferences.UserPreferencesManager
 import de.ywegel.svenska.data.preferences.keys.PrivacyPreferenceKeys
+import de.ywegel.svenska.domain.GetOrCreateCrashReportingIdUseCase
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
@@ -15,10 +16,20 @@ import javax.inject.Singleton
 class SentryConsentObserver @Inject constructor(
     private val preferences: UserPreferencesManager,
     private val sentryController: SentryController,
+    private val getOrCreateCrashReportingId: GetOrCreateCrashReportingIdUseCase,
 ) {
     fun start(scope: CoroutineScope) {
         preferences.flow(PrivacyPreferenceKeys.CrashReportingEnabled)
-            .onEach { enabled -> if (enabled) sentryController.initialize() else sentryController.shutdown() }
+            .onEach { enabled ->
+                // No id means we stay off, see GetOrCreateCrashReportingIdUseCase.
+                val userId = if (enabled) getOrCreateCrashReportingId() else null
+
+                if (userId != null) {
+                    sentryController.initialize(userId)
+                } else {
+                    sentryController.shutdown()
+                }
+            }
             .launchIn(scope)
     }
 }

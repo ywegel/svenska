@@ -147,7 +147,7 @@ private fun SearchScreen(
                 try {
                     uriHandle.openUri(baseUrl + query)
                 } catch (e: IllegalArgumentException) {
-                    Log.w(TAG, "SearchScreen: onOnlineRedirectClicked", e)
+                    Log.w(TAG, "SearchScreen: onOnlineRedirectClicked (${e.javaClass.simpleName})", e)
                     coroutineScope.launch {
                         snackBarHostState.showSnackbar(context.getString(R.string.search_uri_parsing_error))
                     }

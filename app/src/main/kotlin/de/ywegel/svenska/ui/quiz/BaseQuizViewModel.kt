@@ -4,11 +4,11 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import de.ywegel.svenska.data.VocabularyRepository
 import de.ywegel.svenska.data.model.Vocabulary
+import de.ywegel.svenska.diagnostics.captureExceptionWithoutMessage
 import de.ywegel.svenska.domain.quiz.QuizManager
 import de.ywegel.svenska.domain.quiz.QuizStrategy
 import de.ywegel.svenska.domain.quiz.model.QuizQuestion
 import de.ywegel.svenska.domain.quiz.model.UserAnswer
-import io.sentry.Sentry
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -122,7 +122,7 @@ abstract class BaseQuizViewModel<A : UserAnswer, S : QuizInputState<A>, AC : Any
             } catch (e: CancellationException) {
                 throw e
             } catch (e: Exception) {
-                Sentry.captureException(e)
+                captureExceptionWithoutMessage(e)
                 _uiState.value = QuizUiState.Error(e) {
                     launchSafely(block)
                 }
