@@ -130,7 +130,7 @@ fun NounGroupsScreen() {
     ) {
         Text(
             text = stringResource(R.string.noun_gender_title),
-            style = SvenskaTheme.typography.headlineMedium,
+            style = SvenskaTheme.typography.headlineLarge,
             fontWeight = FontWeight.Bold,
         )
 
