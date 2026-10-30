@@ -222,7 +222,7 @@ dependencies {
     testImplementation(libs.roborazzi.compose)
     testImplementation(libs.roborazzi.compose.scanner)
     testImplementation(libs.roborazzi.compose.scanner.sergio.dependency)
-    testImplementation(libs.androidx.compose.ui.test.junit4)
+    testImplementation(libs.compose.ui.test.junit4)
 
     // junit5
     testImplementation(libs.junit5.api)
@@ -332,6 +332,9 @@ roborazzi {
         enable = true
         packages = listOf("de.ywegel.svenska")
         includePrivatePreviews = true
+        testerQualifiedClassName = "de.ywegel.svenska.screenshots.SvenskaComposePreviewTester"
+        // The tester delegates scanning to AndroidComposePreviewTester, which honors includePrivatePreviews
+        useScanOptionParametersInTester = true
         robolectricConfig = mapOf(
             "sdk" to "[32]",
             "qualifiers" to "RobolectricDeviceQualifiers.Pixel5",

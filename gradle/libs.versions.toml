@@ -77,7 +77,6 @@ roborazzi = { module = "io.github.takahirom.roborazzi:roborazzi", version.ref = 
 roborazzi-compose = { module = "io.github.takahirom.roborazzi:roborazzi-compose", version.ref = "roborazzi-version" }
 roborazzi-compose-scanner = { module = "io.github.takahirom.roborazzi:roborazzi-compose-preview-scanner-support", version.ref = "roborazzi-version" }
 roborazzi-compose-scanner-sergio-dependency = "io.github.sergio-sastre.ComposablePreviewScanner:android:0.8.1"
-androidx-compose-ui-test-junit4 = "androidx.compose.ui:ui-test-junit4:1.4.1"
 
 strikt = "io.strikt:strikt-core:0.35.1"
 konsist = "com.lemonappdev:konsist:0.17.3"
