@@ -1,0 +1,95 @@
+name: CompareScreenshot
+
+on:
+  workflow_call:
+
+permissions: { }
+
+jobs:
+  compare-screenshot-test:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+
+    permissions:
+      contents: read # for clone
+      actions: write # for upload-artifact
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up JDK 22
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 22
+
+      - name: Setup Gradle
+        uses: gradle/gradle-build-action@v3
+        with:
+          gradle-version: wrapper
+
+
+      - uses: dawidd6/action-download-artifact@v3
+        id: download-baseline
+        continue-on-error: true
+        with:
+          name: screenshot
+          workflow: StoreScreenshot.yml
+          branch: ${{ github.event.pull_request.base.ref }}
+
+      # The baseline artifact expires after its retention, so render it from the base branch instead
+      - name: Checkout base branch
+        if: steps.download-baseline.outcome == 'failure'
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.base.ref }}
+          path: baseline
+
+      # Allowed to fail while the base branch has no Roborazzi setup yet, everything then counts as added
+      - name: Record baseline screenshots
+        id: record-baseline
+        if: steps.download-baseline.outcome == 'failure'
+        continue-on-error: true
+        working-directory: baseline
+        run: |
+          # Only run the generated snapshot tests. Unit tests already run in their seperate uniTest job.
+          ./gradlew testDebugUnitTest --tests '*RoborazziPreviewParameterizedTests*' -Proborazzi.test.record=true --rerun --stacktrace
+
+      - name: Use recorded baseline
+        if: steps.record-baseline.outcome == 'success'
+        run: |
+          mkdir -p app/build/outputs
+          cp -R baseline/app/build/outputs/roborazzi app/build/outputs/roborazzi
+
+      - name: compare screenshot test
+        id: compare-screenshot-test
+        run: |
+          ./gradlew testDebugUnitTest --tests '*RoborazziPreviewParameterizedTests*' -Proborazzi.test.compare=true --rerun --stacktrace
+
+      - uses: actions/upload-artifact@v4
+        if: ${{ always() }}
+        with:
+          name: screenshot-diff
+          path: |
+            **/build/outputs/roborazzi
+            !baseline/**
+          retention-days: 30
+
+      - uses: actions/upload-artifact@v4
+        if: ${{ always() }}
+        with:
+          name: screenshot-diff-reports
+          path: |
+            **/build/reports
+            !baseline/**
+          retention-days: 30
+
+      - uses: actions/upload-artifact@v4
+        if: ${{ always() }}
+        with:
+          name: screenshot-diff-test-results
+          path: |
+            **/build/test-results
+            !baseline/**
+          retention-days: 30

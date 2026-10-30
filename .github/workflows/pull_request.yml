@@ -159,6 +159,25 @@ jobs:
           title: Code Coverage Report
           coverage-counter-type: BRANCH
 
+  screenshot_tests:
+    name: Screenshot Tests
+    needs: [ ktlint, detekt ]
+    if: github.event_name == 'pull_request'
+    permissions:
+      contents: read
+      actions: write
+    uses: ./.github/workflows/CompareScreenshot.yml
+
+  screenshot_comment:
+    name: Screenshot Comment
+    needs: [ screenshot_tests ]
+    # Fork PRs only get a read-only token, their diffs stay available as artifacts
+    if: github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository
+    permissions:
+      contents: write
+      pull-requests: write
+    uses: ./.github/workflows/CompareScreenshotComment.yml
+
   build-and-test:
     name: Build and Run Instrumentation Tests
     needs: [ lint, unit_tests ]

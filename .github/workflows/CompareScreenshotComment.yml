@@ -1,0 +1,158 @@
+name: Screenshot compare comment
+
+on:
+  workflow_call:
+
+permissions: { }
+
+jobs:
+  Comment-CompareScreenshot:
+    timeout-minutes: 2
+
+    permissions:
+      contents: write # for pushing screenshot-diff to companion branch
+      pull-requests: write # for creating a comment on pull requests
+
+    runs-on: ubuntu-latest
+
+    env:
+      BRANCH_NAME: companion_pr_${{ github.event.pull_request.number }}
+      BASE_BRANCH: ${{ github.event.pull_request.base.ref }}
+
+    steps:
+      - id: check-pull-request-open
+        name: Check if pull request is still open
+        shell: bash
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          # A PR merged before this run finished would otherwise get a companion branch nobody deletes
+          state=$(gh pr view "${{ github.event.pull_request.number }}" --repo "${{ github.repository }}" --json state --jq .state)
+          echo "is_open=$([ "$state" = "OPEN" ] && echo true || echo false)" >> "$GITHUB_OUTPUT"
+      - name: main checkout
+        id: checkout-main
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ env.BASE_BRANCH }}
+      - id: switch-companion-branch
+        run: |
+          # orphan means it will create no history branch
+          git branch -D "$BRANCH_NAME" || true
+          git checkout --orphan "$BRANCH_NAME"
+          git rm -rf .
+      - uses: actions/download-artifact@v4
+        with:
+          name: screenshot-diff
+          path: screenshot-diff
+      - id: check-if-there-are-valid-files
+        name: Check if there are valid files
+        shell: bash
+        run: |
+          # Find all the files ending with _compare.png
+          mapfile -t files_to_add < <(find . -type f -name "*_compare.png")
+
+          # A skipped diff would otherwise be reported as "No snapshot changes"
+          exist_valid_files="false"
+          for file in "${files_to_add[@]}"; do
+            if [[ $file =~ ^[a-zA-Z0-9_./-]+$ ]]; then
+              exist_valid_files="true"
+            else
+              echo "::error::Diff image with unsafe file name, SvenskaComposePreviewTester should have sanitized it: $file"
+              exit 1
+            fi
+          done
+          echo "exist_valid_files=$exist_valid_files" >> "$GITHUB_OUTPUT"
+      - id: push-screenshot-diff
+        shell: bash
+        if: >
+          steps.check-if-there-are-valid-files.outputs.exist_valid_files == 'true' &&
+          steps.check-pull-request-open.outputs.is_open == 'true'
+        run: |
+          # Find all the files ending with _compare.png
+          files_to_add=$(find . -type f -name "*_compare.png")
+
+          # Check for invalid file names and add only valid ones
+          for file in $files_to_add; do
+            if [[ "$file" =~ ^[a-zA-Z0-9_./-]+$ ]]; then
+              git add "$file"
+            fi
+          done
+          git config --global user.name ScreenshotBot
+          git config --global user.email 41898282+github-actions[bot]@users.noreply.github.com
+          git commit -m "Add screenshot diff"
+          git push origin HEAD:"$BRANCH_NAME" -f
+      # A previous push may have left diff images behind that no longer apply
+      - name: Delete outdated companion branch
+        if: >
+          steps.check-if-there-are-valid-files.outputs.exist_valid_files == 'false' &&
+          steps.check-pull-request-open.outputs.is_open == 'true'
+        shell: bash
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          if ! output=$(gh api -X DELETE "repos/${{ github.repository }}/git/refs/heads/$BRANCH_NAME" 2>&1); then
+            # GitHub answers 422 for a missing ref, every other error is a real failure
+            if [[ "$output" == *"HTTP 422"* || "$output" == *"HTTP 404"* ]]; then
+              echo "No companion branch $BRANCH_NAME to delete"
+            else
+              echo "$output"
+              exit 1
+            fi
+          fi
+      - id: generate-diff-reports
+        name: Generate diff reports
+        if: steps.check-pull-request-open.outputs.is_open == 'true'
+        shell: bash
+        env:
+          EXIST_VALID_FILES: ${{ steps.check-if-there-are-valid-files.outputs.exist_valid_files }}
+        run: |
+          delimiter="$(openssl rand -hex 8)"
+          if [[ "$EXIST_VALID_FILES" != "true" ]]; then
+            {
+              echo "reports<<${delimiter}"
+              echo "Snapshot diff report vs base branch: $BASE_BRANCH"
+              echo ""
+              echo "No snapshot changes."
+              echo "${delimiter}"
+            } >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+
+          # Find all the files ending with _compare.png in roborazzi folder
+          files=$(find . -type f -name "*_compare.png" | grep "roborazzi/" | grep -E "^[a-zA-Z0-9_./-]+$")
+          {
+            echo "reports<<${delimiter}"
+
+            # Create markdown table header
+            echo "Snapshot diff report vs base branch: $BASE_BRANCH"
+            echo "| File name | Image |"
+            echo "|-------|-------|"
+          } >> "$GITHUB_OUTPUT"
+
+          # Iterate over the files and create table rows
+          for file in $files; do
+            # Get the file name and insert newlines every 20 characters
+            fileName=$(basename "$file" | sed -r 's/(.{20})/\1<br>/g')
+            echo "| [$fileName](https://github.com/${{ github.repository }}/blob/$BRANCH_NAME/$file) | ![](https://github.com/${{ github.repository }}/blob/$BRANCH_NAME/$file?raw=true) |" >> "$GITHUB_OUTPUT"
+          done
+          echo "${delimiter}" >> "$GITHUB_OUTPUT"
+      - name: Find Comment
+        uses: peter-evans/find-comment@3eae4d37986fb5a8592848f6a574fdf654e61f9e # v3.1.0
+        id: fc
+        if: steps.generate-diff-reports.outputs.reports != ''
+        with:
+          issue-number: ${{ github.event.pull_request.number }}
+          comment-author: 'github-actions[bot]'
+          body-includes: Snapshot diff report
+
+      # Without diffs only an existing comment gets updated, so unchanged PRs stay comment free
+      - name: Add or update comment on PR
+        uses: peter-evans/create-or-update-comment@71345be0265236311c031f5c7866368bd1eff043 # v4.0.0
+        if: >
+          steps.generate-diff-reports.outputs.reports != '' &&
+          (steps.check-if-there-are-valid-files.outputs.exist_valid_files == 'true' || steps.fc.outputs.comment-id != '')
+        with:
+          comment-id: ${{ steps.fc.outputs.comment-id }}
+          issue-number: ${{ github.event.pull_request.number }}
+          body: ${{ steps.generate-diff-reports.outputs.reports }}
+          edit-mode: replace
