@@ -51,12 +51,14 @@ jobs:
           # Find all the files ending with _compare.png
           mapfile -t files_to_add < <(find . -type f -name "*_compare.png")
 
-          # Check for invalid file names and add only valid ones
+          # A skipped diff would otherwise be reported as "No snapshot changes"
           exist_valid_files="false"
           for file in "${files_to_add[@]}"; do
             if [[ $file =~ ^[a-zA-Z0-9_./-]+$ ]]; then
               exist_valid_files="true"
-              break
+            else
+              echo "::error::Diff image with unsafe file name, SvenskaComposePreviewTester should have sanitized it: $file"
+              exit 1
             fi
           done
           echo "exist_valid_files=$exist_valid_files" >> "$GITHUB_OUTPUT"
