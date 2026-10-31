@@ -7,14 +7,18 @@ import dagger.hilt.android.testing.HiltAndroidRule
 import dagger.hilt.android.testing.HiltTestApplication
 import de.ywegel.svenska.HiltTestActivity
 import de.ywegel.svenska.data.ContainerRepository
+import de.ywegel.svenska.data.VocabularyRepository
 import de.ywegel.svenska.data.db.VocabularyDatabase
 import de.ywegel.svenska.data.model.VocabularyContainer
+import de.ywegel.svenska.data.model.WordGroup
+import de.ywegel.svenska.data.model.vocabulary
 import de.ywegel.svenska.navigation.AppNavigation
 import de.ywegel.svenska.ui.theme.SvenskaTheme
 import de.ywegel.svenska.userflows.robots.AddEditRobot
 import de.ywegel.svenska.userflows.robots.ContainerRobot
 import de.ywegel.svenska.userflows.robots.OverviewRobot
 import de.ywegel.svenska.userflows.robots.SettingsRobot
+import de.ywegel.svenska.userflows.robots.VocabularyDetailRobot
 import kotlinx.coroutines.runBlocking
 import org.junit.After
 import org.junit.Before
@@ -37,6 +41,9 @@ abstract class UserFlowTest {
 
     @Inject
     lateinit var containerRepository: ContainerRepository
+
+    @Inject
+    lateinit var vocabularyRepository: VocabularyRepository
 
     @Inject
     lateinit var database: VocabularyDatabase
@@ -65,9 +72,28 @@ abstract class UserFlowTest {
         VocabularyContainer(id = id.toInt(), name = name)
     }
 
+    protected fun givenVocabulary(
+        container: VocabularyContainer,
+        word: String,
+        translation: String,
+        wordGroup: WordGroup,
+    ): Unit = runBlocking {
+        vocabularyRepository.upsertVocabulary(
+            vocabulary(
+                id = 0,
+                containerId = container.id,
+                word = word,
+                translation = translation,
+                wordGroup = wordGroup,
+            ),
+        )
+    }
+
     protected fun container(block: ContainerRobot.() -> Unit) = ContainerRobot(composeRule).block()
 
     protected fun overview(block: OverviewRobot.() -> Unit) = OverviewRobot(composeRule).block()
+
+    protected fun vocabularyDetail(block: VocabularyDetailRobot.() -> Unit) = VocabularyDetailRobot(composeRule).block()
 
     protected fun addEdit(block: AddEditRobot.() -> Unit) = AddEditRobot(composeRule).block()
 

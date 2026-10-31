@@ -10,6 +10,8 @@ class OverviewRobot(composeRule: AndroidComposeTestRule<*, *>) : Robot(composeRu
 
     fun clickAddVocabulary() = clickOnDescription(R.string.accessibility_overview_fab_add_new)
 
+    fun clickVocabulary(word: String) = clickOnText(word)
+
     fun assertOverviewScreenIsVisible(containerName: String) {
         assertEventuallyDisplayed(hasText(containerName))
         assertEventuallyDisplayed(hasContentDescription(string(R.string.accessibility_overview_fab_add_new)))
@@ -26,4 +28,6 @@ class OverviewRobot(composeRule: AndroidComposeTestRule<*, *>) : Robot(composeRu
         val badgeDescription = string(R.string.accessibility_word_group_badge, string(wordGroup), string(subGroup))
         assertEventuallyDisplayed(hasContentDescription(badgeDescription))
     }
+
+    fun assertTranslationIsNotListed(translation: String) = assertDoesNotExist(hasText(translation))
 }

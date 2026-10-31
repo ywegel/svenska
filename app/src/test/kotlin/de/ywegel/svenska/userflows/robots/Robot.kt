@@ -12,18 +12,26 @@ abstract class Robot(protected val composeRule: AndroidComposeTestRule<*, *>) {
 
     protected fun string(@StringRes id: Int, vararg args: Any): String = composeRule.activity.getString(id, *args)
 
-    protected fun clickOnText(text: String) {
-        composeRule.onNode(hasText(text)).performClick()
+    protected fun clickOnText(text: String) = clickOn(hasText(text))
+
+    protected fun clickOnDescription(@StringRes id: Int) = clickOn(hasContentDescription(string(id)))
+
+    protected fun assertEventuallyDisplayed(matcher: SemanticsMatcher) {
+        waitUntilExists(matcher)
+        composeRule.onNode(matcher).assertIsDisplayed()
     }
 
-    protected fun clickOnDescription(@StringRes id: Int) {
-        composeRule.onNode(hasContentDescription(string(id))).performClick()
+    protected fun assertDoesNotExist(matcher: SemanticsMatcher) {
+        composeRule.onNode(matcher).assertDoesNotExist()
+    }
+
+    private fun clickOn(matcher: SemanticsMatcher) {
+        composeRule.onNode(matcher).performClick()
     }
 
     // Room queries and navigation events run on Dispatchers.IO, which waitForIdle does not track
-    protected fun assertEventuallyDisplayed(matcher: SemanticsMatcher) {
+    private fun waitUntilExists(matcher: SemanticsMatcher) {
         composeRule.waitUntil(TIMEOUT_MS) { composeRule.onAllNodes(matcher).fetchSemanticsNodes().isNotEmpty() }
-        composeRule.onNode(matcher).assertIsDisplayed()
     }
 
     private companion object {
