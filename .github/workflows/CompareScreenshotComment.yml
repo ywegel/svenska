@@ -145,12 +145,9 @@ jobs:
           comment-author: 'github-actions[bot]'
           body-includes: Snapshot diff report
 
-      # Without diffs only an existing comment gets updated, so unchanged PRs stay comment free
       - name: Add or update comment on PR
         uses: peter-evans/create-or-update-comment@71345be0265236311c031f5c7866368bd1eff043 # v4.0.0
-        if: >
-          steps.generate-diff-reports.outputs.reports != '' &&
-          (steps.check-if-there-are-valid-files.outputs.exist_valid_files == 'true' || steps.fc.outputs.comment-id != '')
+        if: steps.generate-diff-reports.outputs.reports != ''
         with:
           comment-id: ${{ steps.fc.outputs.comment-id }}
           issue-number: ${{ github.event.pull_request.number }}
