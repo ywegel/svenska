@@ -236,6 +236,10 @@ dependencies {
     androidTestImplementation(libs.androidx.test.ext.junit)
 
     testImplementation(libs.lifecycle.viewmodel.testing)
+
+    // Hilt testing
+    testImplementation(libs.hilt.android.testing)
+    kspTest(libs.hilt.compiler)
 }
 
 ksp {
