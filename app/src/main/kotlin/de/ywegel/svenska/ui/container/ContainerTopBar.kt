@@ -47,7 +47,7 @@ fun ContainerTopBar(
                 )
                 IconButton(
                     icon = SvenskaIcons.Settings,
-                    contentDescription = null,
+                    contentDescription = stringResource(R.string.accessibility_container_toolbar_settings),
                     onClick = navigateToSettings,
                 )
             },

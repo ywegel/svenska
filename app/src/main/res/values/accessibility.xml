@@ -16,6 +16,7 @@
     <string name="accessibility_quiz_toolbar_actions_word_group_info">Navigate to WordGroups screen</string>
 
     <!-- # Containers # -->
+    <string name="accessibility_container_toolbar_settings">Open settings</string>
 
     <!-- ## Favorites & Pronunciation ## -->
     <string name="accessibility_favorites_pronunciation_explanation">Get an explanation of this screen</string>
