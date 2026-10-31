@@ -31,8 +31,6 @@ import de.ywegel.svenska.data.model.vocabulary
 import de.ywegel.svenska.ui.common.HorizontalSpacerXS
 import de.ywegel.svenska.ui.common.vocabulary.abbreviation
 import de.ywegel.svenska.ui.common.vocabulary.annotatedWord
-import de.ywegel.svenska.ui.common.vocabulary.mainGroupAbbreviation
-import de.ywegel.svenska.ui.common.vocabulary.subGroupAbbreviation
 import de.ywegel.svenska.ui.common.vocabulary.wordGroupBadge.StaticWordGroupBadgeExtended
 import de.ywegel.svenska.ui.theme.Spacings
 import de.ywegel.svenska.ui.theme.SvenskaTheme
@@ -60,10 +58,7 @@ fun VocabularyListItem(vocabulary: Vocabulary, modifier: Modifier = Modifier, on
             verticalAlignment = Alignment.CenterVertically,
         ) {
             // WordGroup-Badge
-            StaticWordGroupBadgeExtended(
-                mainWordGroup = vocabulary.wordGroup.mainGroupAbbreviation(),
-                subWordGroup = vocabulary.wordGroup.subGroupAbbreviation(),
-            )
+            StaticWordGroupBadgeExtended(vocabulary.wordGroup)
 
             HorizontalSpacerXS()
 

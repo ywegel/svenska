@@ -38,8 +38,6 @@ import de.ywegel.svenska.ui.common.VerticalSpacerM
 import de.ywegel.svenska.ui.common.VerticalSpacerXXS
 import de.ywegel.svenska.ui.common.VerticalSpacerXXXS
 import de.ywegel.svenska.ui.common.vocabulary.abbreviation
-import de.ywegel.svenska.ui.common.vocabulary.mainGroupAbbreviation
-import de.ywegel.svenska.ui.common.vocabulary.subGroupAbbreviation
 import de.ywegel.svenska.ui.common.vocabulary.wordGroupBadge.StaticWordGroupBadgeExtended
 import de.ywegel.svenska.ui.quiz.controller.TranslateWithEndingsActions
 import de.ywegel.svenska.ui.quiz.controller.TranslateWithEndingsState
@@ -163,10 +161,7 @@ private fun WordGroupSection(
             verticalArrangement = Arrangement.spacedBy(Spacings.xxxs),
         ) {
             Row(verticalAlignment = Alignment.CenterVertically) {
-                StaticWordGroupBadgeExtended(
-                    mainWordGroup = wordGroup.mainGroupAbbreviation(),
-                    subWordGroup = wordGroup.subGroupAbbreviation(),
-                )
+                StaticWordGroupBadgeExtended(wordGroup)
                 if (gender != null && wordGroup is WordGroup.Noun) {
                     HorizontalSpacerXXXS()
                     Text(

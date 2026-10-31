@@ -171,7 +171,10 @@ private fun AddEditScreen(
         },
         floatingActionButton = {
             FloatingActionButton({ callbacks.saveAndNavigateUp() }) {
-                Icon(imageVector = SvenskaIcons.Done, contentDescription = null)
+                Icon(
+                    imageVector = SvenskaIcons.Done,
+                    contentDescription = stringResource(R.string.accessibility_addEdit_fab_done),
+                )
             }
         },
     ) { contentPadding ->

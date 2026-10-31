@@ -2,14 +2,17 @@
 <resources>
     <!-- General -->
     <string name="accessibility_general_toolbar_navigate_up">Navigate up</string>
+    <string name="accessibility_word_group_badge">Word group %1$s %2$s</string>
+    <string name="accessibility_word_group_badge_main_only">Word group %1$s</string>
 
     <!-- # Overview # -->
     <string name="accessibility_overview_fab_quiz">Start Quiz</string>
-    <string name="accessibility_overview_fab_add">Add new vocabulary</string>
+    <string name="accessibility_overview_fab_add_new">Add new vocabulary</string>
 
     <!-- # AddEdit # -->
     <string name="accessibility_addEdit_navigate_word_group_info_screen">Navigate to WordGroups screen</string>
     <string name="accessibility_addEdit_annotation_information_hide">Hide this information</string>
+    <string name="accessibility_addEdit_fab_done">Save Vocabulary</string>
 
     <!-- # Quiz # -->
     <string name="accessibility_quiz_toolbar_actions_favorite">Favorite this word</string>

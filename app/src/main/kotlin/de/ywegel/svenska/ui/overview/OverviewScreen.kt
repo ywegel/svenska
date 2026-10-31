@@ -179,7 +179,7 @@ private fun OverviewFab(onAddClick: () -> Unit, onQuizClick: () -> Unit) {
             onClick = onAddClick,
             text = stringResource(R.string.overview_fab_add),
             icon = SvenskaIcons.Add,
-            contentDescription = stringResource(R.string.accessibility_overview_fab_add),
+            contentDescription = stringResource(R.string.accessibility_overview_fab_add_new),
         )
     }
 }
