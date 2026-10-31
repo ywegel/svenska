@@ -1,9 +1,11 @@
 package de.ywegel.svenska.userflows.robots
 
 import androidx.annotation.StringRes
+import androidx.compose.ui.test.hasContentDescription
 import androidx.compose.ui.test.hasSetTextAction
 import androidx.compose.ui.test.hasText
 import androidx.compose.ui.test.junit4.AndroidComposeTestRule
+import androidx.compose.ui.test.performClick
 import androidx.compose.ui.test.performTextReplacement
 import de.ywegel.svenska.R
 
@@ -25,7 +27,12 @@ class AddEditRobot(composeRule: AndroidComposeTestRule<*, *>) : Robot(composeRul
 
     fun enterEndings(endings: String) = enterText(R.string.addEdit_label_endings, endings)
 
-    fun save() = clickOnDescription(R.string.accessibility_addEdit_fab_done)
+    // Waits until the screen has left composition, otherwise its text fields match the next screen's assertions
+    fun save() {
+        val saveButton = hasContentDescription(string(R.string.accessibility_addEdit_fab_done))
+        composeRule.onNode(saveButton).performClick()
+        waitUntilGone(saveButton)
+    }
 
     private fun enterText(@StringRes label: Int, text: String) {
         composeRule.onNode(hasText(string(label)) and hasSetTextAction()).performTextReplacement(text)

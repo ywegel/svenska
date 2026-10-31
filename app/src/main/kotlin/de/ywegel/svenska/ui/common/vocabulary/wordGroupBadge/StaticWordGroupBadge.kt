@@ -25,7 +25,10 @@ import de.ywegel.svenska.ui.theme.SvenskaTheme
 fun StaticWordGroupBadgeExtended(wordGroup: WordGroup) {
     val mainGroup = wordGroup.mainGroupUserFacingString()
     val subGroup = wordGroup.subGroupAbbreviation()
-    val description = subGroup?.let {
+    // The undefined abbreviation is "?", which screen readers announce as "question mark"
+    val isSubGroupUndefined = (wordGroup as? WordGroup.Noun)?.subgroup == WordGroup.NounSubgroup.UNDEFINED ||
+        (wordGroup as? WordGroup.Verb)?.subgroup == WordGroup.VerbSubgroup.UNDEFINED
+    val description = subGroup?.takeUnless { isSubGroupUndefined }?.let {
         stringResource(R.string.accessibility_word_group_badge, mainGroup, it)
     } ?: stringResource(R.string.accessibility_word_group_badge_main_only, mainGroup)
 

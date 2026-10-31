@@ -25,6 +25,10 @@ abstract class Robot(protected val composeRule: AndroidComposeTestRule<*, *>) {
         composeRule.onNode(matcher).assertDoesNotExist()
     }
 
+    protected fun waitUntilGone(matcher: SemanticsMatcher) {
+        composeRule.waitUntil(TIMEOUT_MS) { composeRule.onAllNodes(matcher).fetchSemanticsNodes().isEmpty() }
+    }
+
     private fun clickOn(matcher: SemanticsMatcher) {
         composeRule.onNode(matcher).performClick()
     }
