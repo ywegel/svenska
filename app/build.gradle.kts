@@ -9,7 +9,6 @@ import java.util.Properties
 
 plugins {
     alias(libs.plugins.com.android.application)
-    alias(libs.plugins.kotlin.android)
     alias(libs.plugins.kotlinx.serialization)
     alias(libs.plugins.kotlin.compose.compiler)
     alias(libs.plugins.dagger.hilt.android)
@@ -348,8 +347,4 @@ roborazzi {
             "qualifiers" to "RobolectricDeviceQualifiers.Pixel5",
         )
     }
-}
-
-configurations.configureEach {
-    resolutionStrategy.force("org.jetbrains.kotlin:kotlin-metadata-jvm:2.4.21")
 }

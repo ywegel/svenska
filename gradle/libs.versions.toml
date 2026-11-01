@@ -2,13 +2,13 @@
 app-version-code = "28"
 app-version-name = "2026.9.0"
 
-agp = "8.13.2"
-dagger-hilt = "2.58"
+agp = "9.5.0"
+dagger-hilt = "2.60.1"
 kotlin = "2.4.21"
 core-ktx = "1.15.0"
 junit = "4.13.2"
 espresso-core = "3.6.1"
-lifecycle-runtime-ktx = "2.9.1"
+lifecycle-runtime-ktx = "2.10.0"
 activity-compose = "1.10.1"
 compose-bom = "2025.04.01"
 room-version = "2.7.2"
@@ -16,7 +16,7 @@ androidx-hilt = "1.2.0"
 compose-destinations = "2.2.0"
 junit5 = "5.11.2"
 about-libraries = "12.1.2"
-roborazzi-version = "1.55.0"
+roborazzi-version = "1.77.0"
 
 [libraries]
 core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "core-ktx" }
@@ -101,13 +101,13 @@ kotlin-compose-compiler = { id = "org.jetbrains.kotlin.plugin.compose", version.
 kotlinx-serialization = { id = "org.jetbrains.kotlin.plugin.serialization", version.ref = "kotlin" }
 dagger-hilt-android = { id = "com.google.dagger.hilt.android", version.ref = "dagger-hilt" }
 google-ksp = "com.google.devtools.ksp:2.3.13"
-junit5 = "de.mannodermaus.android-junit5:1.11.2.0"
+junit5 = "de.mannodermaus.android-junit5:2.0.2"
 ktlint = "org.jlleitschuh.gradle.ktlint:12.2.0"
 detekt = "io.gitlab.arturbosch.detekt:1.23.8"
 room = { id = "androidx.room", version.ref = "room-version" }
 about-libraries = { id = "com.mikepenz.aboutlibraries.plugin", version.ref = "about-libraries" }
 kotlinx-kover = "org.jetbrains.kotlinx.kover:0.9.9"
-sentry-io = "io.sentry.android.gradle:5.12.2"
+sentry-io = "io.sentry.android.gradle:6.25.0"
 roborazzi = { id = "io.github.takahirom.roborazzi", version.ref = "roborazzi-version" }
 
 [bundles]
