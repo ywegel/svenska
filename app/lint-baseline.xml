@@ -2,6 +2,17 @@
 <issues format="6" by="lint 8.13.2" type="baseline" client="gradle" dependencies="true" name="AGP (8.13.2)" variant="all" version="8.13.2">
 
     <issue
+        id="OldTargetApi"
+        message="Not targeting the latest versions of Android; compatibility modes apply. Consider testing and updating this version. Consult the `android.os.Build.VERSION_CODES` javadoc for details."
+        errorLine1="        targetSdk = 36"
+        errorLine2="        ~~~~~~~~~~~~~~">
+        <location
+            file="build.gradle.kts"
+            line="59"
+            column="9"/>
+    </issue>
+
+    <issue
         id="MemberExtensionConflict"
         message="`items` is defined both as a member in class `androidx.compose.foundation.lazy.grid.LazyGridScope` and an extension in package `androidx.compose.foundation.lazy.grid`. The defined behavior for this is to use the member, but since the extension is explicitly imported into this file, there&apos;s a chance that this was not expected. (One common way this happens is for members to be added to a class after code was already written to use an extension)."
         errorLine1="            items(mainSubgroups) { subgroup ->"

@@ -106,7 +106,7 @@ ktlint = "org.jlleitschuh.gradle.ktlint:12.2.0"
 detekt = "io.gitlab.arturbosch.detekt:1.23.8"
 room = { id = "androidx.room", version.ref = "room-version" }
 about-libraries = { id = "com.mikepenz.aboutlibraries.plugin", version.ref = "about-libraries" }
-kotlinx-kover = "org.jetbrains.kotlinx.kover:0.9.1"
+kotlinx-kover = "org.jetbrains.kotlinx.kover:0.9.9"
 sentry-io = "io.sentry.android.gradle:5.12.2"
 roborazzi = { id = "io.github.takahirom.roborazzi", version.ref = "roborazzi-version" }
 
