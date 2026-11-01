@@ -3,6 +3,7 @@
 import com.github.takahirom.roborazzi.ExperimentalRoborazziApi
 import io.gitlab.arturbosch.detekt.Detekt
 import io.sentry.android.gradle.instrumentation.logcat.LogcatLevel
+import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 import org.jlleitschuh.gradle.ktlint.reporter.ReporterType
 import java.util.Properties
 
@@ -113,9 +114,6 @@ android {
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_17
         targetCompatibility = JavaVersion.VERSION_17
-    }
-    kotlinOptions {
-        jvmTarget = "17"
     }
     buildFeatures {
         compose = true
@@ -242,6 +240,12 @@ dependencies {
     kspTest(libs.hilt.compiler)
 }
 
+kotlin {
+    compilerOptions {
+        jvmTarget.set(JvmTarget.JVM_17)
+    }
+}
+
 ksp {
     arg("room.generateKotlin", "true")
 }
@@ -344,4 +348,8 @@ roborazzi {
             "qualifiers" to "RobolectricDeviceQualifiers.Pixel5",
         )
     }
+}
+
+configurations.configureEach {
+    resolutionStrategy.force("org.jetbrains.kotlin:kotlin-metadata-jvm:2.4.21")
 }
