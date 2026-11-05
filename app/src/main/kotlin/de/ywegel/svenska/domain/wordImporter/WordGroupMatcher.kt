@@ -5,34 +5,43 @@ import de.ywegel.svenska.data.model.WordGroup
 
 object WordGroupMatcher {
     fun determineWordGroup(baseWord: String, endings: List<String>): WordGroup {
+        // Check if is verb, bevor checking noun. Verbs are easiert to detect because of the "t"/"ts" ending in the Superlativ form
         return when {
             isAdjective(endings) -> WordGroup.Adjective
-            isNoun(endings) -> determineNounSubgroup(endings)
             isVerb(endings) -> determineVerbSubgroup(baseWord, endings)
+            isNoun(endings) -> determineNounSubgroup(baseWord, endings)
             else -> WordGroup.Other
         }
     }
 
     private fun isAdjective(endings: List<String>): Boolean {
         // Adjectives always only have 2 endings (mostly "-t", "-a")
-        return endings.size == ADJECTIVE_ENDINGS
+        return endings.size == ADJECTIVE_ENDINGS_COUNT
     }
 
     private fun isNoun(endings: List<String>): Boolean {
-        // Nouns always have 3 endings and the first ending is -n/-en/-t/-et
-        return endings.size == NOUN_ENDINGS && endings[0].removePrefix("-") in nounIndicatorEndings
+        // Nouns always have 3 endings. Verbs also have 3, so this has to be checked after isVerb
+        return endings.size == NOUN_ENDINGS_COUNT
     }
 
     private fun isVerb(endings: List<String>): Boolean {
         // Verbs always have 3 endings
-        return endings.size == VERB_ENDINGS
+        if (endings.size != VERB_ENDINGS_COUNT) return false
+
+        // Verbs end with "ts" or 't' in the supine form
+        val supineEnding = endings[2].trim()
+        return verbIndicatorSuperlativEndings.any { supineEnding.endsWith(it, ignoreCase = true) }
     }
 
-    private fun determineNounSubgroup(endings: List<String>): WordGroup.Noun {
+    private fun determineNounSubgroup(baseWord: String, endings: List<String>): WordGroup.Noun {
         val pluralEnding = endings[1]
         val lazyGender by lazy { determineGender(WordGroup.Noun(WordGroup.NounSubgroup.UNDEFINED), endings) }
 
         return when {
+            // serie (-n -er -erna): serie + r, not seri + er
+            baseWord.endsWith("e") && pluralEnding == "-er" -> WordGroup.Noun(WordGroup.NounSubgroup.R)
+            // sko (-n skor skorna): sko + r, not sk + or
+            baseWord.endsWith("o") && pluralEnding.endsWith("or") -> WordGroup.Noun(WordGroup.NounSubgroup.R)
             pluralEnding.endsWith("or") -> WordGroup.Noun(WordGroup.NounSubgroup.OR)
             pluralEnding.endsWith("ar") -> WordGroup.Noun(WordGroup.NounSubgroup.AR)
             pluralEnding.endsWith("er") -> WordGroup.Noun(WordGroup.NounSubgroup.ER)
@@ -50,7 +59,7 @@ object WordGroupMatcher {
         }
     }
 
-    // TODO: if verb or noun has endings, but some endings to not have a '-', treat them as special!
+    // TODO: if verb or noun has endings, but some endings do not have a '-', treat them as special!
     @Suppress("detekt:CyclomaticComplexMethod")
     private fun determineVerbSubgroup(baseWord: String, endings: List<String>): WordGroup.Verb {
         val present = endings[0]
@@ -86,17 +95,16 @@ object WordGroupMatcher {
         if (endings.isEmpty()) return null
         if (wordGroup !is WordGroup.Noun) return null
 
-        val firstEnding = endings[0].removePrefix("-")
-
-        return when {
-            firstEnding == "n" || firstEnding == "en" -> Gender.Ultra // En-word
-            firstEnding == "t" || firstEnding == "et" -> Gender.Neutra // Ett-word
+        // The first form is the definite singular, for example: -n, -an, semestern, -t, -met, teet
+        return when (endings[0].trim().lastOrNull()?.lowercaseChar()) {
+            'n' -> Gender.Ultra // En-word
+            't' -> Gender.Neutra // Ett-word
             else -> null // Unknown
         }
     }
 
-    private val nounIndicatorEndings = setOf("n", "en", "t", "et")
-    const val NOUN_ENDINGS = 3
-    const val VERB_ENDINGS = 3
-    const val ADJECTIVE_ENDINGS = 2
+    private val verbIndicatorSuperlativEndings = setOf("t", "ts")
+    const val NOUN_ENDINGS_COUNT = 3
+    const val VERB_ENDINGS_COUNT = 3
+    const val ADJECTIVE_ENDINGS_COUNT = 2
 }

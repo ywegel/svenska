@@ -11,7 +11,7 @@ import java.util.stream.Stream
 
 class WordGroupMatcherTest {
     @ParameterizedTest
-    @MethodSource("provideDetermineWordGroupTestCases")
+    @MethodSource("provideDetermineWordGroupTestCases", "provideRivstartNounTestCases")
     fun testDetermineWordGroup(baseWord: String, endings: List<String>, expectedGroup: WordGroup) {
         val result = WordGroupMatcher.determineWordGroup(baseWord, endings)
         assertEquals(expectedGroup, result)
@@ -43,18 +43,103 @@ class WordGroupMatcherTest {
                 Arguments.of("hus", listOf("-et", "", "-en"), WordGroup.Noun(WordGroup.NounSubgroup.UNCHANGED_ETT)),
 
                 // Edge cases
-                // Unknown verb
-                Arguments.of(
-                    "example",
-                    listOf("-x", "-y", "-z"),
-                    WordGroup.Verb(WordGroup.VerbSubgroup.GROUP_4_SPECIAL),
-                ),
+                // Unknown endings without a verb supine
+                Arguments.of("example", listOf("-x", "-y", "-z"), WordGroup.Noun(WordGroup.NounSubgroup.UNDEFINED)),
                 // Noun with verb ending
                 Arguments.of("word", listOf("-n", "-ar", "-en"), WordGroup.Noun(WordGroup.NounSubgroup.AR)),
                 // Noun with verb ending
                 Arguments.of("word", listOf("-n", "-er", "-na"), WordGroup.Noun(WordGroup.NounSubgroup.ER)),
                 // No endings
                 Arguments.of("word", emptyList<String>(), WordGroup.Other),
+            )
+        }
+
+        @JvmStatic
+        fun provideRivstartNounTestCases(): Stream<Arguments> {
+            fun noun(word: String, endings: String, subgroup: WordGroup.NounSubgroup) =
+                Arguments.of(word, endings.split(" "), WordGroup.Noun(subgroup))
+
+            return Stream.of(
+                // Group 1: -or
+                noun("våg", "-en -or -orna", WordGroup.NounSubgroup.OR),
+                noun("ros", "-en -or -orna", WordGroup.NounSubgroup.OR),
+                noun("sida", "-n sidor sidorna", WordGroup.NounSubgroup.OR),
+                noun("flicka", "-an flickor flickorna", WordGroup.NounSubgroup.OR),
+
+                // Group 2: -ar
+                noun("bil", "-en -ar -arna", WordGroup.NounSubgroup.AR),
+                noun("vägg", "-en -ar -arna", WordGroup.NounSubgroup.AR),
+                noun("topp", "-en -ar -arna", WordGroup.NounSubgroup.AR),
+                noun("bro", "-n -ar -arna", WordGroup.NounSubgroup.AR),
+                noun("by", "-n -ar -arna", WordGroup.NounSubgroup.AR),
+                noun("ö", "-n -ar -arna", WordGroup.NounSubgroup.AR),
+                noun("å", "-n -ar -arna", WordGroup.NounSubgroup.AR),
+                noun("timme", "-n timmar timmarna", WordGroup.NounSubgroup.AR),
+                noun("hare", "-n harar hararna", WordGroup.NounSubgroup.AR),
+                noun("cykel", "-n cyklar cyklarna", WordGroup.NounSubgroup.AR),
+                noun("minister", "-n ministrar ministrarna", WordGroup.NounSubgroup.AR),
+                noun("parkering", "-en -ar -arna", WordGroup.NounSubgroup.AR),
+                noun("kompis", "-en -ar -arna", WordGroup.NounSubgroup.AR),
+                noun("sjukdom", "-en -ar -arna", WordGroup.NounSubgroup.AR),
+                noun("storlek", "-en -ar -arna", WordGroup.NounSubgroup.AR),
+
+                // Group 3: -er
+                noun("maskerad", "-en -er -erna", WordGroup.NounSubgroup.ER),
+                noun("japan", "-en -er -erna", WordGroup.NounSubgroup.ER),
+                noun("demonstrant", "-en -er -erna", WordGroup.NounSubgroup.ER),
+                noun("student", "-en -er -erna", WordGroup.NounSubgroup.ER),
+                noun("tomat", "-en -er -erna", WordGroup.NounSubgroup.ER),
+                noun("konferens", "-en -er -erna", WordGroup.NounSubgroup.ER),
+                noun("protest", "-en -er -erna", WordGroup.NounSubgroup.ER),
+                noun("raritet", "-en -er -erna", WordGroup.NounSubgroup.ER),
+                noun("omelett", "-en -er -erna", WordGroup.NounSubgroup.ER),
+                noun("mobil", "-en -er -erna", WordGroup.NounSubgroup.ER),
+                noun("station", "-en -er -erna", WordGroup.NounSubgroup.ER),
+                noun("cyklist", "-en -er -erna", WordGroup.NounSubgroup.ER),
+                noun("biolog", "-en -er -erna", WordGroup.NounSubgroup.ER),
+                noun("kromosom", "-en -er -erna", WordGroup.NounSubgroup.ER),
+                noun("idiot", "-en -er -erna", WordGroup.NounSubgroup.ER),
+                noun("filosof", "-en -er -erna", WordGroup.NounSubgroup.ER),
+                noun("frisör", "-en -er -erna", WordGroup.NounSubgroup.ER),
+                noun("nyhet", "-en -er -erna", WordGroup.NounSubgroup.ER),
+                noun("motor", "-n -er -erna", WordGroup.NounSubgroup.ER),
+                noun("kunskap", "-en -er -erna", WordGroup.NounSubgroup.ER),
+                noun("film", "-en -er -erna", WordGroup.NounSubgroup.ER),
+                noun("fest", "-en -er -erna", WordGroup.NounSubgroup.ER),
+                noun("rad", "-en -er -arna", WordGroup.NounSubgroup.ER),
+                noun("kö", "-n -er -erna", WordGroup.NounSubgroup.ER),
+                noun("vy", "-n -er -erna", WordGroup.NounSubgroup.ER),
+                noun("kafé", "-t -er -erna", WordGroup.NounSubgroup.ER),
+                noun("pris", "-et -er -erna", WordGroup.NounSubgroup.ER),
+                noun("bageri", "-t -er -erna", WordGroup.NounSubgroup.ER),
+                noun("bonde", "-n bönder bönderna", WordGroup.NounSubgroup.ER),
+                noun("te", "teet teer teerna", WordGroup.NounSubgroup.ER),
+
+                // Group 4: -r
+                noun("ko", "-n -r -rna", WordGroup.NounSubgroup.R),
+                noun("sko", "-n skor skorna", WordGroup.NounSubgroup.R),
+                noun("tå", "-n -r -rna", WordGroup.NounSubgroup.R),
+                noun("same", "-n -er -erna", WordGroup.NounSubgroup.R),
+                noun("serie", "-n -er -erna", WordGroup.NounSubgroup.R),
+                noun("aktie", "-n -r -rna", WordGroup.NounSubgroup.R),
+                noun("fiende", "-n -r -rna", WordGroup.NounSubgroup.R),
+                noun("linje", "-n -r -rna", WordGroup.NounSubgroup.R),
+                noun("bakelse", "-n -r -rna", WordGroup.NounSubgroup.R),
+                noun("bibliotekarie", "-n -r -rna", WordGroup.NounSubgroup.R),
+
+                // Group 5: -n
+                noun("meddelande", "-t -n -na", WordGroup.NounSubgroup.N),
+                noun("yrke", "-t -n -na", WordGroup.NounSubgroup.N),
+                noun("bi", "-et -n -na", WordGroup.NounSubgroup.N),
+
+                // Group 6a: unchanged ett-words
+                noun("träd", "-et - -en", WordGroup.NounSubgroup.UNCHANGED_ETT),
+                noun("program", "-met - -men", WordGroup.NounSubgroup.UNCHANGED_ETT),
+
+                // Group 6b: unchanged en-words
+                noun("målare", "-n - målarna", WordGroup.NounSubgroup.UNCHANGED_EN),
+                noun("indier", "-n - -na", WordGroup.NounSubgroup.UNCHANGED_EN),
+                noun("elektriker", "-n - -na", WordGroup.NounSubgroup.UNCHANGED_EN),
             )
         }
 
