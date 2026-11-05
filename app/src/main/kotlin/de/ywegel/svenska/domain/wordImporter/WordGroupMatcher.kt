@@ -59,36 +59,46 @@ object WordGroupMatcher {
         }
     }
 
-    // TODO: if verb or noun has endings, but some endings do not have a '-', treat them as special!
-    @Suppress("detekt:CyclomaticComplexMethod")
     private fun determineVerbSubgroup(baseWord: String, endings: List<String>): WordGroup.Verb {
         val present = endings[0]
-        val past = endings[1]
-        return when {
-            // TODO: anpassen, dass ar auch -r matcht?
-            baseWord.endsWith("a") && present.endsWith("ar") && past.endsWith("ade") -> WordGroup.Verb(
-                WordGroup.VerbSubgroup.GROUP_1,
-            )
+        val past = endings[1].substringBefore("/")
+        val supine = endings[2].substringBefore("/")
 
-            baseWord.endsWith("a") && present.endsWith("r") && past.endsWith("de") -> WordGroup.Verb(
-                WordGroup.VerbSubgroup.GROUP_1,
-            )
-
-            baseWord.endsWith("a") && present.endsWith("er") && past.endsWith("de") -> WordGroup.Verb(
-                WordGroup.VerbSubgroup.GROUP_2A,
-            )
-
-            baseWord.endsWith("a") && present.endsWith("er") && past.endsWith("te") -> WordGroup.Verb(
-                WordGroup.VerbSubgroup.GROUP_2B,
-            )
-
-            baseWord.last() in setOf('a', 'e', 'i', 'o', 'u', 'y') &&
-                present.endsWith("r") &&
-                past.endsWith("dde")
-            -> WordGroup.Verb(WordGroup.VerbSubgroup.GROUP_3)
-
-            else -> WordGroup.Verb(WordGroup.VerbSubgroup.GROUP_4_SPECIAL)
+        val subgroup = when {
+            isGroup1(baseWord, present, past, supine) -> WordGroup.VerbSubgroup.GROUP_1
+            isGroup2(baseWord, past, supine) && past.endsWith("de") -> WordGroup.VerbSubgroup.GROUP_2A
+            isGroup2(baseWord, past, supine) && past.endsWith("te") -> WordGroup.VerbSubgroup.GROUP_2B
+            isGroup3(baseWord, present, past, supine) -> WordGroup.VerbSubgroup.GROUP_3
+            else -> WordGroup.VerbSubgroup.GROUP_4_SPECIAL
         }
+
+        return WordGroup.Verb(subgroup)
+    }
+
+    private fun isGroup1(baseWord: String, present: String, past: String, supine: String): Boolean {
+        val isShortNotation = present == "-r" && past == "-de"
+        val isWrittenOut = present.endsWith("ar") && past.endsWith("ade") && supine.endsWith("at")
+        return baseWord.endsWith("a") && (isShortNotation || isWrittenOut)
+    }
+
+    private fun isGroup2(baseWord: String, past: String, supine: String): Boolean {
+        val stem = baseWord.removeSuffix("a")
+        return baseWord.endsWith("a") &&
+            stem.length >= MIN_VERB_STEM_LENGTH &&
+            past.keepsStem(stem) &&
+            supine.keepsStem(stem) &&
+            !supine.endsWith("it") &&
+            !supine.endsWith("at")
+    }
+
+    // Double consonants can be simplified, so the last letter is ignored: glömma -> glömde, känna -> känt
+    private fun String.keepsStem(stem: String): Boolean = startsWith("-") || startsWith(stem.dropLast(1))
+
+    private fun isGroup3(baseWord: String, present: String, past: String, supine: String): Boolean {
+        return baseWord.last() in group3WordEndings &&
+            present.endsWith("r") &&
+            past.endsWith("dde") &&
+            supine.endsWith("tt")
     }
 
     fun determineGender(wordGroup: WordGroup, endings: List<String>): Gender? {
@@ -104,6 +114,8 @@ object WordGroupMatcher {
     }
 
     private val verbIndicatorSuperlativEndings = setOf("t", "ts")
+    private val group3WordEndings = setOf('e', 'i', 'o', 'u', 'y', 'å', 'ä', 'ö')
+    private const val MIN_VERB_STEM_LENGTH = 2
     const val NOUN_ENDINGS_COUNT = 3
     const val VERB_ENDINGS_COUNT = 3
     const val ADJECTIVE_ENDINGS_COUNT = 2

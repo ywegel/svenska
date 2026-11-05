@@ -15,12 +15,10 @@ class WordParserImpl @Inject constructor() : WordParser {
         val wordGroup = WordGroupMatcher.determineWordGroup(baseWord, endings)
         val gender = WordGroupMatcher.determineGender(wordGroup, endings)
 
-        // If we don't have any dashes in one ending, we can be sure that it is a special word
-        val hasInvalidEndings = endings.any { !it.startsWith("-") }
-
         val finalWordGroup = when {
-            hasInvalidEndings && wordGroup is WordGroup.Verb -> WordGroup.Verb(WordGroup.VerbSubgroup.GROUP_4_SPECIAL)
-            hasInvalidEndings && wordGroup is WordGroup.Noun -> WordGroup.Noun(WordGroup.NounSubgroup.SPECIAL)
+            wordGroup is WordGroup.Noun && hasVowelChangeInPlural(baseWord, endings[1]) ->
+                WordGroup.Noun(WordGroup.NounSubgroup.SPECIAL)
+
             else -> wordGroup
         }
 
@@ -35,5 +33,24 @@ class WordParserImpl @Inject constructor() : WordParser {
         )
 
         return newVocabulary
+    }
+
+    /**
+     * fot -> fötter changes the vowel, while sida -> sidor and semester -> semestrar only lose one.
+     * Checks for a contained sequence, as compounds are often shortened: hurtbulle -> bullar.
+     */
+    private fun hasVowelChangeInPlural(baseWord: String, plural: String): Boolean {
+        val pluralStem = plural.removePrefix("-").lowercase().replace(pluralSuffixRegex, "")
+        if (pluralStem.length < MIN_STEM_LENGTH) return false
+
+        return pluralStem.vowels() !in baseWord.lowercase().vowels()
+    }
+
+    private fun String.vowels(): String = filter { it in VOWELS }
+
+    private companion object {
+        val pluralSuffixRegex = Regex("(or|ar|er|r|n)$")
+        const val VOWELS = "aeiouyåäöé"
+        const val MIN_STEM_LENGTH = 2
     }
 }
