@@ -76,6 +76,31 @@ class WordParserTest {
                 Arguments.of("mus (musen, möss, mössen)", noun(WordGroup.NounSubgroup.SPECIAL)),
                 Arguments.of("dagbok (-en, dagböcker, dagböckerna)", noun(WordGroup.NounSubgroup.SPECIAL)),
 
+                // Regular nouns that look similar to typos
+                Arguments.of("plåster (plåstret, plåster, plåstren)", noun(WordGroup.NounSubgroup.UNCHANGED_ETT)),
+                Arguments.of("självkänsla (-n, självkänslor, -orna)", noun(WordGroup.NounSubgroup.OR)),
+                Arguments.of("träningsresa (-n, -resor, resorna)", noun(WordGroup.NounSubgroup.OR)),
+                Arguments.of("uttryck (-et, -en, -ena)", noun(WordGroup.NounSubgroup.N)),
+
+                // Nouns without a definite singular
+                Arguments.of("titel (titel, titlar, titlarna)", noun(WordGroup.NounSubgroup.SPECIAL)),
+                Arguments.of("farmor (farmoder, farmödrar, farmödrarna)", noun(WordGroup.NounSubgroup.SPECIAL)),
+                Arguments.of("examen (-, examina, examina)", noun(WordGroup.NounSubgroup.SPECIAL)),
+
+                // Nouns with typos
+                Arguments.of("block (et, -, -en)", noun(WordGroup.NounSubgroup.SPECIAL)),
+                Arguments.of("vaktmästare (n, -, vaktmästarna)", noun(WordGroup.NounSubgroup.SPECIAL)),
+                Arguments.of("skymning (-en, ar, -arna)", noun(WordGroup.NounSubgroup.SPECIAL)),
+                Arguments.of("smör (-et, -, en)", noun(WordGroup.NounSubgroup.SPECIAL)),
+                Arguments.of("diktatur (-en, -er, erna)", noun(WordGroup.NounSubgroup.SPECIAL)),
+                Arguments.of("tillfälle (-t, -n, - na)", noun(WordGroup.NounSubgroup.SPECIAL)),
+                Arguments.of("klass (-en, -er, -arna)", noun(WordGroup.NounSubgroup.SPECIAL)),
+                Arguments.of("tron (-en, -er, -ern)", noun(WordGroup.NounSubgroup.SPECIAL)),
+                Arguments.of("följdfråga (-n, följdfrågor, följfrågorna)", noun(WordGroup.NounSubgroup.SPECIAL)),
+                Arguments.of("spa (-t, -n, -a)", noun(WordGroup.NounSubgroup.SPECIAL)),
+                Arguments.of("fisk (-en, -, -ar)", noun(WordGroup.NounSubgroup.SPECIAL)),
+                Arguments.of("långlunch (-en, -, -er)", noun(WordGroup.NounSubgroup.SPECIAL)),
+
                 // Regular verbs
                 Arguments.of("svara (svarar, svarade, svarat)", verb(WordGroup.VerbSubgroup.GROUP_1)),
                 Arguments.of("bygga (bygger, byggde, byggt)", verb(WordGroup.VerbSubgroup.GROUP_2A)),

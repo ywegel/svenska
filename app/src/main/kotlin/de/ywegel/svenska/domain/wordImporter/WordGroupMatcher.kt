@@ -34,7 +34,8 @@ object WordGroupMatcher {
     }
 
     private fun determineNounSubgroup(baseWord: String, endings: List<String>): WordGroup.Noun {
-        val pluralEnding = endings[1]
+        // plåster (plåstret, plåster, plåstren) writes out the unchanged plural
+        val pluralEnding = endings[1].takeUnless { it == baseWord } ?: "-"
         val lazyGender by lazy { determineGender(WordGroup.Noun(WordGroup.NounSubgroup.UNDEFINED), endings) }
 
         return when {
@@ -47,11 +48,11 @@ object WordGroupMatcher {
             pluralEnding.endsWith("er") -> WordGroup.Noun(WordGroup.NounSubgroup.ER)
             pluralEnding.endsWith("r") -> WordGroup.Noun(WordGroup.NounSubgroup.R)
             pluralEnding.endsWith("n") -> WordGroup.Noun(WordGroup.NounSubgroup.N)
-            pluralEnding.endsWith("") && lazyGender == Gender.Neutra -> WordGroup.Noun(
+            lazyGender == Gender.Neutra -> WordGroup.Noun(
                 WordGroup.NounSubgroup.UNCHANGED_ETT,
             )
 
-            pluralEnding.endsWith("") && lazyGender == Gender.Ultra -> WordGroup.Noun(
+            lazyGender == Gender.Ultra -> WordGroup.Noun(
                 WordGroup.NounSubgroup.UNCHANGED_EN,
             )
 
