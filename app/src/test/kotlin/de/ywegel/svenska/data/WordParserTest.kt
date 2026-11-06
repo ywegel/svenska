@@ -120,7 +120,7 @@ class WordParserTest {
                 Arguments.of("sätta (sätter, satte, satt)", verb(WordGroup.VerbSubgroup.GROUP_4_SPECIAL)),
                 Arguments.of("växa (växer, växte, vuxit)", verb(WordGroup.VerbSubgroup.GROUP_4_SPECIAL)),
                 Arguments.of("säga (säger, sade/sa, sagt)", verb(WordGroup.VerbSubgroup.GROUP_4_SPECIAL)),
-                Arguments.of("glädja (glädjer, gladde, glatt)", verb(WordGroup.VerbSubgroup.GROUP_4_SPECIAL)),
+                Arguments.of("glädja (glädjer/gläder, gladde, glatt)", verb(WordGroup.VerbSubgroup.GROUP_4_SPECIAL)),
             )
         }
 
