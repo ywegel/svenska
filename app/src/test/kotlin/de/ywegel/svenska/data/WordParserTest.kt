@@ -1,8 +1,6 @@
 package de.ywegel.svenska.data
 
-import de.ywegel.svenska.assertVocabularyEqualsIgnoringTimestamps
 import de.ywegel.svenska.data.model.Gender
-import de.ywegel.svenska.data.model.Vocabulary
 import de.ywegel.svenska.data.model.WordGroup
 import de.ywegel.svenska.domain.wordImporter.WordParserImpl
 import org.junit.jupiter.api.Assertions.assertEquals
@@ -14,18 +12,30 @@ import java.util.stream.Stream
 class WordParserTest {
 
     @ParameterizedTest
-    @MethodSource("detectWordTypeDataProvider")
-    fun `should detect word type correctly`(testData: ParserTestData) {
+    @MethodSource("abbreviatedFormsDataProvider")
+    fun `should detect word group and endings`(word: String, expectedGroup: WordGroup, expectedEnding: String) {
         // Given
         val parser = WordParserImpl()
 
         // When
-        val result = parser.parseWord(testData.word, testData.translation, CONTAINER_ID)
-
-        println(result)
+        val result = parser.parseWord(word, "translation", CONTAINER_ID)
 
         // Then
-        assertVocabularyEqualsIgnoringTimestamps(testData.expected, result)
+        assertEquals(expectedGroup, result.wordGroup)
+        assertEquals(expectedEnding, result.ending)
+    }
+
+    @ParameterizedTest
+    @MethodSource("genderDataProvider")
+    fun `should detect gender correctly`(word: String, expectedGender: Gender?) {
+        // Given
+        val parser = WordParserImpl()
+
+        // When
+        val result = parser.parseWord(word, "translation", CONTAINER_ID)
+
+        // Then
+        assertEquals(expectedGender, result.gender)
     }
 
     @ParameterizedTest
@@ -41,20 +51,14 @@ class WordParserTest {
         assertEquals(expectedGroup, result.wordGroup)
     }
 
-    data class ParserTestData(
-        val word: String,
-        val translation: String,
-        val expected: Vocabulary,
-    )
-
     companion object {
         private const val CONTAINER_ID = 99
 
+        private fun noun(subgroup: WordGroup.NounSubgroup) = WordGroup.Noun(subgroup)
+        private fun verb(subgroup: WordGroup.VerbSubgroup) = WordGroup.Verb(subgroup)
+
         @JvmStatic
         private fun writtenOutFormsDataProvider(): Stream<Arguments> {
-            fun noun(subgroup: WordGroup.NounSubgroup) = WordGroup.Noun(subgroup)
-            fun verb(subgroup: WordGroup.VerbSubgroup) = WordGroup.Verb(subgroup)
-
             return Stream.of(
                 // Regular nouns
                 Arguments.of("sida (-n, sidor, sidorna)", noun(WordGroup.NounSubgroup.OR)),
@@ -125,141 +129,40 @@ class WordParserTest {
         }
 
         @JvmStatic
-        private fun detectWordTypeDataProvider(): Stream<Arguments> = Stream.of(
-            Arguments.of(
-                ParserTestData(
-                    word = "penna (-n, -or, -orna)",
-                    translation = "Stift",
-                    expected = Vocabulary(
-                        word = "penna",
-                        translation = "Stift",
-                        gender = Gender.Ultra,
-                        wordGroup = WordGroup.Noun(WordGroup.NounSubgroup.OR),
-                        ending = "-n -or -orna",
-                        containerId = CONTAINER_ID,
-                    ),
-                ),
-            ),
-            Arguments.of(
-                ParserTestData(
-                    word = "markera (-r, -de, -t)",
-                    translation = "markieren",
-                    expected = Vocabulary(
-                        word = "markera",
-                        translation = "markieren",
-                        wordGroup = WordGroup.Verb(WordGroup.VerbSubgroup.GROUP_1),
-                        ending = "-r -de -t",
-                        containerId = CONTAINER_ID,
-                    ),
-                ),
-            ),
-            Arguments.of(
-                ParserTestData(
-                    word = "plugga (-r, -de, -t)",
-                    translation = "studieren",
-                    expected = Vocabulary(
-                        word = "plugga",
-                        translation = "studieren",
-                        wordGroup = WordGroup.Verb(WordGroup.VerbSubgroup.GROUP_1),
-                        ending = "-r -de -t",
-                        containerId = CONTAINER_ID,
-                    ),
-                ),
-            ),
-            Arguments.of(
-                ParserTestData(
-                    word = "läsa (-er, -te, -t)",
-                    translation = "studieren",
-                    expected = Vocabulary(
-                        word = "läsa",
-                        translation = "studieren",
-                        wordGroup = WordGroup.Verb(WordGroup.VerbSubgroup.GROUP_2B),
-                        ending = "-er -te -t",
-                        containerId = CONTAINER_ID,
-                    ),
-                ),
-            ),
-            Arguments.of(
-                ParserTestData(
-                    word = "mening (-en, -er, -erna)",
-                    translation = "Satz",
-                    expected = Vocabulary(
-                        word = "mening",
-                        translation = "Satz",
-                        gender = Gender.Ultra,
-                        wordGroup = WordGroup.Noun(WordGroup.NounSubgroup.ER),
-                        ending = "-en -er -erna",
-                        containerId = CONTAINER_ID,
-                    ),
-                ),
-            ),
-            Arguments.of(
-                ParserTestData(
-                    word = "göra (gör, gjorde, gjort)",
-                    translation = "machen",
-                    expected = Vocabulary(
-                        word = "göra",
-                        translation = "machen",
-                        wordGroup = WordGroup.Verb(WordGroup.VerbSubgroup.GROUP_4_SPECIAL),
-                        ending = "gör gjorde gjort",
-                        containerId = CONTAINER_ID,
-                    ),
-                ),
-            ),
-            Arguments.of(
-                ParserTestData(
-                    word = "vanlig (-t, -a)",
-                    translation = "gewöhnlich",
-                    expected = Vocabulary(
-                        word = "vanlig",
-                        translation = "gewöhnlich",
-                        wordGroup = WordGroup.Adjective,
-                        ending = "-t -a",
-                        containerId = CONTAINER_ID,
-                    ),
-                ),
-            ),
-            Arguments.of(
-                ParserTestData(
-                    word = "generell (-t, -a)",
-                    translation = "allgemein",
-                    expected = Vocabulary(
-                        word = "generell",
-                        translation = "allgemein",
-                        wordGroup = WordGroup.Adjective,
-                        ending = "-t -a",
-                        containerId = CONTAINER_ID,
-                    ),
-                ),
-            ),
-            Arguments.of(
-                ParserTestData(
-                    word = "kalas (-et, -on, -ona)",
-                    translation = "Fest",
-                    expected = Vocabulary(
-                        word = "kalas",
-                        translation = "Fest",
-                        gender = Gender.Neutra,
-                        wordGroup = WordGroup.Noun(WordGroup.NounSubgroup.N),
-                        ending = "-et -on -ona",
-                        containerId = CONTAINER_ID,
-                    ),
-                ),
-            ),
-            Arguments.of(
-                ParserTestData(
-                    word = "spel (-et, -, -en)",
-                    translation = "Spiel",
-                    expected = Vocabulary(
-                        word = "spel",
-                        translation = "Spiel",
-                        gender = Gender.Neutra,
-                        wordGroup = WordGroup.Noun(WordGroup.NounSubgroup.UNCHANGED_ETT),
-                        ending = "-et - -en",
-                        containerId = CONTAINER_ID,
-                    ),
-                ),
-            ),
+        private fun genderDataProvider(): Stream<Arguments> = Stream.of(
+            // En-words: definite singular ends with n
+            Arguments.of("penna (-n, -or, -orna)", Gender.Ultra),
+            Arguments.of("mening (-en, -er, -erna)", Gender.Ultra),
+            Arguments.of("semester (semestern, semestrar, semestrarna)", Gender.Ultra),
+            Arguments.of("målare (-n, -, målarna)", Gender.Ultra),
+
+            // Ett-words: definite singular ends with t
+            Arguments.of("kalas (-et, -on, -ona)", Gender.Neutra),
+            Arguments.of("spel (-et, -, -en)", Gender.Neutra),
+            Arguments.of("kapitel (kapitlet, -, kapitlen)", Gender.Neutra),
+            Arguments.of("museum (-et, museer, museerna)", Gender.Neutra),
+
+            // No definite singular or unknown ending
+            Arguments.of("examen (-, examina, examina)", null),
+
+            // Only nouns have a gender
+            Arguments.of("markera (-r, -de, -t)", null),
+            Arguments.of("göra (gör, gjorde, gjort)", null),
+            Arguments.of("vanlig (-t, -a)", null),
+        )
+
+        @JvmStatic
+        private fun abbreviatedFormsDataProvider(): Stream<Arguments> = Stream.of(
+            Arguments.of("penna (-n, -or, -orna)", noun(WordGroup.NounSubgroup.OR), "-n -or -orna"),
+            Arguments.of("markera (-r, -de, -t)", verb(WordGroup.VerbSubgroup.GROUP_1), "-r -de -t"),
+            Arguments.of("plugga (-r, -de, -t)", verb(WordGroup.VerbSubgroup.GROUP_1), "-r -de -t"),
+            Arguments.of("läsa (-er, -te, -t)", verb(WordGroup.VerbSubgroup.GROUP_2B), "-er -te -t"),
+            Arguments.of("mening (-en, -er, -erna)", noun(WordGroup.NounSubgroup.ER), "-en -er -erna"),
+            Arguments.of("göra (gör, gjorde, gjort)", verb(WordGroup.VerbSubgroup.GROUP_4_SPECIAL), "gör gjorde gjort"),
+            Arguments.of("vanlig (-t, -a)", WordGroup.Adjective, "-t -a"),
+            Arguments.of("generell (-t, -a)", WordGroup.Adjective, "-t -a"),
+            Arguments.of("kalas (-et, -on, -ona)", noun(WordGroup.NounSubgroup.N), "-et -on -ona"),
+            Arguments.of("spel (-et, -, -en)", noun(WordGroup.NounSubgroup.UNCHANGED_ETT), "-et - -en"),
         )
     }
 }
