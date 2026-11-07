@@ -7,4 +7,8 @@ import de.ywegel.svenska.R
 class SettingsRobot(composeRule: AndroidComposeTestRule<*, *>) : Robot(composeRule) {
 
     fun assertSettingsScreenIsVisible() = assertEventuallyDisplayed(hasText(string(R.string.settings_title)))
+
+    fun openWordImporter() = scrollToAndClickOnText(string(R.string.settings_navigate_word_importer_screen_title))
+
+    fun navigateUp() = clickOnDescription(R.string.accessibility_general_toolbar_navigate_up)
 }

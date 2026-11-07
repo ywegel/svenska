@@ -334,6 +334,27 @@
     <string name="onboarding_page_content_importer_extended">You can either import words from the settings or by clicking on a .json file and selecting the app:</string>
 
     <!-- # WordImporterScreen # -->
+    <string name="wordImporter_idle_title">Import Words from a File</string>
+    <string name="wordImporter_idle_selectFile">Select File</string>
+    <string name="wordImporter_parsing">Parsing file &#8230;</string>
+    <string name="wordImporter_parsed_summary">Found %1$s in %2$s.</string>
+    <plurals name="wordImporter_parsed_words">
+        <item quantity="one">%d word</item>
+        <item quantity="other">%d words</item>
+    </plurals>
+    <plurals name="wordImporter_parsed_chapters">
+        <item quantity="one">%d chapter</item>
+        <item quantity="other">%d chapters</item>
+    </plurals>
+    <string name="wordImporter_parsed_proceed">Proceed</string>
+    <string name="wordImporter_importing">Importing words &#8230;</string>
+    <plurals name="wordImporter_finished_success">
+        <item quantity="one">%d word imported!</item>
+        <item quantity="other">%d words imported!</item>
+    </plurals>
+    <string name="wordImporter_finished_retry">Retry</string>
+    <string name="wordImporter_finished_importAgain">Import again</string>
+    <string name="wordImporter_finished_exit">Exit</string>
     <string name="wordImporter_error_fileNotFound">The file could not be opened. Please pick it again.</string>
     <string name="wordImporter_error_invalidFileFormat">This is not a valid word importer file.</string>
     <string name="wordImporter_error_noWordsLoaded">The file contains no words to import.</string>

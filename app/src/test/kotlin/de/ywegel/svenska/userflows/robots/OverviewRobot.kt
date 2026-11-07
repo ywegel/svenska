@@ -29,5 +29,10 @@ class OverviewRobot(composeRule: AndroidComposeTestRule<*, *>) : Robot(composeRu
         assertEventuallyDisplayed(hasContentDescription(badgeDescription))
     }
 
+    fun assertWordIsListed(word: String, translation: String) {
+        assertEventuallyDisplayed(hasText(word))
+        assertEventuallyDisplayed(hasText(translation))
+    }
+
     fun assertTranslationIsNotListed(translation: String) = assertDoesNotExist(hasText(translation))
 }

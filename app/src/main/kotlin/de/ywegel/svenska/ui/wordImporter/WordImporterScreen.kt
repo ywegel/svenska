@@ -27,6 +27,7 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -36,6 +37,7 @@ import com.ramcosta.composedestinations.navigation.DestinationsNavigator
 import de.ywegel.svenska.R
 import de.ywegel.svenska.navigation.SettingsNavGraph
 import de.ywegel.svenska.ui.common.VerticalSpacerM
+import de.ywegel.svenska.ui.common.VerticalSpacerXS
 import de.ywegel.svenska.ui.theme.SvenskaTheme
 
 @Destination<SettingsNavGraph>(
@@ -82,11 +84,16 @@ private fun WordImporterScreen(
     Scaffold { padding ->
         Box(Modifier.padding(padding)) {
             if (loadingState) {
-                Box(contentAlignment = Alignment.Center) {
-                    CircularProgressIndicator()
+                Column(
+                    modifier = Modifier.fillMaxSize(),
+                    verticalArrangement = Arrangement.Center,
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                ) {
                     importerState.loadingText()?.let {
                         Text(it)
                     }
+                    VerticalSpacerXS()
+                    CircularProgressIndicator()
                 }
             } else {
                 Column(
@@ -108,19 +115,21 @@ private fun WordImporterScreen(
 
 @Composable
 private fun IdleScreen(launchFilePicker: () -> Unit) {
-    Text("Import Words from a File")
+    Text(stringResource(R.string.wordImporter_idle_title))
     VerticalSpacerM()
     Button(onClick = launchFilePicker) {
-        Text("Select File")
+        Text(stringResource(R.string.wordImporter_idle_selectFile))
     }
 }
 
 @Composable
 private fun ParsedScreen(state: ImporterState.Parsed, onProceed: () -> Unit) {
-    Text("Found ${state.words} words in ${state.chapters} chapters.")
+    val words = pluralStringResource(R.plurals.wordImporter_parsed_words, state.words, state.words)
+    val chapters = pluralStringResource(R.plurals.wordImporter_parsed_chapters, state.chapters, state.chapters)
+    Text(stringResource(R.string.wordImporter_parsed_summary, words, chapters))
     VerticalSpacerM()
     Button(onClick = onProceed) {
-        Text("Proceed")
+        Text(stringResource(R.string.wordImporter_parsed_proceed))
     }
 }
 
@@ -131,7 +140,7 @@ fun ImportingScreen(state: ImporterState.Importing) {
         modifier = Modifier.fillMaxWidth(),
     )
     VerticalSpacerM()
-    Text("Importing words...")
+    Text(stringResource(R.string.wordImporter_importing))
 }
 
 @Composable
@@ -148,14 +157,19 @@ fun FinishedScreen(state: ImporterState.Finished, onRestartClicked: () -> Unit, 
             )
         }
     } else {
-        Text("${state.wordCount} words imported!")
+        Text(stringResource(R.string.wordImporter_finished_success, state.wordCount))
     }
     VerticalSpacerM()
     Button(onRestartClicked) {
-        Text(text = state.error?.let { "Retry" } ?: "Import again")
+        val restartLabel = if (state.error != null) {
+            R.string.wordImporter_finished_retry
+        } else {
+            R.string.wordImporter_finished_importAgain
+        }
+        Text(text = stringResource(restartLabel))
     }
     OutlinedButton(onNavigateUp) {
-        Text(text = "Exit")
+        Text(text = stringResource(R.string.wordImporter_finished_exit))
     }
 }
 
@@ -174,10 +188,11 @@ private fun ImporterError.technicalDetail(): String? = when (this) {
     ImporterError.FileNotFound, ImporterError.InvalidFileFormat, ImporterError.NoWordsLoaded -> null
 }
 
+@Composable
 @ReadOnlyComposable
 private fun ImporterState.loadingText(): String? {
     return when (this) {
-        ImporterState.Idle -> "Parsing file..."
+        ImporterState.Idle -> stringResource(R.string.wordImporter_parsing)
         else -> null
     }
 }
