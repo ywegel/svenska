@@ -50,24 +50,32 @@ class FileRepositoryTest {
                 "Kapitel 1",
                 listOf(
                     listOf(
-                        "nounGroupOr Ultra (-n, -or, -orna)",
-                        "translation1",
+                        "klass  (-en, -er, -arna)",
+                        "class",
                     ),
                     listOf(
-                        "verbGroup1 a (-r, -de, -t)",
-                        "translation2",
+                        "ord  (-et, -, -en)",
+                        "word",
                     ),
                     listOf(
-                        "nounGroup5 Neutra (-et, -, -en)",
-                        "translation3",
+                        "dricka  (dricker, drack, druckit)",
+                        "to drink",
                     ),
                     listOf(
-                        "adjective (-t, -a)",
-                        "translation4",
+                        "drink  (-en, -ar, -arna)",
+                        "drink",
                     ),
                     listOf(
-                        "verb a (-er, -te, -t)",
-                        "translation5",
+                        "flytta  (-r, -de, -t)",
+                        "to move",
+                    ),
+                    listOf(
+                        "snygg  (-t, -a)",
+                        "pretty",
+                    ),
+                    listOf(
+                        "gata  (-n, gator, gatorna)",
+                        "street",
                     ),
                 ),
             ),

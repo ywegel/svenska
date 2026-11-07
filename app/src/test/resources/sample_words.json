@@ -3,24 +3,32 @@
     "chapter": "Kapitel 1",
     "words": [
       [
-        "nounGroupOr Ultra (-n, -or, -orna)",
-        "translation1"
+        "klass  (-en, -er, -arna)",
+        "class"
       ],
       [
-        "verbGroup1 a (-r, -de, -t)",
-        "translation2"
+        "ord  (-et, -, -en)",
+        "word"
       ],
       [
-        "nounGroup5 Neutra (-et, -, -en)",
-        "translation3"
+        "dricka  (dricker, drack, druckit)",
+        "to drink"
       ],
       [
-        "adjective (-t, -a)",
-        "translation4"
+        "drink  (-en, -ar, -arna)",
+        "drink"
       ],
       [
-        "verb a (-er, -te, -t)",
-        "translation5"
+        "flytta  (-r, -de, -t)",
+        "to move"
+      ],
+      [
+        "snygg  (-t, -a)",
+        "pretty"
+      ],
+      [
+        "gata  (-n, gator, gatorna)",
+        "street"
       ]
     ]
   }
