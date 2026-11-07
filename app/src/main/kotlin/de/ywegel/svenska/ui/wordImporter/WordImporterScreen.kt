@@ -29,6 +29,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.tooling.preview.PreviewLightDark
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.ramcosta.composedestinations.annotation.Destination
@@ -157,7 +158,7 @@ fun FinishedScreen(state: ImporterState.Finished, onRestartClicked: () -> Unit, 
             )
         }
     } else {
-        Text(stringResource(R.string.wordImporter_finished_success, state.wordCount))
+        Text(pluralStringResource(R.plurals.wordImporter_finished_success, state.wordCount, state.wordCount))
     }
     VerticalSpacerM()
     Button(onRestartClicked) {
@@ -210,4 +211,60 @@ fun HandleJsonImportFromIntent(onJsonFileUriReceived: (Uri) -> Unit) {
             onJsonFileUriReceived(uri)
         }
     }
+}
+
+@Composable
+private fun WordImporterPreview(importerState: ImporterState, loadingState: Boolean = false) {
+    SvenskaTheme {
+        WordImporterScreen(
+            importerState = importerState,
+            loadingState = loadingState,
+            onNavigateUp = {},
+            onFilePicked = {},
+            saveWords = {},
+            onRestartClicked = {},
+        )
+    }
+}
+
+@PreviewLightDark
+@Composable
+private fun WordImporterIdlePreview() {
+    WordImporterPreview(ImporterState.Idle)
+}
+
+@PreviewLightDark
+@Composable
+private fun WordImporterParsingPreview() {
+    WordImporterPreview(ImporterState.Idle, loadingState = true)
+}
+
+@PreviewLightDark
+@Composable
+private fun WordImporterParsedPreview() {
+    WordImporterPreview(ImporterState.Parsed(words = 7, chapters = 1))
+}
+
+@PreviewLightDark
+@Composable
+private fun WordImporterImportingPreview() {
+    WordImporterPreview(ImporterState.Importing(progress = 0.4f))
+}
+
+@PreviewLightDark
+@Composable
+private fun WordImporterFinishedPreview() {
+    WordImporterPreview(ImporterState.Finished(wordCount = 7, success = true))
+}
+
+@PreviewLightDark
+@Composable
+private fun WordImporterErrorPreview() {
+    WordImporterPreview(
+        ImporterState.Finished(
+            wordCount = 0,
+            success = false,
+            error = ImporterError.SaveFailed(IllegalStateException("Database is locked")),
+        ),
+    )
 }
