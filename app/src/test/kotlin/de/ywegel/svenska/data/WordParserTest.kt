@@ -70,6 +70,9 @@ class WordParserTest {
                 Arguments.of("museum (-et, museer, museerna)", noun(WordGroup.NounSubgroup.ER)),
                 Arguments.of("målare (-n, -, målarna)", noun(WordGroup.NounSubgroup.UNCHANGED_EN)),
                 Arguments.of("kapitel (kapitlet, -, kapitlen)", noun(WordGroup.NounSubgroup.UNCHANGED_ETT)),
+                Arguments.of("titel (titeln, titlar, titlarna)", noun(WordGroup.NounSubgroup.AR)),
+                Arguments.of("uttryck (-et, -, -en)", noun(WordGroup.NounSubgroup.UNCHANGED_ETT)),
+                Arguments.of("konto (kontot, konton, kontona)", noun(WordGroup.NounSubgroup.N)),
 
                 // Nouns with a vowel change in the plural
                 Arguments.of("fot (-en, fötter, fötterna)", noun(WordGroup.NounSubgroup.SPECIAL)),
@@ -83,12 +86,8 @@ class WordParserTest {
                 // Regular nouns that look similar to typos
                 Arguments.of("plåster (plåstret, plåster, plåstren)", noun(WordGroup.NounSubgroup.UNCHANGED_ETT)),
                 Arguments.of("självkänsla (-n, självkänslor, -orna)", noun(WordGroup.NounSubgroup.OR)),
-                Arguments.of("träningsresa (-n, -resor, resorna)", noun(WordGroup.NounSubgroup.OR)),
-                Arguments.of("uttryck (-et, -en, -ena)", noun(WordGroup.NounSubgroup.N)),
 
                 // Nouns without a definite singular
-                Arguments.of("titel (titel, titlar, titlarna)", noun(WordGroup.NounSubgroup.SPECIAL)),
-                Arguments.of("farmor (farmoder, farmödrar, farmödrarna)", noun(WordGroup.NounSubgroup.SPECIAL)),
                 Arguments.of("examen (-, examina, examina)", noun(WordGroup.NounSubgroup.SPECIAL)),
 
                 // Nouns with typos
@@ -134,11 +133,11 @@ class WordParserTest {
             Arguments.of("markera (-r, -de, -t)", verb(WordGroup.VerbSubgroup.GROUP_1), "-r -de -t"),
             Arguments.of("plugga (-r, -de, -t)", verb(WordGroup.VerbSubgroup.GROUP_1), "-r -de -t"),
             Arguments.of("läsa (-er, -te, -t)", verb(WordGroup.VerbSubgroup.GROUP_2B), "-er -te -t"),
-            Arguments.of("mening (-en, -er, -erna)", noun(WordGroup.NounSubgroup.ER), "-en -er -erna"),
+            Arguments.of("mening (-en, -ar, -arna)", noun(WordGroup.NounSubgroup.AR), "-en -ar -arna"),
             Arguments.of("göra (gör, gjorde, gjort)", verb(WordGroup.VerbSubgroup.GROUP_4_SPECIAL), "gör gjorde gjort"),
             Arguments.of("vanlig (-t, -a)", WordGroup.Adjective, "-t -a"),
             Arguments.of("generell (-t, -a)", WordGroup.Adjective, "-t -a"),
-            Arguments.of("kalas (-et, -on, -ona)", noun(WordGroup.NounSubgroup.N), "-et -on -ona"),
+            Arguments.of("konto (-t, -n, -na)", noun(WordGroup.NounSubgroup.N), "-t -n -na"),
             Arguments.of("spel (-et, -, -en)", noun(WordGroup.NounSubgroup.UNCHANGED_ETT), "-et - -en"),
 
             // Ported from "writtenOutFormsDataProvider". Words that don't have an abbreviated version are discarded.
@@ -149,6 +148,7 @@ class WordParserTest {
             Arguments.of("hurtbulle (-n, bullar, bullarna)", noun(WordGroup.NounSubgroup.AR), "-n bullar bullarna"),
             Arguments.of("museum (-et, museer, museerna)", noun(WordGroup.NounSubgroup.ER), "-et museer museerna"),
             Arguments.of("målare (-n, -, målarna)", noun(WordGroup.NounSubgroup.UNCHANGED_EN), "-n - målarna"),
+            Arguments.of("uttryck (-et, -, -en)", noun(WordGroup.NounSubgroup.UNCHANGED_ETT), "-et - -en"),
             // Nouns with a vowel change in the plural
             Arguments.of("fot (-en, fötter, fötterna)", noun(WordGroup.NounSubgroup.SPECIAL), "-en fötter fötterna"),
             Arguments.of(
@@ -169,8 +169,6 @@ class WordParserTest {
                 noun(WordGroup.NounSubgroup.OR),
                 "-n självkänslor -orna",
             ),
-            Arguments.of("träningsresa (-n, -resor, resorna)", noun(WordGroup.NounSubgroup.OR), "-n -resor resorna"),
-            Arguments.of("uttryck (-et, -en, -ena)", noun(WordGroup.NounSubgroup.N), "-et -en -ena"),
             // Nouns with typos
             Arguments.of("block (-et, -, -en)", noun(WordGroup.NounSubgroup.UNCHANGED_ETT), "-et - -en"),
             Arguments.of("block (et, -, -en)", noun(WordGroup.NounSubgroup.SPECIAL), "et - -en"),
@@ -203,12 +201,12 @@ class WordParserTest {
         private fun genderDataProvider(): Stream<Arguments> = Stream.of(
             // En-words: definite singular ends with n
             Arguments.of("penna (-n, -or, -orna)", Gender.Ultra),
-            Arguments.of("mening (-en, -er, -erna)", Gender.Ultra),
+            Arguments.of("mening (-en, -ar, -arna)", Gender.Ultra),
             Arguments.of("semester (semestern, semestrar, semestrarna)", Gender.Ultra),
             Arguments.of("målare (-n, -, målarna)", Gender.Ultra),
 
             // Ett-words: definite singular ends with t
-            Arguments.of("kalas (-et, -on, -ona)", Gender.Neutra),
+            Arguments.of("konto (-t, -n, -na)", Gender.Neutra),
             Arguments.of("spel (-et, -, -en)", Gender.Neutra),
             Arguments.of("kapitel (kapitlet, -, kapitlen)", Gender.Neutra),
             Arguments.of("museum (-et, museer, museerna)", Gender.Neutra),
@@ -217,7 +215,7 @@ class WordParserTest {
             Arguments.of("mat (-en)", Gender.Ultra),
             Arguments.of("skam (-men)", Gender.Ultra),
             Arguments.of("kaffe (-t)", Gender.Neutra),
-            Arguments.of("trafik (-et)", Gender.Neutra),
+            Arguments.of("trafik (-en)", Gender.Ultra),
 
             // No definite singular or unknown ending
             Arguments.of("examen (-, examina, examina)", null),
