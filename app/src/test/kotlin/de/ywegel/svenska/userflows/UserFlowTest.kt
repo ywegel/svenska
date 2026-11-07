@@ -19,6 +19,7 @@ import de.ywegel.svenska.userflows.robots.ContainerRobot
 import de.ywegel.svenska.userflows.robots.OverviewRobot
 import de.ywegel.svenska.userflows.robots.SettingsRobot
 import de.ywegel.svenska.userflows.robots.VocabularyDetailRobot
+import de.ywegel.svenska.userflows.robots.WordImporterRobot
 import kotlinx.coroutines.runBlocking
 import org.junit.After
 import org.junit.Before
@@ -98,4 +99,6 @@ abstract class UserFlowTest {
     protected fun addEdit(block: AddEditRobot.() -> Unit) = AddEditRobot(composeRule).block()
 
     protected fun settings(block: SettingsRobot.() -> Unit) = SettingsRobot(composeRule).block()
+
+    protected fun wordImporter(block: WordImporterRobot.() -> Unit) = WordImporterRobot(composeRule).block()
 }
