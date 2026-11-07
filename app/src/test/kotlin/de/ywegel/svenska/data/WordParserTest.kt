@@ -26,19 +26,6 @@ class WordParserTest {
     }
 
     @ParameterizedTest
-    @MethodSource("genderDataProvider")
-    fun `should detect gender correctly`(word: String, expectedGender: Gender?) {
-        // Given
-        val parser = WordParserImpl()
-
-        // When
-        val result = parser.parseWord(word, "translation", CONTAINER_ID)
-
-        // Then
-        assertEquals(expectedGender, result.gender)
-    }
-
-    @ParameterizedTest
     @MethodSource("writtenOutFormsDataProvider")
     fun `should detect word group of written out forms`(word: String, expectedGroup: WordGroup) {
         // Given
@@ -49,6 +36,19 @@ class WordParserTest {
 
         // Then
         assertEquals(expectedGroup, result.wordGroup)
+    }
+
+    @ParameterizedTest
+    @MethodSource("genderDataProvider")
+    fun `should detect gender correctly`(word: String, expectedGender: Gender?) {
+        // Given
+        val parser = WordParserImpl()
+
+        // When
+        val result = parser.parseWord(word, "translation", CONTAINER_ID)
+
+        // Then
+        assertEquals(expectedGender, result.gender)
     }
 
     companion object {
@@ -129,6 +129,70 @@ class WordParserTest {
         }
 
         @JvmStatic
+        private fun abbreviatedFormsDataProvider(): Stream<Arguments> = Stream.of(
+            Arguments.of("penna (-n, -or, -orna)", noun(WordGroup.NounSubgroup.OR), "-n -or -orna"),
+            Arguments.of("markera (-r, -de, -t)", verb(WordGroup.VerbSubgroup.GROUP_1), "-r -de -t"),
+            Arguments.of("plugga (-r, -de, -t)", verb(WordGroup.VerbSubgroup.GROUP_1), "-r -de -t"),
+            Arguments.of("läsa (-er, -te, -t)", verb(WordGroup.VerbSubgroup.GROUP_2B), "-er -te -t"),
+            Arguments.of("mening (-en, -er, -erna)", noun(WordGroup.NounSubgroup.ER), "-en -er -erna"),
+            Arguments.of("göra (gör, gjorde, gjort)", verb(WordGroup.VerbSubgroup.GROUP_4_SPECIAL), "gör gjorde gjort"),
+            Arguments.of("vanlig (-t, -a)", WordGroup.Adjective, "-t -a"),
+            Arguments.of("generell (-t, -a)", WordGroup.Adjective, "-t -a"),
+            Arguments.of("kalas (-et, -on, -ona)", noun(WordGroup.NounSubgroup.N), "-et -on -ona"),
+            Arguments.of("spel (-et, -, -en)", noun(WordGroup.NounSubgroup.UNCHANGED_ETT), "-et - -en"),
+
+            // Ported from "writtenOutFormsDataProvider". Words that don't have an abbreviated version are discarded.
+            // Regular nouns
+            Arguments.of("sida (-n, sidor, sidorna)", noun(WordGroup.NounSubgroup.OR), "-n sidor sidorna"),
+            Arguments.of("timme (-n, timmar, timmarna)", noun(WordGroup.NounSubgroup.AR), "-n timmar timmarna"),
+            Arguments.of("hare (-n, harar, hararna)", noun(WordGroup.NounSubgroup.AR), "-n harar hararna"),
+            Arguments.of("hurtbulle (-n, bullar, bullarna)", noun(WordGroup.NounSubgroup.AR), "-n bullar bullarna"),
+            Arguments.of("museum (-et, museer, museerna)", noun(WordGroup.NounSubgroup.ER), "-et museer museerna"),
+            Arguments.of("målare (-n, -, målarna)", noun(WordGroup.NounSubgroup.UNCHANGED_EN), "-n - målarna"),
+            // Nouns with a vowel change in the plural
+            Arguments.of("fot (-en, fötter, fötterna)", noun(WordGroup.NounSubgroup.SPECIAL), "-en fötter fötterna"),
+            Arguments.of(
+                "dotter (-n, döttrar, döttrarna)",
+                noun(WordGroup.NounSubgroup.SPECIAL),
+                "-n döttrar döttrarna",
+            ),
+            Arguments.of("land (-et, länder, länderna)", noun(WordGroup.NounSubgroup.SPECIAL), "-et länder länderna"),
+            Arguments.of("brandman (-nen, -män, -männen)", noun(WordGroup.NounSubgroup.SPECIAL), "-nen -män -männen"),
+            Arguments.of(
+                "dagbok (-en, dagböcker, dagböckerna)",
+                noun(WordGroup.NounSubgroup.SPECIAL),
+                "-en dagböcker dagböckerna",
+            ),
+            // Regular nouns that look similar to typos
+            Arguments.of(
+                "självkänsla (-n, självkänslor, -orna)",
+                noun(WordGroup.NounSubgroup.OR),
+                "-n självkänslor -orna",
+            ),
+            Arguments.of("träningsresa (-n, -resor, resorna)", noun(WordGroup.NounSubgroup.OR), "-n -resor resorna"),
+            Arguments.of("uttryck (-et, -en, -ena)", noun(WordGroup.NounSubgroup.N), "-et -en -ena"),
+            // Nouns with typos
+            Arguments.of("block (-et, -, -en)", noun(WordGroup.NounSubgroup.UNCHANGED_ETT), "-et - -en"),
+            Arguments.of("block (et, -, -en)", noun(WordGroup.NounSubgroup.SPECIAL), "et - -en"),
+            Arguments.of("skymning (-en, ar, -arna)", noun(WordGroup.NounSubgroup.SPECIAL), "-en ar -arna"),
+            Arguments.of("smör (-et, -, en)", noun(WordGroup.NounSubgroup.SPECIAL), "-et - en"),
+            Arguments.of("diktatur (-en, -er, erna)", noun(WordGroup.NounSubgroup.SPECIAL), "-en -er erna"),
+            Arguments.of("tillfälle (-t, -n, - na)", noun(WordGroup.NounSubgroup.SPECIAL), "-t -n - na"),
+            Arguments.of("klass (-en, -er, -arna)", noun(WordGroup.NounSubgroup.SPECIAL), "-en -er -arna"),
+            Arguments.of("tron (-en, -er, -ern)", noun(WordGroup.NounSubgroup.SPECIAL), "-en -er -ern"),
+            Arguments.of(
+                "följdfråga (-n, följdfrågor, följfrågorna)",
+                noun(WordGroup.NounSubgroup.SPECIAL),
+                "-n följdfrågor följfrågorna",
+            ),
+            Arguments.of("spa (-t, -n, -a)", noun(WordGroup.NounSubgroup.SPECIAL), "-t -n -a"),
+            Arguments.of("fisk (-en, -, -ar)", noun(WordGroup.NounSubgroup.SPECIAL), "-en - -ar"),
+            Arguments.of("långlunch (-en, -, -er)", noun(WordGroup.NounSubgroup.SPECIAL), "-en - -er"),
+            // Regular verbs
+            Arguments.of("svara (-r, -de, -t)", verb(WordGroup.VerbSubgroup.GROUP_1), "-r -de -t"),
+        )
+
+        @JvmStatic
         private fun genderDataProvider(): Stream<Arguments> = Stream.of(
             // En-words: definite singular ends with n
             Arguments.of("penna (-n, -or, -orna)", Gender.Ultra),
@@ -149,20 +213,6 @@ class WordParserTest {
             Arguments.of("markera (-r, -de, -t)", null),
             Arguments.of("göra (gör, gjorde, gjort)", null),
             Arguments.of("vanlig (-t, -a)", null),
-        )
-
-        @JvmStatic
-        private fun abbreviatedFormsDataProvider(): Stream<Arguments> = Stream.of(
-            Arguments.of("penna (-n, -or, -orna)", noun(WordGroup.NounSubgroup.OR), "-n -or -orna"),
-            Arguments.of("markera (-r, -de, -t)", verb(WordGroup.VerbSubgroup.GROUP_1), "-r -de -t"),
-            Arguments.of("plugga (-r, -de, -t)", verb(WordGroup.VerbSubgroup.GROUP_1), "-r -de -t"),
-            Arguments.of("läsa (-er, -te, -t)", verb(WordGroup.VerbSubgroup.GROUP_2B), "-er -te -t"),
-            Arguments.of("mening (-en, -er, -erna)", noun(WordGroup.NounSubgroup.ER), "-en -er -erna"),
-            Arguments.of("göra (gör, gjorde, gjort)", verb(WordGroup.VerbSubgroup.GROUP_4_SPECIAL), "gör gjorde gjort"),
-            Arguments.of("vanlig (-t, -a)", WordGroup.Adjective, "-t -a"),
-            Arguments.of("generell (-t, -a)", WordGroup.Adjective, "-t -a"),
-            Arguments.of("kalas (-et, -on, -ona)", noun(WordGroup.NounSubgroup.N), "-et -on -ona"),
-            Arguments.of("spel (-et, -, -en)", noun(WordGroup.NounSubgroup.UNCHANGED_ETT), "-et - -en"),
         )
     }
 }
