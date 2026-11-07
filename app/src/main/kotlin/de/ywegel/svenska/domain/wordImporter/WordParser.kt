@@ -17,7 +17,10 @@ class WordParserImpl @Inject constructor() : WordParser {
         val gender = WordGroupMatcher.determineGender(wordGroup, endings)
 
         val finalWordGroup = when {
-            wordGroup is WordGroup.Noun && isSpecialNoun(baseWord, endings, gender) ->
+            // Nouns without a plural are already SPECIAL and only have one ending
+            wordGroup is WordGroup.Noun &&
+                endings.size == WordGroupMatcher.NOUN_ENDINGS_COUNT &&
+                isSpecialNoun(baseWord, endings, gender) ->
                 WordGroup.Noun(WordGroup.NounSubgroup.SPECIAL)
 
             else -> wordGroup

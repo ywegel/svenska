@@ -190,6 +190,13 @@ class WordParserTest {
             Arguments.of("långlunch (-en, -, -er)", noun(WordGroup.NounSubgroup.SPECIAL), "-en - -er"),
             // Regular verbs
             Arguments.of("svara (-r, -de, -t)", verb(WordGroup.VerbSubgroup.GROUP_1), "-r -de -t"),
+            // Nouns without a plural
+            Arguments.of("mat  (-en)", noun(WordGroup.NounSubgroup.SPECIAL), "-en"),
+            Arguments.of("kaffe  (-t)", noun(WordGroup.NounSubgroup.SPECIAL), "-t"),
+            Arguments.of("skam  (-men)", noun(WordGroup.NounSubgroup.SPECIAL), "-men"),
+            // Adjectives without a neuter form
+            Arguments.of("trött  (-a)", WordGroup.Adjective, "-a"),
+            Arguments.of("smart  (-a)  mobil  (-er)", WordGroup.Adjective, "-a"),
         )
 
         @JvmStatic
@@ -205,6 +212,12 @@ class WordParserTest {
             Arguments.of("spel (-et, -, -en)", Gender.Neutra),
             Arguments.of("kapitel (kapitlet, -, kapitlen)", Gender.Neutra),
             Arguments.of("museum (-et, museer, museerna)", Gender.Neutra),
+
+            // Nouns without a plural
+            Arguments.of("mat (-en)", Gender.Ultra),
+            Arguments.of("skam (-men)", Gender.Ultra),
+            Arguments.of("kaffe (-t)", Gender.Neutra),
+            Arguments.of("trafik (-et)", Gender.Neutra),
 
             // No definite singular or unknown ending
             Arguments.of("examen (-, examina, examina)", null),

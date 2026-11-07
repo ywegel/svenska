@@ -51,6 +51,22 @@ class WordGroupMatcherTest {
                 Arguments.of("word", listOf("-n", "-er", "-na"), WordGroup.Noun(WordGroup.NounSubgroup.ER)),
                 // No endings
                 Arguments.of("word", emptyList<String>(), WordGroup.Other),
+
+                // Nouns without a plural only have the definite singular
+                Arguments.of("mat", listOf("-en"), WordGroup.Noun(WordGroup.NounSubgroup.SPECIAL)),
+                Arguments.of("socker", listOf("-n"), WordGroup.Noun(WordGroup.NounSubgroup.SPECIAL)),
+                Arguments.of("trafik", listOf("-et"), WordGroup.Noun(WordGroup.NounSubgroup.SPECIAL)),
+                Arguments.of("kaffe", listOf("-t"), WordGroup.Noun(WordGroup.NounSubgroup.SPECIAL)),
+                Arguments.of("skam", listOf("-men"), WordGroup.Noun(WordGroup.NounSubgroup.SPECIAL)),
+                // Adjectives ending on -t only list the plural
+                Arguments.of("trött", listOf("-a"), WordGroup.Adjective),
+                Arguments.of("bäst", listOf("-a"), WordGroup.Adjective),
+                // Single endings that are neither a definite singular nor an adjective plural
+                Arguments.of("snabb", listOf("a"), WordGroup.Other),
+                Arguments.of("kläder", listOf("-na"), WordGroup.Other),
+                Arguments.of("livstid", listOf("-s"), WordGroup.Other),
+                Arguments.of("morgonfika", listOf("-t/-n"), WordGroup.Other),
+                Arguments.of("stan", listOf("vard. för staden"), WordGroup.Other),
             )
         }
 

@@ -10,8 +10,24 @@ object WordGroupMatcher {
             isAdjective(endings) -> WordGroup.Adjective
             isVerb(endings) -> determineVerbSubgroup(baseWord, endings)
             isNoun(endings) -> determineNounSubgroup(baseWord, endings)
+            // Without a plural there is no subgroup to learn: mat (-en), kaffe (-t)
+            isNounWithoutPlural(endings) -> WordGroup.Noun(WordGroup.NounSubgroup.SPECIAL)
+            isAdjectiveWithoutNeuter(endings) -> WordGroup.Adjective
             else -> WordGroup.Other
         }
+    }
+
+    // Adjectives already ending on -t only list the plural: trött (-a), bäst (-a)
+    private fun isAdjectiveWithoutNeuter(endings: List<String>): Boolean {
+        return endings.singleOrNull() == ADJECTIVE_PLURAL_ENDING
+    }
+
+    /**
+     * Only the definite singular is given. The fixed endings keep plural-only nouns (-na)
+     * and free text in parentheses (vard. för staden) out.
+     */
+    private fun isNounWithoutPlural(endings: List<String>): Boolean {
+        return endings.singleOrNull() in definiteSingularOnlyEndings
     }
 
     private fun isAdjective(endings: List<String>): Boolean {
@@ -115,8 +131,11 @@ object WordGroupMatcher {
     }
 
     private val verbIndicatorSuperlativEndings = setOf("t", "ts")
+    // -men doubles the consonant: skam -> skammen
+    private val definiteSingularOnlyEndings = setOf("-en", "-n", "-et", "-t", "-men")
     private val group3WordEndings = setOf('e', 'i', 'o', 'u', 'y', 'å', 'ä', 'ö')
     private const val MIN_VERB_STEM_LENGTH = 2
+    private const val ADJECTIVE_PLURAL_ENDING = "-a"
     const val NOUN_ENDINGS_COUNT = 3
     const val VERB_ENDINGS_COUNT = 3
     const val ADJECTIVE_ENDINGS_COUNT = 2
