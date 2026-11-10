@@ -128,7 +128,8 @@ val MIGRATION_2_3 = object : Migration(2, 3) {
 }
 
 /**
- * Frozen snapshot of `WordExtractor.normalizePdfDashes` in `domain/wordImporter`. Migrations must keep reproducing
+ * Frozen snapshot of the dash replacement in `WordExtractor.normalizeSpecialCharacters` (formerly
+ * `normalizePdfDashes`) in `domain/wordImporter`. Migrations must keep reproducing
  * the exact transformation, so this copy deliberately does not call it.
  *
  * Named in backticks rather than as a KDoc link: resolving the link makes the IDE add a `domain` import here, which
