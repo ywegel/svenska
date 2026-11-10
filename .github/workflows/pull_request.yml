@@ -3,6 +3,7 @@ name: Pull Request
 on:
   pull_request:
     branches: [ master, main ]
+    types: [ opened, synchronize, reopened, ready_for_review ]
   workflow_dispatch:
 
 concurrency:
@@ -15,6 +16,8 @@ env:
 jobs:
   ktlint:
     name: Ktlint
+    # Skip draft PRs. All other jobs depend on this one or detekt, so they are skipped too.
+    if: github.event_name != 'pull_request' || !github.event.pull_request.draft
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -44,6 +47,8 @@ jobs:
 
   detekt:
     name: Detekt
+    # Skip draft PRs. All other jobs depend on this one or ktlint, so they are skipped too.
+    if: github.event_name != 'pull_request' || !github.event.pull_request.draft
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
