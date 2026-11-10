@@ -1,6 +1,6 @@
 [versions]
-app-version-code = "28"
-app-version-name = "2026.9.0"
+app-version-code = "29"
+app-version-name = "2026.11.0"
 
 agp = "9.5.0"
 dagger-hilt = "2.60.1"
