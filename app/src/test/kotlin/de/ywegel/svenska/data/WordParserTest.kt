@@ -51,8 +51,36 @@ class WordParserTest {
         assertEquals(expectedGender, result.gender)
     }
 
+    @ParameterizedTest
+    @MethodSource("wordPartsDataProvider")
+    fun `should store prefix, word and suffix separately`(
+        word: String,
+        expectedPrefix: String,
+        expectedWord: String,
+        expectedSuffix: String,
+    ) {
+        // Given
+        val parser = WordParserImpl()
+
+        // When
+        val result = parser.parseWord(word, "translation", CONTAINER_ID)
+
+        // Then
+        assertEquals(expectedPrefix, result.wordPrefix)
+        assertEquals(expectedWord, result.word)
+        assertEquals(expectedSuffix, result.wordSuffix)
+    }
+
     companion object {
         private const val CONTAINER_ID = 99
+
+        @JvmStatic
+        private fun wordPartsDataProvider(): Stream<Arguments> = Stream.of(
+            Arguments.of("högsta dröm (-men)", "högsta", "dröm", ""),
+            Arguments.of("känna sig (-er, kände, känt)", "", "känna", "sig"),
+            Arguments.of("åka (-er, åkte, åkt) till", "", "åka", "till"),
+            Arguments.of("hej då", "", "hej då", ""),
+        )
 
         private fun noun(subgroup: WordGroup.NounSubgroup) = WordGroup.Noun(subgroup)
         private fun verb(subgroup: WordGroup.VerbSubgroup) = WordGroup.Verb(subgroup)

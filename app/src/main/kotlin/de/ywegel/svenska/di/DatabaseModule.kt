@@ -9,6 +9,7 @@ import dagger.hilt.components.SingletonComponent
 import de.ywegel.svenska.data.db.ContainerDao
 import de.ywegel.svenska.data.db.MIGRATION_1_2
 import de.ywegel.svenska.data.db.MIGRATION_2_3
+import de.ywegel.svenska.data.db.MIGRATION_3_4
 import de.ywegel.svenska.data.db.QuizDao
 import de.ywegel.svenska.data.db.SearchDao
 import de.ywegel.svenska.data.db.VocabularyDao
@@ -25,6 +26,7 @@ class DatabaseModule {
         Room.databaseBuilder(app, VocabularyDatabase::class.java, "vocabulary")
             .addMigrations(MIGRATION_1_2)
             .addMigrations(MIGRATION_2_3)
+            .addMigrations(MIGRATION_3_4)
             .addCallback(dbCallback)
             .build()
 

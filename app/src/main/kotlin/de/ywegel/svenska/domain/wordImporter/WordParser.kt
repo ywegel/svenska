@@ -12,11 +12,8 @@ interface WordParser {
 class WordParserImpl @Inject constructor() : WordParser {
 
     override fun parseWord(word: String?, translation: String?, containerId: Int): Vocabulary {
-        // TODO: Use prefix + suffix in Vocabulary, once the columns exist in the database
         val extractedWord = WordExtractor.extractWord(word.orEmpty().trim())
-        val baseWord = listOf(extractedWord.prefix, extractedWord.baseWord)
-            .filter { it.isNotEmpty() }
-            .joinToString(" ")
+        val baseWord = extractedWord.baseWord
         val endings = extractedWord.endings
         val wordGroup = WordGroupMatcher.determineWordGroup(baseWord, endings)
         val gender = WordGroupMatcher.determineGender(wordGroup, endings)
@@ -33,6 +30,8 @@ class WordParserImpl @Inject constructor() : WordParser {
 
         val newVocabulary = Vocabulary(
             word = baseWord,
+            wordPrefix = extractedWord.prefix,
+            wordSuffix = extractedWord.suffix,
             translation = translation.orEmpty(),
             wordHighlights = emptyList(),
             gender = gender,
