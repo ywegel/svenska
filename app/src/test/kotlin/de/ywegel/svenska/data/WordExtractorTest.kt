@@ -2,7 +2,7 @@ package de.ywegel.svenska.data
 
 import de.ywegel.svenska.domain.wordImporter.ExtractedWord
 import de.ywegel.svenska.domain.wordImporter.WordExtractor.extractWord
-import de.ywegel.svenska.domain.wordImporter.WordExtractor.normalizePdfDashes
+import de.ywegel.svenska.domain.wordImporter.WordExtractor.normalizeSpecialCharacters
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.params.ParameterizedTest
@@ -20,7 +20,7 @@ class WordExtractorTest {
     }
 
     @Nested
-    inner class NormalizePdfDashes {
+    inner class NormalizeSpecialCharacters {
 
         @Test
         fun `should replace unicode minus sign with hyphen-minus`() {
@@ -28,7 +28,7 @@ class WordExtractorTest {
             val input = "a\u2212b" // a−b
 
             // When
-            val result = input.normalizePdfDashes()
+            val result = input.normalizeSpecialCharacters()
 
             // Then
             expectThat(result).isEqualTo("a-b")
@@ -40,7 +40,7 @@ class WordExtractorTest {
             val input = "a\u2013b" // a–b
 
             // When
-            val result = input.normalizePdfDashes()
+            val result = input.normalizeSpecialCharacters()
 
             // Then
             expectThat(result).isEqualTo("a-b")
@@ -52,7 +52,7 @@ class WordExtractorTest {
             val input = "a\u2014b" // a—b
 
             // When
-            val result = input.normalizePdfDashes()
+            val result = input.normalizeSpecialCharacters()
 
             // Then
             expectThat(result).isEqualTo("a-b")
@@ -64,7 +64,7 @@ class WordExtractorTest {
             val input = "a\u2010b" // a‐b
 
             // When
-            val result = input.normalizePdfDashes()
+            val result = input.normalizeSpecialCharacters()
 
             // Then
             expectThat(result).isEqualTo("a-b")
@@ -76,10 +76,34 @@ class WordExtractorTest {
             val input = "test\u2212one\u2013two\u2014three"
 
             // When
-            val result = input.normalizePdfDashes()
+            val result = input.normalizeSpecialCharacters()
 
             // Then
             expectThat(result).isEqualTo("test-one-two-three")
+        }
+
+        @Test
+        fun `should replace special spaces with a normal space`() {
+            // Given
+            val input = "a\u00A0b\u202Fc\u2009d\te"
+
+            // When
+            val result = input.normalizeSpecialCharacters()
+
+            // Then
+            expectThat(result).isEqualTo("a b c d e")
+        }
+
+        @Test
+        fun `should remove soft hyphens`() {
+            // Given
+            val input = "skrap\u00ADa"
+
+            // When
+            val result = input.normalizeSpecialCharacters()
+
+            // Then
+            expectThat(result).isEqualTo("skrapa")
         }
 
         @Test
@@ -88,7 +112,7 @@ class WordExtractorTest {
             val input = "normal-hyphen-test"
 
             // When
-            val result = input.normalizePdfDashes()
+            val result = input.normalizeSpecialCharacters()
 
             // Then
             expectThat(result).isEqualTo("normal-hyphen-test")
@@ -100,7 +124,7 @@ class WordExtractorTest {
             val input = "clean string without dashes"
 
             // When
-            val result = input.normalizePdfDashes()
+            val result = input.normalizeSpecialCharacters()
 
             // Then
             expectThat(result).isEqualTo(input)
@@ -112,7 +136,7 @@ class WordExtractorTest {
             val input = ""
 
             // When
-            val result = input.normalizePdfDashes()
+            val result = input.normalizeSpecialCharacters()
 
             // Then
             expectThat(result).isEqualTo("")
@@ -179,6 +203,8 @@ class WordExtractorTest {
                 Arguments.of("", word("")),
                 // Empty parentheses
                 Arguments.of("word ()", word("word ()")),
+                // No word before the endings
+                Arguments.of("(-er, -te, -t)", word("(-er, -te, -t)")),
                 // Too many endings
                 Arguments.of("word (a, b, c, d)", word("word (a, b, c, d)")),
                 // Empty endings in parentheses

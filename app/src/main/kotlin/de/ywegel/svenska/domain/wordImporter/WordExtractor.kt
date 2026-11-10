@@ -28,7 +28,7 @@ object WordExtractor {
      * Without an endings bracket, the whole input is the base word.
      */
     fun extractWord(word: String): ExtractedWord {
-        val input = word.normalizePdfDashes().trim()
+        val input = word.normalizeSpecialCharacters().trim()
         val endingsBracket = findEndingsBracket(input)
             ?: return ExtractedWord(prefix = "", baseWord = input, endings = emptyList(), suffix = "")
         val endings = endingsBracket.endings
@@ -57,11 +57,13 @@ object WordExtractor {
     }
 
     /**
+     * Endings always belong to a word before them, so brackets at the start are ignored.
      * Brackets with a single ending are often explanations like (plural) or (ATP),
      * so the first bracket with several endings is preferred.
      */
     private fun findEndingsBracket(input: String): EndingsBracket? {
         val endingsBrackets = endingsBracketRegex.findAll(input)
+            .filter { match -> input.substring(0, match.range.first).isNotBlank() }
             .mapNotNull { match ->
                 val content = match.groupValues[1]
                 val endings = content.split(",").map(String::trim)
@@ -73,13 +75,18 @@ object WordExtractor {
     }
 
     /**
-     * Replace the long dashes that are wrongly extracted from the pdf
+     * Replace long dashes and special spaces that are wrongly extracted from the pdf, so splitting on "-" and " " works
      */
-    fun String.normalizePdfDashes(): String {
+    fun String.normalizeSpecialCharacters(): String {
         return this
             .replace('\u2212', '-') // −
             .replace('\u2013', '-') // –
             .replace('\u2014', '-') // —
             .replace('\u2010', '-') // ‐
+            .replace('\u00A0', ' ') // no-break space
+            .replace('\u202F', ' ') // narrow no-break space
+            .replace('\u2009', ' ') // thin space
+            .replace('\t', ' ')
+            .replace("\u00AD", "") // soft hyphen
     }
 }
