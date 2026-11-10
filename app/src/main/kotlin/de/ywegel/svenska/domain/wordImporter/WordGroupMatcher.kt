@@ -40,7 +40,7 @@ object WordGroupMatcher {
         return endings.size == NOUN_ENDINGS_COUNT
     }
 
-    private fun isVerb(endings: List<String>): Boolean {
+    internal fun isVerb(endings: List<String>): Boolean {
         // Verbs always have 3 endings
         if (endings.size != VERB_ENDINGS_COUNT) return false
 
