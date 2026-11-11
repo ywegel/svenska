@@ -4,6 +4,7 @@ import de.ywegel.svenska.data.model.Gender
 import de.ywegel.svenska.data.model.WordGroup
 import de.ywegel.svenska.domain.wordImporter.WordParserImpl
 import org.junit.jupiter.api.Assertions.assertEquals
+import org.junit.jupiter.api.Test
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.Arguments
 import org.junit.jupiter.params.provider.MethodSource
@@ -69,6 +70,33 @@ class WordParserTest {
         assertEquals(expectedPrefix, result.wordPrefix)
         assertEquals(expectedWord, result.word)
         assertEquals(expectedSuffix, result.wordSuffix)
+    }
+
+    @Test
+    fun `null word returns empty word`() {
+        // Given
+        val parser = WordParserImpl()
+
+        // When
+        val result = parser.parseWord(null, "translation", CONTAINER_ID)
+
+        // Then
+        assertEquals(WordGroup.Other, result.wordGroup)
+        assertEquals("", result.ending)
+    }
+
+    @Test
+    fun `null translation returns empty word`() {
+        // Given
+        val parser = WordParserImpl()
+
+        // When
+        val result = parser.parseWord("sida (-n, sidor, sidorna)", null, CONTAINER_ID)
+
+        // Then
+        assertEquals(WordGroup.Noun(WordGroup.NounSubgroup.OR), result.wordGroup)
+        assertEquals("-n sidor sidorna", result.ending)
+        assertEquals("", result.translation)
     }
 
     companion object {

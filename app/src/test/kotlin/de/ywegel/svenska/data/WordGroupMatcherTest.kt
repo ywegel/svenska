@@ -36,19 +36,23 @@ class WordGroupMatcherTest {
                 Arguments.of("penna", listOf("-n", "-or", "-orna"), WordGroup.Noun(WordGroup.NounSubgroup.OR)),
                 Arguments.of("söka", listOf("-er", "-te", "-t"), WordGroup.Verb(WordGroup.VerbSubgroup.GROUP_2B)),
                 Arguments.of("svensk", listOf("-t", "-a"), WordGroup.Adjective),
-                Arguments.of("land", listOf("-et", "länder", "länderna"), WordGroup.Noun(WordGroup.NounSubgroup.ER)),
+                // Vowel change in the plural
+                Arguments.of(
+                    "land",
+                    listOf("-et", "länder", "länderna"),
+                    WordGroup.Noun(WordGroup.NounSubgroup.SPECIAL),
+                ),
                 Arguments.of("bo", listOf("-r", "-dde", "-tt"), WordGroup.Verb(WordGroup.VerbSubgroup.GROUP_3)),
                 Arguments.of("sko", listOf("-n", "-r", "-rna"), WordGroup.Noun(WordGroup.NounSubgroup.R)),
                 Arguments.of("hus", listOf("-et", "-", "-en"), WordGroup.Noun(WordGroup.NounSubgroup.UNCHANGED_ETT)),
                 Arguments.of("hus", listOf("-et", "", "-en"), WordGroup.Noun(WordGroup.NounSubgroup.UNCHANGED_ETT)),
 
                 // Edge cases
-                // Unknown endings without a verb supine
-                Arguments.of("example", listOf("-x", "-y", "-z"), WordGroup.Noun(WordGroup.NounSubgroup.UNDEFINED)),
-                // Noun with verb ending
-                Arguments.of("word", listOf("-n", "-ar", "-en"), WordGroup.Noun(WordGroup.NounSubgroup.AR)),
-                // Noun with verb ending
-                Arguments.of("word", listOf("-n", "-er", "-na"), WordGroup.Noun(WordGroup.NounSubgroup.ER)),
+                // Unknown endings without a verb supine have no gender
+                Arguments.of("example", listOf("-x", "-y", "-z"), WordGroup.Noun(WordGroup.NounSubgroup.SPECIAL)),
+                // Noun with verb ending and a definite plural that does not match the plural
+                Arguments.of("word", listOf("-n", "-ar", "-en"), WordGroup.Noun(WordGroup.NounSubgroup.SPECIAL)),
+                Arguments.of("word", listOf("-n", "-er", "-na"), WordGroup.Noun(WordGroup.NounSubgroup.SPECIAL)),
                 // No endings
                 Arguments.of("word", emptyList<String>(), WordGroup.Other),
 
@@ -126,7 +130,8 @@ class WordGroupMatcherTest {
                 noun("kafé", "-t -er -erna", WordGroup.NounSubgroup.ER),
                 noun("pris", "-et -er -erna", WordGroup.NounSubgroup.ER),
                 noun("bageri", "-t -er -erna", WordGroup.NounSubgroup.ER),
-                noun("bonde", "-n bönder bönderna", WordGroup.NounSubgroup.ER),
+                // Vowel change in the plural
+                noun("bonde", "-n bönder bönderna", WordGroup.NounSubgroup.SPECIAL),
                 noun("te", "teet teer teerna", WordGroup.NounSubgroup.ER),
 
                 // Group 4: -r
