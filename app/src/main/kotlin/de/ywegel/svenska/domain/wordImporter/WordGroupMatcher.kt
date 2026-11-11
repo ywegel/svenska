@@ -11,23 +11,31 @@ object WordGroupMatcher {
             isVerb(endings) -> determineVerbSubgroup(baseWord, endings)
             isNoun(endings) -> determineNounSubgroup(baseWord, endings)
             // Without a plural there is no subgroup to learn: mat (-en), kaffe (-t)
-            isNounWithoutPlural(endings) -> WordGroup.Noun(WordGroup.NounSubgroup.SPECIAL)
-            isAdjectiveWithoutNeuter(endings) -> WordGroup.Adjective
+            isNounWithoutPlural(baseWord, endings) -> WordGroup.Noun(WordGroup.NounSubgroup.SPECIAL)
+            isAdjectiveWithoutNeuter(baseWord, endings) -> WordGroup.Adjective
             else -> WordGroup.Other
         }
     }
 
     // Adjectives already ending on -t only list the plural: trött (-a), bäst (-a)
-    private fun isAdjectiveWithoutNeuter(endings: List<String>): Boolean {
-        return endings.singleOrNull() == ADJECTIVE_PLURAL_ENDING
+    private fun isAdjectiveWithoutNeuter(baseWord: String, endings: List<String>): Boolean {
+        return singleEnding(baseWord, endings) == ADJECTIVE_PLURAL_ENDING
     }
 
     /**
-     * Only the definite singular is given. The fixed endings keep plural-only nouns (-na)
-     * and free text in parentheses (vard. för staden) out.
+     * Only the definite singular is given, which always ends on n or t: -en, -met, -ret, -vattnet.
+     * Plural-only nouns (-na) and free text in parentheses (vard. för staden) stay out.
      */
-    private fun isNounWithoutPlural(endings: List<String>): Boolean {
-        return endings.singleOrNull() in definiteSingularOnlyEndings
+    private fun isNounWithoutPlural(baseWord: String, endings: List<String>): Boolean {
+        val ending = singleEnding(baseWord, endings) ?: return false
+        return ending.startsWith("-") && ending.last() in definiteSingularLastLetters
+    }
+
+    // Written out forms are reduced to their ending: mat (maten) -> -en, trött (trötta) -> -a
+    private fun singleEnding(baseWord: String, endings: List<String>): String? {
+        val ending = endings.singleOrNull() ?: return null
+        val isWrittenOut = ending.length > baseWord.length && ending.startsWith(baseWord, ignoreCase = true)
+        return if (isWrittenOut) "-" + ending.substring(baseWord.length) else ending
     }
 
     private fun isAdjective(endings: List<String>): Boolean {
@@ -201,8 +209,7 @@ object WordGroupMatcher {
     }
 
     private val verbIndicatorSuperlativEndings = setOf("t", "ts")
-    // -men doubles the consonant: skam -> skammen
-    private val definiteSingularOnlyEndings = setOf("-en", "-n", "-et", "-t", "-men")
+    private val definiteSingularLastLetters = setOf('n', 't')
     private val group3WordEndings = setOf('e', 'i', 'o', 'u', 'y', 'å', 'ä', 'ö')
     private val pluralSuffixRegex = Regex("(or|ar|er|r|n)$")
     private val unchangedDefiniteRegex = Regex("(en|n|na)$")
