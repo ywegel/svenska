@@ -13,7 +13,7 @@ import org.junit.jupiter.params.provider.MethodSource
 class WordParserTest {
 
     @ParameterizedTest
-    @MethodSource("referenceWordGroups", "wordGroupEdgeCases")
+    @MethodSource("referenceWordGroups", "writtenOutReferenceWordGroups", "wordGroupEdgeCases")
     fun `should detect word group and endings`(word: String, expectedGroup: WordGroup, expectedEnding: String) {
         // Given
         val parser = WordParserImpl()
@@ -95,6 +95,14 @@ class WordParserTest {
         fun referenceWordGroups() = ReferenceWords.all.map {
             Arguments.of(it.text, it.wordGroup, it.endings.joinToString(" "))
         }
+
+        // Words with a prefix or suffix only have their source text
+        @JvmStatic
+        fun writtenOutReferenceWordGroups() = ReferenceWords.all
+            .filter { it.prefix.isEmpty() && it.suffix.isEmpty() && it.forms != it.endings }
+            .map {
+                Arguments.of("${it.word} (${it.forms.joinToString(", ")})", it.wordGroup, it.forms.joinToString(" "))
+            }
 
         @JvmStatic
         fun referenceGenders() = ReferenceWords.all.map { Arguments.of(it.text, it.gender) }

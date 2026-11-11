@@ -90,6 +90,7 @@ object ReferenceWords {
         // group 4: -r
         en("ko", "-n -r -rna", "kon kor korna", R),
         en("sko", "-n -r -rna", "skon skor skorna", R),
+        en("sko", "-n skor skorna", "skon skor skorna", R),
         en("tå", "-n -r -rna", "tån tår tårna", R),
         en("same", "-n -er -erna", "samen samer samerna", R),
         en("serie", "-n -er -erna", "serien serier serierna", R),
@@ -139,7 +140,6 @@ object ReferenceWords {
         en("hunger", "-n", "hungern", SPECIAL),
         en("trafik", "-en", "trafiken", SPECIAL),
         en("skam", "-men", "skammen", SPECIAL),
-        en("dröm", "-men", "drömmen", SPECIAL, text = "högsta dröm (-men)", prefix = "högsta"),
         ett("kaffe", "-t", "kaffet", SPECIAL),
         ett("beröm", "-met", "berömmet", SPECIAL),
     )
