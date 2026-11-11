@@ -53,14 +53,11 @@ object WordGroupMatcher {
         val gender = determineGender(WordGroup.Noun(WordGroup.NounSubgroup.UNDEFINED), endings)
         if (isSpecialNoun(baseWord, endings, gender)) return WordGroup.Noun(WordGroup.NounSubgroup.SPECIAL)
 
-        // plåster (plåstret, plåster, plåstren) writes out the unchanged plural
-        val pluralEnding = endings[1].takeUnless { it == baseWord } ?: "-"
+        val pluralEnding = pluralEnding(baseWord, endings[1])
 
         return when {
             // serie (-n -er -erna): serie + r, not seri + er
             baseWord.endsWith("e") && pluralEnding == "-er" -> WordGroup.Noun(WordGroup.NounSubgroup.R)
-            // sko (-n skor skorna): sko + r, not sk + or
-            baseWord.endsWith("o") && pluralEnding.endsWith("or") -> WordGroup.Noun(WordGroup.NounSubgroup.R)
             pluralEnding.endsWith("or") -> WordGroup.Noun(WordGroup.NounSubgroup.OR)
             pluralEnding.endsWith("ar") -> WordGroup.Noun(WordGroup.NounSubgroup.AR)
             pluralEnding.endsWith("er") -> WordGroup.Noun(WordGroup.NounSubgroup.ER)
@@ -70,6 +67,18 @@ object WordGroupMatcher {
             // Nouns without a gender are already SPECIAL, so this is an en-word
             else -> WordGroup.Noun(WordGroup.NounSubgroup.UNCHANGED_EN)
         }
+    }
+
+    /**
+     * Cuts the base word off written out plurals, so the group comes from what is added to the base word:
+     * fiender -> r (fiende + r, not fiend + er), skor -> r (sko + r, not sk + or), bilar -> ar.
+     * Abbreviated (-ar), shortened (bullar, -resor) and changed (sidor) plurals stay as they are.
+     */
+    private fun pluralEnding(baseWord: String, plural: String): String = when {
+        // plåster (plåstret, plåster, plåstren) writes out the unchanged plural
+        plural == baseWord -> "-"
+        plural.startsWith(baseWord, ignoreCase = true) -> plural.substring(baseWord.length)
+        else -> plural
     }
 
     private fun isSpecialNoun(baseWord: String, endings: List<String>, gender: Gender?): Boolean {

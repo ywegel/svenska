@@ -145,6 +145,14 @@ class WordGroupMatcherTest {
                 noun("linje", "-n -r -rna", WordGroup.NounSubgroup.R),
                 noun("bakelse", "-n -r -rna", WordGroup.NounSubgroup.R),
                 noun("bibliotekarie", "-n -r -rna", WordGroup.NounSubgroup.R),
+                // Written out forms
+                noun("same", "samen samer samerna", WordGroup.NounSubgroup.R),
+                noun("serie", "serien serier serierna", WordGroup.NounSubgroup.R),
+                noun("aktie", "aktien aktier aktierna", WordGroup.NounSubgroup.R),
+                noun("fiende", "fienden fiender fienderna", WordGroup.NounSubgroup.R),
+                noun("linje", "linjen linjer linjerna", WordGroup.NounSubgroup.R),
+                noun("bakelse", "bakelsen bakelser bakelserna", WordGroup.NounSubgroup.R),
+                noun("bibliotekarie", "bibliotekarien bibliotekarier bibliotekarierna", WordGroup.NounSubgroup.R),
 
                 // Group 5: -n
                 noun("meddelande", "-t -n -na", WordGroup.NounSubgroup.N),
