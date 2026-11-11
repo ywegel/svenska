@@ -3,6 +3,7 @@ package de.ywegel.svenska.data
 import de.ywegel.svenska.domain.wordImporter.ExtractedWord
 import de.ywegel.svenska.domain.wordImporter.WordExtractor.extractWord
 import de.ywegel.svenska.domain.wordImporter.WordExtractor.normalizeSpecialCharacters
+import de.ywegel.svenska.testdata.ReferenceWords
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.params.ParameterizedTest
@@ -14,7 +15,7 @@ import java.util.stream.Stream
 
 class WordExtractorTest {
     @ParameterizedTest
-    @MethodSource("provideExtractWordTestCases")
+    @MethodSource("referenceWords", "provideExtractWordTestCases")
     fun testExtractWord(input: String, expected: ExtractedWord) {
         expectThat(extractWord(input)).isEqualTo(expected)
     }
@@ -145,17 +146,14 @@ class WordExtractorTest {
 
     companion object {
         @JvmStatic
+        fun referenceWords() = ReferenceWords.all.map {
+            Arguments.of(it.text, ExtractedWord(it.prefix, it.word, it.endings, it.suffix))
+        }
+
+        @JvmStatic
         fun provideExtractWordTestCases(): Stream<Arguments> {
             return Stream.of(
-                Arguments.of("penna (-n, -or, -orna)", word("penna", "-n", "-or", "-orna")),
-                Arguments.of("mobil (-en, -er, -erna)", word("mobil", "-en", "-er", "-erna")),
-                Arguments.of("söka (-er, -te, -t)", word("söka", "-er", "-te", "-t")),
-                Arguments.of("land (-et, länder, länderna)", word("land", "-et", "länder", "länderna")),
-                Arguments.of("svensk (-t, -a)", word("svensk", "-t", "-a")),
-
                 // Prefix and suffix
-                Arguments.of("ett fenomen (-et, -, -en)", word("fenomen", "-et", "-", "-en", prefix = "ett")),
-                Arguments.of("ha (-r, hade, haft) ont i", word("ha", "-r", "hade", "haft", suffix = "ont i")),
                 Arguments.of(
                     "en  hel  del bil (-en, -ar, -arna) i  stan",
                     word("bil", "-en", "-ar", "-arna", prefix = "en  hel  del", suffix = "i  stan"),
@@ -163,24 +161,6 @@ class WordExtractorTest {
                 // Bracket without a word directly before it is part of the prefix
                 Arguments.of("(en) bil (-en, -ar, -arna)", word("bil", "-en", "-ar", "-arna", prefix = "(en)")),
 
-                // Verb phrases inflect the first word
-                Arguments.of(
-                    "flyga drake (-er, flög, flugit)",
-                    word("flyga", "-er", "flög", "flugit", suffix = "drake"),
-                ),
-                Arguments.of(
-                    "gå ut med hunden (-r, gick, gått)",
-                    word("gå", "-r", "gick", "gått", suffix = "ut med hunden"),
-                ),
-                Arguments.of("dö ut (dör, dog, dött)", word("dö", "dör", "dog", "dött", suffix = "ut")),
-                Arguments.of(
-                    "gifta sig (-er, -te, -t) med någon",
-                    word("gifta", "-er", "-te", "-t", suffix = "sig med någon"),
-                ),
-                Arguments.of(
-                    "säga till (någon) (-er, sa/sade, sagt)",
-                    word("säga", "-er", "sa/sade", "sagt", suffix = "till (någon)"),
-                ),
                 // First valid bracket is used, the rest is suffix/prefix
                 Arguments.of("tro (-r, -dde, -tt) (på)", word("tro", "-r", "-dde", "-tt", suffix = "(på)")),
                 Arguments.of("x (a, b, c, d) tro (-r)", word("tro", "-r", prefix = "x (a, b, c, d)")),
