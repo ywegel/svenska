@@ -128,6 +128,17 @@ val MIGRATION_2_3 = object : Migration(2, 3) {
 }
 
 /**
+ * Adds the text before and after the changing word. Existing entries keep their full text in `word`.
+ */
+@Suppress("detekt:MagicNumber")
+val MIGRATION_3_4 = object : Migration(3, 4) {
+    override fun migrate(db: SupportSQLiteDatabase) {
+        db.execSQL("ALTER TABLE Vocabulary ADD COLUMN wordPrefix TEXT NOT NULL DEFAULT ''")
+        db.execSQL("ALTER TABLE Vocabulary ADD COLUMN wordSuffix TEXT NOT NULL DEFAULT ''")
+    }
+}
+
+/**
  * Frozen snapshot of the dash replacement in `WordExtractor.normalizeSpecialCharacters` (formerly
  * `normalizePdfDashes`) in `domain/wordImporter`. Migrations must keep reproducing
  * the exact transformation, so this copy deliberately does not call it.
