@@ -153,3 +153,12 @@ jobs:
           issue-number: ${{ github.event.pull_request.number }}
           body: ${{ steps.generate-diff-reports.outputs.reports }}
           edit-mode: replace
+      # Turn the action red for visual changes in dependabot PRs. Runs after he comments, so
+      # Uses the PR author instead of github.actor, which changes once someone pushes to the branch.
+      - name: Fail on screenshot changes in Dependabot PRs
+        if: >
+          github.event.pull_request.user.login == 'dependabot[bot]' &&
+          steps.check-if-there-are-valid-files.outputs.exist_valid_files == 'true'
+        run: |
+          echo "::error::This dependency update changes screenshots, check the snapshot diff report in the PR comments"
+          exit 1

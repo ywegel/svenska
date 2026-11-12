@@ -1,0 +1,56 @@
+version: 2
+
+updates:
+  - package-ecosystem: gradle
+    directory: /
+    schedule:
+      interval: weekly
+    open-pull-requests-limit: 5
+    # Every PR runs the emulator tests, so related libraries are bumped together to keep CI time down.
+    # A dependency joins the first group it matches, so the specific groups come before androidx.
+    groups:
+      kotlin:
+        patterns:
+          - "org.jetbrains.kotlin*"
+          - "com.google.devtools.ksp*"
+      compose:
+        patterns:
+          - "androidx.compose*"
+          - "io.github.raamcosta.compose-destinations*"
+      hilt:
+        patterns:
+          - "com.google.dagger*"
+          - "androidx.hilt*"
+      testing:
+        patterns:
+          - "io.github.takahirom.roborazzi*"
+          - "io.github.sergio-sastre*"
+          - "org.robolectric*"
+          - "junit*"
+          - "org.junit*"
+          - "de.mannodermaus*"
+          - "androidx.test*"
+          - "io.mockk*"
+          - "app.cash.turbine*"
+          - "com.willowtreeapps.assertk*"
+          - "io.strikt*"
+          - "com.lemonappdev*"
+      androidx:
+        patterns:
+          - "androidx.*"
+      # Major updates of everything else stay separate PRs, they usually need code changes
+      other:
+        patterns:
+          - "*"
+        update-types:
+          - minor
+          - patch
+
+  - package-ecosystem: github-actions
+    directory: /
+    schedule:
+      interval: weekly
+    groups:
+      actions:
+        patterns:
+          - "*"
