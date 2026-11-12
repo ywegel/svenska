@@ -96,7 +96,10 @@ jobs:
 
     - name: Build Java/Kotlin (Debug)
       if: matrix.language == 'java-kotlin' && matrix.build-mode == 'manual'
-      run: ./gradlew assembleDebug
+      # CodeQL can only extract code that is actually compiled while it traces the build.
+      # Disable the build cache so compile tasks are not restored FROM-CACHE (which made
+      # the analysis fail with "didn't build any of it").
+      run: ./gradlew assembleDebug --no-build-cache
 
     - name: Perform CodeQL Analysis
       uses: github/codeql-action/analyze@v4
