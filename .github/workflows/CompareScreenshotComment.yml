@@ -31,7 +31,7 @@ jobs:
           echo "is_open=$([ "$state" = "OPEN" ] && echo true || echo false)" >> "$GITHUB_OUTPUT"
       - name: main checkout
         id: checkout-main
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
         with:
           ref: ${{ env.BASE_BRANCH }}
       - id: switch-companion-branch
@@ -40,7 +40,7 @@ jobs:
           git branch -D "$BRANCH_NAME" || true
           git checkout --orphan "$BRANCH_NAME"
           git rm -rf .
-      - uses: actions/download-artifact@v4
+      - uses: actions/download-artifact@v8
         with:
           name: screenshot-diff
           path: screenshot-diff
@@ -137,7 +137,7 @@ jobs:
           done
           echo "${delimiter}" >> "$GITHUB_OUTPUT"
       - name: Find Comment
-        uses: peter-evans/find-comment@3eae4d37986fb5a8592848f6a574fdf654e61f9e # v3.1.0
+        uses: peter-evans/find-comment@b30e6a3c0ed37e7c023ccd3f1db5c6c0b0c23aad # v4.0.0
         id: fc
         if: steps.generate-diff-reports.outputs.reports != ''
         with:
@@ -146,7 +146,7 @@ jobs:
           body-includes: Snapshot diff report
 
       - name: Add or update comment on PR
-        uses: peter-evans/create-or-update-comment@71345be0265236311c031f5c7866368bd1eff043 # v4.0.0
+        uses: peter-evans/create-or-update-comment@e8674b075228eee787fea43ef493e45ece1004c9 # v5.0.0
         if: steps.generate-diff-reports.outputs.reports != ''
         with:
           comment-id: ${{ steps.fc.outputs.comment-id }}
