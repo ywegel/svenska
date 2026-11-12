@@ -1,8 +1,12 @@
 package de.ywegel.svenska.ui.common.vocabulary
 
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.SpanStyle
+import androidx.compose.ui.text.font.FontWeight
 import de.ywegel.svenska.common.streamOf
 import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Nested
+import org.junit.jupiter.api.Test
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.Arguments
 import org.junit.jupiter.params.provider.MethodSource
@@ -139,7 +143,52 @@ class HighlightUtilsTest {
         }
     }
 
+    @Nested
+    @DisplayName("buildAnnotatedWord with prefix and suffix")
+    inner class AffixTest {
+        private val affixStyle = SpanStyle(color = Color.Gray)
+
+        @ParameterizedTest(name = "\"{0}\" + \"{1}\" + \"{2}\" is shown as \"{3}\"")
+        @MethodSource("de.ywegel.svenska.ui.common.vocabulary.HighlightUtilsTest#affixCases")
+        fun `prefix and suffix surround the word and are styled`(
+            prefix: String,
+            word: String,
+            suffix: String,
+            expectedText: String,
+            expectedAffixRanges: List<Pair<Int, Int>>,
+        ) {
+            // When
+            val result = HighlightUtils.buildAnnotatedWord(prefix, word, suffix, emptyList(), affixStyle)
+
+            // Then
+            expect {
+                that(result.text).isEqualTo(expectedText)
+                that(result.spanStyles.filter { it.item == affixStyle }.map { it.start to it.end })
+                    .isEqualTo(expectedAffixRanges)
+            }
+        }
+
+        @Test
+        fun `highlights are shifted behind the prefix`() {
+            // When
+            val result = HighlightUtils.buildAnnotatedWord("högsta", "dröm", "", listOf(1 to 2), affixStyle)
+
+            // Then
+            expectThat(result.spanStyles.filter { it.item.fontWeight == FontWeight.Bold }.map { it.start to it.end })
+                .isEqualTo(listOf(8 to 9))
+        }
+    }
+
     companion object {
+        @JvmStatic
+        fun affixCases() = streamOf(
+            Arguments.of("", "lampa", "", "lampa", emptyList<Pair<Int, Int>>()),
+            Arguments.of("högsta", "dröm", "", "högsta dröm", listOf(0 to 6)),
+            Arguments.of("", "känna", "sig", "känna sig", listOf(6 to 9)),
+            Arguments.of("en", "kopp", "kaffe", "en kopp kaffe", listOf(0 to 2, 8 to 13)),
+            Arguments.of(" ", "ta", "", "ta", emptyList<Pair<Int, Int>>()),
+        )
+
         @JvmStatic
         fun balancedHighlightCases() = streamOf(
             Arguments.of("hello", "hello", emptyList<Pair<Int, Int>>()),

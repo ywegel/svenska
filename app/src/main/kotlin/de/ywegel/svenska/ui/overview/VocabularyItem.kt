@@ -211,6 +211,21 @@ fun SingleWordPreviewNewCreative() {
 
 @Preview(showBackground = true)
 @Composable
+private fun PrefixAndSuffixPreview() {
+    SvenskaTheme {
+        Column(verticalArrangement = Arrangement.spacedBy(Spacings.xs)) {
+            VocabularyListItem(
+                vocabulary = vocabulary(word = "dröm", translation = "größter Traum").copy(wordPrefix = "högsta"),
+            )
+            VocabularyListItem(
+                vocabulary = vocabulary(word = "känna", translation = "sich fühlen").copy(wordSuffix = "sig"),
+            )
+        }
+    }
+}
+
+@Preview(showBackground = true)
+@Composable
 fun WordListPreview() {
     val sampleWords = vocabularies()
 
