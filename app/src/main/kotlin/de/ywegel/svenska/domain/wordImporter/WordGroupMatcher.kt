@@ -102,7 +102,7 @@ object WordGroupMatcher {
 
     /**
      * Detects definite plurals that are not built from the indefinite plural.
-     * Catches typos like klass (-en, -er, -arna), but also real irregular plurals like öga (ögat, ögon, ögonen),
+     * Catches typos like klass (-en, -er, -arna), instead of -erna, but also real irregular plurals like öga (ögat, ögon, ögonen),
      * where the regular pattern would be ögona.
      *
      * @param indefinitePluralEnding Second entry in the brackets. Only the ending ("-ar"), written out ("sidor"),

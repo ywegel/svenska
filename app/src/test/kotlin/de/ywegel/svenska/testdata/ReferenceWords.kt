@@ -56,6 +56,7 @@ object ReferenceWords {
         en("storlek", "-en -ar -arna", "storleken storlekar storlekarna", AR),
 
         // group 3: -er
+        en("klass", "-en -er -erna", "klassen klasser klasserna", ER),
         en("maskerad", "-en -er -erna", "maskeraden maskerader maskeraderna", ER),
         en("japan", "-en -er -erna", "japanen japaner japanerna", ER),
         en("demonstrant", "-en -er -erna", "demonstranten demonstranter demonstranterna", ER),

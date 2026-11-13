@@ -125,6 +125,7 @@ class WordParserTest {
             Arguments.of("smör (-et, -, en)", noun(WordGroup.NounSubgroup.SPECIAL), "-et - en"),
             Arguments.of("diktatur (-en, -er, erna)", noun(WordGroup.NounSubgroup.SPECIAL), "-en -er erna"),
             Arguments.of("tillfälle (-t, -n, - na)", noun(WordGroup.NounSubgroup.SPECIAL), "-t -n - na"),
+            // klass + erna would be correct
             Arguments.of("klass (-en, -er, -arna)", noun(WordGroup.NounSubgroup.SPECIAL), "-en -er -arna"),
             Arguments.of("tron (-en, -er, -ern)", noun(WordGroup.NounSubgroup.SPECIAL), "-en -er -ern"),
             Arguments.of(
