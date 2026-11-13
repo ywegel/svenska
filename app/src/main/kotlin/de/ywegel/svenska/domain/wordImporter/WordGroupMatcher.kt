@@ -2,6 +2,12 @@ package de.ywegel.svenska.domain.wordImporter
 
 import de.ywegel.svenska.data.model.Gender
 import de.ywegel.svenska.data.model.WordGroup
+import de.ywegel.svenska.domain.words.hasInconsistentPlural
+import de.ywegel.svenska.domain.words.hasVowelChangeInPlural
+import de.ywegel.svenska.domain.words.isAbbreviated
+import de.ywegel.svenska.domain.words.isMalformed
+import de.ywegel.svenska.domain.words.variants
+import de.ywegel.svenska.domain.words.verbStem
 
 object WordGroupMatcher {
     fun determineWordGroup(baseWord: String, endings: List<String>): WordGroup {
@@ -28,7 +34,7 @@ object WordGroupMatcher {
      */
     private fun isNounWithoutPlural(baseWord: String, endings: List<String>): Boolean {
         val ending = singleEnding(baseWord, endings) ?: return false
-        return ending.startsWith("-") && ending.last() in definiteSingularLastLetters
+        return ending.isAbbreviated && ending.last() in definiteSingularLastLetters
     }
 
     // Written out forms are reduced to their ending: mat (maten) -> -en, trött (trötta) -> -a
@@ -97,67 +103,10 @@ object WordGroupMatcher {
             hasInconsistentPlural(baseWord, plural, definitePlural)
     }
 
-    // block (et, -, -en) misses a dash and tillfälle (-t, -n, - na) has a space in the ending
-    private fun String.isMalformed(): Boolean = this in bareSuffixes || contains(' ')
-
-    /**
-     * Detects definite plurals that are not built from the indefinite plural.
-     * Catches typos like klass (-en, -er, -arna), instead of -erna, but also real irregular plurals like öga (ögat, ögon, ögonen),
-     * where the regular pattern would be ögona.
-     *
-     * @param indefinitePluralEnding Second entry in the brackets. Only the ending ("-ar"), written out ("sidor"),
-     * a shortened compound ("-resor") or "-" if unchanged.
-     * @param definitePluralEnding Third entry in the brackets, written the same ways ("-arna", "sidorna").
-     */
-    private fun hasInconsistentPlural(
-        baseWord: String,
-        indefinitePluralEnding: String,
-        definitePluralEnding: String,
-    ): Boolean {
-        val indefinitePlural = indefinitePluralEnding.removePrefix("-").lowercase()
-        val definitePlural = definitePluralEnding.removePrefix("-").lowercase()
-
-        // ord (-et, -, -en) and plåster (plåstret, plåster, plåstren). Catches fisk (-en, -, -ar)
-        val isPluralUnchanged = indefinitePlural.isEmpty() || indefinitePlural == baseWord.lowercase()
-        if (isPluralUnchanged) return !definitePlural.contains(unchangedDefiniteRegex)
-
-        // bilar -> bilarna, yrken -> yrkena. Irregular plurals like "examen (-, examina, examina)" are skipped
-        val definiteSuffix = when {
-            indefinitePlural.endsWith("r") -> "na"
-            indefinitePlural.endsWith("n") -> "a"
-            else -> return false
-        }
-
-        // "arna" -> "ar"
-        val definiteStem = definitePlural.removeSuffix(definiteSuffix)
-
-        // Catches öga (ögon, ögonen), öra (öron, öronen) and man (män, männen): "en" instead of "a".
-        // Also catches typos like klass (-en, -er, -arna) instead of -erna: "er" does not match "ar".
-        // Both directions, as compounds are shortened on either side: -resor -> resorna, självkänslor -> -orna
-        val definiteFollowsIndefinitePlural = definitePlural.endsWith(definiteSuffix) &&
-            definiteStem.isNotEmpty() &&
-            (indefinitePlural.endsWith(definiteStem) || definiteStem.endsWith(indefinitePlural))
-
-        return !definiteFollowsIndefinitePlural
-    }
-
-    /**
-     * fot -> fötter changes the vowel, while sida -> sidor and semester -> semestrar only lose one.
-     * Checks for a contained sequence, as compounds are often shortened: hurtbulle -> bullar.
-     */
-    private fun hasVowelChangeInPlural(baseWord: String, plural: String): Boolean {
-        val pluralStem = plural.removePrefix("-").lowercase().replace(pluralSuffixRegex, "")
-        if (pluralStem.length < MIN_PLURAL_STEM_LENGTH) return false
-
-        return pluralStem.vowels() !in baseWord.lowercase().vowels()
-    }
-
-    private fun String.vowels(): String = filter { it in VOWELS }
-
     private fun determineVerbSubgroup(baseWord: String, endings: List<String>): WordGroup.Verb {
         val present = endings[0]
-        val past = endings[1].substringBefore("/")
-        val supine = endings[2].substringBefore("/")
+        val past = endings[1].variants().first()
+        val supine = endings[2].variants().first()
 
         val subgroup = when {
             isGroup1(baseWord, present, past, supine) -> WordGroup.VerbSubgroup.GROUP_1
@@ -177,7 +126,7 @@ object WordGroupMatcher {
     }
 
     private fun isGroup2(baseWord: String, past: String, supine: String): Boolean {
-        val stem = baseWord.removeSuffix("a")
+        val stem = baseWord.verbStem()
         return baseWord.endsWith("a") &&
             stem.length >= MIN_VERB_STEM_LENGTH &&
             past.keepsStem(stem) &&
@@ -187,7 +136,7 @@ object WordGroupMatcher {
     }
 
     // Double consonants can be simplified, so the last letter is ignored: glömma -> glömde, känna -> känt
-    private fun String.keepsStem(stem: String): Boolean = startsWith("-") || startsWith(stem.dropLast(1))
+    private fun String.keepsStem(stem: String): Boolean = isAbbreviated || startsWith(stem.dropLast(1))
 
     private fun isGroup3(baseWord: String, present: String, past: String, supine: String): Boolean {
         return baseWord.last() in group3WordEndings &&
@@ -211,12 +160,7 @@ object WordGroupMatcher {
     private val verbIndicatorSuperlativEndings = setOf("t", "ts")
     private val definiteSingularLastLetters = setOf('n', 't')
     private val group3WordEndings = setOf('e', 'i', 'o', 'u', 'y', 'å', 'ä', 'ö')
-    private val pluralSuffixRegex = Regex("(or|ar|er|r|n)$")
-    private val unchangedDefiniteRegex = Regex("(en|n|na)$")
-    private val bareSuffixes = setOf("n", "en", "t", "et", "r", "ar", "or", "er", "na", "arna", "orna", "erna", "rna")
-    private const val VOWELS = "aeiouyåäöé"
     private const val MIN_VERB_STEM_LENGTH = 2
-    private const val MIN_PLURAL_STEM_LENGTH = 2
     private const val ADJECTIVE_PLURAL_ENDING = "-a"
     private const val NOUN_ENDINGS_COUNT = 3
     private const val VERB_ENDINGS_COUNT = 3
