@@ -31,7 +31,6 @@ object ReferenceWords {
         en("ros", "-en -or -orna", "rosen rosor rosorna", OR),
         en("sida", "-n sidor sidorna", "sidan sidor sidorna", OR),
         en("flicka", "-an flickor flickorna", "flickan flickor flickorna", OR),
-        en("självkänsla", "-n självkänslor -orna", "självkänslan självkänslor självkänslorna", OR),
 
         // group 2: -ar
         en("bil", "-en -ar -arna", "bilen bilar bilarna", AR),
@@ -130,7 +129,7 @@ object ReferenceWords {
         ett("bekymmer", "-ret - -ren", "bekymret bekymmer bekymren", UNCHANGED_ETT),
         ett(
             "fenomen", "-et - -en", "fenomenet fenomen fenomenen", UNCHANGED_ETT,
-            text = "ett fenomen (-et, -, -en)", prefix = "ett",
+            text = "ett fenomen (-et, -, -en)", prefix = "ett", formsNeedReview = true,
         ),
 
         // group 6b: unchanged en-words

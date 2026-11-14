@@ -19,17 +19,20 @@ object FormBuilder {
         if (wordGroup == WordGroup.Other) return BuiltForms(forms = emptyList(), needsReview = false)
 
         val base = baseOf(word, endings, wordGroup)
+        val forms = endings.map { buildForm(word, base, it) }
         return BuiltForms(
-            forms = endings.map { buildForm(word, base, it) },
-            needsReview = needsReview(word, base, endings, wordGroup),
+            forms = forms,
+            needsReview = needsReview(word, base, endings, wordGroup) || forms.any { it.contains(tripleLetterRegex) },
         )
     }
 
     /**
      * @param text The word the abbreviated endings are added to: svara, sök (söka), spegel.
      * @param hasUnstressedE The e before the last l/n/r drops, when something is added: spegel -> speglar.
+     * @param doublesLastLetter An ending starting with the last letter doubles it: program -met, get -ter, dum -ma.
+     * Otherwise the book only repeats the letter the ending is attached to: blyg -gt, sköta -tte.
      */
-    private data class Base(val text: String, val hasUnstressedE: Boolean)
+    private data class Base(val text: String, val hasUnstressedE: Boolean, val doublesLastLetter: Boolean)
 
     /**
      * Verbs with "-r" in the present keep their -a (svara -> svarade), all others add their endings to the
@@ -38,12 +41,16 @@ object FormBuilder {
      * The e is unstressed in polysyllabic adjectives on consonant + el/en/er (öppen, makaber) and in nouns of that
      * shape, whose definite singular is -n/-t or repeats the last letter (spegel -n, fönster -ret).
      * With -en/-et it is stressed and stays: fördel (-en, -ar) -> fördelar.
+     *
+     * Nouns double any last letter, verbs and adjectives only m and n.
      */
     private fun baseOf(word: String, endings: List<String>, wordGroup: WordGroup): Base {
         val keepsA = wordGroup !is WordGroup.Verb || endings.firstOrNull() == "-r"
+        val text = if (keepsA) word else word.verbStem()
         return Base(
-            text = if (keepsA) word else word.verbStem(),
+            text = text,
             hasUnstressedE = word.hasUnstressedE(endings.firstOrNull().orEmpty(), wordGroup),
+            doublesLastLetter = wordGroup is WordGroup.Noun || text.last() in doubledLetters,
         )
     }
 
@@ -60,12 +67,14 @@ object FormBuilder {
         ending.isUnchanged -> word
         !ending.isAbbreviated -> overlay(word, ending) ?: ending
         ending.isPureEnding(base.text) -> append(base, ending.withoutDash())
-        else -> overlay(word, ending.withoutDash()) ?: (word + ending.withoutDash())
+        else -> overlayAbbreviated(word, ending.withoutDash()) ?: (word + ending.withoutDash())
     }
 
     private fun append(base: Base, ending: String): String {
         val text = base.text
         return when {
+            // läkare + na -> läkarna, tränare + arna -> tränarna
+            text.endsWith("are") && ending in definitePluralEndingsAfterAre -> text.dropLast(1) + "na"
             // glad -> glatt, känd -> känt, stressad -> stressat
             text.endsWith("d") && ending.startsWith("t") -> text.withDAssimilatedToT() + ending.trimStart('t')
             // skrämd + da -> skrämda, hända + de -> hände, betyda + dde -> betydde
@@ -76,6 +85,8 @@ object FormBuilder {
             base.hasUnstressedE && ending.startsWith(text.last()) -> join(text.dropLast(2), ending)
             // spegel + ar -> speglar, öppen + a -> öppna, himmel + ar -> himlar
             base.hasUnstressedE && ending.startsWithVowel() -> join(text.withoutUnstressedE(), ending)
+            // blyg + gt -> blygt, sköt + tte -> skötte, vit + tt -> vitt
+            !base.doublesLastLetter && ending.repeatsLastLetterOf(text) -> text.dropLast(1) + ending
             // penna + or -> pennor, flicka + an -> flickan
             text.endsWithDroppableVowel() && ending.startsWithVowel() -> join(text.dropLast(1), ending)
             // bil + ar -> bilar, program + met -> programmet
@@ -86,6 +97,10 @@ object FormBuilder {
     // glömm + de -> glömde, tunn + t -> tunt. Before vowels the double consonant stays: glömmer, tunna
     private fun join(stem: String, ending: String): String =
         if (ending.startsWithVowel()) stem + ending else stem.withSingleFinalConsonant() + ending
+
+    // -tte and -gt repeat the last letter, -te after möt is a plain ending: mötte
+    private fun String.repeatsLastLetterOf(text: String): Boolean =
+        startsWith(text.last()) && (this !in pureEndings || startsWith(text.takeLast(1).repeat(2)))
 
     /**
      * dd -> tt (nyfödd -> nyfött). Polysyllabic -ad -> -at (stressad -> stressat, friad -> friat).
@@ -124,12 +139,21 @@ object FormBuilder {
      * [MIN_OVERLAY_LENGTH] letters) appears: hurtbulle + bullar -> hurtbullar, trafikolycka + olyckor -> trafikolyckor.
      * Returns null if nothing matches.
      */
-    private fun overlay(word: String, piece: String): String? {
-        val start = (piece.length downTo MIN_OVERLAY_LENGTH)
+    private fun overlay(word: String, piece: String, minLength: Int = MIN_OVERLAY_LENGTH): String? {
+        val start = (piece.length downTo minLength)
             .map { piece.take(it) }
             .firstOrNull { it in word }
             ?: return null
         return word.substringBeforeLast(start) + piece
+    }
+
+    /**
+     * A vowel change leaves only two letters to match: storstad + städer -> storstäder, bidra + drog -> bidrog.
+     * Short pieces would match by accident: kortfattad + at -> kortfat.
+     */
+    private fun overlayAbbreviated(word: String, piece: String): String? {
+        val minLength = if (piece.length >= LONG_PIECE_LENGTH) MIN_LONG_PIECE_OVERLAY_LENGTH else MIN_OVERLAY_LENGTH
+        return overlay(word, piece, minLength)
     }
 
     /**
@@ -145,7 +169,30 @@ object FormBuilder {
         word in irregularWords ||
                 endings.any { it.isMalformed() || it.hasAbbreviatedVariants() || it.isWronglyBuilt(base.text) } ||
                 endings.any { it.doesNotFit(word, base.text) } ||
-                (wordGroup is WordGroup.Noun && (endings.lacksEInDefinite(word) || hasUnexplainedPlural(word, endings)))
+                (wordGroup is WordGroup.Verb && endings.hasUnclearPresent(word)) ||
+                (wordGroup is WordGroup.Noun && nounNeedsReview(word, endings))
+
+    private fun nounNeedsReview(word: String, endings: List<String>): Boolean = endings.lacksEInDefinite(word) ||
+        endings.hasUnclearE(word) ||
+        endings.repeatsPluralEndingAfterUnchanged(word) ||
+        hasUnexplainedPlural(word, endings)
+
+    // höra (-r, -de, -t) means hör, hörde, hört, but is written like svara (-r, -de, -t)
+    private fun List<String>.hasUnclearPresent(word: String): Boolean =
+        firstOrNull() == "-r" && word.contains(presentWithoutEndingRegex)
+
+    /**
+     * With -en/-et the e can stay (dataspel -> dataspelet) or drop (exempel -> exemplet). Only compounds of
+     * stressed one syllable words are safe.
+     */
+    private fun List<String>.hasUnclearE(word: String): Boolean = firstOrNull() in fullDefiniteEndings &&
+        word.contains(unstressedERegex) &&
+        word.isPolysyllabic() &&
+        stressedNounEndings.none { word.endsWith(it) }
+
+    // allergiker (-n, -, -erna): an unchanged plural only takes -na. Nouns on -are are built right
+    private fun List<String>.repeatsPluralEndingAfterUnchanged(word: String): Boolean =
+        size == NOUN_ENDINGS_COUNT && this[1].isUnchanged && this[2] in fullDefinitePluralEndings && !word.endsWith("are")
 
     // -et/-en: only written out variants can be compared later
     private fun String.hasAbbreviatedVariants(): Boolean = isAbbreviated && variants().size > 1
@@ -164,7 +211,7 @@ object FormBuilder {
     private fun String.doesNotFit(word: String, base: String): Boolean = when {
         this == "-an" -> !base.endsWith("a")
         !isAbbreviated || isUnchanged || isPureEnding(base) -> false
-        else -> overlay(word, withoutDash()) == null
+        else -> overlayAbbreviated(word, withoutDash()) == null
     }
 
     // bil (-n), hus (-t): after a consonant only unstressed endings take a bare -n/-t: cykel -n, motor -n
@@ -180,6 +227,13 @@ object FormBuilder {
     private val enToEtEndings = setOf("t", "et")
     private val bareDefiniteEndings = setOf("-n", "-t")
     private val shortenedDoubleConsonants = setOf("mm", "nn")
+    private val doubledLetters = setOf('m', 'n')
+    private val definitePluralEndingsAfterAre = setOf("na", "arna")
+    private val fullDefiniteEndings = setOf("-en", "-et")
+    private val fullDefinitePluralEndings = setOf("-arna", "-erna", "-orna")
+    private val stressedNounEndings = setOf("del", "spel", "fel", "ben", "sten", "sken")
+    private val presentWithoutEndingRegex = Regex("[öäy]ra$")
+    private val tripleLetterRegex = Regex("""(.)\1\1""")
     private val unstressedNounEndings = setOf("el", "er", "or", "ar")
     private val unstressedERegex = Regex("[^aeiouyåäöé]e[lnr]$")
     private val pureEndings = setOf(
@@ -199,7 +253,9 @@ object FormBuilder {
     // sen and ingen look like öppen, but are irregular: jättesent, jättesena; inget, inga
     private val irregularWords = setOf("ingen", "jättesen")
 
-    private const val MIN_OVERLAY_LENGTH = 2
+    private const val MIN_OVERLAY_LENGTH = 3
+    private const val MIN_LONG_PIECE_OVERLAY_LENGTH = 2
+    private const val LONG_PIECE_LENGTH = 4
     private const val MIN_POLYSYLLABIC_VOWELS = 2
     private const val NOUN_ENDINGS_COUNT = 3
 }
