@@ -58,6 +58,16 @@ class FormBuilderTest {
         assertEquals(BuiltForms(forms = emptyList(), needsReview = false), result)
     }
 
+    @ParameterizedTest
+    @MethodSource("wordsWithoutBase")
+    fun `should build no forms without a base word`(word: String, endings: List<String>, wordGroup: WordGroup) {
+        // When
+        val result = FormBuilder.build(word, endings, wordGroup)
+
+        // Then
+        assertEquals(BuiltForms(forms = emptyList(), needsReview = false), result)
+    }
+
     companion object {
         private val noun = WordGroup.Noun(WordGroup.NounSubgroup.SPECIAL)
         private val verb = WordGroup.Verb(WordGroup.VerbSubgroup.GROUP_4_SPECIAL)
@@ -72,6 +82,14 @@ class FormBuilderTest {
 
         @JvmStatic
         fun writtenOutReferenceWords() = ReferenceWords.all.map { Arguments.of(it.word, it.forms, it.wordGroup) }
+
+        // The add/edit screen builds on every input, so words can be empty or half typed
+        @JvmStatic
+        fun wordsWithoutBase(): List<Arguments> = listOf(
+            Arguments.of("", listOf("-en", "-ar", "-arna"), noun),
+            Arguments.of(" ", listOf("-en", "-ar", "-arna"), noun),
+            Arguments.of("a", listOf("-er", "-de", "-t"), verb),
+        )
 
         @JvmStatic
         fun formEdgeCases(): List<Arguments> = listOf(
@@ -99,9 +117,24 @@ class FormBuilderTest {
             Arguments.of("vit", listOf("-tt", "-a"), WordGroup.Adjective, listOf("vitt", "vita")),
             Arguments.of("sköta", listOf("-er", "-tte", "-tt"), verb, listOf("sköter", "skötte", "skött")),
             Arguments.of("blåsa", listOf("-er", "-ste", "-st"), verb, listOf("blåser", "blåste", "blåst")),
+            // Plain ending after the same letter
+            Arguments.of("byta", listOf("-er", "-te", "-t"), verb, listOf("byter", "bytte", "bytt")),
             // Ending doubles the last letter
             Arguments.of("get", listOf("-en", "-ter", "-terna"), noun, listOf("geten", "getter", "getterna")),
             Arguments.of("dum", listOf("-t", "-ma"), WordGroup.Adjective, listOf("dumt", "dumma")),
+            // d before -de after a polysyllabic -ad
+            Arguments.of("oväntad", listOf("-t", "-de"), WordGroup.Adjective, listOf("oväntat", "oväntade")),
+            // One syllable, so the e is stressed
+            Arguments.of("ren", listOf("-t", "-a"), WordGroup.Adjective, listOf("rent", "rena")),
+            // Unstressed e drops and mm gets single
+            Arguments.of("himmel", listOf("-n", "-ar", "-arna"), noun, listOf("himmeln", "himlar", "himlarna")),
+            // Abbreviated piece appears twice in the word
+            Arguments.of(
+                "barnbarn", listOf("-et", "-", "-barnen"), noun,
+                listOf("barnbarnet", "barnbarn", "barnbarnen"),
+            ),
+            // Single letter of a half typed word
+            Arguments.of("d", listOf("-t", "-a"), WordGroup.Adjective, listOf("t", "da")),
         )
 
         @JvmStatic
@@ -140,6 +173,8 @@ class FormBuilderTest {
             Arguments.of("skorsten", listOf("-en", "-ar", "-arna"), noun, false),
             // Short piece that only matches the word by accident
             Arguments.of("kortfattad", listOf("-at", "-ade"), WordGroup.Adjective, true),
+            // Verbs on -s
+            Arguments.of("svettas", listOf("-as", "-ades", "-ats"), verb, true),
             // Repeated last letter is built safely
             Arguments.of("blyg", listOf("-gt", "-ga"), WordGroup.Adjective, false),
             Arguments.of("sköta", listOf("-er", "-tte", "-tt"), verb, false),

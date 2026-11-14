@@ -15,9 +15,10 @@ data class BuiltForms(val forms: List<String>, val needsReview: Boolean)
 object FormBuilder {
 
     fun build(word: String, endings: List<String>, wordGroup: WordGroup): BuiltForms {
-        if (wordGroup == WordGroup.Other) return BuiltForms(forms = emptyList(), needsReview = false)
-
         val base = baseOf(word, endings, wordGroup)
+        // Nothing to add the endings to: other words, empty input or a half typed verb like "a"
+        if (wordGroup == WordGroup.Other || base.text.isBlank()) return noForms
+
         val forms = endings.map { buildForm(word, base, it) }
         return BuiltForms(
             forms = forms,
@@ -108,7 +109,7 @@ object FormBuilder {
     private fun String.withDAssimilatedToT(): String = when {
         endsWith("dd") -> dropLast(2) + "tt"
         endsWith("ad") && isPolysyllabic() -> dropLast(1) + "t"
-        dropLast(1).last().isVowel() -> dropLast(1) + "tt"
+        hasVowelBeforeLastLetter() -> dropLast(1) + "tt"
         else -> dropLast(1) + "t"
     }
 
@@ -119,9 +120,12 @@ object FormBuilder {
      */
     private fun String.dropsDBefore(ending: String): Boolean = when (ending) {
         "da", "dde" -> true
-        "de" -> !dropLast(1).last().isVowel() || (endsWith("ad") && isPolysyllabic())
+        "de" -> !hasVowelBeforeLastLetter() || (endsWith("ad") && isPolysyllabic())
         else -> false
     }
+
+    // glad, föd, but not känd or a single d
+    private fun String.hasVowelBeforeLastLetter(): Boolean = dropLast(1).lastOrNull()?.isVowel() == true
 
     // spegel -> spegl, himmel -> himl
     private fun String.withoutUnstressedE(): String = dropLast(2).withSingleFinalConsonant() + last()
@@ -130,6 +134,7 @@ object FormBuilder {
     private fun String.withSingleFinalConsonant(): String =
         if (takeLast(2) in doubledConsonants) dropLast(1) else this
 
+    private val noForms = BuiltForms(forms = emptyList(), needsReview = false)
     private val enToEtEndings = setOf("t", "et")
     private val doubledConsonants = setOf("mm", "nn")
     private val definitePluralEndingsAfterAre = setOf("na", "arna")
