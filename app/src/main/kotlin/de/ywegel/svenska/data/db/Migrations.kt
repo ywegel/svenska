@@ -139,6 +139,19 @@ val MIGRATION_3_4 = object : Migration(3, 4) {
 }
 
 /**
+ * Adds the written-out forms and the review flag. Existing entries get no forms; they are filled by a re-import.
+ */
+@Suppress("detekt:MagicNumber")
+val MIGRATION_4_5 = object : Migration(4, 5) {
+    override fun migrate(db: SupportSQLiteDatabase) {
+        db.execSQL("ALTER TABLE Vocabulary ADD COLUMN form1 TEXT")
+        db.execSQL("ALTER TABLE Vocabulary ADD COLUMN form2 TEXT")
+        db.execSQL("ALTER TABLE Vocabulary ADD COLUMN form3 TEXT")
+        db.execSQL("ALTER TABLE Vocabulary ADD COLUMN formsNeedReview INTEGER NOT NULL DEFAULT 0")
+    }
+}
+
+/**
  * Frozen snapshot of the dash replacement in `WordExtractor.normalizeSpecialCharacters` (formerly
  * `normalizePdfDashes`) in `domain/wordImporter`. Migrations must keep reproducing
  * the exact transformation, so this copy deliberately does not call it.

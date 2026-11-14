@@ -27,6 +27,15 @@ data class Vocabulary(
     // "Noun", "Verb", "Adjective" or "Other"
     val wordGroup: WordGroup = WordGroup.Other,
     val ending: String = "",
+    // Written-out forms of `word` only, without prefix and suffix. Variants stay text ("lade/la"). null = no form.
+    // Noun: sg. definite · pl. indefinite · pl. definite
+    // Verb: present · past · supine
+    // Adjective: neuter · plural, or comparative · superlative
+    val form1: String? = null,
+    val form2: String? = null,
+    val form3: String? = null,
+    // Set by the importer when the forms don't fit together ("klass (-en -er -arna)"). Cleared once the user fixes or confirms them
+    @ColumnInfo(defaultValue = "0") val formsNeedReview: Boolean = false,
     val notes: String = "",
     val irregularPronunciation: String? = null,
     val isFavorite: Boolean = false,
