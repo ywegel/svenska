@@ -43,6 +43,14 @@ object ReferenceWords {
         en("å", "-n -ar -arna", "ån åar åarna", AR),
         en("timme", "-n timmar timmarna", "timmen timmar timmarna", AR),
         en("hare", "-n harar hararna", "haren harar hararna", AR),
+        // Unstressed e drops before a vowel
+        en("spegel", "-n -ar -arna", "spegeln speglar speglarna", AR),
+        en("nyckel", "-n -ar -arna", "nyckeln nycklar nycklarna", AR),
+        // Stressed e stays
+        en("fördel", "-en -ar -arna", "fördelen fördelar fördelarna", AR),
+        // Ending repeats the last letter
+        en("feber", "-n -rar -rarna", "febern febrar febrarna", AR),
+        en("artikel", "-n -lar -larna", "artikeln artiklar artiklarna", AR),
         en("hurtbulle", "-n bullar bullarna", "hurtbullen hurtbullar hurtbullarna", AR),
         en("cykel", "-n cyklar cyklarna", "cykeln cyklar cyklarna", AR),
         en("titel", "titeln titlar titlarna", "titeln titlar titlarna", AR),
@@ -82,10 +90,12 @@ object ReferenceWords {
         en("rad", "-en -er -erna", "raden rader raderna", ER),
         en("kö", "-n -er -erna", "kön köer köerna", ER),
         en("vy", "-n -er -erna", "vyn vyer vyerna", ER),
-        ett("kafé", "-t -er -erna", "kaféet kaféer kaféerna", ER),
+        en("regel", "-n -er -erna", "regeln regler reglerna", ER),
+        ett("skafferi", "-t -er -erna", "skafferiet skafferier skafferierna", ER, formsNeedReview = true),
+        ett("kafé", "-t -er -erna", "kaféet kaféer kaféerna", ER, formsNeedReview = true),
         ett("pris", "-et -er -erna", "priset priser priserna", ER),
-        ett("bageri", "-t -er -erna", "bageriet bagerier bagerierna", ER),
-        ett("museum", "-et museer museerna", "museet museer museerna", ER),
+        ett("bageri", "-t -er -erna", "bageriet bagerier bagerierna", ER, formsNeedReview = true),
+        ett("museum", "-et museer museerna", "museet museer museerna", ER, formsNeedReview = true),
         ett("te", "teet teer teerna", "teet teer teerna", ER),
 
         // group 4: -r
@@ -116,6 +126,8 @@ object ReferenceWords {
         ett("uttryck", "-et - -en", "uttrycket uttryck uttrycken", UNCHANGED_ETT),
         ett("kapitel", "kapitlet - kapitlen", "kapitlet kapitel kapitlen", UNCHANGED_ETT),
         ett("plåster", "plåstret plåster plåstren", "plåstret plåster plåstren", UNCHANGED_ETT),
+        ett("fönster", "-ret - -ren", "fönstret fönster fönstren", UNCHANGED_ETT),
+        ett("bekymmer", "-ret - -ren", "bekymret bekymmer bekymren", UNCHANGED_ETT),
         ett(
             "fenomen", "-et - -en", "fenomenet fenomen fenomenen", UNCHANGED_ETT,
             text = "ett fenomen (-et, -, -en)", prefix = "ett",
@@ -131,7 +143,7 @@ object ReferenceWords {
         en("dotter", "-n döttrar döttrarna", "dottern döttrar döttrarna", SPECIAL),
         en("bonde", "-n bönder bönderna", "bonden bönder bönderna", SPECIAL),
         en("man", "mannen män männen", "mannen män männen", SPECIAL),
-        en("brandman", "-nen -män -männen", "brandmannen brandmän brandmännen", SPECIAL),
+        en("brandman", "-nen -män -männen", "brandmannen brandmän brandmännen", SPECIAL, formsNeedReview = true),
         en("mus", "musen möss mössen", "musen möss mössen", SPECIAL),
         en("dagbok", "-en dagböcker dagböckerna", "dagboken dagböcker dagböckerna", SPECIAL),
         ett("land", "-et länder länderna", "landet länder länderna", SPECIAL),
@@ -159,6 +171,11 @@ object ReferenceWords {
             "känna", "-er kände känt", "känner kände känt", GROUP_2A,
             text = "känna sig (-er, kände, känt)", suffix = "sig",
         ),
+        verb("använda", "-er -de -t", "använder använde använt", GROUP_2A),
+        verb("hända", "-er -de -t", "händer hände hänt", GROUP_2A),
+        verb("föda", "-er -de -t", "föder födde fött", GROUP_2A),
+        verb("betyda", "-er -dde -tt", "betyder betydde betytt", GROUP_2A),
+        verb("påminna", "-er -de -t", "påminner påminde påmint", GROUP_2A),
 
         // Group 2b: -er, -te
         verb("söka", "-er -te -t", "söker sökte sökt", GROUP_2B),
@@ -168,7 +185,7 @@ object ReferenceWords {
         verb("åka", "-er åkte åkt", "åker åkte åkt", GROUP_2B, text = "åka (-er, åkte, åkt) till", suffix = "till"),
         verb(
             "gifta", "-er -te -t", "gifter gifte gift", GROUP_2B,
-            text = "gifta sig (-er, -te, -t) med någon", suffix = "sig med någon",
+            text = "gifta sig (-er, -te, -t) med någon", suffix = "sig med någon", formsNeedReview = true,
         ),
 
         // Group 3: -r, -dde
@@ -207,6 +224,28 @@ object ReferenceWords {
         adjective("generell", "-t -a", "generellt generella"),
         adjective("svensk", "-t -a", "svenskt svenska"),
 
+        // d before t and d
+        adjective("glad", "-tt -a", "glatt glada"),
+        adjective("känd", "-t -a", "känt kända"),
+        adjective("stressad", "-t -e", "stressat stressade"),
+        adjective("friad", "-t -e", "friat friade"),
+        adjective("nyfödd", "-tt -a", "nyfött nyfödda"),
+        adjective("skrämd", "-t -da", "skrämt skrämda"),
+
+        // Unstressed e drops, -en becomes -et
+        adjective("öppen", "-t -a", "öppet öppna"),
+        adjective("sugen", "-et -na", "suget sugna"),
+        adjective("ljummen", "-t -na", "ljummet ljumna"),
+        adjective("makaber", "-t -a", "makabert makabra"),
+
+        // Double consonant gets single before a consonant
+        adjective("tunn", "-t -a", "tunt tunna"),
+
+        // Built wrong, so flagged
+        adjective("salt", "-t -a", "salt salta", formsNeedReview = true),
+        adjective("färgglad", "-t -a", "färgglatt färgglada", formsNeedReview = true),
+        adjective("jättesen", "-t -a", "jättesent jättesena", formsNeedReview = true),
+
         // Already ending on -t, so only the plural is listed
         adjective("trött", "-a", "trötta"),
         adjective("bäst", "-a", "bästa"),
@@ -222,9 +261,10 @@ object ReferenceWords {
         text: String? = null,
         prefix: String = "",
         suffix: String = "",
+        formsNeedReview: Boolean = false,
     ) = ReferenceWord(
         word, endings.words(), forms.words(), WordGroup.Noun(subgroup), Gender.Ultra,
-        text ?: defaultText(word, endings), prefix, suffix,
+        text ?: defaultText(word, endings), prefix, suffix, formsNeedReview,
     )
 
     private fun ett(
@@ -235,9 +275,10 @@ object ReferenceWords {
         text: String? = null,
         prefix: String = "",
         suffix: String = "",
+        formsNeedReview: Boolean = false,
     ) = ReferenceWord(
         word, endings.words(), forms.words(), WordGroup.Noun(subgroup), Gender.Neutra,
-        text ?: defaultText(word, endings), prefix, suffix,
+        text ?: defaultText(word, endings), prefix, suffix, formsNeedReview,
     )
 
     private fun verb(
@@ -248,9 +289,10 @@ object ReferenceWords {
         text: String? = null,
         prefix: String = "",
         suffix: String = "",
+        formsNeedReview: Boolean = false,
     ) = ReferenceWord(
         word, endings.words(), forms.words(), WordGroup.Verb(subgroup), gender = null,
-        text ?: defaultText(word, endings), prefix, suffix,
+        text ?: defaultText(word, endings), prefix, suffix, formsNeedReview,
     )
 
     private fun adjective(
@@ -260,9 +302,10 @@ object ReferenceWords {
         text: String? = null,
         prefix: String = "",
         suffix: String = "",
+        formsNeedReview: Boolean = false,
     ) = ReferenceWord(
         word, endings.words(), forms.words(), WordGroup.Adjective, gender = null,
-        text ?: defaultText(word, endings), prefix, suffix,
+        text ?: defaultText(word, endings), prefix, suffix, formsNeedReview,
     )
 
     private fun String.words() = split(" ")

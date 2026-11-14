@@ -39,7 +39,22 @@ object FormBuilder {
      * shape, whose definite singular is -n/-t or repeats the last letter (spegel -n, fönster -ret).
      * With -en/-et it is stressed and stays: fördel (-en, -ar) -> fördelar.
      */
-    private fun baseOf(word: String, endings: List<String>, wordGroup: WordGroup): Base = TODO()
+    private fun baseOf(word: String, endings: List<String>, wordGroup: WordGroup): Base {
+        val keepsA = wordGroup !is WordGroup.Verb || endings.firstOrNull() == "-r"
+        return Base(
+            text = if (keepsA) word else word.verbStem(),
+            hasUnstressedE = word.hasUnstressedE(endings.firstOrNull().orEmpty(), wordGroup),
+        )
+    }
+
+    private fun String.hasUnstressedE(definite: String, wordGroup: WordGroup): Boolean {
+        if (!contains(unstressedERegex) || !isPolysyllabic()) return false
+        return when (wordGroup) {
+            WordGroup.Adjective -> true
+            is WordGroup.Noun -> definite in bareDefiniteEndings || definite.withoutDash().startsWith(last())
+            else -> false
+        }
+    }
 
     private fun buildForm(word: String, base: Base, ending: String): String = when {
         ending.isUnchanged -> word
@@ -76,39 +91,61 @@ object FormBuilder {
      * dd -> tt (nyfödd -> nyfött). Polysyllabic -ad -> -at (stressad -> stressat, friad -> friat).
      * Other vowel + d -> tt (glad -> glatt, betyd -> betytt). Consonant + d -> t (känd -> känt, använd -> använt).
      */
-    private fun String.withDAssimilatedToT(): String = TODO()
+    private fun String.withDAssimilatedToT(): String = when {
+        endsWith("dd") -> dropLast(2) + "tt"
+        endsWith("ad") && isPolysyllabic() -> dropLast(1) + "t"
+        dropLast(1).last().isVowel() -> dropLast(1) + "tt"
+        else -> dropLast(1) + "t"
+    }
 
     /**
      * -da and -dde always keep one d (skrämd -> skrämda, betyd -> betydde). -de only after consonant + d or
      * polysyllabic -ad (hänt -> hände, oväntad -> oväntade). After another vowel + d, the book means -dde:
      * föd + de -> födde.
      */
-    private fun String.dropsDBefore(ending: String): Boolean = TODO()
+    private fun String.dropsDBefore(ending: String): Boolean = when (ending) {
+        "da", "dde" -> true
+        "de" -> !dropLast(1).last().isVowel() || (endsWith("ad") && isPolysyllabic())
+        else -> false
+    }
+
+    // friad, stressad, but not glad
+    private fun String.isPolysyllabic(): Boolean = vowels().length >= MIN_POLYSYLLABIC_VOWELS
 
     // spegel -> spegl, himmel -> himl
-    private fun String.withoutUnstressedE(): String = TODO()
+    private fun String.withoutUnstressedE(): String = dropLast(2).withSingleFinalConsonant() + last()
 
     // glömm -> glöm, tunn -> tun. Only mm and nn, other double consonants stay: fett, glatt
-    private fun String.withSingleFinalConsonant(): String = TODO()
+    private fun String.withSingleFinalConsonant(): String =
+        if (takeLast(2) in shortenedDoubleConsonants) dropLast(1) else this
 
     /**
      * Lays a shortened compound over the end of the word, where the longest beginning of [piece] (at least
      * [MIN_OVERLAY_LENGTH] letters) appears: hurtbulle + bullar -> hurtbullar, trafikolycka + olyckor -> trafikolyckor.
      * Returns null if nothing matches.
      */
-    private fun overlay(word: String, piece: String): String? = TODO()
+    private fun overlay(word: String, piece: String): String? {
+        val start = (piece.length downTo MIN_OVERLAY_LENGTH)
+            .map { piece.take(it) }
+            .firstOrNull { it in word }
+            ?: return null
+        return word.substringBeforeLast(start) + piece
+    }
 
     /**
      * A plain ending like -or, -arna, -dde, -e, optionally with the doubled last letter of the base:
      * program + -met, feber + -rar. Everything else is a shortened compound: -olyckor, -ministrar.
      */
-    private fun String.isPureEnding(base: String): Boolean = TODO()
+    private fun String.isPureEnding(base: String): Boolean {
+        val ending = withoutDash()
+        return ending in pureEndings || (ending.startsWith(base.last()) && ending.drop(1) in pureEndings)
+    }
 
     private fun needsReview(word: String, base: Base, endings: List<String>, wordGroup: WordGroup): Boolean =
         word in irregularWords ||
                 endings.any { it.isMalformed() || it.hasAbbreviatedVariants() || it.isWronglyBuilt(base.text) } ||
                 endings.any { it.doesNotFit(word, base.text) } ||
-                (wordGroup is WordGroup.Noun && hasUnexplainedPlural(word, endings))
+                (wordGroup is WordGroup.Noun && (endings.lacksEInDefinite(word) || hasUnexplainedPlural(word, endings)))
 
     // -et/-en: only written out variants can be compared later
     private fun String.hasAbbreviatedVariants(): Boolean = isAbbreviated && variants().size > 1
@@ -124,7 +161,15 @@ object FormBuilder {
     /**
      * The ending can't be added to this word (bil + -an, hus + -t), or a shortened compound matches nowhere.
      */
-    private fun String.doesNotFit(word: String, base: String): Boolean = TODO()
+    private fun String.doesNotFit(word: String, base: String): Boolean = when {
+        this == "-an" -> !base.endsWith("a")
+        !isAbbreviated || isUnchanged || isPureEnding(base) -> false
+        else -> overlay(word, withoutDash()) == null
+    }
+
+    // bil (-n), hus (-t): after a consonant only unstressed endings take a bare -n/-t: cykel -n, motor -n
+    private fun List<String>.lacksEInDefinite(word: String): Boolean =
+        firstOrNull() in bareDefiniteEndings && !word.last().isVowel() && unstressedNounEndings.none { word.endsWith(it) }
 
     // klass (-en, -er, -arna) is a typo. man (mannen, män, männen) changes the vowel, so it is a real exception
     private fun hasUnexplainedPlural(word: String, endings: List<String>): Boolean {
@@ -133,6 +178,14 @@ object FormBuilder {
     }
 
     private val enToEtEndings = setOf("t", "et")
+    private val bareDefiniteEndings = setOf("-n", "-t")
+    private val shortenedDoubleConsonants = setOf("mm", "nn")
+    private val unstressedNounEndings = setOf("el", "er", "or", "ar")
+    private val unstressedERegex = Regex("[^aeiouyåäöé]e[lnr]$")
+    private val pureEndings = setOf(
+        "n", "en", "et", "t", "tt", "an", "a", "e", "r", "ar", "or", "er", "na", "ena", "rna", "arna", "orna", "erna",
+        "de", "dde", "te", "da",
+    )
 
     // Checked against the base, so verbs match with their stem: gifta -> gift
     private val wronglyBuilt = listOf(
@@ -147,5 +200,6 @@ object FormBuilder {
     private val irregularWords = setOf("ingen", "jättesen")
 
     private const val MIN_OVERLAY_LENGTH = 2
+    private const val MIN_POLYSYLLABIC_VOWELS = 2
     private const val NOUN_ENDINGS_COUNT = 3
 }
