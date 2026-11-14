@@ -252,6 +252,7 @@ object ReferenceWords {
 
     val all: List<ReferenceWord> get() = nouns + verbs + adjectives
 
+    @Suppress("LongParameterList")
     private fun en(
         word: String,
         endings: String,
@@ -266,6 +267,7 @@ object ReferenceWords {
         text ?: defaultText(word, endings), prefix, suffix, formsNeedReview,
     )
 
+    @Suppress("LongParameterList")
     private fun ett(
         word: String,
         endings: String,
@@ -280,6 +282,7 @@ object ReferenceWords {
         text ?: defaultText(word, endings), prefix, suffix, formsNeedReview,
     )
 
+    @Suppress("LongParameterList")
     private fun verb(
         word: String,
         endings: String,

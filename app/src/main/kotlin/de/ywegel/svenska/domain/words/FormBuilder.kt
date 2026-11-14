@@ -70,6 +70,7 @@ object FormBuilder {
         else -> overlayAbbreviated(word, ending.withoutDash()) ?: (word + ending.withoutDash())
     }
 
+    @Suppress("CyclomaticComplexMethod")
     private fun append(base: Base, ending: String): String {
         val text = base.text
         return when {

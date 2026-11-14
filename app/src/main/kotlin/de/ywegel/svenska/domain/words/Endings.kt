@@ -1,3 +1,5 @@
+@file:Suppress("TooManyFunctions")
+
 package de.ywegel.svenska.domain.words
 
 internal const val VOWELS = "aeiouyåäöé"
