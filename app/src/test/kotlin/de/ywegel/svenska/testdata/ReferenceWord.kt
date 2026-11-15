@@ -10,6 +10,7 @@ import de.ywegel.svenska.data.model.WordGroup
  * @param forms Written out forms without prefix and suffix. Nouns: definite singular, plural, definite plural.
  * Verbs: present, past, supine. Adjectives: neuter, plural.
  * @param text The entry exactly as written in the source: "känna sig (-er, -de, -t)".
+ * @param formsNeedReview Whether the forms built from the endings have to be reviewed. [forms] stay correct anyway.
  */
 data class ReferenceWord(
     val word: String,
@@ -20,6 +21,7 @@ data class ReferenceWord(
     val text: String,
     val prefix: String = "",
     val suffix: String = "",
+    val formsNeedReview: Boolean = false,
 ) {
     override fun toString(): String = text
 }

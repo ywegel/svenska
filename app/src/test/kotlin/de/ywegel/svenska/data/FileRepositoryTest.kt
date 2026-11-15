@@ -50,7 +50,7 @@ class FileRepositoryTest {
                 "Kapitel 1",
                 listOf(
                     listOf(
-                        "klass  (-en, -er, -arna)",
+                        "klass  (-en, -er, -erna)",
                         "class",
                     ),
                     listOf(
