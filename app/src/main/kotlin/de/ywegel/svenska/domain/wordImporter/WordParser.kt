@@ -1,6 +1,7 @@
 package de.ywegel.svenska.domain.wordImporter
 
 import de.ywegel.svenska.data.model.Vocabulary
+import de.ywegel.svenska.domain.words.WordGroupMatcher
 import javax.inject.Inject
 
 interface WordParser {

@@ -1,13 +1,7 @@
-package de.ywegel.svenska.domain.wordImporter
+package de.ywegel.svenska.domain.words
 
 import de.ywegel.svenska.data.model.Gender
 import de.ywegel.svenska.data.model.WordGroup
-import de.ywegel.svenska.domain.words.hasInconsistentPlural
-import de.ywegel.svenska.domain.words.hasVowelChangeInPlural
-import de.ywegel.svenska.domain.words.isAbbreviated
-import de.ywegel.svenska.domain.words.isMalformed
-import de.ywegel.svenska.domain.words.variants
-import de.ywegel.svenska.domain.words.verbStem
 
 object WordGroupMatcher {
     fun determineWordGroup(baseWord: String, endings: List<String>): WordGroup {

@@ -1,8 +1,7 @@
-package de.ywegel.svenska.data
+package de.ywegel.svenska.domain.words
 
 import de.ywegel.svenska.data.model.Gender
 import de.ywegel.svenska.data.model.WordGroup
-import de.ywegel.svenska.domain.wordImporter.WordGroupMatcher
 import de.ywegel.svenska.testdata.ReferenceWords
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.params.ParameterizedTest
