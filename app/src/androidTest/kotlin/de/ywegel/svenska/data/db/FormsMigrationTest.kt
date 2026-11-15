@@ -52,13 +52,4 @@ class FormsMigrationTest {
             expectThat(it.getInt(it.getColumnIndexOrThrow("formsNeedReview"))).isEqualTo(0)
         }
     }
-
-    @Test
-    fun migrate1To5_fullChainProducesTheCurrentSchema() {
-        // Given
-        helper.createDatabase(TEST_DB, 1).close()
-
-        // When / Then: validates the resulting schema against 5.json
-        helper.runMigrationsAndValidate(TEST_DB, 5, true, MIGRATION_1_2, MIGRATION_2_3, MIGRATION_3_4, MIGRATION_4_5)
-    }
 }

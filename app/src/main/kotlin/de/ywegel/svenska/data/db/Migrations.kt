@@ -152,6 +152,12 @@ val MIGRATION_4_5 = object : Migration(4, 5) {
 }
 
 /**
+ * Every migration in order. The database builder and the full chain migration test both use this list, so a new
+ * migration only has to be added here.
+ */
+val ALL_MIGRATIONS = arrayOf(MIGRATION_1_2, MIGRATION_2_3, MIGRATION_3_4, MIGRATION_4_5)
+
+/**
  * Frozen snapshot of the dash replacement in `WordExtractor.normalizeSpecialCharacters` (formerly
  * `normalizePdfDashes`) in `domain/wordImporter`. Migrations must keep reproducing
  * the exact transformation, so this copy deliberately does not call it.

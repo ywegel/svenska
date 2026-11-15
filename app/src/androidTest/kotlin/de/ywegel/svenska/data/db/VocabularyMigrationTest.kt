@@ -1,9 +1,15 @@
 package de.ywegel.svenska.data.db
 
+import androidx.room.Room
 import androidx.room.testing.MigrationTestHelper
 import androidx.sqlite.db.framework.FrameworkSQLiteOpenHelperFactory
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
+import de.ywegel.svenska.data.model.Gender
+import de.ywegel.svenska.data.model.Vocabulary
+import de.ywegel.svenska.data.model.VocabularyContainer
+import de.ywegel.svenska.data.model.WordGroup
+import kotlinx.coroutines.test.runTest
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -12,6 +18,8 @@ import strikt.assertions.containsExactly
 import strikt.assertions.isEqualTo
 
 private const val TEST_DB_NAME = "test_db"
+private const val CHAIN_TEST_DB_NAME = "full-chain-migration-test-db"
+private val SCHEMA_ASSETS_FOLDER = VocabularyDatabase::class.java.canonicalName!!
 
 @RunWith(AndroidJUnit4::class)
 class VocabularyMigrationTest {
@@ -23,9 +31,66 @@ class VocabularyMigrationTest {
     @get:Rule
     val helper: MigrationTestHelper = MigrationTestHelper(
         instrumentation = InstrumentationRegistry.getInstrumentation(),
-        assetsFolder = VocabularyDatabase::class.java.canonicalName!!,
+        assetsFolder = SCHEMA_ASSETS_FOLDER,
         openFactory = FrameworkSQLiteOpenHelperFactory(),
     )
+
+    @Test
+    fun migrate1ToX_fullChainProducesTheCurrentSchema() = runTest {
+        // Given
+        val instrumentation = InstrumentationRegistry.getInstrumentation()
+        // The newest version is the highest exported schema file, so the target never has to be updated by hand
+        val latestSchemaVersion = instrumentation.context.assets.list(SCHEMA_ASSETS_FOLDER).orEmpty()
+            .mapNotNull { it.removeSuffix(".json").toIntOrNull() }
+            .max()
+
+        helper.createDatabase(CHAIN_TEST_DB_NAME, 1).apply {
+            execSQL("INSERT INTO VocabularyContainer (id, name) VALUES (1, 'Kapitel 1')")
+            execSQL(
+                """
+                INSERT INTO Vocabulary (id, word, wordHighlights, translation, gender, wordGroup, ending, notes, irregularPronunciation, isFavorite, containerId, lastEdited, created)
+                VALUES (1, 'bil', '0;1', 'Auto', 'Ultra', 'NOUN:AR', '-en -ar -arna', 'Nur Pkw', 'biil', 1, 1, $currentTime, $currentTime)
+                """.trimIndent(),
+            )
+            close()
+        }
+
+        // When
+        // Fails if a step is missing in ALL_MIGRATIONS or the result differs from the latest schema file
+        val migratedVersion = helper.runMigrationsAndValidate(
+            CHAIN_TEST_DB_NAME,
+            latestSchemaVersion,
+            true,
+            *ALL_MIGRATIONS,
+        ).use { it.version }
+
+        val roomDb = Room.databaseBuilder(instrumentation.targetContext, VocabularyDatabase::class.java, CHAIN_TEST_DB_NAME)
+            .addMigrations(*ALL_MIGRATIONS)
+            .build()
+        helper.closeWhenFinished(roomDb)
+
+        // Then
+        // Check that nothing from version 1 got lost
+        expectThat(roomDb.openHelper.readableDatabase.version).isEqualTo(migratedVersion)
+        expectThat(roomDb.vocabulary().getAllVocabulariesSnapshot()).containsExactly(
+            Vocabulary(
+                word = "bil",
+                wordHighlights = listOf(0 to 1),
+                translation = "Auto",
+                gender = Gender.Ultra,
+                wordGroup = WordGroup.Noun(WordGroup.NounSubgroup.AR),
+                ending = "-en -ar -arna",
+                notes = "Nur Pkw",
+                irregularPronunciation = "biil",
+                isFavorite = true,
+                containerId = 1,
+                lastEdited = currentTime,
+                created = currentTime,
+                id = 1,
+            ),
+        )
+        expectThat(roomDb.container().getContainerById(1)).isEqualTo(VocabularyContainer(id = 1, name = "Kapitel 1"))
+    }
 
     @Test
     fun migrate1To2_withExistingHighlights_convertsCorrectly() {
