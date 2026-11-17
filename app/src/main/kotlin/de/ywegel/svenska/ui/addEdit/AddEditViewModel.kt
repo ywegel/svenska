@@ -90,21 +90,7 @@ class AddEditViewModel @Inject constructor(
     }
 
     override fun switchToEndings() {
-        _uiState.update {
-            if (it.writtenFormsDifferFromEndings) {
-                it.copy(showSwitchToEndingsDialog = true)
-            } else {
-                it.copy(formsMode = FormsMode.Endings)
-            }
-        }
-    }
-
-    override fun confirmSwitchToEndings() {
-        _uiState.update { it.copy(formsMode = FormsMode.Endings, showSwitchToEndingsDialog = false) }
-    }
-
-    override fun dismissSwitchToEndings() {
-        _uiState.update { it.copy(showSwitchToEndingsDialog = false) }
+        _uiState.update { it.copy(formsMode = FormsMode.Endings) }
     }
 
     override fun confirmForms() {
@@ -191,7 +177,6 @@ data class AddEditUiState(
     val formsMode: FormsMode = FormsMode.Endings,
     val writtenForms: List<String> = emptyList(),
     val confirmedFormInputs: FormInputs? = null,
-    val showSwitchToEndingsDialog: Boolean = false,
     val notes: String = "",
     val isIrregularPronunciation: Boolean = false,
     val irregularPronunciation: String? = null,

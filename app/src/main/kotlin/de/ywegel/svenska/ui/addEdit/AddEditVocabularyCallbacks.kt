@@ -19,8 +19,6 @@ interface AddEditVocabularyCallbacks {
     fun updateWrittenForm(index: Int, form: String)
     fun switchToWrittenOutForms()
     fun switchToEndings()
-    fun confirmSwitchToEndings()
-    fun dismissSwitchToEndings()
     fun confirmForms()
     fun applySuggestedWordGroup()
     fun updateNotes(notes: String)

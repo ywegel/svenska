@@ -159,23 +159,32 @@ class AddEditViewModelTest {
         }
 
         @Test
-        fun `Unchanged written out forms switch back to the endings without asking`() {
+        fun `Unchanged written out forms do not differ from the endings`() {
+            // Given
+            val viewModel = setupViewModel(initialVocabulary = penna())
+
+            // When
+            viewModel.switchToWrittenOutForms()
+
+            // Then
+            expectThat(viewModel.uiState.value.writtenFormsDifferFromEndings).isFalse()
+        }
+
+        @Test
+        fun `Changed written out forms differ from the endings`() {
             // Given
             val viewModel = setupViewModel(initialVocabulary = penna())
             viewModel.switchToWrittenOutForms()
 
             // When
-            viewModel.switchToEndings()
+            viewModel.updateWrittenForm(index = 1, form = "pennar")
 
             // Then
-            expectThat(viewModel.uiState.value) {
-                get { formsMode }.isEqualTo(FormsMode.Endings)
-                get { showSwitchToEndingsDialog }.isFalse()
-            }
+            expectThat(viewModel.uiState.value.writtenFormsDifferFromEndings).isTrue()
         }
 
         @Test
-        fun `Changed written out forms ask before they are replaced`() {
+        fun `Switching to the endings replaces the written out forms`() {
             // Given
             val viewModel = setupViewModel(initialVocabulary = penna())
             viewModel.switchToWrittenOutForms()
@@ -186,26 +195,8 @@ class AddEditViewModelTest {
 
             // Then
             expectThat(viewModel.uiState.value) {
-                get { formsMode }.isEqualTo(FormsMode.WrittenOut)
-                get { showSwitchToEndingsDialog }.isTrue()
-            }
-        }
-
-        @Test
-        fun `Confirming the dialog switches back to the endings`() {
-            // Given
-            val viewModel = setupViewModel(initialVocabulary = penna())
-            viewModel.switchToWrittenOutForms()
-            viewModel.updateWrittenForm(index = 1, form = "pennar")
-            viewModel.switchToEndings()
-
-            // When
-            viewModel.confirmSwitchToEndings()
-
-            // Then
-            expectThat(viewModel.uiState.value) {
                 get { formsMode }.isEqualTo(FormsMode.Endings)
-                get { showSwitchToEndingsDialog }.isFalse()
+                get { forms }.isEqualTo(listOf("pennan", "pennor", "pennorna"))
             }
         }
     }

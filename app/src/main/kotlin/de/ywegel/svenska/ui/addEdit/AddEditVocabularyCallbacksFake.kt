@@ -17,8 +17,6 @@ object AddEditVocabularyCallbacksFake : AddEditVocabularyCallbacks {
     override fun updateWrittenForm(index: Int, form: String) {}
     override fun switchToWrittenOutForms() {}
     override fun switchToEndings() {}
-    override fun confirmSwitchToEndings() {}
-    override fun dismissSwitchToEndings() {}
     override fun confirmForms() {}
     override fun applySuggestedWordGroup() {}
     override fun updateNotes(notes: String) {}
