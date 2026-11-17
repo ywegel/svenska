@@ -44,7 +44,7 @@ fun WordSection(uiState: AddEditUiState, callbacks: AddEditVocabularyCallbacks, 
         Row(horizontalArrangement = Arrangement.spacedBy(Spacings.xs)) {
             if (uiState.selectedWordGroup == ViewWordGroup.Noun) {
                 GenderToggle(
-                    gender = uiState.gender ?: Gender.defaultIfEmpty,
+                    gender = uiState.gender,
                     onGenderChange = callbacks::updateGender,
                     modifier = Modifier.padding(top = TextFieldLabelOffset),
                 )

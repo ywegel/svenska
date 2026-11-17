@@ -11,7 +11,7 @@ import de.ywegel.svenska.ui.addEdit.models.ViewWordSubGroup
 interface AddEditVocabularyCallbacks {
     fun updateSelectedWordGroup(group: ViewWordGroup)
     fun updateSelectedSubWordGroup(subGroup: ViewWordSubGroup)
-    fun updateGender(gender: Gender?)
+    fun updateGender(gender: Gender)
     fun updateWordWithAnnotation(word: String)
     fun selectChangingWord(index: Int)
     fun updateTranslation(translation: String)

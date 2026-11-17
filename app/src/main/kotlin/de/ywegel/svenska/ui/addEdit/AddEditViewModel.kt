@@ -59,7 +59,7 @@ class AddEditViewModel @Inject constructor(
         _uiState.update { it.copy(selectedSubGroup = subGroup) }
     }
 
-    override fun updateGender(gender: Gender?) {
+    override fun updateGender(gender: Gender) {
         _uiState.update { it.copy(gender = gender) }
     }
 
@@ -165,7 +165,7 @@ private fun AddEditUiState.withArticleGender(): AddEditUiState =
 data class AddEditUiState(
     val selectedWordGroup: ViewWordGroup? = null,
     val selectedSubGroup: ViewWordSubGroup = ViewWordSubGroup.None,
-    val gender: Gender? = null,
+    val gender: Gender = Gender.defaultIfEmpty,
     val wordWithAnnotation: String = "",
     val chosenChangingIndex: Int? = null,
     val translation: String = "",
@@ -221,7 +221,7 @@ data class AddEditUiState(
             val state = AddEditUiState(
                 selectedWordGroup = ViewWordGroup.fromWordGroup(vocabulary.wordGroup),
                 selectedSubGroup = ViewWordSubGroup.fromWordGroup(vocabulary.wordGroup),
-                gender = vocabulary.gender,
+                gender = vocabulary.gender ?: Gender.defaultIfEmpty,
                 wordWithAnnotation = listOf(vocabulary.wordPrefix, wordWithStars, vocabulary.wordSuffix)
                     .filter { it.isNotBlank() }
                     .joinToString(" "),

@@ -42,7 +42,6 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
 import de.ywegel.svenska.R
-import de.ywegel.svenska.data.model.Gender
 import de.ywegel.svenska.data.model.WordGroup
 import de.ywegel.svenska.ui.addEdit.models.ViewWordGroup
 import de.ywegel.svenska.ui.addEdit.models.userFacingString
@@ -301,7 +300,7 @@ private fun WrittenOutForm(form: String, prefix: String, suffix: String, onFormC
 @Composable
 private fun baseFormText(uiState: AddEditUiState, wordInput: WordInput): AnnotatedString {
     val article = when (uiState.selectedWordGroup) {
-        ViewWordGroup.Noun -> (uiState.gender ?: Gender.defaultIfEmpty).article()
+        ViewWordGroup.Noun -> uiState.gender.article()
         ViewWordGroup.Verb -> "att"
         else -> ""
     }

@@ -99,13 +99,13 @@ class MapUiStateToVocabularyUseCaseTest {
     }
 
     @Test
-    fun `Uses default gender if null and word group is noun`() {
+    fun `Gender is null if word group is not noun`() {
         val uiState = AddEditUiState(
-            selectedWordGroup = ViewWordGroup.Noun,
-            selectedSubGroup = ViewWordSubGroup.Noun(WordGroup.NounSubgroup.OR),
-            gender = null,
-            wordWithAnnotation = "penna",
-            translation = "pencil",
+            selectedWordGroup = ViewWordGroup.Verb,
+            selectedSubGroup = ViewWordSubGroup.Verb(WordGroup.VerbSubgroup.GROUP_1),
+            gender = Gender.Ultra,
+            wordWithAnnotation = "gå",
+            translation = "walk",
         )
 
         val result = useCase(
@@ -115,7 +115,7 @@ class MapUiStateToVocabularyUseCaseTest {
         )
 
         expectThat(result).isNotNull()
-        expectThat(result!!.gender).isEqualTo(Gender.defaultIfEmpty)
+        expectThat(result!!.gender).isNull()
     }
 
     @Test

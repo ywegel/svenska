@@ -9,7 +9,7 @@ import org.jetbrains.annotations.VisibleForTesting
 object AddEditVocabularyCallbacksFake : AddEditVocabularyCallbacks {
     override fun updateSelectedWordGroup(group: ViewWordGroup) {}
     override fun updateSelectedSubWordGroup(subGroup: ViewWordSubGroup) {}
-    override fun updateGender(gender: Gender?) {}
+    override fun updateGender(gender: Gender) {}
     override fun updateWordWithAnnotation(word: String) {}
     override fun selectChangingWord(index: Int) {}
     override fun updateTranslation(translation: String) {}

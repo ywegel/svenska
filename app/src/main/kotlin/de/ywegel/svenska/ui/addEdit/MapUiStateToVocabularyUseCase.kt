@@ -1,6 +1,5 @@
 package de.ywegel.svenska.ui.addEdit
 
-import de.ywegel.svenska.data.model.Gender
 import de.ywegel.svenska.data.model.Vocabulary
 import de.ywegel.svenska.data.model.WordGroup
 import de.ywegel.svenska.ui.addEdit.models.ViewWordGroup
@@ -60,7 +59,7 @@ private fun AddEditUiState.toVocabulary(
         wordSuffix = wordInput.suffix,
         wordHighlights = wordInput.wordHighlights,
         translation = translation,
-        gender = if (wordGroup is WordGroup.Noun) gender ?: Gender.defaultIfEmpty else null,
+        gender = if (wordGroup is WordGroup.Noun) gender else null,
         wordGroup = wordGroup,
         ending = endingFor(wordGroup),
         form1 = forms.getOrNull(0)?.takeIf { it.isNotEmpty() },
