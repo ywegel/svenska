@@ -119,12 +119,11 @@ class MapUiStateToVocabularyUseCaseTest {
     }
 
     @Test
-    fun `IrregularPronunciation is null when isIrregularPronunciation is false`() {
+    fun `IrregularPronunciation is null when it is blank`() {
         val uiState = AddEditUiState(
             selectedWordGroup = ViewWordGroup.Verb,
             selectedSubGroup = ViewWordSubGroup.Verb(WordGroup.VerbSubgroup.GROUP_1),
-            isIrregularPronunciation = false,
-            irregularPronunciation = "ignored",
+            irregularPronunciation = " ",
             wordWithAnnotation = "gå",
             translation = "walk",
         )
@@ -144,7 +143,6 @@ class MapUiStateToVocabularyUseCaseTest {
         val uiState = AddEditUiState(
             selectedWordGroup = ViewWordGroup.Verb,
             selectedSubGroup = ViewWordSubGroup.Verb(WordGroup.VerbSubgroup.GROUP_1),
-            isIrregularPronunciation = true,
             irregularPronunciation = "testPronunciation",
             wordWithAnnotation = "gå",
             translation = "walk",

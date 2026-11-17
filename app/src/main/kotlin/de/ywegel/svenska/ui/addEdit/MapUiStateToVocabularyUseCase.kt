@@ -68,7 +68,7 @@ private fun AddEditUiState.toVocabulary(
         form3 = forms.getOrNull(2)?.takeIf { it.isNotEmpty() },
         formsNeedReview = wordGroup != WordGroup.Other && showReviewHint,
         notes = notes,
-        irregularPronunciation = irregularPronunciation?.takeIf { isIrregularPronunciation },
+        irregularPronunciation = irregularPronunciation.takeIf { it.isNullOrBlank().not() },
         isFavorite = isFavorite,
         lastEdited = System.currentTimeMillis(),
     )

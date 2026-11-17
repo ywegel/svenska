@@ -112,10 +112,6 @@ class AddEditViewModel @Inject constructor(
         _uiState.update { it.copy(notes = notes) }
     }
 
-    override fun updateIsIrregularPronunciation(isIrregular: Boolean) {
-        _uiState.update { it.copy(isIrregularPronunciation = isIrregular) }
-    }
-
     override fun updateIrregularPronunciation(pronunciation: String) {
         _uiState.update { it.copy(irregularPronunciation = pronunciation) }
     }
@@ -178,7 +174,6 @@ data class AddEditUiState(
     val writtenForms: List<String> = emptyList(),
     val confirmedFormInputs: FormInputs? = null,
     val notes: String = "",
-    val isIrregularPronunciation: Boolean = false,
     val irregularPronunciation: String? = null,
     val isFavorite: Boolean = false,
     val editingExistingVocabulary: String? = null,
@@ -234,7 +229,6 @@ data class AddEditUiState(
                 translation = vocabulary.translation,
                 endings = vocabulary.ending,
                 notes = vocabulary.notes,
-                isIrregularPronunciation = vocabulary.irregularPronunciation?.isNotBlank() == true,
                 irregularPronunciation = vocabulary.irregularPronunciation,
                 isFavorite = vocabulary.isFavorite,
                 editingExistingVocabulary = vocabulary.word,

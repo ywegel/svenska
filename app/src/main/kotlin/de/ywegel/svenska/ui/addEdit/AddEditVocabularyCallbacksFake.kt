@@ -21,7 +21,6 @@ object AddEditVocabularyCallbacksFake : AddEditVocabularyCallbacks {
     override fun applySuggestedWordGroup() {}
     override fun updateNotes(notes: String) {}
     override fun updateIsFavorite(isFavorite: Boolean) {}
-    override fun updateIsIrregularPronunciation(isIrregular: Boolean) {}
     override fun updateIrregularPronunciation(pronunciation: String) {}
     override fun deleteVocabulary() {}
     override fun saveAndNavigateUp() {}

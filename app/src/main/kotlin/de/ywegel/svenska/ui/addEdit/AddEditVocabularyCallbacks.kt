@@ -23,7 +23,6 @@ interface AddEditVocabularyCallbacks {
     fun applySuggestedWordGroup()
     fun updateNotes(notes: String)
     fun updateIsFavorite(isFavorite: Boolean)
-    fun updateIsIrregularPronunciation(isIrregular: Boolean)
     fun updateIrregularPronunciation(pronunciation: String)
     fun deleteVocabulary()
     fun saveAndNavigateUp()

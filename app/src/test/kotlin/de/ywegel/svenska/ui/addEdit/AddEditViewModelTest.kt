@@ -88,7 +88,6 @@ class AddEditViewModelTest {
                     translation = "sich fühlen",
                     endings = "-er -de -t",
                     notes = "testNote",
-                    isIrregularPronunciation = true,
                     irregularPronunciation = "testPronunciation",
                     editingExistingVocabulary = "känna",
                 ),

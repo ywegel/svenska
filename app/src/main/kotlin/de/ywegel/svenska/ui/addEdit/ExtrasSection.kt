@@ -7,6 +7,7 @@ import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.size
 import androidx.compose.material.icons.outlined.Add
+import androidx.compose.material.icons.outlined.Close
 import androidx.compose.material3.AssistChip
 import androidx.compose.material3.Icon
 import androidx.compose.material3.OutlinedTextField
@@ -20,6 +21,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import de.ywegel.svenska.R
+import de.ywegel.svenska.ui.common.IconButton
 import de.ywegel.svenska.ui.theme.Spacings
 import de.ywegel.svenska.ui.theme.SvenskaIcons
 import de.ywegel.svenska.ui.theme.SvenskaTheme
@@ -29,23 +31,34 @@ import de.ywegel.svenska.ui.theme.SvenskaTheme
 @Composable
 fun ExtrasSection(uiState: AddEditUiState, callbacks: AddEditVocabularyCallbacks, modifier: Modifier = Modifier) {
     var showNotes by rememberSaveable { mutableStateOf(uiState.notes.isNotBlank()) }
+    var showPronunciation by rememberSaveable { mutableStateOf(!uiState.irregularPronunciation.isNullOrBlank()) }
 
     Column(modifier = modifier, verticalArrangement = Arrangement.spacedBy(Spacings.m)) {
         if (showNotes) {
-            OutlinedTextField(
-                modifier = Modifier.fillMaxWidth(),
+            RemovableTextField(
                 value = uiState.notes,
                 onValueChange = callbacks::updateNotes,
+                label = stringResource(R.string.addEdit_label_notes),
+                removeContentDescription = stringResource(R.string.accessibility_addEdit_remove_notes),
                 minLines = 2,
-                label = { Text(stringResource(R.string.addEdit_label_notes)) },
+                onRemove = {
+                    showNotes = false
+                    callbacks.updateNotes("")
+                },
             )
         }
-        if (uiState.isIrregularPronunciation) {
-            OutlinedTextField(
-                modifier = Modifier.fillMaxWidth(),
+        if (showPronunciation) {
+            RemovableTextField(
                 value = uiState.irregularPronunciation.orEmpty(),
                 onValueChange = callbacks::updateIrregularPronunciation,
-                label = { Text(stringResource(R.string.addEdit_label_irregular_pronunciation)) },
+                label = stringResource(R.string.addEdit_label_irregular_pronunciation),
+                removeContentDescription = stringResource(
+                    R.string.accessibility_addEdit_remove_irregular_pronunciation,
+                ),
+                onRemove = {
+                    showPronunciation = false
+                    callbacks.updateIrregularPronunciation("")
+                },
             )
         }
 
@@ -53,14 +66,40 @@ fun ExtrasSection(uiState: AddEditUiState, callbacks: AddEditVocabularyCallbacks
             if (!showNotes) {
                 AddFieldChip(label = stringResource(R.string.addEdit_label_notes), onClick = { showNotes = true })
             }
-            if (!uiState.isIrregularPronunciation) {
+            if (!showPronunciation) {
                 AddFieldChip(
                     label = stringResource(R.string.addEdit_label_irregular_pronunciation),
-                    onClick = { callbacks.updateIsIrregularPronunciation(true) },
+                    onClick = { showPronunciation = true },
                 )
             }
         }
     }
+}
+
+@Composable
+private fun RemovableTextField(
+    value: String,
+    onValueChange: (String) -> Unit,
+    label: String,
+    removeContentDescription: String,
+    onRemove: () -> Unit,
+    modifier: Modifier = Modifier,
+    minLines: Int = 1,
+) {
+    OutlinedTextField(
+        modifier = modifier.fillMaxWidth(),
+        value = value,
+        onValueChange = onValueChange,
+        minLines = minLines,
+        label = { Text(label) },
+        trailingIcon = {
+            IconButton(
+                icon = SvenskaIcons.Close,
+                contentDescription = removeContentDescription,
+                onClick = onRemove,
+            )
+        },
+    )
 }
 
 @Composable
