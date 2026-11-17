@@ -71,7 +71,7 @@ mockk = "io.mockk:mockk:1.14.4"
 mockk-android = "io.mockk:mockk-android:1.14.4"
 assertk = "com.willowtreeapps.assertk:assertk:0.26.1"
 turbine = "app.cash.turbine:turbine:1.2.1"
-robolectric = "org.robolectric:robolectric:4.16"
+robolectric = "org.robolectric:robolectric:4.18"
 
 # Snapshot testing
 roborazzi = { module = "io.github.takahirom.roborazzi:roborazzi", version.ref = "roborazzi-version" }
