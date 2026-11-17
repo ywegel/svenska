@@ -18,6 +18,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
@@ -38,7 +39,12 @@ import de.ywegel.svenska.ui.theme.SvenskaTheme
 // TODO: Refactor Vocabulary Items (both normal and compact)
 @Suppress("detekt:LongMethod")
 @Composable
-fun VocabularyListItem(vocabulary: Vocabulary, modifier: Modifier = Modifier, onClick: (Vocabulary) -> Unit = {}) {
+fun VocabularyListItem(
+    vocabulary: Vocabulary,
+    modifier: Modifier = Modifier,
+    containerColor: Color = SvenskaTheme.colors.surfaceVariant,
+    onClick: (Vocabulary) -> Unit = {},
+) {
     val annotatedWord = vocabulary.annotatedWord
     val showEnding = vocabulary.ending.isNotBlank()
     val showGender = vocabulary.wordGroup is WordGroup.Noun && vocabulary.gender != null
@@ -49,7 +55,7 @@ fun VocabularyListItem(vocabulary: Vocabulary, modifier: Modifier = Modifier, on
             .clip(RoundedCornerShape(Spacings.xs))
             .clickable { onClick(vocabulary) },
         tonalElevation = Spacings.xxxs,
-        color = SvenskaTheme.colors.surfaceVariant,
+        color = containerColor,
     ) {
         Row(
             modifier = Modifier

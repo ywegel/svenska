@@ -11,7 +11,8 @@
 
     <!-- # AddEdit # -->
     <string name="accessibility_addEdit_navigate_word_group_info_screen">Navigate to WordGroups screen</string>
-    <string name="accessibility_addEdit_annotation_information_hide">Hide this information</string>
+    <string name="accessibility_addEdit_gender_toggle">Gender %1$s, switch to %2$s</string>
+    <string name="accessibility_addEdit_forms_review">Forms need review</string>
     <string name="accessibility_addEdit_fab_done">Save Vocabulary</string>
 
     <!-- # Quiz # -->

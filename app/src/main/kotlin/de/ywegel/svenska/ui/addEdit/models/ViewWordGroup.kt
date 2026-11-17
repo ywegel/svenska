@@ -22,6 +22,14 @@ enum class ViewWordGroup {
         }
     }
 
+    /** Like [toWordGroup], but a missing subgroup counts as undefined, so forms can be built before it is chosen. */
+    fun toWordGroupOrUndefined(subGroup: ViewWordSubGroup): WordGroup = toWordGroup(subGroup) ?: when (this) {
+        Noun -> WordGroup.Noun(WordGroup.NounSubgroup.UNDEFINED)
+        Verb -> WordGroup.Verb(WordGroup.VerbSubgroup.UNDEFINED)
+        Adjective -> WordGroup.Adjective
+        Other -> WordGroup.Other
+    }
+
     companion object {
         fun fromWordGroup(wordGroup: WordGroup): ViewWordGroup {
             return when (wordGroup) {

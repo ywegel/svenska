@@ -24,6 +24,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
@@ -45,6 +46,7 @@ fun WordGroupSelection(
     onGroupSelected: (ViewWordGroup) -> Unit,
     onSubgroupSelected: (ViewWordSubGroup) -> Unit,
     modifier: Modifier = Modifier,
+    trailingContent: @Composable () -> Unit = {},
 ) {
     Column(modifier = modifier) {
         ChipRow(
@@ -52,6 +54,7 @@ fun WordGroupSelection(
             selectedItem = selectedGroup,
             onItemSelected = onGroupSelected,
             labelProvider = { it.userFacingString() },
+            trailingContent = trailingContent,
         )
 
         // We store the last valid group (NOUN or VERB) to ensure content is still available during the exit animation.
@@ -103,10 +106,12 @@ private fun <T> ChipRow(
     selectedItem: T?,
     onItemSelected: (T) -> Unit,
     animate: Boolean = true,
+    trailingContent: @Composable () -> Unit = {},
     labelProvider: @Composable (T) -> String,
 ) {
     LazyRow(
         modifier = Modifier.fillMaxWidth(),
+        verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.spacedBy(Spacings.xs),
         contentPadding = PaddingValues(horizontal = Spacings.m),
     ) {
@@ -132,6 +137,7 @@ private fun <T> ChipRow(
                 )
             }
         }
+        item { trailingContent() }
     }
 }
 
@@ -167,7 +173,7 @@ private fun AnimatedChipEntry(
 // Special abbreviations, making it clearer to the user what he is selecting, without cluttering the ui
 @ReadOnlyComposable
 @Composable
-private fun WordGroup.NounSubgroup.selectorAbbreviation(): String {
+internal fun WordGroup.NounSubgroup.selectorAbbreviation(): String {
     return when (this) {
         WordGroup.NounSubgroup.UNCHANGED_ETT -> R.string.addEdit_group_selector_noun_title_unchanged_ett
         WordGroup.NounSubgroup.UNCHANGED_EN -> R.string.addEdit_group_selector_noun_title_unchanged_en
@@ -180,7 +186,7 @@ private fun WordGroup.NounSubgroup.selectorAbbreviation(): String {
 // Special abbreviations, making it clearer to the user what he is selecting, without cluttering the ui
 @ReadOnlyComposable
 @Composable
-private fun WordGroup.VerbSubgroup.selectorAbbreviation(): String {
+internal fun WordGroup.VerbSubgroup.selectorAbbreviation(): String {
     return when (this) {
         WordGroup.VerbSubgroup.GROUP_4_SPECIAL -> R.string.addEdit_group_selector_verb_title_special
         WordGroup.VerbSubgroup.UNDEFINED -> R.string.addEdit_group_selector_verb_title_undefined

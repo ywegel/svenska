@@ -117,11 +117,43 @@
     <string name="addEdit_title_new">Creating a new vocabulary</string>
     <string name="addEdit_title_existing">Editing %1$s</string>
 
-    <string name="addEdit_label_word">Word with * annotation</string>
+    <string name="addEdit_label_word">Word</string>
     <string name="addEdit_label_translation">Translation</string>
     <string name="addEdit_label_endings">Endings</string>
     <string name="addEdit_label_notes">Notes</string>
     <string name="addEdit_label_irregular_pronunciation">Irregular pronunciation</string>
+
+    <string name="addEdit_word_supporting_text">Use * to highlight letters, e.g. e*ll*er</string>
+    <string name="addEdit_word_highlight_error">Use * only in the word that changes</string>
+
+    <string name="addEdit_changing_word_title">Which word changes?</string>
+    <string name="addEdit_changing_word_role_prefix">prefix</string>
+    <string name="addEdit_changing_word_role_changes">changes</string>
+    <string name="addEdit_changing_word_role_suffix">suffix</string>
+
+    <string name="addEdit_forms_title">Forms</string>
+    <string name="addEdit_forms_write_out">Write out forms</string>
+    <string name="addEdit_forms_use_endings">Type endings instead</string>
+    <string name="addEdit_forms_suggestion">Looks like %1$s · Apply</string>
+    <string name="addEdit_forms_review_title">Please check these forms</string>
+    <string name="addEdit_forms_review_write_out">Write out</string>
+    <string name="addEdit_forms_review_confirm">Looks right</string>
+
+    <string name="addEdit_forms_switch_dialog_title">Use endings again?</string>
+    <string name="addEdit_forms_switch_dialog_body">Your written out forms will be replaced by the forms built from the endings.</string>
+    <string name="addEdit_forms_switch_dialog_confirm">Replace</string>
+
+    <string name="addEdit_form_noun_indefinite">Indefinite</string>
+    <string name="addEdit_form_noun_definite">Definite</string>
+    <string name="addEdit_form_noun_plural">Plural</string>
+    <string name="addEdit_form_noun_definite_plural">Def. plural</string>
+    <string name="addEdit_form_verb_infinitive">Infinitive</string>
+    <string name="addEdit_form_verb_present">Present</string>
+    <string name="addEdit_form_verb_past">Past</string>
+    <string name="addEdit_form_verb_supine">Supine</string>
+    <string name="addEdit_form_adjective_base">Base</string>
+    <string name="addEdit_form_adjective_neuter">Neuter</string>
+    <string name="addEdit_form_adjective_plural">Plural</string>
 
     <string name="addEdit_confirm_delete_title">Delete Word</string>
     <string name="addEdit_confirm_delete_body">Are you sure that you want to delete %1$s? This will be permanent</string>
@@ -135,8 +167,6 @@
     <string name="addEdit_group_selector_verb_title_undefined">Undefined</string>
 
     <string name="addEdit_group_selector_invalid_configuration">You have either not selected a group or subgroup</string>
-
-    <string name="addEdit_annotation_information_text">You can emphasize long pronunciations by surrounding the pronounced letters with two stars:\ne*ll*er -> </string>
 
     <!-- # Quiz Configuration # -->
     <string name="quiz_config_title">Configure the Quiz</string>

@@ -9,9 +9,11 @@ import kotlinx.coroutines.ExperimentalCoroutinesApi
 import org.junit.jupiter.api.Test
 import strikt.api.expectThat
 import strikt.assertions.isEqualTo
+import strikt.assertions.isFalse
 import strikt.assertions.isGreaterThan
 import strikt.assertions.isNotNull
 import strikt.assertions.isNull
+import strikt.assertions.isTrue
 import kotlin.time.Clock
 import kotlin.time.Duration.Companion.days
 import kotlin.time.ExperimentalTime
@@ -176,5 +178,95 @@ class MapUiStateToVocabularyUseCaseTest {
         expectThat(result).isNotNull()
         expectThat(result!!.word).isEqualTo("penna")
         expectThat(result.wordHighlights).isEqualTo(listOf(0 to 1))
+    }
+
+    @Test
+    fun `Saves prefix, suffix and the forms of the changing word`() {
+        val uiState = AddEditUiState(
+            selectedWordGroup = ViewWordGroup.Verb,
+            selectedSubGroup = ViewWordSubGroup.Verb(WordGroup.VerbSubgroup.GROUP_2A),
+            wordWithAnnotation = "att känna sig",
+            translation = "sich fühlen",
+            endings = "-er, -de, -t",
+        )
+
+        val result = useCase(uiState, initialVocabulary = null, containerId = containerId)
+
+        expectThat(result).isNotNull().and {
+            get { wordPrefix }.isEqualTo("")
+            get { word }.isEqualTo("känna")
+            get { wordSuffix }.isEqualTo("sig")
+            get { ending }.isEqualTo("-er -de -t")
+            get { listOf(form1, form2, form3) }.isEqualTo(listOf("känner", "kände", "känt"))
+            get { gender }.isNull()
+        }
+    }
+
+    @Test
+    fun `Written out forms are saved as forms and as full word endings`() {
+        val uiState = AddEditUiState(
+            selectedWordGroup = ViewWordGroup.Verb,
+            selectedSubGroup = ViewWordSubGroup.Verb(WordGroup.VerbSubgroup.GROUP_4_SPECIAL),
+            wordWithAnnotation = "ta en dusch",
+            translation = "duschen",
+            endings = "-r",
+            formsMode = FormsMode.WrittenOut,
+            writtenForms = listOf("tar", " tog ", "tagit"),
+        )
+
+        val result = useCase(uiState, initialVocabulary = null, containerId = containerId)
+
+        expectThat(result).isNotNull().and {
+            get { ending }.isEqualTo("tar tog tagit")
+            get { listOf(form1, form2, form3) }.isEqualTo(listOf("tar", "tog", "tagit"))
+            get { formsNeedReview }.isFalse()
+        }
+    }
+
+    @Test
+    fun `Forms with a pending review are saved with the review flag`() {
+        val uiState = AddEditUiState(
+            selectedWordGroup = ViewWordGroup.Noun,
+            selectedSubGroup = ViewWordSubGroup.Noun(WordGroup.NounSubgroup.UNCHANGED_ETT),
+            wordWithAnnotation = "exempel",
+            translation = "Beispiel",
+            endings = "-et - -en",
+        )
+
+        val result = useCase(uiState, initialVocabulary = null, containerId = containerId)
+
+        expectThat(result).isNotNull().get { formsNeedReview }.isTrue()
+    }
+
+    @Test
+    fun `Phrases under other are saved without endings and forms`() {
+        val uiState = AddEditUiState(
+            selectedWordGroup = ViewWordGroup.Other,
+            wordWithAnnotation = "en gång",
+            translation = "einmal",
+            endings = "-er -de -t",
+        )
+
+        val result = useCase(uiState, initialVocabulary = null, containerId = containerId)
+
+        expectThat(result).isNotNull().and {
+            get { word }.isEqualTo("en gång")
+            get { ending }.isEqualTo("")
+            get { form1 }.isNull()
+            get { formsNeedReview }.isFalse()
+        }
+    }
+
+    @Test
+    fun `Returns null when highlights are outside the changing word`() {
+        val uiState = AddEditUiState(
+            selectedWordGroup = ViewWordGroup.Verb,
+            selectedSubGroup = ViewWordSubGroup.Verb(WordGroup.VerbSubgroup.GROUP_2A),
+            wordWithAnnotation = "känna s*i*g",
+        )
+
+        val result = useCase(uiState, initialVocabulary = null, containerId = containerId)
+
+        expectThat(result).isNull()
     }
 }
