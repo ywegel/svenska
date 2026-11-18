@@ -31,8 +31,8 @@ class AddEditViewModel @Inject constructor(
     @ImmediateDispatcher private val immediateDispatcher: CoroutineDispatcher,
 ) : ViewModel(), AddEditVocabularyCallbacks {
 
-    private var initialVocabulary = savedStateHandle.navArgs<AddEditNavArgs>().initialVocabulary
-    private var containerId = savedStateHandle.navArgs<AddEditNavArgs>().containerId
+    private val initialVocabulary = savedStateHandle.navArgs<AddEditNavArgs>().initialVocabulary
+    private val containerId = savedStateHandle.navArgs<AddEditNavArgs>().containerId
 
     private val _uiState = MutableStateFlow(AddEditUiState.fromExistingVocabulary(initialVocabulary))
     val uiState = _uiState.asStateFlow()
