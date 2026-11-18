@@ -1,7 +1,7 @@
 package de.ywegel.svenska.ui.addEdit
 
 import de.ywegel.svenska.data.model.Gender
-import de.ywegel.svenska.domain.words.splitPhrase
+import de.ywegel.svenska.domain.words.changingWordIndex
 import de.ywegel.svenska.ui.addEdit.models.ViewWordGroup
 import de.ywegel.svenska.ui.common.vocabulary.HighlightUtils
 
@@ -49,7 +49,8 @@ data class WordInput(
             val words = if (article != null) allWords.drop(1) else allWords
             if (words.isEmpty()) return phrase(cleanText, highlights)
 
-            val index = chosenIndex?.takeIf { it in words.indices } ?: defaultChangingIndex(words, group)
+            val index = chosenIndex?.takeIf { it in words.indices }
+                ?: changingWordIndex(words.size, isVerb = group == ViewWordGroup.Verb)
             val changingWord = words[index].range
             val highlightsInWord = highlights.filter { (start, end) ->
                 start >= changingWord.first && end <= changingWord.last + 1
@@ -81,11 +82,6 @@ data class WordInput(
                 wordHighlights = highlights.map { (start, end) -> start - leadingSpaces to end - leadingSpaces },
                 hasHighlightError = false,
             )
-        }
-
-        private fun defaultChangingIndex(words: List<MatchResult>, group: ViewWordGroup?): Int {
-            val prefix = splitPhrase(words.joinToString(" ") { it.value }, isVerb = group == ViewWordGroup.Verb).prefix
-            return prefix.split(" ").count { it.isNotEmpty() }
         }
 
         private fun String.isArticleOf(group: ViewWordGroup?): Boolean = when (group) {

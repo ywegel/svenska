@@ -72,4 +72,30 @@ class VocabularyFlowTest : UserFlowTest() {
             assertTranslationIsNotListed("lamp")
         }
     }
+
+    @Test
+    fun `a chosen changing word is still chosen when editing the vocabulary again`() {
+        // Given
+        val container = givenContainer(name = "Nouns")
+        launchApp(startRoute = OverviewScreenDestination(containerId = container.id))
+
+        // When
+        overview { clickAddVocabulary() }
+        addEdit {
+            selectWordGroup(R.string.lang_noun, R.string.lang_noun_abbreviation_ar)
+            enterWord("kopp kaffe")
+            selectChangingWord("kopp")
+            enterTranslation("cup of coffee")
+            enterEndings("-en -ar -arna")
+            save()
+        }
+        overview { clickVocabulary("kopp kaffe") }
+        vocabularyDetail { clickEdit() }
+
+        // Then
+        addEdit {
+            assertIsEditing(word = "kopp")
+            assertChangingWordIs("kopp")
+        }
+    }
 }

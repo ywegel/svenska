@@ -1,11 +1,15 @@
 package de.ywegel.svenska.userflows.robots
 
 import androidx.annotation.StringRes
+import androidx.compose.ui.test.assertIsDisplayed
+import androidx.compose.ui.test.hasClickAction
 import androidx.compose.ui.test.hasContentDescription
 import androidx.compose.ui.test.hasSetTextAction
 import androidx.compose.ui.test.hasText
+import androidx.compose.ui.test.isSelected
 import androidx.compose.ui.test.junit4.AndroidComposeTestRule
 import androidx.compose.ui.test.performClick
+import androidx.compose.ui.test.performScrollTo
 import androidx.compose.ui.test.performTextReplacement
 import de.ywegel.svenska.R
 
@@ -23,6 +27,14 @@ class AddEditRobot(composeRule: AndroidComposeTestRule<*, *>) : Robot(composeRul
 
     fun enterWord(word: String) = enterText(R.string.addEdit_label_word, word)
 
+    fun selectChangingWord(word: String) {
+        composeRule.onNode(changingWordChip(word)).performClick()
+    }
+
+    fun assertChangingWordIs(word: String) {
+        composeRule.onNode(changingWordChip(word) and isSelected()).performScrollTo().assertIsDisplayed()
+    }
+
     fun enterTranslation(translation: String) = enterText(R.string.addEdit_label_translation, translation)
 
     fun enterEndings(endings: String) = enterText(R.string.addEdit_label_endings, endings)
@@ -33,6 +45,9 @@ class AddEditRobot(composeRule: AndroidComposeTestRule<*, *>) : Robot(composeRul
         composeRule.onNode(saveButton).performClick()
         waitUntilGone(saveButton)
     }
+
+    // The word field contains the same words, but has no click action
+    private fun changingWordChip(word: String) = hasText(word) and hasClickAction()
 
     private fun enterText(@StringRes label: Int, text: String) {
         composeRule.onNode(hasText(string(label)) and hasSetTextAction()).performTextReplacement(text)
