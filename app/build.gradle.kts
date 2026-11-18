@@ -295,6 +295,7 @@ kover {
                     "*_Impl*",
                     "*_HiltModules*",
                 )
+                annotatedBy("androidx.compose.ui.tooling.preview.Preview*")
             }
         }
     }
