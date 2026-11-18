@@ -12,6 +12,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.outlined.SwapHoriz
 import androidx.compose.material3.Icon
 import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -31,7 +32,6 @@ import de.ywegel.svenska.ui.theme.SvenskaIcons
 import de.ywegel.svenska.ui.theme.SvenskaTheme
 
 private val GenderToggleWidth = 76.dp
-private val TextFieldHeight = 56.dp
 
 // OutlinedTextField reserves space above its border for the floating label
 private val TextFieldLabelOffset = 8.dp
@@ -85,7 +85,7 @@ private fun GenderToggle(gender: Gender, onGenderChange: (Gender) -> Unit, modif
     Surface(
         onClick = { onGenderChange(other) },
         modifier = modifier
-            .size(width = GenderToggleWidth, height = TextFieldHeight)
+            .size(width = GenderToggleWidth, height = OutlinedTextFieldDefaults.MinHeight)
             .semantics { contentDescription = description },
         shape = RoundedCornerShape(Spacings.m),
         color = SvenskaTheme.colors.secondaryContainer,
