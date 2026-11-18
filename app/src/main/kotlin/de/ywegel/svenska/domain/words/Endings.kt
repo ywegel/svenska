@@ -4,6 +4,7 @@ package de.ywegel.svenska.domain.words
 
 internal const val VOWELS = "aeiouyåäöé"
 private const val MIN_POLYSYLLABIC_VOWELS = 2
+private const val MIN_SHARED_STEM = 2
 private val eBeforeFinalLnrRegex = Regex("[^$VOWELS]e[lnr]$")
 private val droppableVowels = setOf('a', 'e')
 // Definite singular without e, only after a vowel or an unstressed ending: penna -n, cykel -n, yrke -t
@@ -13,6 +14,18 @@ internal val pureEndings = setOf(
     "n", "en", "et", "t", "tt", "an", "a", "e", "r", "ar", "or", "er", "na", "ena", "rna", "arna", "orna", "erna",
     "de", "dde", "te", "da",
 )
+
+/** Endings can be separated by commas or spaces: "-er, -de, -t" and "-er -de -t". */
+fun splitEndings(text: String): List<String> = text.split(',', ' ').map { it.trim() }.filter { it.isNotEmpty() }
+
+/**
+ * Splits a form into the part it shares with the base word and the part that changes: drömmen -> dröm + men.
+ * Forms that barely share anything change completely: ta -> tog.
+ */
+fun String.splitAtChange(baseWord: String): Pair<String, String> {
+    val shared = commonPrefixWith(baseWord).length
+    return if (shared < MIN_SHARED_STEM) "" to this else take(shared) to drop(shared)
+}
 
 // "-or", "-n", "-" are abbreviated. "sidor", "pennan" are written out
 val String.isAbbreviated: Boolean get() = startsWith("-")

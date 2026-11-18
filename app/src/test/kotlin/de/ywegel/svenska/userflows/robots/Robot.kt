@@ -2,6 +2,7 @@ package de.ywegel.svenska.userflows.robots
 
 import androidx.annotation.PluralsRes
 import androidx.annotation.StringRes
+import androidx.compose.ui.semantics.SemanticsActions
 import androidx.compose.ui.test.SemanticsMatcher
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.hasContentDescription
@@ -9,6 +10,7 @@ import androidx.compose.ui.test.hasText
 import androidx.compose.ui.test.junit4.AndroidComposeTestRule
 import androidx.compose.ui.test.performClick
 import androidx.compose.ui.test.performScrollTo
+import androidx.compose.ui.test.performSemanticsAction
 
 abstract class Robot(protected val composeRule: AndroidComposeTestRule<*, *>) {
 
@@ -19,11 +21,15 @@ abstract class Robot(protected val composeRule: AndroidComposeTestRule<*, *>) {
 
     protected fun clickOnText(text: String) = clickOn(hasText(text))
 
-    protected fun scrollToAndClickOnText(text: String) {
-        composeRule.onNode(hasText(text)).performScrollTo().performClick()
+    protected fun scrollToAndClickOnText(text: String) = scrollToAndClickOn(hasText(text))
+
+    // Clicks through the semantics action: scrolled to the bottom edge, a touch could hit a floating action button
+    protected fun scrollToAndClickOn(matcher: SemanticsMatcher) {
+        composeRule.onNode(matcher).performScrollTo().performSemanticsAction(SemanticsActions.OnClick)
     }
 
-    protected fun clickOnDescription(@StringRes id: Int) = clickOn(hasContentDescription(string(id)))
+    protected fun clickOnDescription(@StringRes id: Int, vararg args: Any) =
+        clickOn(hasContentDescription(string(id, *args)))
 
     protected fun assertEventuallyDisplayed(matcher: SemanticsMatcher) {
         waitUntilExists(matcher)

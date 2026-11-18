@@ -45,6 +45,7 @@ import de.ywegel.svenska.ui.common.HorizontalSpacerS
 import de.ywegel.svenska.ui.common.VerticalSpacerXS
 import de.ywegel.svenska.ui.common.VerticalSpacerXXS
 import de.ywegel.svenska.ui.common.vocabulary.abbreviation
+import de.ywegel.svenska.ui.common.vocabulary.annotatedWord
 import de.ywegel.svenska.ui.common.vocabulary.article
 import de.ywegel.svenska.ui.common.vocabulary.mainGroupAbbreviation
 import de.ywegel.svenska.ui.common.vocabulary.mainGroupUserFacingString
@@ -137,7 +138,7 @@ private fun Header(vocabulary: Vocabulary, isFavorite: Boolean, onFavoriteChange
             verticalAlignment = Alignment.CenterVertically,
         ) {
             Text(
-                text = vocabulary.word,
+                text = vocabulary.annotatedWord,
                 style = SvenskaTheme.typography.headlineMedium,
                 fontWeight = FontWeight.Bold,
                 modifier = Modifier

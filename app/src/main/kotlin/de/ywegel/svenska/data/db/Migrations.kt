@@ -176,7 +176,7 @@ private object FrozenDashNormalizerAtV2ToV3 {
 }
 
 /**
- * Frozen snapshot of [de.ywegel.svenska.domain.wordImporter.WordGroupMatcher]. Migrations must keep reproducing the
+ * Frozen snapshot of [de.ywegel.svenska.domain.words.WordGroupMatcher]. Migrations must keep reproducing the
  * exact transformation.
  */
 private object FrozenWordGroupMatcherAtV2ToV3 {

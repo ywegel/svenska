@@ -1,12 +1,12 @@
-package de.ywegel.svenska.data
+package de.ywegel.svenska.domain.words
 
 import de.ywegel.svenska.data.model.Gender
 import de.ywegel.svenska.data.model.WordGroup
-import de.ywegel.svenska.domain.wordImporter.WordGroupMatcher
 import de.ywegel.svenska.testdata.ReferenceWords
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.Arguments
+import org.junit.jupiter.params.provider.Arguments.argumentSet
 import org.junit.jupiter.params.provider.MethodSource
 
 class WordGroupMatcherTest {
@@ -27,7 +27,38 @@ class WordGroupMatcherTest {
         assertEquals(expectedGender, result)
     }
 
+    @ParameterizedTest
+    @MethodSource("suggestionCases")
+    fun `suggest only suggests complete, known and different groups`(
+        word: String,
+        endings: List<String>,
+        selected: WordGroup,
+        expected: WordGroup?,
+    ) {
+        assertEquals(expected, WordGroupMatcher.suggest(word, endings, selected))
+    }
+
     companion object {
+        private val ar = WordGroup.Noun(WordGroup.NounSubgroup.AR)
+        private val undefinedNoun = WordGroup.Noun(WordGroup.NounSubgroup.UNDEFINED)
+        private val dreamEndings = listOf("-men", "-mar", "-marna")
+
+        @JvmStatic
+        fun suggestionCases(): List<Arguments> = listOf(
+            argumentSet("other selected", "dröm", dreamEndings, WordGroup.Other, ar),
+            argumentSet("noun without subgroup selected", "dröm", dreamEndings, undefinedNoun, ar),
+            argumentSet("suggestion already selected", "dröm", dreamEndings, ar, null),
+            argumentSet(
+                "second of three noun endings is no complete adjective",
+                "dröm",
+                listOf("-men", "-mar"),
+                undefinedNoun,
+                null,
+            ),
+            argumentSet("incomplete endings", "dröm", listOf("-men"), WordGroup.Other, null),
+            argumentSet("blank word", "", dreamEndings, WordGroup.Other, null),
+        )
+
         // Abbreviated and written out endings have to lead to the same result
         @JvmStatic
         fun referenceWordGroups() = ReferenceWords.all.flatMap { word ->

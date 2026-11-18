@@ -1,11 +1,15 @@
 package de.ywegel.svenska.ui.common.vocabulary
 
 import android.util.Log
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.ReadOnlyComposable
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.withStyle
 import de.ywegel.svenska.data.model.Vocabulary
+import de.ywegel.svenska.ui.theme.SvenskaTheme
 
 object HighlightUtils {
 
@@ -88,6 +92,30 @@ object HighlightUtils {
     }
 
     /**
+     * Builds the full text "prefix word suffix". Highlight ranges refer to [word] only,
+     * prefix and suffix are styled with [affixStyle], because they stay the same in every form.
+     */
+    fun buildAnnotatedWord(
+        prefix: String,
+        word: String,
+        suffix: String,
+        highlightRanges: List<Pair<Int, Int>>,
+        affixStyle: SpanStyle,
+    ): AnnotatedString {
+        return buildAnnotatedString {
+            if (prefix.isNotBlank()) {
+                withStyle(affixStyle) { append(prefix) }
+                append(' ')
+            }
+            append(buildAnnotatedWord(word, highlightRanges))
+            if (suffix.isNotBlank()) {
+                append(' ')
+                withStyle(affixStyle) { append(suffix) }
+            }
+        }
+    }
+
+    /**
      * Builds an AnnotatedString directly from a star-annotated string.
      * Returns null if star-annotations could not be parsed.
      */
@@ -101,8 +129,17 @@ fun String.parseHighlights(): Result<Pair<String, List<Pair<Int, Int>>>> = Highl
 fun Pair<String, List<Pair<Int, Int>>>.toAnnotatedWord(): AnnotatedString =
     HighlightUtils.buildAnnotatedWord(first, second)
 
+/** The full word with prefix and suffix greyed out, e.g. "högsta" in "högsta dröm". */
 val Vocabulary.annotatedWord: AnnotatedString
-    get() = HighlightUtils.buildAnnotatedWord(word, wordHighlights)
+    @ReadOnlyComposable
+    @Composable
+    get() = HighlightUtils.buildAnnotatedWord(
+        prefix = wordPrefix,
+        word = word,
+        suffix = wordSuffix,
+        highlightRanges = wordHighlights,
+        affixStyle = SpanStyle(color = SvenskaTheme.colors.onSurfaceVariant, fontWeight = FontWeight.Normal),
+    )
 
 /**
  * Thrown when the input string has an odd number of '*' delimiters, indicating unbalanced highlights.

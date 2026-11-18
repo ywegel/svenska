@@ -138,6 +138,8 @@ class WordParserTest {
             Arguments.of("långlunch (-en, -, -er)", noun(WordGroup.NounSubgroup.SPECIAL), "-en - -er"),
             // Endings in the suffix are ignored
             Arguments.of("smart  (-a)  mobil  (-er)", WordGroup.Adjective, "-a"),
+            // Brackets of other words hold no endings
+            Arguments.of("i dag (adv.)", WordGroup.Other, ""),
         )
 
         @JvmStatic
@@ -150,6 +152,9 @@ class WordParserTest {
         fun wordPartsEdgeCases(): List<Arguments> = listOf(
             // No endings
             Arguments.of("hej då", "", "hej då", ""),
+            // Other words are not split and keep their bracket
+            Arguments.of("i dag (adv.)", "", "i dag (adv.)", ""),
+            Arguments.of("tack så mycket (interj.) för hjälpen", "", "tack så mycket (interj.) för hjälpen", ""),
         )
     }
 }

@@ -1,5 +1,8 @@
 package de.ywegel.svenska.domain.wordImporter
 
+import de.ywegel.svenska.domain.words.WordGroupMatcher
+import de.ywegel.svenska.domain.words.splitPhrase
+
 data class ExtractedWord(
     val prefix: String,
     val baseWord: String,
@@ -38,22 +41,13 @@ object WordExtractor {
         val wordsBeforeEndings = textBeforeEndings.removeSuffix(explanations)
         val textAfterWords = explanations + input.substring(endingsBracket.indices.last + 1)
 
-        // Verb phrases inflect the first word: flyga drake (-er, flög, flugit), gifta sig (-er, -te, -t)
-        return if (WordGroupMatcher.isVerb(endings)) {
-            ExtractedWord(
-                prefix = "",
-                baseWord = wordsBeforeEndings.substringBefore(" "),
-                endings = endings,
-                suffix = (wordsBeforeEndings.substringAfter(" ", missingDelimiterValue = "") + textAfterWords).trim(),
-            )
-        } else {
-            ExtractedWord(
-                prefix = wordsBeforeEndings.substringBeforeLast(" ", missingDelimiterValue = "").trim(),
-                baseWord = wordsBeforeEndings.substringAfterLast(" "),
-                endings = endings,
-                suffix = textAfterWords.trim(),
-            )
-        }
+        val phrase = splitPhrase(wordsBeforeEndings, isVerb = WordGroupMatcher.isVerb(endings))
+        return ExtractedWord(
+            prefix = phrase.prefix,
+            baseWord = phrase.word,
+            endings = endings,
+            suffix = (phrase.suffix + textAfterWords).trim(),
+        )
     }
 
     /**
