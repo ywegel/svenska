@@ -140,6 +140,48 @@ class AddEditViewModelTest {
     @Nested
     inner class FormsModes {
         @Test
+        fun `A word group with more forms adds a field for the missing form`() {
+            // Given
+            val viewModel = setupViewModel()
+            viewModel.updateSelectedWordGroup(ViewWordGroup.Adjective)
+            viewModel.updateWordWithAnnotation("glad")
+            viewModel.switchToWrittenOutForms()
+
+            // When
+            viewModel.updateSelectedWordGroup(ViewWordGroup.Noun)
+
+            // Then
+            expectThat(viewModel.uiState.value.forms).isEqualTo(listOf("", "", ""))
+        }
+
+        @Test
+        fun `A word group with fewer forms hides the extra form until switching back`() {
+            // Given
+            val viewModel = setupViewModel(initialVocabulary = penna(form2 = "pennar"))
+
+            // When
+            viewModel.updateSelectedWordGroup(ViewWordGroup.Adjective)
+            val adjectiveForms = viewModel.uiState.value.forms
+            viewModel.updateSelectedWordGroup(ViewWordGroup.Noun)
+
+            // Then
+            expectThat(adjectiveForms).isEqualTo(listOf("pennan", "pennar"))
+            expectThat(viewModel.uiState.value.forms).isEqualTo(listOf("pennan", "pennar", "pennorna"))
+        }
+
+        @Test
+        fun `A form the stored forms left empty can still be written out`() {
+            // Given
+            val viewModel = setupViewModel(initialVocabulary = penna().copy(form2 = "pennar"))
+
+            // When
+            viewModel.updateWrittenForm(index = 2, form = "pennorna")
+
+            // Then
+            expectThat(viewModel.uiState.value.forms).isEqualTo(listOf("", "pennar", "pennorna"))
+        }
+
+        @Test
         fun `Writing out the forms starts with the built forms`() {
             // Given
             val viewModel = setupViewModel(initialVocabulary = penna())

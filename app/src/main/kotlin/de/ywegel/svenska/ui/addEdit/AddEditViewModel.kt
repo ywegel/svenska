@@ -79,9 +79,7 @@ class AddEditViewModel @Inject constructor(
     }
 
     override fun updateWrittenForm(index: Int, form: String) {
-        _uiState.update { state ->
-            state.copy(writtenForms = state.writtenForms.mapIndexed { i, old -> if (i == index) form else old })
-        }
+        _uiState.update { it.withWrittenForm(index, form) }
     }
 
     override fun switchToWrittenOutForms() {
@@ -184,9 +182,13 @@ data class AddEditUiState(
 
     private val builtForms by lazy { FormBuilder.build(formInputs.word, formInputs.endings, formInputs.wordGroup) }
 
-    /** The forms that are shown and saved: built from the endings, or written out by the user. */
+    /**
+     * The forms that are shown and saved: built from the endings, or written out by the user. Only as many as the word
+     * group has. Forms beyond that stay in [writtenForms], so they come back when switching to a group with more forms.
+     */
     val forms: List<String>
-        get() = if (formsMode == FormsMode.WrittenOut) writtenForms else builtForms.forms
+        get() = (if (formsMode == FormsMode.WrittenOut) writtenForms.withAllSlots() else builtForms.forms)
+            .take(formWordGroup.formCount)
 
     val hasForms: Boolean
         get() = formWordGroup.formCount > 0
@@ -202,11 +204,18 @@ data class AddEditUiState(
 
     /** Switching back to the endings would replace forms the user wrote out differently. */
     val writtenFormsDifferFromEndings: Boolean
-        get() = writtenForms.map { it.trim() }.filter { it.isNotEmpty() } != builtForms.forms
+        get() = writtenForms.take(formWordGroup.formCount).map { it.trim() }.filter { it.isNotEmpty() } !=
+            builtForms.forms.take(formWordGroup.formCount)
 
-    /** The built forms as the starting point for writing them out, with an empty field for each missing form. */
-    fun builtFormsForAllSlots(): List<String> =
-        List(maxOf(formWordGroup.formCount, builtForms.forms.size)) { builtForms.forms.getOrElse(it) { "" } }
+    /** The built forms as the starting point for writing them out. */
+    fun builtFormsForAllSlots(): List<String> = builtForms.forms.withAllSlots()
+
+    fun withWrittenForm(index: Int, form: String): AddEditUiState =
+        copy(writtenForms = writtenForms.withAllSlots().mapIndexed { i, old -> if (i == index) form else old })
+
+    /** The word group decides how many forms there are, so every missing form gets an empty field. */
+    private fun List<String>.withAllSlots(): List<String> =
+        this + List(maxOf(0, formWordGroup.formCount - size)) { "" }
 
     companion object {
         fun fromExistingVocabulary(vocabulary: Vocabulary?): AddEditUiState {

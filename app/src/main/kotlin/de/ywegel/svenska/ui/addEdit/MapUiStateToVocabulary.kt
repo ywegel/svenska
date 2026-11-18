@@ -73,9 +73,12 @@ private fun AddEditUiState.toVocabulary(
     )
 }
 
-/** Written out forms are saved as full words, so the endings always build the same forms again. */
+/**
+ * Written out forms are saved as full words, so the endings always build the same forms again.
+ * Endings beyond the forms of the word group are dropped, like the forms themselves.
+ */
 private fun AddEditUiState.endingFor(wordGroup: WordGroup): String = when {
     wordGroup == WordGroup.Other -> ""
-    formsMode == FormsMode.WrittenOut -> writtenForms.map { it.trim() }.filter { it.isNotEmpty() }.joinToString(" ")
-    else -> splitEndings(endings).joinToString(" ")
+    formsMode == FormsMode.WrittenOut -> forms.map { it.trim() }.filter { it.isNotEmpty() }.joinToString(" ")
+    else -> splitEndings(endings).take(wordGroup.formCount).joinToString(" ")
 }

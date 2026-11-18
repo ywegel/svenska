@@ -227,6 +227,43 @@ class MapUiStateToVocabularyTest {
     }
 
     @Test
+    fun `An adjective saves only two written out forms`() {
+        val uiState = AddEditUiState(
+            selectedWordGroup = ViewWordGroup.Adjective,
+            wordWithAnnotation = "glad",
+            formsMode = FormsMode.WrittenOut,
+            writtenForms = listOf("glatt", "glada", "gladare"),
+        )
+
+        val result = mapUiStateToVocabulary(uiState, initialVocabulary = null, containerId = containerId)
+
+        expectThat(result).savedVocabulary().and {
+            get { ending }.isEqualTo("glatt glada")
+            get { form1 }.isEqualTo("glatt")
+            get { form2 }.isEqualTo("glada")
+            get { form3 }.isNull()
+        }
+    }
+
+    @Test
+    fun `An adjective saves only two endings`() {
+        val uiState = AddEditUiState(
+            selectedWordGroup = ViewWordGroup.Adjective,
+            wordWithAnnotation = "glad",
+            endings = "-tt -a -are",
+        )
+
+        val result = mapUiStateToVocabulary(uiState, initialVocabulary = null, containerId = containerId)
+
+        expectThat(result).savedVocabulary().and {
+            get { ending }.isEqualTo("-tt -a")
+            get { form1 }.isEqualTo("glatt")
+            get { form2 }.isEqualTo("glada")
+            get { form3 }.isNull()
+        }
+    }
+
+    @Test
     fun `Reports invalid highlights when they are outside the changing word`() {
         val uiState = AddEditUiState(
             selectedWordGroup = ViewWordGroup.Verb,
