@@ -209,6 +209,25 @@ class AddEditViewModelTest {
         expectThat(viewModel.uiState.value.wordInput.word).isEqualTo("dusch")
     }
 
+    @ParameterizedTest
+    @MethodSource("typingAfterTappingAWord")
+    fun `Typing keeps the tapped word only while the number of words stays the same`(
+        keystrokes: List<String>,
+        expectedWord: String,
+    ) {
+        // Given
+        val viewModel = setupViewModel()
+        viewModel.updateSelectedWordGroup(ViewWordGroup.Noun)
+        viewModel.updateWordWithAnnotation("kopp kaffe")
+        viewModel.selectChangingWord(0)
+
+        // When
+        keystrokes.forEach(viewModel::updateWordWithAnnotation)
+
+        // Then
+        expectThat(viewModel.uiState.value.wordInput.word).isEqualTo(expectedWord)
+    }
+
     @Nested
     inner class FormsModes {
         @Test
@@ -541,6 +560,24 @@ class AddEditViewModelTest {
                 "the same group keeps the subgroup",
                 ViewWordGroup.Noun,
                 ViewWordSubGroup.Noun(WordGroup.NounSubgroup.OR),
+            ),
+        )
+
+        /** Starts from "kopp kaffe" with "kopp" tapped. Without a tapped word, a noun changes its last word. */
+        @JvmStatic
+        fun typingAfterTappingAWord(): List<Arguments> = listOf(
+            argumentSet("fixing a typo in the tapped word keeps it", listOf("kop kaffe", "kopa kaffe"), "kopa"),
+            argumentSet("fixing a typo in another word keeps it", listOf("kopp kaffee"), "kopp"),
+            argumentSet("a trailing space keeps it", listOf("kopp kaffe "), "kopp"),
+            argumentSet(
+                "splitting the tapped word resets it",
+                listOf("skopp kaffe", "stkopp kaffe", "stokopp kaffe", "storkopp kaffe", "stor kopp kaffe"),
+                "kaffe",
+            ),
+            argumentSet(
+                "a new word typed after a leading space resets it",
+                listOf(" kopp kaffe", "s kopp kaffe", "st kopp kaffe", "sto kopp kaffe", "stor kopp kaffe"),
+                "kaffe",
             ),
         )
     }

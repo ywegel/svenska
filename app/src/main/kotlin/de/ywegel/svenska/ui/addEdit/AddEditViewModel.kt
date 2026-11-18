@@ -59,7 +59,12 @@ class AddEditViewModel @Inject constructor(
     }
 
     override fun updateWordWithAnnotation(word: String) {
-        _uiState.update { it.copy(wordWithAnnotation = word).withArticleGender() }
+        _uiState.update { old ->
+            val new = old.copy(wordWithAnnotation = word)
+            // The chosen index would point to another word once words are added or removed
+            val keepsChosenWord = new.wordInput.words.size == old.wordInput.words.size
+            new.copy(chosenChangingIndex = old.chosenChangingIndex.takeIf { keepsChosenWord }).withArticleGender()
+        }
     }
 
     override fun selectChangingWord(index: Int) {
