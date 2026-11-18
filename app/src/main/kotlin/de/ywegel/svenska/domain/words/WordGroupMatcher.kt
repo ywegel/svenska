@@ -17,6 +17,25 @@ object WordGroupMatcher {
         }
     }
 
+    /**
+     * The word group the endings point to, if it is worth suggesting: the endings are complete, the group is known and
+     * the user selected something else. Endings are only complete once they are enough for the selected word group
+     * too, so typing the second of three noun endings doesn't suggest an adjective.
+     * A suggestion is never Other or undefined, so a selection without subgroup always differs from it.
+     */
+    fun suggest(word: String, endings: List<String>, selected: WordGroup): WordGroup? {
+        if (word.isBlank()) return null
+        val suggestion = determineWordGroup(word, endings)
+        val isComplete = suggestion.formCount > 0 &&
+            endings.size == suggestion.formCount &&
+            endings.size >= selected.formCount
+        return suggestion.takeIf { isComplete && !it.isUndefined && it != selected }
+    }
+
+    private val WordGroup.isUndefined: Boolean
+        get() = (this as? WordGroup.Noun)?.subgroup == WordGroup.NounSubgroup.UNDEFINED ||
+            (this as? WordGroup.Verb)?.subgroup == WordGroup.VerbSubgroup.UNDEFINED
+
     // Adjectives already ending on -t only list the plural: trött (-a), bäst (-a)
     private fun isAdjectiveWithoutNeuter(baseWord: String, endings: List<String>): Boolean {
         return singleEnding(baseWord, endings) == ADJECTIVE_PLURAL_ENDING

@@ -44,6 +44,7 @@ import androidx.compose.ui.unit.dp
 import de.ywegel.svenska.BuildConfig
 import de.ywegel.svenska.R
 import de.ywegel.svenska.data.model.WordGroup
+import de.ywegel.svenska.domain.words.splitAtChange
 import de.ywegel.svenska.ui.addEdit.models.ViewWordGroup
 import de.ywegel.svenska.ui.addEdit.models.userFacingString
 import de.ywegel.svenska.ui.common.vocabulary.article

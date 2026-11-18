@@ -2,6 +2,8 @@ package de.ywegel.svenska.ui.addEdit
 
 import de.ywegel.svenska.data.model.Vocabulary
 import de.ywegel.svenska.data.model.WordGroup
+import de.ywegel.svenska.domain.words.formCount
+import de.ywegel.svenska.domain.words.splitEndings
 import de.ywegel.svenska.ui.addEdit.models.ViewWordGroup
 import de.ywegel.svenska.ui.addEdit.models.ViewWordSubGroup
 

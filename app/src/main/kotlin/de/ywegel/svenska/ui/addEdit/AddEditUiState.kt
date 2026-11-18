@@ -4,6 +4,9 @@ import de.ywegel.svenska.data.model.Gender
 import de.ywegel.svenska.data.model.Vocabulary
 import de.ywegel.svenska.data.model.WordGroup
 import de.ywegel.svenska.domain.words.FormBuilder
+import de.ywegel.svenska.domain.words.WordGroupMatcher
+import de.ywegel.svenska.domain.words.formCount
+import de.ywegel.svenska.domain.words.splitEndings
 import de.ywegel.svenska.ui.addEdit.models.ViewWordGroup
 import de.ywegel.svenska.ui.addEdit.models.ViewWordSubGroup
 import de.ywegel.svenska.ui.common.vocabulary.HighlightUtils
@@ -55,7 +58,9 @@ data class AddEditUiState(
         formsMode == FormsMode.Endings && builtForms.needsReview && formInputs != confirmedFormInputs
     }
 
-    val suggestedWordGroup: WordGroup? by lazy { suggestWordGroup(formInputs) }
+    val suggestedWordGroup: WordGroup? by lazy {
+        WordGroupMatcher.suggest(formInputs.word, formInputs.endings, formInputs.wordGroup)
+    }
 
     /** Only written out forms are checked. Other has no forms, built forms never have gaps or spaces. */
     val writtenFormsError: WrittenFormsError? by lazy {
