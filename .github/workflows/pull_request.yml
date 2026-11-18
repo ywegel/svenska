@@ -140,12 +140,20 @@ jobs:
   screenshot_comment:
     name: Screenshot Comment
     needs: [ screenshot_tests ]
+    # Also runs when the screenshot tests failed, so the PR gets a comment saying they could not run.
+    # Without !cancelled() GitHub implicitly adds success() and skips this job on a red test run.
     # Fork PRs only get a read-only token, their diffs stay available as artifacts
-    if: github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository
+    if: >
+      !cancelled() &&
+      needs.screenshot_tests.result != 'skipped' &&
+      github.event_name == 'pull_request' &&
+      github.event.pull_request.head.repo.full_name == github.repository
     permissions:
       contents: write
       pull-requests: write
     uses: ./.github/workflows/CompareScreenshotComment.yml
+    with:
+      tests-result: ${{ needs.screenshot_tests.result }}
 
   build-and-test:
     name: Build and Run Instrumentation Tests
