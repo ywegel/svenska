@@ -1,3 +1,5 @@
+@file:Suppress("MatchingDeclarationName")
+
 package de.ywegel.svenska.ui.addEdit
 
 import de.ywegel.svenska.data.model.Vocabulary
@@ -22,21 +24,8 @@ sealed interface SaveResult {
 }
 
 /**
- * Maps a [AddEditUiState] and optional [initialVocabulary] into a [Vocabulary] object.
- *
- * Used in the Add/Edit screen where vocabulary entries are either created from scratch
- * or updated based on user input.
- *
- * It handles:
- * - Converting UI-level representations ([ViewWordGroup], [ViewWordSubGroup]) into domain-level [WordGroup]
- * - Applying default values (e.g., default gender if a noun is selected and no gender was specified)
- * - Splitting the word field into prefix, changing word and suffix, and saving the forms of the changing word
- * - Keeping the original `created` timestamp when editing an existing vocabulary
- *
- * @param snapshot the current UI state containing the user's input
- * @param initialVocabulary the existing vocabulary if the screen is in edit mode, or null for creation mode
- * @param containerId the ID of the container to associate with the new vocabulary (ignored if editing)
- * @return [SaveResult.Valid] with a [Vocabulary] ready for persistence, or the reason the input can't be saved
+ * Maps the input to the [Vocabulary] to save, or returns why it can't be saved.
+ * When editing, the [initialVocabulary] keeps its id and `created` timestamp and [containerId] is ignored.
  */
 fun mapUiStateToVocabulary(snapshot: AddEditUiState, initialVocabulary: Vocabulary?, containerId: Int): SaveResult {
     val wordGroup = snapshot.selectedWordGroup?.toWordGroup(snapshot.selectedSubGroup)
@@ -73,7 +62,7 @@ private fun AddEditUiState.toVocabulary(
         form3 = forms.getOrNull(2)?.takeIf { it.isNotEmpty() },
         formsNeedReview = wordGroup != WordGroup.Other && showReviewHint,
         notes = notes,
-        irregularPronunciation = irregularPronunciation.takeIf { it.isNullOrBlank().not() },
+        irregularPronunciation = irregularPronunciation?.takeIf { it.isNotBlank() },
         isFavorite = isFavorite,
         lastEdited = System.currentTimeMillis(),
     )

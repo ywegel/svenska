@@ -6,8 +6,11 @@ import de.ywegel.svenska.data.model.WordGroup
 import de.ywegel.svenska.data.model.vocabulary
 import de.ywegel.svenska.ui.addEdit.models.ViewWordGroup
 import de.ywegel.svenska.ui.addEdit.models.ViewWordSubGroup
-import kotlinx.coroutines.ExperimentalCoroutinesApi
 import org.junit.jupiter.api.Test
+import org.junit.jupiter.params.ParameterizedTest
+import org.junit.jupiter.params.provider.Arguments
+import org.junit.jupiter.params.provider.Arguments.argumentSet
+import org.junit.jupiter.params.provider.MethodSource
 import strikt.api.Assertion
 import strikt.api.expectThat
 import strikt.assertions.isA
@@ -19,36 +22,21 @@ import strikt.assertions.isTrue
 import kotlin.time.Clock
 import kotlin.time.Duration.Companion.days
 
-@ExperimentalCoroutinesApi
 class MapUiStateToVocabularyTest {
 
-    private val containerId = 42
+    @ParameterizedTest
+    @MethodSource("unsavableInputs")
+    fun `Reports why the input can't be saved`(uiState: AddEditUiState, expected: SaveResult) {
+        // When
+        val result = save(uiState)
 
-    @Test
-    fun `Reports a missing word group when none is selected`() {
-        val uiState = AddEditUiState(selectedWordGroup = null)
-
-        val result = mapUiStateToVocabulary(uiState, null, containerId)
-
-        expectThat(result).isEqualTo(SaveResult.MissingWordGroup)
-    }
-
-    @Test
-    fun `Reports a missing word group when the subgroup is missing`() {
-        val uiState = AddEditUiState(
-            selectedWordGroup = ViewWordGroup.Noun,
-            selectedSubGroup = ViewWordSubGroup.None,
-            wordWithAnnotation = "penna",
-            translation = "pencil",
-        )
-
-        val result = mapUiStateToVocabulary(uiState, null, containerId)
-
-        expectThat(result).isEqualTo(SaveResult.MissingWordGroup)
+        // Then
+        expectThat(result).isEqualTo(expected)
     }
 
     @Test
     fun `Creates new vocabulary when initialVocabulary is null`() {
+        // Given
         val uiState = AddEditUiState(
             selectedWordGroup = ViewWordGroup.Noun,
             selectedSubGroup = ViewWordSubGroup.Noun(WordGroup.NounSubgroup.OR),
@@ -57,14 +45,16 @@ class MapUiStateToVocabularyTest {
             gender = Gender.Ultra,
         )
 
-        val result = mapUiStateToVocabulary(uiState, initialVocabulary = null, containerId = containerId)
+        // When
+        val result = save(uiState)
 
+        // Then
         expectThat(result).savedVocabulary().and {
             get { word }.isEqualTo("penna")
             get { translation }.isEqualTo("pencil")
             get { wordGroup }.isEqualTo(WordGroup.Noun(WordGroup.NounSubgroup.OR))
             get { gender }.isEqualTo(Gender.Ultra)
-            get { this.containerId }.isEqualTo(containerId)
+            get { containerId }.isEqualTo(CONTAINER_ID)
             get { created }.isGreaterThan(0)
             get { lastEdited }.isGreaterThan(0)
         }
@@ -72,77 +62,59 @@ class MapUiStateToVocabularyTest {
 
     @Test
     fun `Preserves created value and updates everything else when editing existing vocabulary`() {
-        val initialCreationTime = Clock.System.now().minus(30.days)
-        val initial = vocabulary().copy(
-            created = initialCreationTime.toEpochMilliseconds(),
-            lastEdited = initialCreationTime.toEpochMilliseconds(),
-        )
+        // Given
+        val initialCreationTime = Clock.System.now().minus(30.days).toEpochMilliseconds()
+        val initial = vocabulary().copy(created = initialCreationTime, lastEdited = initialCreationTime)
         val uiState = AddEditUiState.fromExistingVocabulary(initial)
 
-        val result = mapUiStateToVocabulary(uiState, initialVocabulary = initial, containerId = containerId)
+        // When
+        val result = save(uiState, initialVocabulary = initial)
 
+        // Then
         expectThat(result).savedVocabulary().and {
-            get { created }.isEqualTo(initialCreationTime.toEpochMilliseconds())
+            get { created }.isEqualTo(initialCreationTime)
             get { lastEdited }.isGreaterThan(initial.lastEdited)
         }
     }
 
     @Test
     fun `Gender is null if word group is not noun`() {
-        val uiState = AddEditUiState(
-            selectedWordGroup = ViewWordGroup.Verb,
-            selectedSubGroup = ViewWordSubGroup.Verb(WordGroup.VerbSubgroup.GROUP_1),
-            gender = Gender.Ultra,
-            wordWithAnnotation = "gå",
-            translation = "walk",
-        )
+        // Given
+        val uiState = verb(wordWithAnnotation = "gå").copy(gender = Gender.Ultra)
 
-        val result = mapUiStateToVocabulary(uiState, initialVocabulary = null, containerId = containerId)
+        // When
+        val result = save(uiState)
 
+        // Then
         expectThat(result).savedVocabulary().get { gender }.isNull()
     }
 
-    @Test
-    fun `IrregularPronunciation is null when it is blank`() {
-        val uiState = AddEditUiState(
-            selectedWordGroup = ViewWordGroup.Verb,
-            selectedSubGroup = ViewWordSubGroup.Verb(WordGroup.VerbSubgroup.GROUP_1),
-            irregularPronunciation = " ",
-            wordWithAnnotation = "gå",
-            translation = "walk",
-        )
+    @ParameterizedTest
+    @MethodSource("irregularPronunciations")
+    fun `Saves the irregular pronunciation only when it is not blank`(input: String?, expected: String?) {
+        // Given
+        val uiState = verb(wordWithAnnotation = "gå").copy(irregularPronunciation = input)
 
-        val result = mapUiStateToVocabulary(uiState, initialVocabulary = null, containerId = containerId)
+        // When
+        val result = save(uiState)
 
-        expectThat(result).savedVocabulary().get { irregularPronunciation }.isNull()
-    }
-
-    @Test
-    fun `IrregularPronunciation is kept when isIrregularPronunciation is true`() {
-        val uiState = AddEditUiState(
-            selectedWordGroup = ViewWordGroup.Verb,
-            selectedSubGroup = ViewWordSubGroup.Verb(WordGroup.VerbSubgroup.GROUP_1),
-            irregularPronunciation = "testPronunciation",
-            wordWithAnnotation = "gå",
-            translation = "walk",
-        )
-
-        val result = mapUiStateToVocabulary(uiState, initialVocabulary = null, containerId = containerId)
-
-        expectThat(result).savedVocabulary().get { irregularPronunciation }.isEqualTo("testPronunciation")
+        // Then
+        expectThat(result).savedVocabulary().get { irregularPronunciation }.isEqualTo(expected)
     }
 
     @Test
     fun `Word highlights and cleaned string are extracted from annotated input`() {
+        // Given
         val uiState = AddEditUiState(
             selectedWordGroup = ViewWordGroup.Noun,
             selectedSubGroup = ViewWordSubGroup.Noun(WordGroup.NounSubgroup.OR),
             wordWithAnnotation = "*p*enna",
-            translation = "pencil",
         )
 
-        val result = mapUiStateToVocabulary(uiState, initialVocabulary = null, containerId = containerId)
+        // When
+        val result = save(uiState)
 
+        // Then
         expectThat(result).savedVocabulary().and {
             get { word }.isEqualTo("penna")
             get { wordHighlights }.isEqualTo(listOf(0 to 1))
@@ -151,40 +123,32 @@ class MapUiStateToVocabularyTest {
 
     @Test
     fun `Saves prefix, suffix and the forms of the changing word`() {
-        val uiState = AddEditUiState(
-            selectedWordGroup = ViewWordGroup.Verb,
-            selectedSubGroup = ViewWordSubGroup.Verb(WordGroup.VerbSubgroup.GROUP_2A),
-            wordWithAnnotation = "att känna sig",
-            translation = "sich fühlen",
-            endings = "-er, -de, -t",
-        )
+        // Given
+        val uiState = verb(wordWithAnnotation = "att känna sig", subgroup = WordGroup.VerbSubgroup.GROUP_2A)
+            .copy(endings = "-er, -de, -t")
 
-        val result = mapUiStateToVocabulary(uiState, initialVocabulary = null, containerId = containerId)
+        // When
+        val result = save(uiState)
 
+        // Then
         expectThat(result).savedVocabulary().and {
             get { wordPrefix }.isEqualTo("")
             get { word }.isEqualTo("känna")
             get { wordSuffix }.isEqualTo("sig")
             get { ending }.isEqualTo("-er -de -t")
             get { listOf(form1, form2, form3) }.isEqualTo(listOf("känner", "kände", "känt"))
-            get { gender }.isNull()
         }
     }
 
     @Test
     fun `Written out forms are saved as forms and as full word endings`() {
-        val uiState = AddEditUiState(
-            selectedWordGroup = ViewWordGroup.Verb,
-            selectedSubGroup = ViewWordSubGroup.Verb(WordGroup.VerbSubgroup.GROUP_4_SPECIAL),
-            wordWithAnnotation = "ta en dusch",
-            translation = "duschen",
-            endings = "-r",
-            formsMode = FormsMode.WrittenOut,
-            writtenForms = listOf("tar", " tog ", "tagit"),
-        )
+        // Given
+        val uiState = writtenOutVerb("tar", " tog ", "tagit").copy(endings = "-r")
 
-        val result = mapUiStateToVocabulary(uiState, initialVocabulary = null, containerId = containerId)
+        // When
+        val result = save(uiState)
 
+        // Then
         expectThat(result).savedVocabulary().and {
             get { ending }.isEqualTo("tar tog tagit")
             get { listOf(form1, form2, form3) }.isEqualTo(listOf("tar", "tog", "tagit"))
@@ -193,31 +157,95 @@ class MapUiStateToVocabularyTest {
     }
 
     @Test
+    fun `Empty written out forms at the end are saved`() {
+        // Given
+        val uiState = AddEditUiState(
+            selectedWordGroup = ViewWordGroup.Noun,
+            selectedSubGroup = ViewWordSubGroup.Noun(WordGroup.NounSubgroup.SPECIAL),
+            wordWithAnnotation = "mat",
+            formsMode = FormsMode.WrittenOut,
+            writtenForms = listOf("maten", "", ""),
+        )
+
+        // When
+        val result = save(uiState)
+
+        // Then
+        expectThat(result).savedVocabulary().and {
+            get { ending }.isEqualTo("maten")
+            get { listOf(form1, form2, form3) }.isEqualTo(listOf("maten", null, null))
+        }
+    }
+
+    @Test
     fun `Forms with a pending review are saved with the review flag`() {
+        // Given
         val uiState = AddEditUiState(
             selectedWordGroup = ViewWordGroup.Noun,
             selectedSubGroup = ViewWordSubGroup.Noun(WordGroup.NounSubgroup.UNCHANGED_ETT),
             wordWithAnnotation = "exempel",
-            translation = "Beispiel",
             endings = "-et - -en",
         )
 
-        val result = mapUiStateToVocabulary(uiState, initialVocabulary = null, containerId = containerId)
+        // When
+        val result = save(uiState)
 
+        // Then
         expectThat(result).savedVocabulary().get { formsNeedReview }.isTrue()
     }
 
     @Test
+    fun `An adjective saves only two endings`() {
+        // Given
+        val uiState = AddEditUiState(
+            selectedWordGroup = ViewWordGroup.Adjective,
+            wordWithAnnotation = "glad",
+            endings = "-tt -a -are",
+        )
+
+        // When
+        val result = save(uiState)
+
+        // Then
+        expectThat(result).savedVocabulary().and {
+            get { ending }.isEqualTo("-tt -a")
+            get { listOf(form1, form2, form3) }.isEqualTo(listOf("glatt", "glada", null))
+        }
+    }
+
+    @Test
+    fun `An adjective saves only two written out forms`() {
+        // Given
+        val uiState = AddEditUiState(
+            selectedWordGroup = ViewWordGroup.Adjective,
+            wordWithAnnotation = "glad",
+            formsMode = FormsMode.WrittenOut,
+            writtenForms = listOf("glatt", "glada", "gladare"),
+        )
+
+        // When
+        val result = save(uiState)
+
+        // Then
+        expectThat(result).savedVocabulary().and {
+            get { ending }.isEqualTo("glatt glada")
+            get { listOf(form1, form2, form3) }.isEqualTo(listOf("glatt", "glada", null))
+        }
+    }
+
+    @Test
     fun `Phrases under other are saved without endings and forms`() {
+        // Given
         val uiState = AddEditUiState(
             selectedWordGroup = ViewWordGroup.Other,
             wordWithAnnotation = "en gång",
-            translation = "einmal",
             endings = "-er -de -t",
         )
 
-        val result = mapUiStateToVocabulary(uiState, initialVocabulary = null, containerId = containerId)
+        // When
+        val result = save(uiState)
 
+        // Then
         expectThat(result).savedVocabulary().and {
             get { word }.isEqualTo("en gång")
             get { ending }.isEqualTo("")
@@ -227,102 +255,8 @@ class MapUiStateToVocabularyTest {
     }
 
     @Test
-    fun `An adjective saves only two written out forms`() {
-        val uiState = AddEditUiState(
-            selectedWordGroup = ViewWordGroup.Adjective,
-            wordWithAnnotation = "glad",
-            formsMode = FormsMode.WrittenOut,
-            writtenForms = listOf("glatt", "glada", "gladare"),
-        )
-
-        val result = mapUiStateToVocabulary(uiState, initialVocabulary = null, containerId = containerId)
-
-        expectThat(result).savedVocabulary().and {
-            get { ending }.isEqualTo("glatt glada")
-            get { form1 }.isEqualTo("glatt")
-            get { form2 }.isEqualTo("glada")
-            get { form3 }.isNull()
-        }
-    }
-
-    @Test
-    fun `An adjective saves only two endings`() {
-        val uiState = AddEditUiState(
-            selectedWordGroup = ViewWordGroup.Adjective,
-            wordWithAnnotation = "glad",
-            endings = "-tt -a -are",
-        )
-
-        val result = mapUiStateToVocabulary(uiState, initialVocabulary = null, containerId = containerId)
-
-        expectThat(result).savedVocabulary().and {
-            get { ending }.isEqualTo("-tt -a")
-            get { form1 }.isEqualTo("glatt")
-            get { form2 }.isEqualTo("glada")
-            get { form3 }.isNull()
-        }
-    }
-
-    @Test
-    fun `Reports invalid highlights when they are outside the changing word`() {
-        val uiState = AddEditUiState(
-            selectedWordGroup = ViewWordGroup.Verb,
-            selectedSubGroup = ViewWordSubGroup.Verb(WordGroup.VerbSubgroup.GROUP_2A),
-            wordWithAnnotation = "känna s*i*g",
-        )
-
-        val result = mapUiStateToVocabulary(uiState, initialVocabulary = null, containerId = containerId)
-
-        expectThat(result).isEqualTo(SaveResult.InvalidHighlights)
-    }
-
-    @Test
-    fun `Reports a gap when a written out form before a filled one is empty`() {
-        val uiState = writtenOutVerb("", "tog", "tagit")
-
-        val result = mapUiStateToVocabulary(uiState, initialVocabulary = null, containerId = containerId)
-
-        expectThat(result).isEqualTo(SaveResult.InvalidWrittenForms(WrittenFormsError.Gap))
-    }
-
-    @Test
-    fun `A blank written out form counts as a gap`() {
-        val uiState = writtenOutVerb("tar", "  ", "tagit")
-
-        val result = mapUiStateToVocabulary(uiState, initialVocabulary = null, containerId = containerId)
-
-        expectThat(result).isEqualTo(SaveResult.InvalidWrittenForms(WrittenFormsError.Gap))
-    }
-
-    @Test
-    fun `Reports a space inside a written out form`() {
-        val uiState = writtenOutVerb("tar", "tog", "har tagit")
-
-        val result = mapUiStateToVocabulary(uiState, initialVocabulary = null, containerId = containerId)
-
-        expectThat(result).isEqualTo(SaveResult.InvalidWrittenForms(WrittenFormsError.Space))
-    }
-
-    @Test
-    fun `Empty written out forms at the end are saved`() {
-        val uiState = AddEditUiState(
-            selectedWordGroup = ViewWordGroup.Noun,
-            selectedSubGroup = ViewWordSubGroup.Noun(WordGroup.NounSubgroup.SPECIAL),
-            wordWithAnnotation = "mat",
-            formsMode = FormsMode.WrittenOut,
-            writtenForms = listOf("maten", "", ""),
-        )
-
-        val result = mapUiStateToVocabulary(uiState, initialVocabulary = null, containerId = containerId)
-
-        expectThat(result).savedVocabulary().and {
-            get { ending }.isEqualTo("maten")
-            get { listOf(form1, form2, form3) }.isEqualTo(listOf("maten", null, null))
-        }
-    }
-
-    @Test
     fun `Written out forms are not checked when the word group has no forms`() {
+        // Given
         val uiState = AddEditUiState(
             selectedWordGroup = ViewWordGroup.Other,
             wordWithAnnotation = "hur mår du",
@@ -330,21 +264,26 @@ class MapUiStateToVocabularyTest {
             writtenForms = listOf("", "a b"),
         )
 
-        val result = mapUiStateToVocabulary(uiState, initialVocabulary = null, containerId = containerId)
+        // When
+        val result = save(uiState)
 
+        // Then
         expectThat(result).isA<SaveResult.Valid>()
     }
 
     @Test
     fun `The preview shows a noun without subgroup as undefined noun`() {
+        // Given
         val uiState = AddEditUiState(
             selectedWordGroup = ViewWordGroup.Noun,
             wordWithAnnotation = "penna",
             translation = "pencil",
         )
 
+        // When
         val preview = uiState.toPreviewVocabulary()
 
+        // Then
         expectThat(preview) {
             get { word }.isEqualTo("penna")
             get { translation }.isEqualTo("pencil")
@@ -354,10 +293,13 @@ class MapUiStateToVocabularyTest {
 
     @Test
     fun `The preview shows a word without word group as other without forms`() {
+        // Given
         val uiState = AddEditUiState(wordWithAnnotation = "penna", endings = "-n -or -orna")
 
+        // When
         val preview = uiState.toPreviewVocabulary()
 
+        // Then
         expectThat(preview) {
             get { wordGroup }.isEqualTo(WordGroup.Other)
             get { ending }.isEqualTo("")
@@ -365,14 +307,69 @@ class MapUiStateToVocabularyTest {
         }
     }
 
-    private fun writtenOutVerb(vararg forms: String) = AddEditUiState(
-        selectedWordGroup = ViewWordGroup.Verb,
-        selectedSubGroup = ViewWordSubGroup.Verb(WordGroup.VerbSubgroup.GROUP_4_SPECIAL),
-        wordWithAnnotation = "ta",
-        formsMode = FormsMode.WrittenOut,
-        writtenForms = forms.toList(),
-    )
+    private fun save(uiState: AddEditUiState, initialVocabulary: Vocabulary? = null): SaveResult =
+        mapUiStateToVocabulary(uiState, initialVocabulary, CONTAINER_ID)
 
     private fun Assertion.Builder<SaveResult>.savedVocabulary(): Assertion.Builder<Vocabulary> =
         isA<SaveResult.Valid>().get { vocabulary }
+
+    companion object {
+        private const val CONTAINER_ID = 42
+
+        private fun verb(
+            wordWithAnnotation: String,
+            subgroup: WordGroup.VerbSubgroup = WordGroup.VerbSubgroup.GROUP_1,
+        ) = AddEditUiState(
+            selectedWordGroup = ViewWordGroup.Verb,
+            selectedSubGroup = ViewWordSubGroup.Verb(subgroup),
+            wordWithAnnotation = wordWithAnnotation,
+        )
+
+        private fun writtenOutVerb(vararg forms: String) =
+            verb(wordWithAnnotation = "ta", subgroup = WordGroup.VerbSubgroup.GROUP_4_SPECIAL).copy(
+                formsMode = FormsMode.WrittenOut,
+                writtenForms = forms.toList(),
+            )
+
+        @JvmStatic
+        fun unsavableInputs(): List<Arguments> = listOf(
+            argumentSet(
+                "no word group selected",
+                AddEditUiState(selectedWordGroup = null),
+                SaveResult.MissingWordGroup,
+            ),
+            argumentSet(
+                "noun without subgroup",
+                AddEditUiState(selectedWordGroup = ViewWordGroup.Noun, selectedSubGroup = ViewWordSubGroup.None),
+                SaveResult.MissingWordGroup,
+            ),
+            argumentSet(
+                "highlight outside the changing word",
+                verb(wordWithAnnotation = "känna s*i*g", subgroup = WordGroup.VerbSubgroup.GROUP_2A),
+                SaveResult.InvalidHighlights,
+            ),
+            argumentSet(
+                "empty written out form before a filled one",
+                writtenOutVerb("", "tog", "tagit"),
+                SaveResult.InvalidWrittenForms(WrittenFormsError.Gap),
+            ),
+            argumentSet(
+                "blank written out form counts as a gap",
+                writtenOutVerb("tar", "  ", "tagit"),
+                SaveResult.InvalidWrittenForms(WrittenFormsError.Gap),
+            ),
+            argumentSet(
+                "space inside a written out form",
+                writtenOutVerb("tar", "tog", "har tagit"),
+                SaveResult.InvalidWrittenForms(WrittenFormsError.Space),
+            ),
+        )
+
+        @JvmStatic
+        fun irregularPronunciations(): List<Arguments> = listOf(
+            argumentSet("blank is dropped", " ", null),
+            argumentSet("text is kept", "jå", "jå"),
+            argumentSet("Initial empty irregularPronunciation stays null", null, null),
+        )
+    }
 }
