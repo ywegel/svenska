@@ -169,7 +169,7 @@ data class AddEditUiState(
     val notes: String = "",
     val irregularPronunciation: String? = null,
     val isFavorite: Boolean = false,
-    val editingExistingVocabulary: String? = null,
+    val existingWord: String? = null,
 ) {
     val wordInput: WordInput by lazy { WordInput.parse(wordWithAnnotation, selectedWordGroup, chosenChangingIndex) }
 
@@ -245,7 +245,7 @@ data class AddEditUiState(
                 notes = vocabulary.notes,
                 irregularPronunciation = vocabulary.irregularPronunciation,
                 isFavorite = vocabulary.isFavorite,
-                editingExistingVocabulary = vocabulary.word,
+                existingWord = vocabulary.word,
             )
             return state.withStoredForms(vocabulary)
         }

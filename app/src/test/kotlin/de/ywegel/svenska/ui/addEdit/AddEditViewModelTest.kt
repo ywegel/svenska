@@ -86,7 +86,7 @@ class AddEditViewModelTest {
                     endings = "-er -de -t",
                     notes = "testNote",
                     irregularPronunciation = "testPronunciation",
-                    editingExistingVocabulary = "känna",
+                    existingWord = "känna",
                 ),
             )
         }

@@ -222,7 +222,7 @@ private fun Header(
     ) {
         TopBar(
             translation = uiState.translation,
-            editingExisting = uiState.editingExistingVocabulary,
+            editingExisting = uiState.existingWord,
             isFavorite = uiState.isFavorite,
             navigateUp = navigateUp,
             updateIsFavorite = updateIsFavorite,
@@ -324,7 +324,7 @@ private fun AddEditScreenSuggestionAndReviewPreview() {
                 wordWithAnnotation = "exempel",
                 translation = "Beispiel",
                 endings = "-et, -, -en",
-                editingExistingVocabulary = "exempel",
+                existingWord = "exempel",
             ),
             callbacks = AddEditVocabularyCallbacksFake,
             navigateUp = {},
@@ -346,7 +346,7 @@ private fun AddEditScreenWrittenOutPreview() {
                 formsMode = FormsMode.WrittenOut,
                 writtenForms = listOf("tar", "tog", "tagit"),
                 isFavorite = true,
-                editingExistingVocabulary = "ta",
+                existingWord = "ta",
             ),
             callbacks = AddEditVocabularyCallbacksFake,
             navigateUp = {},

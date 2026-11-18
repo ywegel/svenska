@@ -41,6 +41,7 @@ import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
+import de.ywegel.svenska.BuildConfig
 import de.ywegel.svenska.R
 import de.ywegel.svenska.data.model.WordGroup
 import de.ywegel.svenska.ui.addEdit.models.ViewWordGroup
@@ -106,7 +107,7 @@ fun FormsSection(uiState: AddEditUiState, callbacks: AddEditVocabularyCallbacks,
                 label = { Text(stringResource(R.string.addEdit_label_endings)) },
             )
             uiState.suggestedWordGroup?.let {
-                SuggestionChip(suggestion = it, onApply = callbacks::applySuggestedWordGroup)
+                WordGroupSuggestionChip(suggestion = it, onApply = callbacks::applySuggestedWordGroup)
             }
         }
 
@@ -148,7 +149,7 @@ private fun SwitchToEndingsDialog(onConfirm: () -> Unit, onDismiss: () -> Unit) 
 }
 
 @Composable
-private fun SuggestionChip(suggestion: WordGroup, onApply: () -> Unit) {
+private fun WordGroupSuggestionChip(suggestion: WordGroup, onApply: () -> Unit) {
     AssistChip(
         onClick = onApply,
         label = { Text(stringResource(R.string.addEdit_forms_suggestion, suggestion.userFacingName())) },
@@ -365,11 +366,17 @@ private fun formLabels(wordGroup: WordGroup): FormLabels = when (wordGroup) {
         ),
     )
 
-    else -> FormLabels(
+    WordGroup.Adjective -> FormLabels(
         base = stringResource(R.string.addEdit_form_adjective_base),
         forms = listOf(
             stringResource(R.string.addEdit_form_adjective_neuter),
             stringResource(R.string.addEdit_form_adjective_plural),
         ),
     )
+
+    // Unreachable: FormsSection is only shown when uiState.hasForms, and Other has no forms
+    WordGroup.Other -> {
+        check(!BuildConfig.DEBUG) { "Form labels requested for WordGroup.Other" }
+        FormLabels(base = "", forms = emptyList())
+    }
 }
