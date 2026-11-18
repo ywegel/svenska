@@ -252,11 +252,18 @@ private fun TopBar(
         title = { Text(text = title) },
         colors = TopAppBarDefaults.topAppBarColors(containerColor = SvenskaTheme.colors.surfaceContainer),
         navigationIcon = {
-            IconButton(icon = SvenskaIcons.Close, contentDescription = null, onClick = navigateUp)
+            IconButton(
+                icon = SvenskaIcons.Close,
+                contentDescription = stringResource(R.string.accessibility_addEdit_close),
+                onClick = navigateUp,
+            )
         },
         actions = {
             IconToggleButton(checked = isFavorite, onCheckedChange = updateIsFavorite) {
-                Icon(if (isFavorite) SvenskaIcons.Favorite else SvenskaIcons.FavoriteBorder, null)
+                Icon(
+                    imageVector = if (isFavorite) SvenskaIcons.Favorite else SvenskaIcons.FavoriteBorder,
+                    contentDescription = stringResource(R.string.accessibility_addEdit_favorite),
+                )
             }
             editingExisting?.let {
                 ConfirmableComponent(
@@ -266,7 +273,7 @@ private fun TopBar(
                 ) { onClick ->
                     IconButton(
                         icon = SvenskaIcons.Delete,
-                        contentDescription = null,
+                        contentDescription = stringResource(R.string.accessibility_addEdit_delete),
                         onClick = onClick,
                     )
                 }

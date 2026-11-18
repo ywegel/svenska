@@ -9,6 +9,7 @@ import de.ywegel.svenska.HiltTestActivity
 import de.ywegel.svenska.data.ContainerRepository
 import de.ywegel.svenska.data.VocabularyRepository
 import de.ywegel.svenska.data.db.VocabularyDatabase
+import de.ywegel.svenska.data.model.Vocabulary
 import de.ywegel.svenska.data.model.VocabularyContainer
 import de.ywegel.svenska.data.model.WordGroup
 import de.ywegel.svenska.data.model.vocabulary
@@ -19,6 +20,7 @@ import de.ywegel.svenska.userflows.robots.ContainerRobot
 import de.ywegel.svenska.userflows.robots.OverviewRobot
 import de.ywegel.svenska.userflows.robots.SettingsRobot
 import de.ywegel.svenska.userflows.robots.VocabularyDetailRobot
+import de.ywegel.svenska.userflows.robots.WordGroupsRobot
 import de.ywegel.svenska.userflows.robots.WordImporterRobot
 import kotlinx.coroutines.runBlocking
 import org.junit.After
@@ -27,6 +29,10 @@ import org.junit.Rule
 import org.junit.runner.RunWith
 import org.robolectric.RobolectricTestRunner
 import org.robolectric.annotation.Config
+import strikt.api.expectThat
+import strikt.assertions.isEmpty
+import strikt.assertions.isEqualTo
+import strikt.assertions.single
 import javax.inject.Inject
 
 // Subclasses still need @HiltAndroidTest, Hilt does not pick it up from the base class
@@ -90,6 +96,25 @@ abstract class UserFlowTest {
         )
     }
 
+    /** Stores the [vocabulary] as it is and returns it with its generated id. */
+    protected fun givenVocabulary(vocabulary: Vocabulary): Vocabulary = runBlocking {
+        val id = vocabularyRepository.upsertVocabulary(vocabulary)
+        vocabulary.copy(id = id.toInt())
+    }
+
+    /** Ignores id and timestamps, the database and the save generate them. */
+    protected fun assertSavedVocabularyIs(container: VocabularyContainer, expected: Vocabulary) {
+        val saved = runBlocking { vocabularyRepository.getAllVocabulariesSnapshot(container.id) }
+        expectThat(saved).single().get { withoutGeneratedValues() }.isEqualTo(expected.withoutGeneratedValues())
+    }
+
+    protected fun assertNoVocabularyIsSaved(container: VocabularyContainer) {
+        val saved = runBlocking { vocabularyRepository.getAllVocabulariesSnapshot(container.id) }
+        expectThat(saved).isEmpty()
+    }
+
+    private fun Vocabulary.withoutGeneratedValues() = copy(id = 0, created = 0, lastEdited = 0)
+
     protected fun container(block: ContainerRobot.() -> Unit) = ContainerRobot(composeRule).block()
 
     protected fun overview(block: OverviewRobot.() -> Unit) = OverviewRobot(composeRule).block()
@@ -99,6 +124,8 @@ abstract class UserFlowTest {
     protected fun addEdit(block: AddEditRobot.() -> Unit) = AddEditRobot(composeRule).block()
 
     protected fun settings(block: SettingsRobot.() -> Unit) = SettingsRobot(composeRule).block()
+
+    protected fun wordGroups(block: WordGroupsRobot.() -> Unit) = WordGroupsRobot(composeRule).block()
 
     protected fun wordImporter(block: WordImporterRobot.() -> Unit) = WordImporterRobot(composeRule).block()
 }
