@@ -12,7 +12,6 @@
     <!-- # AddEdit # -->
     <string name="accessibility_addEdit_navigate_word_group_info_screen">Navigate to WordGroups screen</string>
     <string name="accessibility_addEdit_gender_toggle">Gender %1$s, switch to %2$s</string>
-    <string name="accessibility_addEdit_forms_review">Forms need review</string>
     <string name="accessibility_addEdit_fab_done">Save Vocabulary</string>
     <string name="accessibility_addEdit_close">Close without saving</string>
     <string name="accessibility_addEdit_favorite">Favorite</string>

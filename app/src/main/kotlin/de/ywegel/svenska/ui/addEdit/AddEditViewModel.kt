@@ -149,6 +149,6 @@ class AddEditViewModel @Inject constructor(
     }
 }
 
-private fun AddEditUiState.withArticleGender(): AddEditUiState =
+internal fun AddEditUiState.withArticleGender(): AddEditUiState =
     wordInput.articleGender?.let { copy(gender = it) } ?: this
 
