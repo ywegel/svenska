@@ -137,6 +137,10 @@
     <string name="addEdit_forms_suggestion">Looks like %1$s · Apply</string>
     <string name="addEdit_forms_gap_error">Fill in the forms from the top, only the last ones can stay empty</string>
     <string name="addEdit_forms_space_error">Type only the word that changes, without spaces</string>
+    <plurals name="addEdit_forms_too_many_endings">
+        <item quantity="one">Too many endings, only the first one is used</item>
+        <item quantity="other">Too many endings, only the first %1$d are used</item>
+    </plurals>
     <string name="addEdit_forms_review_title">Please check these forms</string>
     <string name="addEdit_forms_review_write_out">Write out</string>
     <string name="addEdit_forms_review_confirm">Looks right</string>

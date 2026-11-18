@@ -34,6 +34,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.SolidColor
+import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.SpanStyle
@@ -44,6 +45,7 @@ import androidx.compose.ui.unit.dp
 import de.ywegel.svenska.BuildConfig
 import de.ywegel.svenska.R
 import de.ywegel.svenska.data.model.WordGroup
+import de.ywegel.svenska.domain.words.formCount
 import de.ywegel.svenska.domain.words.splitAtChange
 import de.ywegel.svenska.ui.addEdit.models.ViewWordGroup
 import de.ywegel.svenska.ui.addEdit.models.userFacingString
@@ -117,7 +119,19 @@ fun FormsSection(uiState: AddEditUiState, callbacks: AddEditVocabularyCallbacks,
         }
 
         uiState.writtenFormsError?.let { WrittenFormsErrorText(it) }
+        if (uiState.hasTooManyEndings) TooManyEndingsText(usedEndings = uiState.formWordGroup.formCount)
     }
+}
+
+/** Only a hint, saving still works. That's why it is not in the error color. */
+@Composable
+private fun TooManyEndingsText(usedEndings: Int) {
+    Text(
+        text = pluralStringResource(R.plurals.addEdit_forms_too_many_endings, usedEndings, usedEndings),
+        style = SvenskaTheme.typography.bodySmall,
+        color = SvenskaTheme.colors.onSurfaceVariant,
+        modifier = Modifier.padding(horizontal = Spacings.m),
+    )
 }
 
 @Composable

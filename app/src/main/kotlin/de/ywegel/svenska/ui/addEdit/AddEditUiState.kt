@@ -47,8 +47,10 @@ data class AddEditUiState(
      * group has. Forms beyond that stay in [writtenForms], so they come back when switching to a group with more forms.
      */
     val forms: List<String>
-        get() = (if (formsMode == FormsMode.WrittenOut) writtenForms.withAllSlots() else builtForms.forms)
-            .take(formWordGroup.formCount)
+        get() {
+            val allForms = if (formsMode == FormsMode.WrittenOut) writtenForms else builtForms.forms
+            return allForms.withAllSlots().take(formWordGroup.formCount)
+        }
 
     val hasForms: Boolean
         get() = formWordGroup.formCount > 0
@@ -72,6 +74,11 @@ data class AddEditUiState(
             forms.dropLastWhile { it.isEmpty() }.any { it.isEmpty() } -> WrittenFormsError.Gap
             else -> null
         }
+    }
+
+    /** More endings than the word group has forms. Only a hint: the extra ones are not shown, saving still works. */
+    val hasTooManyEndings: Boolean by lazy {
+        formsMode == FormsMode.Endings && hasForms && formInputs.endings.size > formWordGroup.formCount
     }
 
     /** Switching back to the endings would replace forms the user wrote out differently. */
