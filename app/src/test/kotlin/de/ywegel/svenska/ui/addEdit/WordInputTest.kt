@@ -6,6 +6,7 @@ import de.ywegel.svenska.ui.addEdit.models.ViewWordGroup
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.Arguments
+import org.junit.jupiter.params.provider.Arguments.argumentSet
 import org.junit.jupiter.params.provider.MethodSource
 import strikt.api.expectThat
 import strikt.assertions.isEqualTo
@@ -50,13 +51,14 @@ class WordInputTest {
         expectThat(result.article).isEqualTo(article)
     }
 
-    @Test
-    fun `articleGender maps ett to neuter`() {
+    @ParameterizedTest
+    @MethodSource("articleGenderCases")
+    fun `articleGender maps the article to its gender`(text: String, group: ViewWordGroup, gender: Gender?) {
         // When
-        val result = WordInput.parse("ett hus", ViewWordGroup.Noun, chosenIndex = null)
+        val result = WordInput.parse(text, group, chosenIndex = null)
 
         // Then
-        expectThat(result.articleGender).isEqualTo(Gender.Neutra)
+        expectThat(result.articleGender).isEqualTo(gender)
     }
 
     @Test
@@ -119,6 +121,13 @@ class WordInputTest {
             Arguments.of("att vara", ViewWordGroup.Noun, null),
             Arguments.of("en gång", ViewWordGroup.Other, null),
             Arguments.of("en gång", null, null),
+        )
+
+        @JvmStatic
+        fun articleGenderCases(): List<Arguments> = listOf(
+            argumentSet("en is utrum", "en bil", ViewWordGroup.Noun, Gender.Ultra),
+            argumentSet("ett is neutrum", "ett hus", ViewWordGroup.Noun, Gender.Neutra),
+            argumentSet("att has no gender", "att vara", ViewWordGroup.Verb, null),
         )
 
         @JvmStatic

@@ -26,9 +26,14 @@ import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
+import org.junit.jupiter.params.ParameterizedTest
+import org.junit.jupiter.params.provider.Arguments
+import org.junit.jupiter.params.provider.Arguments.argumentSet
+import org.junit.jupiter.params.provider.MethodSource
 import strikt.api.expectThat
 import strikt.assertions.isEqualTo
 import strikt.assertions.isFalse
+import strikt.assertions.isNull
 import strikt.assertions.isTrue
 
 class AddEditViewModelTest {
@@ -115,6 +120,26 @@ class AddEditViewModelTest {
         }
 
         @Test
+        fun `Stored forms with a pending review show the review hint again`() {
+            // Given
+            val initial = exempel().copy(
+                form1 = "exempelet",
+                form2 = "exempel",
+                form3 = "exempelen",
+                formsNeedReview = true,
+            )
+
+            // When
+            val viewModel = setupViewModel(initialVocabulary = initial)
+
+            // Then
+            expectThat(viewModel.uiState.value) {
+                get { formsMode }.isEqualTo(FormsMode.Endings)
+                get { showReviewHint }.isTrue()
+            }
+        }
+
+        @Test
         fun `Words without stored forms show the review hint, if the built forms need a review`() {
             // When
             val viewModel = setupViewModel(initialVocabulary = exempel())
@@ -135,6 +160,53 @@ class AddEditViewModelTest {
 
         // Then
         expectThat(viewModel.uiState.value.gender).isEqualTo(Gender.Neutra)
+    }
+
+    @Test
+    fun `Selecting noun sets the gender of an article typed before`() {
+        // Given
+        val viewModel = setupViewModel()
+        viewModel.updateWordWithAnnotation("ett hus")
+        expectThat(viewModel.uiState.value.gender).isEqualTo(Gender.Ultra)
+
+        // When
+        viewModel.updateSelectedWordGroup(ViewWordGroup.Noun)
+
+        // Then
+        expectThat(viewModel.uiState.value.gender).isEqualTo(Gender.Neutra)
+    }
+
+    @ParameterizedTest
+    @MethodSource("wordGroupSelections")
+    fun `Selecting a word group keeps the subgroup only for the same group`(
+        group: ViewWordGroup,
+        expectedSubGroup: ViewWordSubGroup,
+    ) {
+        // Given
+        val viewModel = setupViewModel(initialVocabulary = penna())
+        expectThat(viewModel.uiState.value.selectedWordGroup).isEqualTo(ViewWordGroup.Noun)
+        expectThat(viewModel.uiState.value.selectedSubGroup).isEqualTo(ViewWordSubGroup.Noun(WordGroup.NounSubgroup.OR))
+
+        // When
+        viewModel.updateSelectedWordGroup(group)
+
+        // Then
+        expectThat(viewModel.uiState.value.selectedSubGroup).isEqualTo(expectedSubGroup)
+    }
+
+    @Test
+    fun `Tapping a word makes it the changing word`() {
+        // Given
+        val viewModel = setupViewModel()
+        viewModel.updateSelectedWordGroup(ViewWordGroup.Verb)
+        viewModel.updateWordWithAnnotation("ta en dusch")
+        expectThat(viewModel.uiState.value.wordInput.word).isEqualTo("ta")
+
+        // When
+        viewModel.selectChangingWord(2)
+
+        // Then
+        expectThat(viewModel.uiState.value.wordInput.word).isEqualTo("dusch")
     }
 
     @Nested
@@ -299,6 +371,20 @@ class AddEditViewModelTest {
         }
     }
 
+    @Test
+    fun `Applying without a suggestion changes nothing`() {
+        // Given
+        val viewModel = setupViewModel(initialVocabulary = penna())
+        val before = viewModel.uiState.value
+        expectThat(before.suggestedWordGroup).isNull()
+
+        // When
+        viewModel.applySuggestedWordGroup()
+
+        // Then
+        expectThat(viewModel.uiState.value).isEqualTo(before)
+    }
+
     @Nested
     inner class Saving {
         @Test
@@ -317,6 +403,21 @@ class AddEditViewModelTest {
                 expectThat(awaitItem()).isEqualTo(AddEditViewModel.UiEvent.NavigateUp)
                 expectNoEvents()
             }
+        }
+
+        @Test
+        fun `Confirmed forms are saved without the review flag`() = runTest(testDispatcher) {
+            // Given
+            val repository = mockk<VocabularyRepository>(relaxed = true)
+            val viewModel = setupViewModel(initialVocabulary = exempel(), repository = repository)
+            viewModel.confirmForms()
+
+            // When
+            viewModel.saveAndNavigateUp()
+            advanceUntilIdle()
+
+            // Then
+            coVerify { repository.upsertVocabulary(match { !it.formsNeedReview }) }
         }
 
         @Test
@@ -356,6 +457,46 @@ class AddEditViewModelTest {
         }
     }
 
+    @Nested
+    inner class Deleting {
+        @Test
+        fun `An existing vocabulary is deleted and the screen navigates up`() = runTest(testDispatcher) {
+            // Given
+            val repository = mockk<VocabularyRepository>(relaxed = true)
+            val initial = penna()
+            val viewModel = setupViewModel(initialVocabulary = initial, repository = repository)
+
+            // When
+            viewModel.deleteVocabulary()
+            advanceUntilIdle()
+
+            // Then
+            coVerify { repository.deleteVocabulary(initial) }
+            viewModel.uiEvents.test {
+                expectThat(awaitItem()).isEqualTo(AddEditViewModel.UiEvent.NavigateUp)
+                expectNoEvents()
+            }
+        }
+
+        @Test
+        fun `A new vocabulary is not deleted, but the screen navigates up`() = runTest(testDispatcher) {
+            // Given
+            val repository = mockk<VocabularyRepository>(relaxed = true)
+            val viewModel = setupViewModel(repository = repository)
+
+            // When
+            viewModel.deleteVocabulary()
+            advanceUntilIdle()
+
+            // Then
+            coVerify(exactly = 0) { repository.deleteVocabulary(any()) }
+            viewModel.uiEvents.test {
+                expectThat(awaitItem()).isEqualTo(AddEditViewModel.UiEvent.NavigateUp)
+                expectNoEvents()
+            }
+        }
+    }
+
     private fun penna(form2: String? = null) = Vocabulary(
         word = "penna",
         translation = "pencil",
@@ -389,6 +530,18 @@ class AddEditViewModelTest {
             repository = repository,
             ioDispatcher = dispatcher,
             immediateDispatcher = dispatcher,
+        )
+    }
+
+    companion object {
+        @JvmStatic
+        fun wordGroupSelections(): List<Arguments> = listOf(
+            argumentSet("another group resets the subgroup", ViewWordGroup.Verb, ViewWordSubGroup.None),
+            argumentSet(
+                "the same group keeps the subgroup",
+                ViewWordGroup.Noun,
+                ViewWordSubGroup.Noun(WordGroup.NounSubgroup.OR),
+            ),
         )
     }
 }

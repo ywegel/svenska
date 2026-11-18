@@ -335,6 +335,36 @@ class MapUiStateToVocabularyTest {
         expectThat(result).isA<SaveResult.Valid>()
     }
 
+    @Test
+    fun `The preview shows a noun without subgroup as undefined noun`() {
+        val uiState = AddEditUiState(
+            selectedWordGroup = ViewWordGroup.Noun,
+            wordWithAnnotation = "penna",
+            translation = "pencil",
+        )
+
+        val preview = uiState.toPreviewVocabulary()
+
+        expectThat(preview) {
+            get { word }.isEqualTo("penna")
+            get { translation }.isEqualTo("pencil")
+            get { wordGroup }.isEqualTo(WordGroup.Noun(WordGroup.NounSubgroup.UNDEFINED))
+        }
+    }
+
+    @Test
+    fun `The preview shows a word without word group as other without forms`() {
+        val uiState = AddEditUiState(wordWithAnnotation = "penna", endings = "-n -or -orna")
+
+        val preview = uiState.toPreviewVocabulary()
+
+        expectThat(preview) {
+            get { wordGroup }.isEqualTo(WordGroup.Other)
+            get { ending }.isEqualTo("")
+            get { form1 }.isNull()
+        }
+    }
+
     private fun writtenOutVerb(vararg forms: String) = AddEditUiState(
         selectedWordGroup = ViewWordGroup.Verb,
         selectedSubGroup = ViewWordSubGroup.Verb(WordGroup.VerbSubgroup.GROUP_4_SPECIAL),
