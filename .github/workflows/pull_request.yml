@@ -106,7 +106,8 @@ jobs:
         uses: gradle/actions/setup-gradle@v6
 
       - name: Run unit tests
-        run: ./gradlew test --build-cache --parallel --max-workers=2
+        # Also renders the screenshot tests for coverage, they only fail on crashes, not on diffs
+        run: ./gradlew testDebugUnitTest koverXmlReportDebug -Proborazzi.test.compare=true --build-cache --parallel --max-workers=2
 
       - name: Upload test results
         uses: actions/upload-artifact@v7
@@ -116,15 +117,12 @@ jobs:
           path: '**/build/reports/tests/'
           retention-days: 7
 
-      - name: Generate Coverage Report
-        run: ./gradlew koverXmlReport
-
       - name: Post coverage comment
         uses: mi-kas/kover-report@v2
         if: github.event_name == 'pull_request'
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
-          path: app/build/reports/kover/report.xml
+          path: app/build/reports/kover/reportDebug.xml
           title: Code Coverage Report
           coverage-counter-type: BRANCH
 
