@@ -31,7 +31,6 @@ import javax.inject.Inject
 class AddEditViewModel @Inject constructor(
     savedStateHandle: SavedStateHandle,
     private val repository: VocabularyRepository,
-    private val mapUiStateToVocabularyUseCase: MapUiStateToVocabularyUseCase,
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
     @ImmediateDispatcher private val immediateDispatcher: CoroutineDispatcher,
 ) : ViewModel(), AddEditVocabularyCallbacks {
@@ -130,22 +129,18 @@ class AddEditViewModel @Inject constructor(
     }
 
     override fun saveAndNavigateUp() {
-        // The error is already shown under the word field
-        if (uiState.value.wordInput.hasHighlightError) return
-
-        val vocab = mapUiStateToVocabularyUseCase(uiState.value, initialVocabulary, containerId)
-            ?: run {
-                viewModelScope.launch(immediateDispatcher) {
-                    _uiEvents.send(UiEvent.InvalidWordGroupConfiguration)
+        when (val result = mapUiStateToVocabulary(uiState.value, initialVocabulary, containerId)) {
+            is SaveResult.Valid -> viewModelScope.launch(ioDispatcher) {
+                repository.upsertVocabulary(result.vocabulary)
+                withContext(immediateDispatcher) {
+                    _uiEvents.send(UiEvent.NavigateUp)
                 }
-                return
             }
-
-        viewModelScope.launch(ioDispatcher) {
-            repository.upsertVocabulary(vocab)
-            withContext(immediateDispatcher) {
-                _uiEvents.send(UiEvent.NavigateUp)
+            SaveResult.MissingWordGroup -> viewModelScope.launch(immediateDispatcher) {
+                _uiEvents.send(UiEvent.InvalidWordGroupConfiguration)
             }
+            // The error is shown under the word field
+            SaveResult.InvalidHighlights -> Unit
         }
     }
 

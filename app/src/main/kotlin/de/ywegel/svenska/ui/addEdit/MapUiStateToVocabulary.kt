@@ -4,12 +4,22 @@ import de.ywegel.svenska.data.model.Vocabulary
 import de.ywegel.svenska.data.model.WordGroup
 import de.ywegel.svenska.ui.addEdit.models.ViewWordGroup
 import de.ywegel.svenska.ui.addEdit.models.ViewWordSubGroup
-import javax.inject.Inject
+
+/** The outcome of mapping the input to a [Vocabulary]. An invalid input says what is wrong with it. */
+sealed interface SaveResult {
+    data class Valid(val vocabulary: Vocabulary) : SaveResult
+
+    /** No [ViewWordGroup] is selected, or the selected one lacks its [ViewWordSubGroup]. */
+    data object MissingWordGroup : SaveResult
+
+    /** The highlight stars are unbalanced or outside the changing word. The word field shows this error. */
+    data object InvalidHighlights : SaveResult
+}
 
 /**
  * Maps a [AddEditUiState] and optional [initialVocabulary] into a [Vocabulary] object.
  *
- * This use case is used in Add/Edit screens where vocabulary entries are either created from scratch
+ * Used in the Add/Edit screen where vocabulary entries are either created from scratch
  * or updated based on user input.
  *
  * It handles:
@@ -21,24 +31,14 @@ import javax.inject.Inject
  * @param snapshot the current UI state containing the user's input
  * @param initialVocabulary the existing vocabulary if the screen is in edit mode, or null for creation mode
  * @param containerId the ID of the container to associate with the new vocabulary (ignored if editing)
- * @return a [Vocabulary] object ready for persistence, or null if the input can't be saved
- *
- * Returns null if:
- * - No [ViewWordGroup] is selected
- * - The selected [ViewWordGroup] does not match the [ViewWordSubGroup] (e.g., noun selected but verb subgroup passed)
- * - The highlight stars are unbalanced or outside the changing word
- *
- * This allows the ViewModel to signal validation errors and block saving if required fields are missing.
+ * @return [SaveResult.Valid] with a [Vocabulary] ready for persistence, or the reason the input can't be saved
  */
-class MapUiStateToVocabularyUseCase @Inject constructor() {
+fun mapUiStateToVocabulary(snapshot: AddEditUiState, initialVocabulary: Vocabulary?, containerId: Int): SaveResult {
+    val wordGroup = snapshot.selectedWordGroup?.toWordGroup(snapshot.selectedSubGroup)
+        ?: return SaveResult.MissingWordGroup
+    if (snapshot.wordInput.hasHighlightError) return SaveResult.InvalidHighlights
 
-    operator fun invoke(snapshot: AddEditUiState, initialVocabulary: Vocabulary?, containerId: Int): Vocabulary? {
-        val viewWordGroup = snapshot.selectedWordGroup ?: return null
-        val wordGroup = viewWordGroup.toWordGroup(snapshot.selectedSubGroup) ?: return null
-        if (snapshot.wordInput.hasHighlightError) return null
-
-        return snapshot.toVocabulary(wordGroup, initialVocabulary, containerId)
-    }
+    return SaveResult.Valid(snapshot.toVocabulary(wordGroup, initialVocabulary, containerId))
 }
 
 /** The vocabulary as the list shows it, also while the input is still incomplete. */

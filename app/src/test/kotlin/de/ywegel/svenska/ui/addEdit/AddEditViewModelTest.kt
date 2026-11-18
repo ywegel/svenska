@@ -8,15 +8,12 @@ import de.ywegel.svenska.data.VocabularyRepository
 import de.ywegel.svenska.data.model.Gender
 import de.ywegel.svenska.data.model.Vocabulary
 import de.ywegel.svenska.data.model.WordGroup
-import de.ywegel.svenska.data.model.vocabulary
 import de.ywegel.svenska.fakes.VocabularyRepositoryFake
 import de.ywegel.svenska.ui.addEdit.models.ViewWordGroup
 import de.ywegel.svenska.ui.addEdit.models.ViewWordSubGroup
 import io.mockk.clearAllMocks
 import io.mockk.coVerify
-import io.mockk.every
 import io.mockk.mockk
-import io.mockk.verify
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -263,21 +260,17 @@ class AddEditViewModelTest {
     @Nested
     inner class Saving {
         @Test
-        fun `saveAndNavigateUp runs the use case and upserts the vocabulary correctly`() = runTest(testDispatcher) {
+        fun `A valid input is upserted and the screen navigates up`() = runTest(testDispatcher) {
             // Given
-            val expectedVocabulary = vocabulary()
-            val mapper = mockk<MapUiStateToVocabularyUseCase> {
-                every { this@mockk.invoke(any(), any(), any()) } returns expectedVocabulary
-            }
             val repository = mockk<VocabularyRepository>(relaxed = true)
-            val viewModel = setupViewModel(mapper = mapper, repository = repository)
+            val viewModel = setupViewModel(initialVocabulary = penna(), repository = repository)
 
             // When
             viewModel.saveAndNavigateUp()
             advanceUntilIdle()
 
             // Then
-            coVerify { repository.upsertVocabulary(expectedVocabulary) }
+            coVerify { repository.upsertVocabulary(match { it.word == "penna" }) }
             viewModel.uiEvents.test {
                 expectThat(awaitItem()).isEqualTo(AddEditViewModel.UiEvent.NavigateUp)
                 expectNoEvents()
@@ -285,13 +278,10 @@ class AddEditViewModelTest {
         }
 
         @Test
-        fun `saveAndNavigateUp emits an error event if the use case fails`() = runTest(testDispatcher) {
+        fun `A missing word group is reported and nothing is saved`() = runTest(testDispatcher) {
             // Given
-            val mapper = mockk<MapUiStateToVocabularyUseCase> {
-                every { this@mockk.invoke(any(), any(), any()) } returns null
-            }
             val repository = mockk<VocabularyRepository>(relaxed = true)
-            val viewModel = setupViewModel(mapper = mapper, repository = repository)
+            val viewModel = setupViewModel(repository = repository)
 
             // When
             viewModel.saveAndNavigateUp()
@@ -306,11 +296,12 @@ class AddEditViewModelTest {
         }
 
         @Test
-        fun `saveAndNavigateUp does nothing while the highlights are invalid`() = runTest(testDispatcher) {
+        fun `Invalid highlights are not reported again and nothing is saved`() = runTest(testDispatcher) {
             // Given
-            val mapper = mockk<MapUiStateToVocabularyUseCase>()
-            val viewModel = setupViewModel(mapper = mapper)
+            val repository = mockk<VocabularyRepository>(relaxed = true)
+            val viewModel = setupViewModel(repository = repository)
             viewModel.updateSelectedWordGroup(ViewWordGroup.Verb)
+            viewModel.updateSelectedSubWordGroup(ViewWordSubGroup.Verb(WordGroup.VerbSubgroup.GROUP_2A))
             viewModel.updateWordWithAnnotation("känna s*i*g")
 
             // When
@@ -318,7 +309,7 @@ class AddEditViewModelTest {
             advanceUntilIdle()
 
             // Then
-            verify(exactly = 0) { mapper.invoke(any(), any(), any()) }
+            coVerify(exactly = 0) { repository.upsertVocabulary(any()) }
             viewModel.uiEvents.test { expectNoEvents() }
         }
     }
@@ -348,7 +339,6 @@ class AddEditViewModelTest {
         initialVocabulary: Vocabulary? = null,
         repository: VocabularyRepository = VocabularyRepositoryFake(),
         dispatcher: CoroutineDispatcher = testDispatcher,
-        mapper: MapUiStateToVocabularyUseCase = MapUiStateToVocabularyUseCase(),
     ): AddEditViewModel {
         return AddEditViewModel(
             savedStateHandle = SavedStateHandle(
@@ -357,7 +347,6 @@ class AddEditViewModelTest {
             repository = repository,
             ioDispatcher = dispatcher,
             immediateDispatcher = dispatcher,
-            mapUiStateToVocabularyUseCase = mapper,
         )
     }
 }

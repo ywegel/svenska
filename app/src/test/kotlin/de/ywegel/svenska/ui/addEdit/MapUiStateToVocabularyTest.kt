@@ -1,42 +1,40 @@
 package de.ywegel.svenska.ui.addEdit
 
 import de.ywegel.svenska.data.model.Gender
+import de.ywegel.svenska.data.model.Vocabulary
 import de.ywegel.svenska.data.model.WordGroup
 import de.ywegel.svenska.data.model.vocabulary
 import de.ywegel.svenska.ui.addEdit.models.ViewWordGroup
 import de.ywegel.svenska.ui.addEdit.models.ViewWordSubGroup
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import org.junit.jupiter.api.Test
+import strikt.api.Assertion
 import strikt.api.expectThat
+import strikt.assertions.isA
 import strikt.assertions.isEqualTo
 import strikt.assertions.isFalse
 import strikt.assertions.isGreaterThan
-import strikt.assertions.isNotNull
 import strikt.assertions.isNull
 import strikt.assertions.isTrue
 import kotlin.time.Clock
 import kotlin.time.Duration.Companion.days
-import kotlin.time.ExperimentalTime
 
 @ExperimentalCoroutinesApi
-class MapUiStateToVocabularyUseCaseTest {
+class MapUiStateToVocabularyTest {
 
-    private val useCase = MapUiStateToVocabularyUseCase()
     private val containerId = 42
 
     @Test
-    fun `Returns null when selectedWordGroup is null`() {
+    fun `Reports a missing word group when none is selected`() {
         val uiState = AddEditUiState(selectedWordGroup = null)
-        val result = useCase(
-            snapshot = uiState,
-            initialVocabulary = null,
-            containerId = containerId,
-        )
-        expectThat(result).isNull()
+
+        val result = mapUiStateToVocabulary(uiState, null, containerId)
+
+        expectThat(result).isEqualTo(SaveResult.MissingWordGroup)
     }
 
     @Test
-    fun `Returns null when toWordGroup mapping fails`() {
+    fun `Reports a missing word group when the subgroup is missing`() {
         val uiState = AddEditUiState(
             selectedWordGroup = ViewWordGroup.Noun,
             selectedSubGroup = ViewWordSubGroup.None,
@@ -44,9 +42,9 @@ class MapUiStateToVocabularyUseCaseTest {
             translation = "pencil",
         )
 
-        val result = useCase(uiState, null, containerId)
+        val result = mapUiStateToVocabulary(uiState, null, containerId)
 
-        expectThat(result).isNull()
+        expectThat(result).isEqualTo(SaveResult.MissingWordGroup)
     }
 
     @Test
@@ -59,23 +57,19 @@ class MapUiStateToVocabularyUseCaseTest {
             gender = Gender.Ultra,
         )
 
-        val result = useCase(
-            snapshot = uiState,
-            initialVocabulary = null,
-            containerId = containerId,
-        )
+        val result = mapUiStateToVocabulary(uiState, initialVocabulary = null, containerId = containerId)
 
-        expectThat(result).isNotNull()
-        expectThat(result!!.word).isEqualTo("penna")
-        expectThat(result.translation).isEqualTo("pencil")
-        expectThat(result.wordGroup).isEqualTo(WordGroup.Noun(WordGroup.NounSubgroup.OR))
-        expectThat(result.gender).isEqualTo(Gender.Ultra)
-        expectThat(result.containerId).isEqualTo(containerId)
-        expectThat(result.created).isGreaterThan(0)
-        expectThat(result.lastEdited).isGreaterThan(0)
+        expectThat(result).savedVocabulary().and {
+            get { word }.isEqualTo("penna")
+            get { translation }.isEqualTo("pencil")
+            get { wordGroup }.isEqualTo(WordGroup.Noun(WordGroup.NounSubgroup.OR))
+            get { gender }.isEqualTo(Gender.Ultra)
+            get { this.containerId }.isEqualTo(containerId)
+            get { created }.isGreaterThan(0)
+            get { lastEdited }.isGreaterThan(0)
+        }
     }
 
-    @OptIn(ExperimentalTime::class)
     @Test
     fun `Preserves created value and updates everything else when editing existing vocabulary`() {
         val initialCreationTime = Clock.System.now().minus(30.days)
@@ -85,17 +79,12 @@ class MapUiStateToVocabularyUseCaseTest {
         )
         val uiState = AddEditUiState.fromExistingVocabulary(initial)
 
-        val result = useCase(
-            snapshot = uiState,
-            initialVocabulary = initial,
-            containerId = containerId,
-        )
+        val result = mapUiStateToVocabulary(uiState, initialVocabulary = initial, containerId = containerId)
 
-        expectThat(result).isNotNull()
-        expectThat(result!!.created).isEqualTo(initial.created)
-        expectThat(result.created).isEqualTo(initialCreationTime.toEpochMilliseconds())
-        expectThat(result.lastEdited).isGreaterThan(initial.lastEdited)
-        expectThat(result.lastEdited).isGreaterThan(initialCreationTime.toEpochMilliseconds())
+        expectThat(result).savedVocabulary().and {
+            get { created }.isEqualTo(initialCreationTime.toEpochMilliseconds())
+            get { lastEdited }.isGreaterThan(initial.lastEdited)
+        }
     }
 
     @Test
@@ -108,14 +97,9 @@ class MapUiStateToVocabularyUseCaseTest {
             translation = "walk",
         )
 
-        val result = useCase(
-            snapshot = uiState,
-            initialVocabulary = null,
-            containerId = containerId,
-        )
+        val result = mapUiStateToVocabulary(uiState, initialVocabulary = null, containerId = containerId)
 
-        expectThat(result).isNotNull()
-        expectThat(result!!.gender).isNull()
+        expectThat(result).savedVocabulary().get { gender }.isNull()
     }
 
     @Test
@@ -128,14 +112,9 @@ class MapUiStateToVocabularyUseCaseTest {
             translation = "walk",
         )
 
-        val result = useCase(
-            snapshot = uiState,
-            initialVocabulary = null,
-            containerId = containerId,
-        )
+        val result = mapUiStateToVocabulary(uiState, initialVocabulary = null, containerId = containerId)
 
-        expectThat(result).isNotNull()
-        expectThat(result!!.irregularPronunciation).isNull()
+        expectThat(result).savedVocabulary().get { irregularPronunciation }.isNull()
     }
 
     @Test
@@ -148,14 +127,9 @@ class MapUiStateToVocabularyUseCaseTest {
             translation = "walk",
         )
 
-        val result = useCase(
-            snapshot = uiState,
-            initialVocabulary = null,
-            containerId = containerId,
-        )
+        val result = mapUiStateToVocabulary(uiState, initialVocabulary = null, containerId = containerId)
 
-        expectThat(result).isNotNull()
-        expectThat(result!!.irregularPronunciation).isEqualTo("testPronunciation")
+        expectThat(result).savedVocabulary().get { irregularPronunciation }.isEqualTo("testPronunciation")
     }
 
     @Test
@@ -167,15 +141,12 @@ class MapUiStateToVocabularyUseCaseTest {
             translation = "pencil",
         )
 
-        val result = useCase(
-            snapshot = uiState,
-            initialVocabulary = null,
-            containerId = containerId,
-        )
+        val result = mapUiStateToVocabulary(uiState, initialVocabulary = null, containerId = containerId)
 
-        expectThat(result).isNotNull()
-        expectThat(result!!.word).isEqualTo("penna")
-        expectThat(result.wordHighlights).isEqualTo(listOf(0 to 1))
+        expectThat(result).savedVocabulary().and {
+            get { word }.isEqualTo("penna")
+            get { wordHighlights }.isEqualTo(listOf(0 to 1))
+        }
     }
 
     @Test
@@ -188,9 +159,9 @@ class MapUiStateToVocabularyUseCaseTest {
             endings = "-er, -de, -t",
         )
 
-        val result = useCase(uiState, initialVocabulary = null, containerId = containerId)
+        val result = mapUiStateToVocabulary(uiState, initialVocabulary = null, containerId = containerId)
 
-        expectThat(result).isNotNull().and {
+        expectThat(result).savedVocabulary().and {
             get { wordPrefix }.isEqualTo("")
             get { word }.isEqualTo("känna")
             get { wordSuffix }.isEqualTo("sig")
@@ -212,9 +183,9 @@ class MapUiStateToVocabularyUseCaseTest {
             writtenForms = listOf("tar", " tog ", "tagit"),
         )
 
-        val result = useCase(uiState, initialVocabulary = null, containerId = containerId)
+        val result = mapUiStateToVocabulary(uiState, initialVocabulary = null, containerId = containerId)
 
-        expectThat(result).isNotNull().and {
+        expectThat(result).savedVocabulary().and {
             get { ending }.isEqualTo("tar tog tagit")
             get { listOf(form1, form2, form3) }.isEqualTo(listOf("tar", "tog", "tagit"))
             get { formsNeedReview }.isFalse()
@@ -231,9 +202,9 @@ class MapUiStateToVocabularyUseCaseTest {
             endings = "-et - -en",
         )
 
-        val result = useCase(uiState, initialVocabulary = null, containerId = containerId)
+        val result = mapUiStateToVocabulary(uiState, initialVocabulary = null, containerId = containerId)
 
-        expectThat(result).isNotNull().get { formsNeedReview }.isTrue()
+        expectThat(result).savedVocabulary().get { formsNeedReview }.isTrue()
     }
 
     @Test
@@ -245,9 +216,9 @@ class MapUiStateToVocabularyUseCaseTest {
             endings = "-er -de -t",
         )
 
-        val result = useCase(uiState, initialVocabulary = null, containerId = containerId)
+        val result = mapUiStateToVocabulary(uiState, initialVocabulary = null, containerId = containerId)
 
-        expectThat(result).isNotNull().and {
+        expectThat(result).savedVocabulary().and {
             get { word }.isEqualTo("en gång")
             get { ending }.isEqualTo("")
             get { form1 }.isNull()
@@ -256,15 +227,18 @@ class MapUiStateToVocabularyUseCaseTest {
     }
 
     @Test
-    fun `Returns null when highlights are outside the changing word`() {
+    fun `Reports invalid highlights when they are outside the changing word`() {
         val uiState = AddEditUiState(
             selectedWordGroup = ViewWordGroup.Verb,
             selectedSubGroup = ViewWordSubGroup.Verb(WordGroup.VerbSubgroup.GROUP_2A),
             wordWithAnnotation = "känna s*i*g",
         )
 
-        val result = useCase(uiState, initialVocabulary = null, containerId = containerId)
+        val result = mapUiStateToVocabulary(uiState, initialVocabulary = null, containerId = containerId)
 
-        expectThat(result).isNull()
+        expectThat(result).isEqualTo(SaveResult.InvalidHighlights)
     }
+
+    private fun Assertion.Builder<SaveResult>.savedVocabulary(): Assertion.Builder<Vocabulary> =
+        isA<SaveResult.Valid>().get { vocabulary }
 }
