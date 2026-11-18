@@ -276,6 +276,73 @@ class MapUiStateToVocabularyTest {
         expectThat(result).isEqualTo(SaveResult.InvalidHighlights)
     }
 
+    @Test
+    fun `Reports a gap when a written out form before a filled one is empty`() {
+        val uiState = writtenOutVerb("", "tog", "tagit")
+
+        val result = mapUiStateToVocabulary(uiState, initialVocabulary = null, containerId = containerId)
+
+        expectThat(result).isEqualTo(SaveResult.InvalidWrittenForms(WrittenFormsError.Gap))
+    }
+
+    @Test
+    fun `A blank written out form counts as a gap`() {
+        val uiState = writtenOutVerb("tar", "  ", "tagit")
+
+        val result = mapUiStateToVocabulary(uiState, initialVocabulary = null, containerId = containerId)
+
+        expectThat(result).isEqualTo(SaveResult.InvalidWrittenForms(WrittenFormsError.Gap))
+    }
+
+    @Test
+    fun `Reports a space inside a written out form`() {
+        val uiState = writtenOutVerb("tar", "tog", "har tagit")
+
+        val result = mapUiStateToVocabulary(uiState, initialVocabulary = null, containerId = containerId)
+
+        expectThat(result).isEqualTo(SaveResult.InvalidWrittenForms(WrittenFormsError.Space))
+    }
+
+    @Test
+    fun `Empty written out forms at the end are saved`() {
+        val uiState = AddEditUiState(
+            selectedWordGroup = ViewWordGroup.Noun,
+            selectedSubGroup = ViewWordSubGroup.Noun(WordGroup.NounSubgroup.SPECIAL),
+            wordWithAnnotation = "mat",
+            formsMode = FormsMode.WrittenOut,
+            writtenForms = listOf("maten", "", ""),
+        )
+
+        val result = mapUiStateToVocabulary(uiState, initialVocabulary = null, containerId = containerId)
+
+        expectThat(result).savedVocabulary().and {
+            get { ending }.isEqualTo("maten")
+            get { listOf(form1, form2, form3) }.isEqualTo(listOf("maten", null, null))
+        }
+    }
+
+    @Test
+    fun `Written out forms are not checked when the word group has no forms`() {
+        val uiState = AddEditUiState(
+            selectedWordGroup = ViewWordGroup.Other,
+            wordWithAnnotation = "hur mår du",
+            formsMode = FormsMode.WrittenOut,
+            writtenForms = listOf("", "a b"),
+        )
+
+        val result = mapUiStateToVocabulary(uiState, initialVocabulary = null, containerId = containerId)
+
+        expectThat(result).isA<SaveResult.Valid>()
+    }
+
+    private fun writtenOutVerb(vararg forms: String) = AddEditUiState(
+        selectedWordGroup = ViewWordGroup.Verb,
+        selectedSubGroup = ViewWordSubGroup.Verb(WordGroup.VerbSubgroup.GROUP_4_SPECIAL),
+        wordWithAnnotation = "ta",
+        formsMode = FormsMode.WrittenOut,
+        writtenForms = forms.toList(),
+    )
+
     private fun Assertion.Builder<SaveResult>.savedVocabulary(): Assertion.Builder<Vocabulary> =
         isA<SaveResult.Valid>().get { vocabulary }
 }

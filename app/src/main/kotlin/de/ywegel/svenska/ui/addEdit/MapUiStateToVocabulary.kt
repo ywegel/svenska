@@ -14,6 +14,9 @@ sealed interface SaveResult {
 
     /** The highlight stars are unbalanced or outside the changing word. The word field shows this error. */
     data object InvalidHighlights : SaveResult
+
+    /** The written out forms can't be saved, see [WrittenFormsError]. The forms show this error. */
+    data class InvalidWrittenForms(val error: WrittenFormsError) : SaveResult
 }
 
 /**
@@ -37,6 +40,7 @@ fun mapUiStateToVocabulary(snapshot: AddEditUiState, initialVocabulary: Vocabula
     val wordGroup = snapshot.selectedWordGroup?.toWordGroup(snapshot.selectedSubGroup)
         ?: return SaveResult.MissingWordGroup
     if (snapshot.wordInput.hasHighlightError) return SaveResult.InvalidHighlights
+    snapshot.writtenFormsError?.let { return SaveResult.InvalidWrittenForms(it) }
 
     return SaveResult.Valid(snapshot.toVocabulary(wordGroup, initialVocabulary, containerId))
 }
@@ -75,6 +79,7 @@ private fun AddEditUiState.toVocabulary(
 
 /**
  * Written out forms are saved as full words, so the endings always build the same forms again.
+ * [WrittenFormsError] keeps gaps and spaces out, which would shift the forms when the ending is split again.
  * Endings beyond the forms of the word group are dropped, like the forms themselves.
  */
 private fun AddEditUiState.endingFor(wordGroup: WordGroup): String = when {

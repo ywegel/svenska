@@ -137,8 +137,8 @@ class AddEditViewModel @Inject constructor(
             SaveResult.MissingWordGroup -> viewModelScope.launch(immediateDispatcher) {
                 _uiEvents.send(UiEvent.InvalidWordGroupConfiguration)
             }
-            // The error is shown under the word field
-            SaveResult.InvalidHighlights -> Unit
+            // The errors are shown under the word field and the forms
+            SaveResult.InvalidHighlights, is SaveResult.InvalidWrittenForms -> Unit
         }
     }
 
@@ -200,6 +200,18 @@ data class AddEditUiState(
 
     val suggestedWordGroup: WordGroup? by lazy {
         suggestWordGroup(formInputs, selected = selectedWordGroup?.toWordGroup(selectedSubGroup))
+    }
+
+    /** Only written out forms are checked. Other has no forms, built forms never have gaps or spaces. */
+    val writtenFormsError: WrittenFormsError? by lazy {
+        if (formsMode != FormsMode.WrittenOut || formWordGroup == WordGroup.Other) return@lazy null
+        val forms = forms.map { it.trim() }
+        when {
+            forms.any { form -> form.any(Char::isWhitespace) } -> WrittenFormsError.Space
+            // Empty forms at the end are fine, only an empty one before a filled one is a gap
+            forms.dropLastWhile { it.isEmpty() }.any { it.isEmpty() } -> WrittenFormsError.Gap
+            else -> null
+        }
     }
 
     /** Switching back to the endings would replace forms the user wrote out differently. */

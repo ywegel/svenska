@@ -113,7 +113,23 @@ fun FormsSection(uiState: AddEditUiState, callbacks: AddEditVocabularyCallbacks,
         if (uiState.wordInput.word.isNotBlank()) {
             FormsList(uiState, callbacks, modifier = Modifier.padding(top = Spacings.xs))
         }
+
+        uiState.writtenFormsError?.let { WrittenFormsErrorText(it) }
     }
+}
+
+@Composable
+private fun WrittenFormsErrorText(error: WrittenFormsError) {
+    val message = when (error) {
+        WrittenFormsError.Gap -> R.string.addEdit_forms_gap_error
+        WrittenFormsError.Space -> R.string.addEdit_forms_space_error
+    }
+    Text(
+        text = stringResource(message),
+        style = SvenskaTheme.typography.bodySmall,
+        color = SvenskaTheme.colors.error,
+        modifier = Modifier.padding(horizontal = Spacings.m),
+    )
 }
 
 @Composable

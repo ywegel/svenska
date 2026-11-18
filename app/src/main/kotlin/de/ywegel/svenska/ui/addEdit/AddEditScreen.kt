@@ -355,6 +355,46 @@ private fun AddEditScreenWrittenOutPreview() {
     }
 }
 
+@Preview(heightDp = 1000)
+@Composable
+private fun AddEditScreenWrittenFormsGapErrorPreview() {
+    SvenskaTheme {
+        AddEditScreen(
+            uiState = AddEditUiState(
+                selectedWordGroup = ViewWordGroup.Verb,
+                selectedSubGroup = ViewWordSubGroup.Verb(WordGroup.VerbSubgroup.GROUP_4_SPECIAL),
+                wordWithAnnotation = "ta",
+                translation = "nehmen",
+                formsMode = FormsMode.WrittenOut,
+                writtenForms = listOf("", "tog", "tagit"),
+            ),
+            callbacks = AddEditVocabularyCallbacksFake,
+            navigateUp = {},
+            navigateToWordGroupsScreen = {},
+        )
+    }
+}
+
+@Preview(heightDp = 1000)
+@Composable
+private fun AddEditScreenWrittenFormsSpaceErrorPreview() {
+    SvenskaTheme {
+        AddEditScreen(
+            uiState = AddEditUiState(
+                selectedWordGroup = ViewWordGroup.Verb,
+                selectedSubGroup = ViewWordSubGroup.Verb(WordGroup.VerbSubgroup.GROUP_4_SPECIAL),
+                wordWithAnnotation = "ta",
+                translation = "nehmen",
+                formsMode = FormsMode.WrittenOut,
+                writtenForms = listOf("tar", "tog", "har tagit"),
+            ),
+            callbacks = AddEditVocabularyCallbacksFake,
+            navigateUp = {},
+            navigateToWordGroupsScreen = {},
+        )
+    }
+}
+
 @Preview
 @Composable
 private fun AddEditScreenHighlightErrorPreview() {
