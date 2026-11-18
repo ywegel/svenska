@@ -2,6 +2,11 @@ name: Screenshot compare comment
 
 on:
   workflow_call:
+    inputs:
+      tests-result:
+        description: Result of the screenshot test job (success, failure, ...)
+        required: true
+        type: string
 
 permissions: { }
 
@@ -40,7 +45,9 @@ jobs:
           git branch -D "$BRANCH_NAME" || true
           git checkout --orphan "$BRANCH_NAME"
           git rm -rf .
+      # A build that fails before the tests run uploads no diff images, so the artifact may be missing
       - uses: actions/download-artifact@v8
+        continue-on-error: ${{ inputs.tests-result != 'success' }}
         with:
           name: screenshot-diff
           path: screenshot-diff
@@ -105,14 +112,28 @@ jobs:
         shell: bash
         env:
           EXIST_VALID_FILES: ${{ steps.check-if-there-are-valid-files.outputs.exist_valid_files }}
+          TESTS_RESULT: ${{ inputs.tests-result }}
+          RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
         run: |
           delimiter="$(openssl rand -hex 8)"
+          # Roborazzi's compare mode never fails on visual changes, so a red test job means a build or test error
+          failure_note=""
+          if [[ "$TESTS_RESULT" != "success" ]]; then
+            failure_note="> [!WARNING]
+          > The screenshot tests did not complete (result: $TESTS_RESULT), so this report may be incomplete.
+          > Check the [workflow run]($RUN_URL) for the build or test error."
+          fi
+
           if [[ "$EXIST_VALID_FILES" != "true" ]]; then
             {
               echo "reports<<${delimiter}"
               echo "Snapshot diff report vs base branch: $BASE_BRANCH"
               echo ""
-              echo "No snapshot changes."
+              if [[ -n "$failure_note" ]]; then
+                echo "$failure_note"
+              else
+                echo "No snapshot changes."
+              fi
               echo "${delimiter}"
             } >> "$GITHUB_OUTPUT"
             exit 0
@@ -125,6 +146,11 @@ jobs:
 
             # Create markdown table header
             echo "Snapshot diff report vs base branch: $BASE_BRANCH"
+            if [[ -n "$failure_note" ]]; then
+              echo ""
+              echo "$failure_note"
+              echo ""
+            fi
             echo "| File name | Image |"
             echo "|-------|-------|"
           } >> "$GITHUB_OUTPUT"
