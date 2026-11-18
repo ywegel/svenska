@@ -48,14 +48,15 @@ fun String.splitAtChange(baseWord: String): Pair<String, String> {
  * The word group the endings point to, if it is worth suggesting: the endings are complete, the group is known and
  * the user selected something else. Endings are only complete once they are enough for the selected word group too,
  * so typing the second of three noun endings doesn't suggest an adjective.
+ * A suggestion is never Other or undefined, so a selection without subgroup always differs from it.
  */
-fun suggestWordGroup(inputs: FormInputs, selected: WordGroup?): WordGroup? {
+fun suggestWordGroup(inputs: FormInputs): WordGroup? {
     if (inputs.word.isBlank()) return null
     val suggestion = WordGroupMatcher.determineWordGroup(inputs.word, inputs.endings)
     val isComplete = suggestion.formCount > 0 &&
         inputs.endings.size == suggestion.formCount &&
         inputs.endings.size >= inputs.wordGroup.formCount
-    return suggestion.takeIf { isComplete && !it.isUndefined && it != selected }
+    return suggestion.takeIf { isComplete && !it.isUndefined && it != inputs.wordGroup }
 }
 
 private val WordGroup.isUndefined: Boolean

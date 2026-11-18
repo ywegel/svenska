@@ -4,6 +4,7 @@ import de.ywegel.svenska.common.streamOf
 import de.ywegel.svenska.data.model.WordGroup
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.Arguments
+import org.junit.jupiter.params.provider.Arguments.argumentSet
 import org.junit.jupiter.params.provider.MethodSource
 import strikt.api.expectThat
 import strikt.assertions.isEqualTo
@@ -27,23 +28,16 @@ class FormsTest {
         expectThat(form.splitAtChange(baseWord)).isEqualTo(stem to change)
     }
 
-    @ParameterizedTest(name = "{0} {1}, selected {2} -> {3}")
+    @ParameterizedTest
     @MethodSource("suggestionCases")
     fun `suggestWordGroup only suggests complete, known and different groups`(
         word: String,
         endings: List<String>,
-        selected: WordGroup?,
+        selected: WordGroup,
         expected: WordGroup?,
     ) {
-        // Given
-        val formWordGroup = when (selected) {
-            null -> WordGroup.Other
-            is WordGroup.Noun -> WordGroup.Noun(WordGroup.NounSubgroup.UNDEFINED)
-            else -> selected
-        }
-
         // When
-        val result = suggestWordGroup(FormInputs(word, endings, formWordGroup), selected)
+        val result = suggestWordGroup(FormInputs(word, endings, selected))
 
         // Then
         expectThat(result).isEqualTo(expected)
@@ -51,6 +45,8 @@ class FormsTest {
 
     companion object {
         private val ar = WordGroup.Noun(WordGroup.NounSubgroup.AR)
+        private val undefinedNoun = WordGroup.Noun(WordGroup.NounSubgroup.UNDEFINED)
+        private val dreamEndings = listOf("-men", "-mar", "-marna")
 
         @JvmStatic
         fun endingsCases() = streamOf(
@@ -70,12 +66,18 @@ class FormsTest {
 
         @JvmStatic
         fun suggestionCases() = streamOf(
-            Arguments.of("dröm", listOf("-men", "-mar", "-marna"), null, ar),
-            Arguments.of("dröm", listOf("-men", "-mar", "-marna"), ar, null),
-            // The second of three noun endings is no complete adjective
-            Arguments.of("dröm", listOf("-men", "-mar"), WordGroup.Noun(WordGroup.NounSubgroup.UNDEFINED), null),
-            Arguments.of("dröm", listOf("-men"), null, null),
-            Arguments.of("", listOf("-men", "-mar", "-marna"), null, null),
+            argumentSet("other selected", "dröm", dreamEndings, WordGroup.Other, ar),
+            argumentSet("noun without subgroup selected", "dröm", dreamEndings, undefinedNoun, ar),
+            argumentSet("suggestion already selected", "dröm", dreamEndings, ar, null),
+            argumentSet(
+                "second of three noun endings is no complete adjective",
+                "dröm",
+                listOf("-men", "-mar"),
+                undefinedNoun,
+                null,
+            ),
+            argumentSet("incomplete endings", "dröm", listOf("-men"), WordGroup.Other, null),
+            argumentSet("blank word", "", dreamEndings, WordGroup.Other, null),
         )
     }
 }

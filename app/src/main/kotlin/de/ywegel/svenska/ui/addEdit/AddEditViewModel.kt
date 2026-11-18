@@ -198,9 +198,7 @@ data class AddEditUiState(
         formsMode == FormsMode.Endings && builtForms.needsReview && formInputs != confirmedFormInputs
     }
 
-    val suggestedWordGroup: WordGroup? by lazy {
-        suggestWordGroup(formInputs, selected = selectedWordGroup?.toWordGroup(selectedSubGroup))
-    }
+    val suggestedWordGroup: WordGroup? by lazy { suggestWordGroup(formInputs) }
 
     /** Only written out forms are checked. Other has no forms, built forms never have gaps or spaces. */
     val writtenFormsError: WrittenFormsError? by lazy {
