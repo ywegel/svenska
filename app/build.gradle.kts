@@ -50,7 +50,7 @@ val releaseSentryDsn: String? = LocalPropertiesManager
 
 android {
     namespace = "de.ywegel.svenska"
-    compileSdk = 36
+    compileSdk = 37
 
     defaultConfig {
         applicationId = "de.ywegel.svenska"
