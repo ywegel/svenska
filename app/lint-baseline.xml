@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<issues format="6" by="lint 8.13.2" type="baseline" client="gradle" dependencies="true" name="AGP (8.13.2)" variant="all" version="8.13.2">
+<issues format="6" by="lint 9.5.0" type="baseline" client="gradle" dependencies="true" name="AGP (9.5.0)" variant="all" version="9.5.0">
 
     <issue
         id="OldTargetApi"
@@ -8,19 +8,8 @@
         errorLine2="        ~~~~~~~~~~~~~~">
         <location
             file="build.gradle.kts"
-            line="59"
+            line="58"
             column="9"/>
-    </issue>
-
-    <issue
-        id="MemberExtensionConflict"
-        message="`items` is defined both as a member in class `androidx.compose.foundation.lazy.grid.LazyGridScope` and an extension in package `androidx.compose.foundation.lazy.grid`. The defined behavior for this is to use the member, but since the extension is explicitly imported into this file, there&apos;s a chance that this was not expected. (One common way this happens is for members to be added to a class after code was already written to use an extension)."
-        errorLine1="            items(mainSubgroups) { subgroup ->"
-        errorLine2="            ^">
-        <location
-            file="src/main/kotlin/de/ywegel/svenska/ui/quiz/wordGroupQuiz/QuizContent.kt"
-            line="109"
-            column="13"/>
     </issue>
 
     <issue
@@ -52,7 +41,7 @@
         errorLine2="    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values/strings.xml"
-            line="174"
+            line="210"
             column="5"/>
     </issue>
 

@@ -13,8 +13,8 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusDirection
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalFocusManager
+import androidx.compose.ui.platform.LocalResources
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
@@ -94,7 +94,7 @@ class TranslateWithEndingsRenderer : QuizRenderer<
         userAnswerResult: TranslateWithEndingsResult,
         wordGroupSection: (@Composable (highlightEndings: Boolean) -> Unit)?,
     ) {
-        val context = LocalContext.current
+        val resources = LocalResources.current
         val colors = SvenskaTheme.colors
 
         val resultMessage = rememberResultTitle(userAnswerResult)
@@ -107,7 +107,7 @@ class TranslateWithEndingsRenderer : QuizRenderer<
                 }
                 if (userAnswer.answer.isNotBlank() && !userAnswer.endings.isNullOrBlank()) {
                     withStyle(SpanStyle(color = colors.onSurface)) {
-                        append(context.getString(R.string.quiz_result_endings_formated))
+                        append(resources.getString(R.string.quiz_result_endings_formated))
                     }
                     append(" ")
                 }

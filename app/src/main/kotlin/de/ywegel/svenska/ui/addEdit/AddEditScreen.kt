@@ -37,7 +37,7 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalResources
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -88,7 +88,7 @@ private fun AddEditScreen(navigator: DestinationsNavigator) {
 
     val uiState by viewModel.uiState.collectAsState()
 
-    val context = LocalContext.current
+    val resources = LocalResources.current
     val snackbarHostState = remember { SnackbarHostState() }
     val lifecycleOwner = LocalLifecycleOwner.current
     LaunchedEffect(lifecycleOwner.lifecycle) {
@@ -98,7 +98,7 @@ private fun AddEditScreen(navigator: DestinationsNavigator) {
                     AddEditViewModel.UiEvent.NavigateUp -> navigator.navigateUp()
                     AddEditViewModel.UiEvent.InvalidWordGroupConfiguration -> {
                         snackbarHostState.showSnackbar(
-                            message = context.getString(R.string.addEdit_group_selector_invalid_configuration),
+                            message = resources.getString(R.string.addEdit_group_selector_invalid_configuration),
                         )
                     }
                 }

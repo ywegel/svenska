@@ -40,8 +40,8 @@ import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.SolidColor
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalFocusManager
+import androidx.compose.ui.platform.LocalResources
 import androidx.compose.ui.platform.LocalUriHandler
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
@@ -122,7 +122,7 @@ private fun SearchScreen(
     val snackBarHostState = remember { SnackbarHostState() }
     val uriHandle = LocalUriHandler.current
     val coroutineScope = rememberCoroutineScope()
-    val context = LocalContext.current
+    val resources = LocalResources.current
 
     Scaffold(
         topBar = {
@@ -149,7 +149,7 @@ private fun SearchScreen(
                 } catch (e: IllegalArgumentException) {
                     Log.w(TAG, "SearchScreen: onOnlineRedirectClicked (${e.javaClass.simpleName})", e)
                     coroutineScope.launch {
-                        snackBarHostState.showSnackbar(context.getString(R.string.search_uri_parsing_error))
+                        snackBarHostState.showSnackbar(resources.getString(R.string.search_uri_parsing_error))
                     }
                 }
             },
