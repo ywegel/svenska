@@ -21,7 +21,7 @@ roborazzi-version = "1.77.0"
 [libraries]
 core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "core-ktx" }
 lifecycle-runtime-ktx = { group = "androidx.lifecycle", name = "lifecycle-runtime-ktx", version.ref = "lifecycle-runtime-ktx" }
-kotlinx-serialization = "org.jetbrains.kotlinx:kotlinx-serialization-json:1.6.3"
+kotlinx-serialization = "org.jetbrains.kotlinx:kotlinx-serialization-json:1.13.0"
 
 # compose
 compose-bom = { group = "androidx.compose", name = "compose-bom", version.ref = "compose-bom" }
@@ -66,7 +66,7 @@ splish-splash-screen = "androidx.core:core-splashscreen:1.0.1"
 
 # testing
 espresso-core = { group = "androidx.test.espresso", name = "espresso-core", version.ref = "espresso-core" }
-kotlinx-coroutines-test = "org.jetbrains.kotlinx:kotlinx-coroutines-test:1.10.2"
+kotlinx-coroutines-test = "org.jetbrains.kotlinx:kotlinx-coroutines-test:1.11.0"
 mockk = "io.mockk:mockk:1.14.4"
 mockk-android = "io.mockk:mockk-android:1.14.4"
 assertk = "com.willowtreeapps.assertk:assertk:0.26.1"
@@ -100,13 +100,13 @@ kotlin-android = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }
 kotlin-compose-compiler = { id = "org.jetbrains.kotlin.plugin.compose", version.ref = "kotlin" }
 kotlinx-serialization = { id = "org.jetbrains.kotlin.plugin.serialization", version.ref = "kotlin" }
 dagger-hilt-android = { id = "com.google.dagger.hilt.android", version.ref = "dagger-hilt" }
-google-ksp = "com.google.devtools.ksp:2.3.13"
+google-ksp = "com.google.devtools.ksp:2.3.14"
 junit5 = "de.mannodermaus.android-junit5:2.0.2"
 ktlint = "org.jlleitschuh.gradle.ktlint:12.2.0"
 detekt = "io.gitlab.arturbosch.detekt:1.23.8"
 room = { id = "androidx.room", version.ref = "room-version" }
 about-libraries = { id = "com.mikepenz.aboutlibraries.plugin", version.ref = "about-libraries" }
-kotlinx-kover = "org.jetbrains.kotlinx.kover:0.9.9"
+kotlinx-kover = "org.jetbrains.kotlinx.kover:0.9.11"
 sentry-io = "io.sentry.android.gradle:6.25.0"
 roborazzi = { id = "io.github.takahirom.roborazzi", version.ref = "roborazzi-version" }
 
