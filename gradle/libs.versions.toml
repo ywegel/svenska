@@ -11,7 +11,7 @@ espresso-core = "3.6.1"
 lifecycle-runtime-ktx = "2.10.0"
 activity-compose = "1.10.1"
 compose-bom = "2026.09.00"
-room-version = "2.7.2"
+room-version = "2.8.5"
 androidx-hilt = "1.4.0"
 compose-destinations = "2.3.0"
 junit5 = "5.11.2"
@@ -54,14 +54,14 @@ hilt-android-testing = { module = "com.google.dagger:hilt-android-testing", vers
 androidx-hilt-navigation = { module = "androidx.hilt:hilt-navigation-compose", version.ref = "androidx-hilt" }
 
 # datastore
-androidx-datastore = "androidx.datastore:datastore-preferences:1.1.7"
+androidx-datastore = "androidx.datastore:datastore-preferences:1.3.0"
 
 # about libraries
 about-libraries-core = { module = "com.mikepenz:aboutlibraries-core", version.ref = "about-libraries" }
 about-libraries-compose-m3 = { module = "com.mikepenz:aboutlibraries-compose-m3", version.ref = "about-libraries" }
 
 # splash screen
-splish-splash-screen = "androidx.core:core-splashscreen:1.0.1"
+splish-splash-screen = "androidx.core:core-splashscreen:1.2.0"
 
 
 # testing
