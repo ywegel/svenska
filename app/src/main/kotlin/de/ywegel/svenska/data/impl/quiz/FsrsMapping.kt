@@ -1,20 +1,12 @@
-package de.ywegel.svenska.data.model.quiz
+package de.ywegel.svenska.data.impl.quiz
 
+import de.ywegel.svenska.data.db.quiz.CardPhase
+import de.ywegel.svenska.data.db.quiz.FsrsColumns
+import de.ywegel.svenska.data.db.quiz.ReviewLog
 import one.felsen.fsrskt.fsrs6.FsrsCard
 import one.felsen.fsrskt.fsrs6.FsrsCardState
 import one.felsen.fsrskt.fsrs6.FsrsRating
 import kotlin.time.Instant
-
-/**
- * The phase of a [FacetCard] in the FSRS scheduler, stored by name.
- *
- * A copy of FsrsKt's `FsrsCardState`, so that a renamed constant in the library can't make stored cards unreadable.
- *
- * - [LEARNING]: new, or going through the learning steps (minutes).
- * - [REVIEW]: scheduled in whole days from the desired retention.
- * - [RELEARNING]: forgotten in review, going through the relearning steps.
- */
-enum class CardPhase { LEARNING, REVIEW, RELEARNING }
 
 fun CardPhase.toFsrs(): FsrsCardState = when (this) {
     CardPhase.LEARNING -> FsrsCardState.LEARNING

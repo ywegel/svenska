@@ -1,4 +1,4 @@
-package de.ywegel.svenska.data.model.quiz
+package de.ywegel.svenska.data.db.quiz
 
 import androidx.room.Embedded
 import androidx.room.Entity
@@ -7,6 +7,9 @@ import androidx.room.ForeignKey.Companion.CASCADE
 import androidx.room.Index
 import androidx.room.PrimaryKey
 import de.ywegel.svenska.data.model.Vocabulary
+import de.ywegel.svenska.data.model.quiz.QuizFacet
+import de.ywegel.svenska.data.model.quiz.QuizPoolStatus
+import de.ywegel.svenska.data.model.quiz.formsKey
 
 /**
  * The FSRS state of one quizzed facet ([QuizFacet]) of a vocabulary. Each facet has its own state, due date and
@@ -24,8 +27,19 @@ sealed interface FacetCard {
 }
 
 /**
+ * The phase of a [FacetCard] in the FSRS scheduler, stored by name.
+ *
+ * A copy of FsrsKt's `FsrsCardState`, so that a renamed constant in the library can't make stored cards unreadable.
+ *
+ * - [LEARNING]: new, or going through the learning steps (minutes).
+ * - [REVIEW]: scheduled in whole days from the desired retention.
+ * - [RELEARNING]: forgotten in review, going through the relearning steps.
+ */
+enum class CardPhase { LEARNING, REVIEW, RELEARNING }
+
+/**
  * The FSRS columns that both card tables share, embedded with their plain column names (`due`, `step`, …).
- * Mapped to and from FsrsKt's `FsrsCard` in `FsrsMapping.kt`.
+ * Mapped to and from FsrsKt's `FsrsCard` in `data/impl/quiz/FsrsMapping.kt`.
  *
  * @property phase The phase of the card in the FSRS scheduler.
  * @property step The current learning or relearning step, as an index into the scheduler's steps. `null` in
@@ -99,15 +113,3 @@ data class FormsFacetCard(
     @Embedded override val fsrs: FsrsColumns,
     val introducedAt: Long,
 ) : FacetCard
-
-/**
- * The key of the forms card of this row, or `null` if the row has no forms, so it has no forms card.
- *
- * Made of the changing [Vocabulary.word] and its three forms, trimmed and in lowercase. The prefix and suffix are not
- * part of it, as the forms belong to the changing word only: `känna sig` and `känna` share their forms card.
- */
-val Vocabulary.formsKey: String?
-    get() {
-        if (form1 == null && form2 == null && form3 == null) return null
-        return listOf(word, form1, form2, form3).joinToString("|") { it.orEmpty().trim().lowercase() }
-    }

@@ -1,10 +1,11 @@
-package de.ywegel.svenska.data.model.quiz
+package de.ywegel.svenska.data.db.quiz
 
 import androidx.room.Entity
 import androidx.room.ForeignKey
 import androidx.room.ForeignKey.Companion.CASCADE
 import androidx.room.PrimaryKey
 import de.ywegel.svenska.data.model.Vocabulary
+import de.ywegel.svenska.data.model.quiz.QuizPoolStatus
 
 /**
  * The quiz pool state of one vocabulary row. It holds no FSRS values; those live in the [FacetCard]s of the row.
@@ -58,12 +59,3 @@ data class QuizPoolEntry(
             else -> QuizPoolStatus.ACTIVE
         }
 }
-
-/**
- * The state of a word in the quiz pool. A word that is not in the pool has no [QuizPoolEntry].
- *
- * - [QUEUED]: waiting to be introduced, at most the daily limit of new cards per day and none on a day with a backlog.
- * - [ACTIVE]: introduced, its unlocked facets are quizzed when due.
- * - [PAUSED]: removed after its introduction, not quizzed, progress kept.
- */
-enum class QuizPoolStatus { QUEUED, ACTIVE, PAUSED }

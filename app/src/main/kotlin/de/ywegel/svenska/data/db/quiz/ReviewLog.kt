@@ -1,4 +1,4 @@
-package de.ywegel.svenska.data.model.quiz
+package de.ywegel.svenska.data.db.quiz
 
 import androidx.room.Entity
 import androidx.room.ForeignKey
@@ -7,6 +7,7 @@ import androidx.room.Index
 import androidx.room.PrimaryKey
 import de.ywegel.svenska.data.impl.quiz.HIGHEST_FSRS_RATING
 import de.ywegel.svenska.data.model.Vocabulary
+import de.ywegel.svenska.data.model.quiz.QuizFacet
 
 /**
  * One review of a facet card. Append-only: rows are only changed to move them to another row or key (merging
@@ -23,8 +24,8 @@ import de.ywegel.svenska.data.model.Vocabulary
  * whose logs should be kept, move them to the remaining row.
  * @property formsKey The key of the forms card at the time of the review, set exactly for [QuizFacet.FORMS]. Stored,
  * as the forms of the row can change later.
- * @property rating The final rating, 1 (AGAIN) to 4 (EASY), after "War doch richtig" or "Leicht". See
- * [toStoredRating].
+ * @property rating The final rating, 1 (AGAIN) to 4 (EASY), after "War doch richtig" or "Leicht". These are the FSRS
+ * standard values that py-fsrs and the FSRS optimizer use as well.
  * @property rawAnswer What was typed. For [QuizFacet.FORMS] all answered parts in the order they were asked, separated
  * by `|`.
  * @property reviewAt When the review happened, in epoch milliseconds.
