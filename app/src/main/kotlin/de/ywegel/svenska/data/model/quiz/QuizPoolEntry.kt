@@ -6,7 +6,29 @@ import androidx.room.ForeignKey.Companion.CASCADE
 import androidx.room.PrimaryKey
 import de.ywegel.svenska.data.model.Vocabulary
 
-// Learning progress of one Vocabulary Entry. Saves Vocabulary specific fields. Learning Progress does not save Fsrs values, as Fsrs is only applied to the Vocabularies Facets.
+/**
+ * The quiz pool state of one vocabulary row. It holds no FSRS values; those live in the [FacetCard]s of the row.
+ *
+ * A row without entry is not in the pool. Adding it to the pool creates the entry as [QuizPoolStatus.QUEUED].
+ * Removing a queued word deletes the entry, removing an active word pauses it. The [poolStatus] is derived from the
+ * fields, not stored.
+ *
+ * @property queuedAt When the word was added to the pool, in epoch milliseconds. Queued words are introduced first in,
+ * first out. Words added together, e.g. a whole container, have the same time and are introduced in the order of
+ * their [vocabularyId].
+ * @property introducedAt When the word was introduced, in epoch milliseconds, `null` while it is queued. Counts towards
+ * the daily limit of new cards, together with [FormsFacetCard.introducedAt]. Introducing the word creates its
+ * [QuizTranslationDirection.SV_DE] card. Pausing and resuming keeps it, so a resumed word doesn't count again.
+ * @property isPaused Whether the word was removed from the pool after its introduction. Its cards are not quizzed, but
+ * keep their progress. Only an introduced word can be paused.
+ * @property svDeStreak The number of SV_DE reviews in a row with a final rating of GOOD or EASY since [resetAt]. Any
+ * other final rating sets it back to 0. Stored instead of derived from the logs, as the forms unlock needs it for all
+ * active words at once. Updated in the same transaction as the log, and again when "War doch richtig" changes the
+ * final rating.
+ * @property resetAt When the progress of the word was reset last, in epoch milliseconds, `null` if never. A reset sets
+ * the [svDeStreak] to 0, makes the SV_DE card new and deletes the DE_SV card. Logs before this time are kept, but no
+ * longer count when the cards are recomputed from the logs. The forms card is not reset, as it is shared.
+ */
 @Entity(
     foreignKeys = [
         ForeignKey(
@@ -19,8 +41,8 @@ import de.ywegel.svenska.data.model.Vocabulary
 )
 data class QuizPoolEntry(
     @PrimaryKey val vocabularyId: Int,
-    val queuedAt: Long,        // needed for comparison for FIFO of QuizPool
-    val introducedAt: Long? = null,    // needed to limit daily new words
+    val queuedAt: Long,
+    val introducedAt: Long? = null,
     val isPaused: Boolean = false,
     val svDeStreak: Int = 0,
     val resetAt: Long? = null,
@@ -37,4 +59,11 @@ data class QuizPoolEntry(
         }
 }
 
+/**
+ * The state of a word in the quiz pool. A word that is not in the pool has no [QuizPoolEntry].
+ *
+ * - [QUEUED]: waiting to be introduced, at most the daily limit of new cards per day and none on a day with a backlog.
+ * - [ACTIVE]: introduced, its unlocked facets are quizzed when due.
+ * - [PAUSED]: removed after its introduction, not quizzed, progress kept.
+ */
 enum class QuizPoolStatus { QUEUED, ACTIVE, PAUSED }
