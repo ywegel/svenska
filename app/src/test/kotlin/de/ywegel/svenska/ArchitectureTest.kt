@@ -2,9 +2,28 @@ package de.ywegel.svenska
 
 import com.lemonappdev.konsist.api.Konsist
 import com.lemonappdev.konsist.api.ext.list.withPackage
+import com.lemonappdev.konsist.api.ext.list.withoutPackage
 import org.junit.jupiter.api.Test
 
 class ArchitectureTest {
+
+    // Domain and UI address a quiz card as vocabulary + QuizFacet. The card tables, QuizTranslationDirection and the
+    // mapping to FsrsKt are storage details. Later, as core:database and core:data, Gradle enforces this boundary.
+    @Test
+    fun `quiz entities and their mapping stay inside the data layer`() {
+        val forbidden = listOf("de.ywegel.svenska.data.db.quiz.", "de.ywegel.svenska.data.impl.quiz.")
+        Konsist.scopeFromProduction()
+            .files
+            .withoutPackage("de.ywegel.svenska.data.db..", "de.ywegel.svenska.data.impl..")
+            .forEach { file ->
+                file.imports.forEach { import ->
+                    check(forbidden.none { import.name.startsWith(it) }) {
+                        "${file.path} imports '${import.name}' - quiz entities and their mapping may only be used in " +
+                            "data/db and data/impl. Use QuizFacet and the models from data/model/quiz instead."
+                    }
+                }
+            }
+    }
 
     @Test
     fun `data does not depend on domain`() {
