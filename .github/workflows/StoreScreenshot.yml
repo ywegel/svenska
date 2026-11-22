@@ -8,6 +8,10 @@ on:
 
 permissions: { }
 
+env:
+  # Read access for the FsrsKt fork on GitHub Packages, see settings.gradle.kts.
+  GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
 jobs:
   store-screenshot-test:
     runs-on: ubuntu-latest
@@ -16,6 +20,7 @@ jobs:
     permissions:
       contents: read # for clone
       actions: write # for upload-artifact
+      packages: read # for the FsrsKt package
 
     steps:
       - name: Checkout

@@ -10,8 +10,14 @@ concurrency:
   group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
   cancel-in-progress: true
 
+permissions:
+  contents: read
+  packages: read
+
 env:
   SENTRY_DSN: ${{ secrets.SENTRY_DSN }}
+  # Read access for the FsrsKt fork on GitHub Packages, see settings.gradle.kts.
+  GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
 jobs:
   ktlint:
@@ -93,6 +99,7 @@ jobs:
     runs-on: ubuntu-latest
     permissions:
       pull-requests: write
+      packages: read
     steps:
       - uses: actions/checkout@v7
 
@@ -133,6 +140,7 @@ jobs:
     permissions:
       contents: read
       actions: write
+      packages: read
     uses: ./.github/workflows/CompareScreenshot.yml
 
   screenshot_comment:

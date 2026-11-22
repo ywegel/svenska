@@ -7,9 +7,12 @@ on:
 
 permissions:
   contents: write
+  packages: read
 
 env:
   SENTRY_DSN: ${{ secrets.SENTRY_DSN }}
+  # Read access for the FsrsKt fork on GitHub Packages, see settings.gradle.kts.
+  GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
 jobs:
   build:
