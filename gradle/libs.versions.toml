@@ -94,6 +94,8 @@ androidx-test-ext-junit = "androidx.test.ext:junit-ktx:1.3.0"
 
 lifecycle-viewmodel-testing = { module = "androidx.lifecycle:lifecycle-viewmodel-testing", version.ref = "lifecycle-runtime-ktx" }
 
+fsrs-kt = { module = "one.felsen.fsrskt:fsrskt", version = "2.0.0-ywegel" }
+
 [plugins]
 com-android-application = { id = "com.android.application", version.ref = "agp" }
 kotlin-android = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }

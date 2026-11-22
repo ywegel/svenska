@@ -203,6 +203,9 @@ dependencies {
     // Splash screen
     implementation(libs.splish.splash.screen)
 
+    // Fsrs
+    implementation(libs.fsrs.kt)
+
     // testing
     androidTestImplementation(libs.espresso.core)
     androidTestImplementation(platform(libs.compose.bom))
