@@ -37,8 +37,6 @@ class AnswerChecker(knownWords: Collection<String>) {
         return if (edits <= allowedEdits) AnswerVerdict.Typo(alignment) else AnswerVerdict.Wrong
     }
 
-    private fun String.comparable(): String = trim().toNfc().lowercase()
-
     // One edit is a third of a three letter word, so short words like bil or hus get no tolerance
     private fun allowedEdits(expectedLength: Int): Int = when {
         expectedLength <= SHORT_WORD_MAX_LENGTH -> 0

@@ -6,9 +6,23 @@ import de.ywegel.svenska.data.model.WordGroup
 import de.ywegel.svenska.domain.words.FormBuilder
 
 sealed interface FormsQuestion {
-    data class Noun(val gender: Gender, val plural: String) : FormsQuestion
-    data class Verb(val past: String, val supine: String) : FormsQuestion
-    data class Adjective(val neuter: String, val plural: String) : FormsQuestion
+    /** The gender to tap, only asked for nouns. */
+    val gender: Gender? get() = null
+
+    /** The forms to type, in the order of the input fields. */
+    val forms: List<String>
+
+    data class Noun(override val gender: Gender, val plural: String) : FormsQuestion {
+        override val forms get() = listOf(plural)
+    }
+
+    data class Verb(val past: String, val supine: String) : FormsQuestion {
+        override val forms get() = listOf(past, supine)
+    }
+
+    data class Adjective(val neuter: String, val plural: String) : FormsQuestion {
+        override val forms get() = listOf(neuter, plural)
+    }
 }
 
 fun Vocabulary.formsQuestion(): FormsQuestion? {
