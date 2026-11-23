@@ -1,6 +1,7 @@
 package de.ywegel.svenska.testdata
 
 import de.ywegel.svenska.data.model.Gender
+import de.ywegel.svenska.data.model.Vocabulary
 import de.ywegel.svenska.data.model.WordGroup
 
 /**
@@ -24,4 +25,19 @@ data class ReferenceWord(
     val formsNeedReview: Boolean = false,
 ) {
     override fun toString(): String = text
+
+    fun toVocabulary(containerId: Int = 0) = Vocabulary(
+        word = word,
+        wordPrefix = prefix,
+        wordSuffix = suffix,
+        translation = "",
+        gender = gender,
+        wordGroup = wordGroup,
+        ending = endings.joinToString(" "),
+        form1 = forms.getOrNull(0),
+        form2 = forms.getOrNull(1),
+        form3 = forms.getOrNull(2),
+        formsNeedReview = formsNeedReview,
+        containerId = containerId,
+    )
 }
