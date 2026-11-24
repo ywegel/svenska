@@ -18,6 +18,25 @@ class AnswerChecker(knownWords: Collection<String>) {
     private val knownWords = knownWords.mapTo(HashSet()) { it.comparable() }
 
     fun check(typed: String, expected: String): AnswerVerdict {
+        val typedWords = typed.words()
+        val expectedWords = expected.words()
+        if (typedWords.size != expectedWords.size) return AnswerVerdict.Wrong
+
+        val alignment = typedWords
+            .zip(expectedWords) { t, e ->
+                when (val verdict = checkWord(t, e)) {
+                    AnswerVerdict.Wrong -> return AnswerVerdict.Wrong
+                    AnswerVerdict.Correct -> listOf(EditStep.Match(t, e))
+                    is AnswerVerdict.Typo -> verdict.alignment
+                }
+            }
+            .reduce { joined, word -> joined + EditStep.Match(" ", " ") + word }
+
+        return if (alignment.all { it is EditStep.Match }) AnswerVerdict.Correct else AnswerVerdict.Typo(alignment)
+    }
+
+    // check -> checkWord
+    private fun checkWord(typed: String, expected: String): AnswerVerdict {
         val comparableTyped = typed.comparable()
         val comparableExpected = expected.comparable()
         val allowedEdits = allowedEdits(comparableExpected.length)
@@ -43,6 +62,11 @@ class AnswerChecker(knownWords: Collection<String>) {
         expectedLength <= MEDIUM_WORD_MAX_LENGTH -> 1
         else -> 2
     }
+
+    // Hyphens and apostrophes stay part of the word
+    private val wordRegex = Regex("""[^\s.,!?;:]+""")
+
+    private fun String.words(): List<String> = wordRegex.findAll(this).map { it.value }.toList()
 
     private companion object {
         const val SHORT_WORD_MAX_LENGTH = 3
