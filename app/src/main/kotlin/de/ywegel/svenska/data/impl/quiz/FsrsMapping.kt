@@ -1,10 +1,11 @@
 package de.ywegel.svenska.data.impl.quiz
 
 import de.ywegel.svenska.data.db.quiz.CardPhase
-import de.ywegel.svenska.data.db.quiz.FacetCard
-import de.ywegel.svenska.data.db.quiz.FormsFacetCard
 import de.ywegel.svenska.data.db.quiz.FsrsColumns
 import de.ywegel.svenska.data.db.quiz.ReviewLog
+import de.ywegel.svenska.data.model.Vocabulary
+import de.ywegel.svenska.data.model.quiz.QuizFacet
+import de.ywegel.svenska.data.model.quiz.formsKey
 import one.felsen.fsrskt.fsrs6.FsrsCard
 import one.felsen.fsrskt.fsrs6.FsrsCardState
 import one.felsen.fsrskt.fsrs6.FsrsRating
@@ -62,10 +63,10 @@ fun FsrsCard.toFsrsColumns() = FsrsColumns(
     lastReview = lastReview?.toEpochMilliseconds(),
 )
 
-fun FsrsReviewLog.toReviewLog(card: FacetCard, vocabularyId: Int, rawAnswer: String) = ReviewLog(
-    vocabularyId = vocabularyId,
-    facet = card.facet,
-    formsKey = (card as? FormsFacetCard)?.formsKey,
+fun FsrsReviewLog.toReviewLog(vocabulary: Vocabulary, facet: QuizFacet, rawAnswer: String) = ReviewLog(
+    vocabularyId = vocabulary.id,
+    facet = facet,
+    formsKey = vocabulary.formsKey.takeIf { facet == QuizFacet.FORMS },
     rating = rating.toStoredRating(),
     rawAnswer = rawAnswer,
     reviewAt = reviewAt.toEpochMilliseconds(),

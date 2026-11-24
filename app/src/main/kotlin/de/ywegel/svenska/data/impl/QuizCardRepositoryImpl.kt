@@ -33,7 +33,7 @@ class QuizCardRepositoryImpl @Inject constructor(
         val stored = findCard(vocabulary, facet) ?: return
         reviewDao.saveReview(
             card = stored.withFsrs(card.toFsrsColumns()),
-            log = log.toReviewLog(stored, vocabulary.id, rawAnswer),
+            log = log.toReviewLog(vocabulary, facet, rawAnswer),
             svDe = svDe,
         )
     }
