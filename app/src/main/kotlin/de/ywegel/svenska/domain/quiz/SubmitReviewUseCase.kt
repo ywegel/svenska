@@ -28,9 +28,8 @@ class SubmitReviewUseCase @Inject constructor(
         reviewAt: Instant,
         reviewDuration: Duration,
     ) {
-        val reviewAtMillis = Instant.fromEpochMilliseconds(reviewAt.toEpochMilliseconds())
         val card = quizCardRepository.getCard(vocabulary, facet) ?: return
-        val (reviewedCard, log) = fsrsScheduler.review(card, rating, reviewAtMillis, reviewDuration)
+        val (reviewedCard, log) = fsrsScheduler.review(card, rating, reviewAt, reviewDuration)
 
         val isSvDe = facet == QuizFacet.SV_DE
         quizCardRepository.saveReview(
@@ -40,7 +39,7 @@ class SubmitReviewUseCase @Inject constructor(
             log = log,
             rawAnswer = rawAnswer,
             passedSvDe = rating.isPassing.takeIf { isSvDe },
-            unlockDeSvDue = reviewAtMillis.startOfNextDay(DAY_CUTOFF_HOUR, timeZone).takeIf { isSvDe && rating.isPassing },
+            unlockDeSvDue = reviewAt.startOfNextDay(DAY_CUTOFF_HOUR, timeZone).takeIf { isSvDe && rating.isPassing },
         )
     }
 }
