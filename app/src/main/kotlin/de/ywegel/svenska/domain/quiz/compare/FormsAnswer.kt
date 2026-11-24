@@ -35,6 +35,7 @@ private fun String.checkForm(expected: String): FormVerdict {
     val comparableTyped = comparable()
     if (variants.any { it.comparable() == comparableTyped }) return FormVerdict.Correct
 
+    // TODO: Introduce variants splitting to both forms and whole words. It should be possible to share logic.
     // The alignment keeps the typed case for the UI, it ignores case and normalizes to NFC itself
     val closest = variants
         .map { OptimalStringAlignment.alignment(trim(), it.trim()) }
