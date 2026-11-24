@@ -55,6 +55,26 @@ class AnswerCheckerTest {
         )
     }
 
+    @Test
+    fun `phrase typo aligns correct words as one match each`() {
+        // When
+        val result = checker.check("tv\u00E5 bialr", "tv\u00E5 bilar")
+
+        // Then
+        expectThat(result).isEqualTo(
+            AnswerVerdict.Typo(
+                listOf(
+                    Match("tv\u00E5", "tv\u00E5"),
+                    Match(" ", " "),
+                    Match("b", "b"),
+                    Match("i", "i"),
+                    SwappedLetters("al", "la"),
+                    Match("r", "r"),
+                ),
+            ),
+        )
+    }
+
     companion object {
         private const val NFD_A_RING = "a\u030A"
 
@@ -65,6 +85,9 @@ class AnswerCheckerTest {
             argumentSet("surrounding whitespace", " bilar ", "bilar"),
             argumentSet("decomposed å", "s${NFD_A_RING}g", "såg"),
             argumentSet("empty", "", ""),
+            argumentSet("phrase", "tycka om", "tycka om"),
+            argumentSet("phrase with extra whitespace", "tycka   om", "tycka om"),
+            argumentSet("phrase without punctuation", "hur mår du", "Hur mår du?"),
         )
 
         @JvmStatic
@@ -74,6 +97,7 @@ class AnswerCheckerTest {
             argumentSet("one edit in a seven letter word", "flicor", "flickor"),
             argumentSet("two edits in an eight letter word", "arbtaer", "arbetare"),
             argumentSet("a for ä when the typed word is unknown", "hamta", "hämta"),
+            argumentSet("one edit in one word of a phrase", "att ha ont i huvdet", "att ha ont i huvudet"),
         )
 
         @JvmStatic
@@ -85,6 +109,9 @@ class AnswerCheckerTest {
             argumentSet("another known word", "andra", "ändra"),
             argumentSet("another known word in different case", "Andra", "ändra"),
             argumentSet("another known word stored decomposed", "såg", "sågs"),
+            argumentSet("wrong article in a phrase", "en bilar", "ett bilar"),
+            argumentSet("missing word in a phrase", "tycka", "tycka om"),
+            argumentSet("another known word in a phrase", "andra bilar", "ändra bilar"),
         )
     }
 }

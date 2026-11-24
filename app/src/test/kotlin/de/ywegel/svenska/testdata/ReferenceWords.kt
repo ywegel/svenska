@@ -252,6 +252,8 @@ object ReferenceWords {
 
     val all: List<ReferenceWord> get() = nouns + verbs + adjectives
 
+    fun byWord(word: String): ReferenceWord = all.single { it.word == word }
+
     @Suppress("LongParameterList")
     private fun en(
         word: String,

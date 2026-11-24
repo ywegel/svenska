@@ -11,13 +11,37 @@ sealed interface AnswerVerdict {
 }
 
 /**
- * Decides whether a typed answer is correct, close enough to count as a typo, or wrong.
+ * Decides whether a typed answer is correct, close enough to count as a typo, or wrong. Both words and sentences are accepte.
  * Typing a different known word is never a typo, even if it is only one letter away: andra is no typo of ändra.
  */
 class AnswerChecker(knownWords: Collection<String>) {
     private val knownWords = knownWords.mapTo(HashSet()) { it.comparable() }
 
+    /**
+     * Checks each word on its own, so short words keep their strict tolerance: en is no typo of ett, even in a long
+     * phrase. Punctuation and extra whitespace are ignored, a missing or extra word is wrong. A [AnswerVerdict.Typo]
+     * aligns the whole phrase, with each correct word as a single [EditStep.Match].
+     */
     fun check(typed: String, expected: String): AnswerVerdict {
+        val typedWords = typed.words()
+        val expectedWords = expected.words()
+        if (typedWords.size != expectedWords.size) return AnswerVerdict.Wrong
+
+        val alignment = typedWords
+            .zip(expectedWords) { t, e ->
+                when (val verdict = checkWord(t, e)) {
+                    AnswerVerdict.Wrong -> return AnswerVerdict.Wrong
+                    AnswerVerdict.Correct -> listOf(EditStep.Match(t, e))
+                    is AnswerVerdict.Typo -> verdict.alignment
+                }
+            }
+            .reduceOrNull { joined, word -> joined + EditStep.Match(" ", " ") + word }
+            .orEmpty()
+
+        return if (alignment.all { it is EditStep.Match }) AnswerVerdict.Correct else AnswerVerdict.Typo(alignment)
+    }
+
+    private fun checkWord(typed: String, expected: String): AnswerVerdict {
         val comparableTyped = typed.comparable()
         val comparableExpected = expected.comparable()
         val allowedEdits = allowedEdits(comparableExpected.length)
@@ -37,14 +61,17 @@ class AnswerChecker(knownWords: Collection<String>) {
         return if (edits <= allowedEdits) AnswerVerdict.Typo(alignment) else AnswerVerdict.Wrong
     }
 
-    private fun String.comparable(): String = trim().toNfc().lowercase()
-
     // One edit is a third of a three letter word, so short words like bil or hus get no tolerance
     private fun allowedEdits(expectedLength: Int): Int = when {
         expectedLength <= SHORT_WORD_MAX_LENGTH -> 0
         expectedLength <= MEDIUM_WORD_MAX_LENGTH -> 1
         else -> 2
     }
+
+    // Hyphens and apostrophes stay part of the word
+    private val wordRegex = Regex("""[^\s.,!?;:]+""")
+
+    private fun String.words(): List<String> = wordRegex.findAll(this).map { it.value }.toList()
 
     private companion object {
         const val SHORT_WORD_MAX_LENGTH = 3
