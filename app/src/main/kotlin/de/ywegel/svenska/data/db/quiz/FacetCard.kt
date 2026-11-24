@@ -24,6 +24,17 @@ import de.ywegel.svenska.data.model.quiz.formsKey
  */
 sealed interface FacetCard {
     val fsrs: FsrsColumns
+
+    fun withFsrs(fsrs: FsrsColumns): FacetCard = when (this) {
+        is TranslationFacetCard -> copy(fsrs = fsrs)
+        is FormsFacetCard -> copy(fsrs = fsrs)
+    }
+
+    val facet: QuizFacet
+        get() = when (this) {
+            is TranslationFacetCard -> direction.toQuizFacet()
+            is FormsFacetCard -> QuizFacet.FORMS
+        }
 }
 
 /**
