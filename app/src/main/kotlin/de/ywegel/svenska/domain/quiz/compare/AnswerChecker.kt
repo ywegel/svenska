@@ -11,12 +11,17 @@ sealed interface AnswerVerdict {
 }
 
 /**
- * Decides whether a typed answer is correct, close enough to count as a typo, or wrong.
+ * Decides whether a typed answer is correct, close enough to count as a typo, or wrong. Both words and sentences are accepte.
  * Typing a different known word is never a typo, even if it is only one letter away: andra is no typo of ändra.
  */
 class AnswerChecker(knownWords: Collection<String>) {
     private val knownWords = knownWords.mapTo(HashSet()) { it.comparable() }
 
+    /**
+     * Checks each word on its own, so short words keep their strict tolerance: en is no typo of ett, even in a long
+     * phrase. Punctuation and extra whitespace are ignored, a missing or extra word is wrong. A [AnswerVerdict.Typo]
+     * aligns the whole phrase, with each correct word as a single [EditStep.Match].
+     */
     fun check(typed: String, expected: String): AnswerVerdict {
         val typedWords = typed.words()
         val expectedWords = expected.words()
@@ -30,12 +35,12 @@ class AnswerChecker(knownWords: Collection<String>) {
                     is AnswerVerdict.Typo -> verdict.alignment
                 }
             }
-            .reduce { joined, word -> joined + EditStep.Match(" ", " ") + word }
+            .reduceOrNull { joined, word -> joined + EditStep.Match(" ", " ") + word }
+            .orEmpty()
 
         return if (alignment.all { it is EditStep.Match }) AnswerVerdict.Correct else AnswerVerdict.Typo(alignment)
     }
 
-    // check -> checkWord
     private fun checkWord(typed: String, expected: String): AnswerVerdict {
         val comparableTyped = typed.comparable()
         val comparableExpected = expected.comparable()
