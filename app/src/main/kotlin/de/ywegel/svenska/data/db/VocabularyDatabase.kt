@@ -6,6 +6,10 @@ import androidx.room.RoomDatabase
 import androidx.sqlite.db.SupportSQLiteDatabase
 import de.ywegel.svenska.data.ContainerRepository
 import de.ywegel.svenska.data.VocabularyRepository
+import de.ywegel.svenska.data.db.quiz.FormsFacetCard
+import de.ywegel.svenska.data.db.quiz.QuizPoolEntry
+import de.ywegel.svenska.data.db.quiz.ReviewLog
+import de.ywegel.svenska.data.db.quiz.TranslationFacetCard
 import de.ywegel.svenska.data.model.Vocabulary
 import de.ywegel.svenska.data.model.VocabularyContainer
 import de.ywegel.svenska.data.model.containers
@@ -18,8 +22,15 @@ import javax.inject.Inject
 import javax.inject.Provider
 
 @Database(
-    entities = [Vocabulary::class, VocabularyContainer::class],
-    version = 5,
+    entities = [
+        Vocabulary::class,
+        VocabularyContainer::class,
+        QuizPoolEntry::class,
+        TranslationFacetCard::class,
+        FormsFacetCard::class,
+        ReviewLog::class,
+    ],
+    version = 6,
     exportSchema = true,
 )
 abstract class VocabularyDatabase : RoomDatabase() {

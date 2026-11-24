@@ -1,0 +1,460 @@
+{
+  "formatVersion": 1,
+  "database": {
+    "version": 6,
+    "identityHash": "57e2d80b807b757b431a52f47ef663ed",
+    "entities": [
+      {
+        "tableName": "Vocabulary",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`word` TEXT NOT NULL, `wordPrefix` TEXT NOT NULL DEFAULT '', `wordSuffix` TEXT NOT NULL DEFAULT '', `wordHighlights` TEXT NOT NULL, `translation` TEXT NOT NULL, `gender` TEXT, `wordGroup` TEXT NOT NULL, `ending` TEXT NOT NULL, `form1` TEXT, `form2` TEXT, `form3` TEXT, `formsNeedReview` INTEGER NOT NULL DEFAULT 0, `notes` TEXT NOT NULL, `irregularPronunciation` TEXT, `isFavorite` INTEGER NOT NULL, `containerId` INTEGER NOT NULL, `lastEdited` INTEGER NOT NULL, `created` INTEGER NOT NULL, `id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL)",
+        "fields": [
+          {
+            "fieldPath": "word",
+            "columnName": "word",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "wordPrefix",
+            "columnName": "wordPrefix",
+            "affinity": "TEXT",
+            "notNull": true,
+            "defaultValue": "''"
+          },
+          {
+            "fieldPath": "wordSuffix",
+            "columnName": "wordSuffix",
+            "affinity": "TEXT",
+            "notNull": true,
+            "defaultValue": "''"
+          },
+          {
+            "fieldPath": "wordHighlights",
+            "columnName": "wordHighlights",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "translation",
+            "columnName": "translation",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "gender",
+            "columnName": "gender",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "wordGroup",
+            "columnName": "wordGroup",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "ending",
+            "columnName": "ending",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "form1",
+            "columnName": "form1",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "form2",
+            "columnName": "form2",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "form3",
+            "columnName": "form3",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "formsNeedReview",
+            "columnName": "formsNeedReview",
+            "affinity": "INTEGER",
+            "notNull": true,
+            "defaultValue": "0"
+          },
+          {
+            "fieldPath": "notes",
+            "columnName": "notes",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "irregularPronunciation",
+            "columnName": "irregularPronunciation",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "isFavorite",
+            "columnName": "isFavorite",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "containerId",
+            "columnName": "containerId",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "lastEdited",
+            "columnName": "lastEdited",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "created",
+            "columnName": "created",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "id",
+            "columnName": "id",
+            "affinity": "INTEGER",
+            "notNull": true
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": true,
+          "columnNames": [
+            "id"
+          ]
+        }
+      },
+      {
+        "tableName": "VocabularyContainer",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `name` TEXT NOT NULL)",
+        "fields": [
+          {
+            "fieldPath": "id",
+            "columnName": "id",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "name",
+            "columnName": "name",
+            "affinity": "TEXT",
+            "notNull": true
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": true,
+          "columnNames": [
+            "id"
+          ]
+        }
+      },
+      {
+        "tableName": "QuizPoolEntry",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`vocabularyId` INTEGER NOT NULL, `queuedAt` INTEGER NOT NULL, `introducedAt` INTEGER, `isPaused` INTEGER NOT NULL, `svDeStreak` INTEGER NOT NULL, `resetAt` INTEGER, PRIMARY KEY(`vocabularyId`), FOREIGN KEY(`vocabularyId`) REFERENCES `Vocabulary`(`id`) ON UPDATE NO ACTION ON DELETE CASCADE )",
+        "fields": [
+          {
+            "fieldPath": "vocabularyId",
+            "columnName": "vocabularyId",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "queuedAt",
+            "columnName": "queuedAt",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "introducedAt",
+            "columnName": "introducedAt",
+            "affinity": "INTEGER"
+          },
+          {
+            "fieldPath": "isPaused",
+            "columnName": "isPaused",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "svDeStreak",
+            "columnName": "svDeStreak",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "resetAt",
+            "columnName": "resetAt",
+            "affinity": "INTEGER"
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": false,
+          "columnNames": [
+            "vocabularyId"
+          ]
+        },
+        "foreignKeys": [
+          {
+            "table": "Vocabulary",
+            "onDelete": "CASCADE",
+            "onUpdate": "NO ACTION",
+            "columns": [
+              "vocabularyId"
+            ],
+            "referencedColumns": [
+              "id"
+            ]
+          }
+        ]
+      },
+      {
+        "tableName": "TranslationFacetCard",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`vocabularyId` INTEGER NOT NULL, `direction` TEXT NOT NULL, `phase` TEXT NOT NULL, `step` INTEGER, `stability` REAL, `difficulty` REAL, `due` INTEGER NOT NULL, `lastReview` INTEGER, PRIMARY KEY(`vocabularyId`, `direction`), FOREIGN KEY(`vocabularyId`) REFERENCES `Vocabulary`(`id`) ON UPDATE NO ACTION ON DELETE CASCADE )",
+        "fields": [
+          {
+            "fieldPath": "vocabularyId",
+            "columnName": "vocabularyId",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "direction",
+            "columnName": "direction",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "fsrs.phase",
+            "columnName": "phase",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "fsrs.step",
+            "columnName": "step",
+            "affinity": "INTEGER"
+          },
+          {
+            "fieldPath": "fsrs.stability",
+            "columnName": "stability",
+            "affinity": "REAL"
+          },
+          {
+            "fieldPath": "fsrs.difficulty",
+            "columnName": "difficulty",
+            "affinity": "REAL"
+          },
+          {
+            "fieldPath": "fsrs.due",
+            "columnName": "due",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "fsrs.lastReview",
+            "columnName": "lastReview",
+            "affinity": "INTEGER"
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": false,
+          "columnNames": [
+            "vocabularyId",
+            "direction"
+          ]
+        },
+        "indices": [
+          {
+            "name": "index_TranslationFacetCard_due",
+            "unique": false,
+            "columnNames": [
+              "due"
+            ],
+            "orders": [],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_TranslationFacetCard_due` ON `${TABLE_NAME}` (`due`)"
+          }
+        ],
+        "foreignKeys": [
+          {
+            "table": "Vocabulary",
+            "onDelete": "CASCADE",
+            "onUpdate": "NO ACTION",
+            "columns": [
+              "vocabularyId"
+            ],
+            "referencedColumns": [
+              "id"
+            ]
+          }
+        ]
+      },
+      {
+        "tableName": "FormsFacetCard",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`formsKey` TEXT NOT NULL, `introducedAt` INTEGER NOT NULL, `phase` TEXT NOT NULL, `step` INTEGER, `stability` REAL, `difficulty` REAL, `due` INTEGER NOT NULL, `lastReview` INTEGER, PRIMARY KEY(`formsKey`))",
+        "fields": [
+          {
+            "fieldPath": "formsKey",
+            "columnName": "formsKey",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "introducedAt",
+            "columnName": "introducedAt",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "fsrs.phase",
+            "columnName": "phase",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "fsrs.step",
+            "columnName": "step",
+            "affinity": "INTEGER"
+          },
+          {
+            "fieldPath": "fsrs.stability",
+            "columnName": "stability",
+            "affinity": "REAL"
+          },
+          {
+            "fieldPath": "fsrs.difficulty",
+            "columnName": "difficulty",
+            "affinity": "REAL"
+          },
+          {
+            "fieldPath": "fsrs.due",
+            "columnName": "due",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "fsrs.lastReview",
+            "columnName": "lastReview",
+            "affinity": "INTEGER"
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": false,
+          "columnNames": [
+            "formsKey"
+          ]
+        },
+        "indices": [
+          {
+            "name": "index_FormsFacetCard_due",
+            "unique": false,
+            "columnNames": [
+              "due"
+            ],
+            "orders": [],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_FormsFacetCard_due` ON `${TABLE_NAME}` (`due`)"
+          }
+        ]
+      },
+      {
+        "tableName": "ReviewLog",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `vocabularyId` INTEGER NOT NULL, `facet` TEXT NOT NULL, `formsKey` TEXT, `rating` INTEGER NOT NULL, `rawAnswer` TEXT NOT NULL, `reviewAt` INTEGER NOT NULL, `durationMillis` INTEGER, FOREIGN KEY(`vocabularyId`) REFERENCES `Vocabulary`(`id`) ON UPDATE NO ACTION ON DELETE CASCADE )",
+        "fields": [
+          {
+            "fieldPath": "id",
+            "columnName": "id",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "vocabularyId",
+            "columnName": "vocabularyId",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "facet",
+            "columnName": "facet",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "formsKey",
+            "columnName": "formsKey",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "rating",
+            "columnName": "rating",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "rawAnswer",
+            "columnName": "rawAnswer",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "reviewAt",
+            "columnName": "reviewAt",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "durationMillis",
+            "columnName": "durationMillis",
+            "affinity": "INTEGER"
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": true,
+          "columnNames": [
+            "id"
+          ]
+        },
+        "indices": [
+          {
+            "name": "index_ReviewLog_vocabularyId_facet",
+            "unique": false,
+            "columnNames": [
+              "vocabularyId",
+              "facet"
+            ],
+            "orders": [],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_ReviewLog_vocabularyId_facet` ON `${TABLE_NAME}` (`vocabularyId`, `facet`)"
+          },
+          {
+            "name": "index_ReviewLog_formsKey",
+            "unique": false,
+            "columnNames": [
+              "formsKey"
+            ],
+            "orders": [],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_ReviewLog_formsKey` ON `${TABLE_NAME}` (`formsKey`)"
+          }
+        ],
+        "foreignKeys": [
+          {
+            "table": "Vocabulary",
+            "onDelete": "CASCADE",
+            "onUpdate": "NO ACTION",
+            "columns": [
+              "vocabularyId"
+            ],
+            "referencedColumns": [
+              "id"
+            ]
+          }
+        ]
+      }
+    ],
+    "setupQueries": [
+      "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '57e2d80b807b757b431a52f47ef663ed')"
+    ]
+  }
+}
