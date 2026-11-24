@@ -1,6 +1,7 @@
 package de.ywegel.svenska.data.db
 
 import androidx.room.Dao
+import androidx.room.Delete
 import androidx.room.Insert
 import androidx.room.Query
 import androidx.room.Update
@@ -13,6 +14,9 @@ interface QuizPoolDao {
 
     @Update
     suspend fun update(entry: QuizPoolEntry)
+
+    @Delete
+    suspend fun delete(entry: QuizPoolEntry)
 
     @Query("SELECT * FROM QuizPoolEntry WHERE vocabularyId = :vocabularyId")
     suspend fun get(vocabularyId: Int): QuizPoolEntry?
