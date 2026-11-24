@@ -3,9 +3,13 @@ package de.ywegel.svenska.data.impl.quiz
 import de.ywegel.svenska.data.db.quiz.CardPhase
 import de.ywegel.svenska.data.db.quiz.FsrsColumns
 import de.ywegel.svenska.data.db.quiz.ReviewLog
+import de.ywegel.svenska.data.model.Vocabulary
+import de.ywegel.svenska.data.model.quiz.QuizFacet
+import de.ywegel.svenska.data.model.quiz.formsKey
 import one.felsen.fsrskt.fsrs6.FsrsCard
 import one.felsen.fsrskt.fsrs6.FsrsCardState
 import one.felsen.fsrskt.fsrs6.FsrsRating
+import one.felsen.fsrskt.fsrs6.FsrsReviewLog
 import kotlin.time.Instant
 
 fun CardPhase.toFsrs(): FsrsCardState = when (this) {
@@ -57,4 +61,14 @@ fun FsrsCard.toFsrsColumns() = FsrsColumns(
     difficulty = difficulty,
     due = due.toEpochMilliseconds(),
     lastReview = lastReview?.toEpochMilliseconds(),
+)
+
+fun FsrsReviewLog.toReviewLog(vocabulary: Vocabulary, facet: QuizFacet, rawAnswer: String) = ReviewLog(
+    vocabularyId = vocabulary.id,
+    facet = facet,
+    formsKey = vocabulary.formsKey.takeIf { facet == QuizFacet.FORMS },
+    rating = rating.toStoredRating(),
+    rawAnswer = rawAnswer,
+    reviewAt = reviewAt.toEpochMilliseconds(),
+    durationMillis = reviewDuration?.inWholeMilliseconds,
 )
