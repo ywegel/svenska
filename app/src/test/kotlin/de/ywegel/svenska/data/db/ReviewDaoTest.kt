@@ -49,7 +49,7 @@ class ReviewDaoTest : RobolectricTest() {
         val reviewed = svDeCard(due = LATER)
 
         // When
-        reviewDao.saveReview(reviewed, svDeStreak = 2, log = svDeLog(), unlockedDeSv = null)
+        reviewDao.saveReview(reviewed, passedSvDe = true, log = svDeLog(), unlockedDeSv = null)
 
         // Then
         expectThat(reviewDao.getTranslationCard(VOCABULARY_ID, QuizTranslationDirection.SV_DE)).isEqualTo(reviewed)
@@ -64,7 +64,7 @@ class ReviewDaoTest : RobolectricTest() {
         reviewDao.insertFormsCardIfAbsent(formsCard(due = NOW))
 
         // When
-        reviewDao.saveReview(formsCard(due = LATER), svDeStreak = null, log = formsLog(), unlockedDeSv = null)
+        reviewDao.saveReview(formsCard(due = LATER), passedSvDe = null, log = formsLog(), unlockedDeSv = null)
 
         // Then
         expectThat(reviewDao.getFormsCard(FORMS_KEY)?.fsrs?.due).isEqualTo(LATER)
@@ -80,7 +80,7 @@ class ReviewDaoTest : RobolectricTest() {
         reviewDao.insertTranslationCardIfAbsent(svDeCard(due = NOW))
 
         // When
-        reviewDao.saveReview(svDeCard(due = LATER), svDeStreak = 1, log = svDeLog(), unlockedDeSv = null)
+        reviewDao.saveReview(svDeCard(due = LATER), passedSvDe = true, log = svDeLog(), unlockedDeSv = null)
 
         // Then
         expectThat(poolDao.get(VOCABULARY_ID)?.isPaused).isEqualTo(true)
@@ -92,7 +92,7 @@ class ReviewDaoTest : RobolectricTest() {
         poolDao.insert(activeEntry())
 
         // When
-        reviewDao.saveReview(deSvCard(due = LATER), svDeStreak = null, log = deSvLog(), unlockedDeSv = null)
+        reviewDao.saveReview(deSvCard(due = LATER), passedSvDe = null, log = deSvLog(), unlockedDeSv = null)
 
         // Then
         expectThat(reviewDao.getTranslationCard(VOCABULARY_ID, QuizTranslationDirection.DE_SV)).isNull()
@@ -106,7 +106,7 @@ class ReviewDaoTest : RobolectricTest() {
         val unlocked = deSvCard(due = TOMORROW)
 
         // When
-        reviewDao.saveReview(svDeCard(due = LATER), svDeStreak = 1, log = svDeLog(), unlockedDeSv = unlocked)
+        reviewDao.saveReview(svDeCard(due = LATER), passedSvDe = true, log = svDeLog(), unlockedDeSv = unlocked)
 
         // Then
         expectThat(reviewDao.getTranslationCard(VOCABULARY_ID, QuizTranslationDirection.DE_SV)).isEqualTo(unlocked)
@@ -123,7 +123,7 @@ class ReviewDaoTest : RobolectricTest() {
         // When
         reviewDao.saveReview(
             svDeCard(due = LATER),
-            svDeStreak = 2,
+            passedSvDe = true,
             log = svDeLog(),
             unlockedDeSv = deSvCard(due = TOMORROW),
         )
@@ -137,8 +137,8 @@ class ReviewDaoTest : RobolectricTest() {
         // Given
         poolDao.insert(activeEntry())
         reviewDao.insertTranslationCardIfAbsent(svDeCard(due = NOW))
-        reviewDao.saveReview(svDeCard(due = LATER), svDeStreak = 1, log = svDeLog(reviewAt = NOW), unlockedDeSv = null)
-        reviewDao.saveReview(svDeCard(due = LATER), svDeStreak = 2, log = svDeLog(reviewAt = LATER), unlockedDeSv = null)
+        reviewDao.saveReview(svDeCard(due = LATER), passedSvDe = true, log = svDeLog(reviewAt = NOW), unlockedDeSv = null)
+        reviewDao.saveReview(svDeCard(due = LATER), passedSvDe = true, log = svDeLog(reviewAt = LATER), unlockedDeSv = null)
 
         // When
         val logs = reviewDao.getLogs(VOCABULARY_ID)
@@ -154,10 +154,10 @@ class ReviewDaoTest : RobolectricTest() {
         poolDao.insert(entry)
         reviewDao.insertTranslationCardIfAbsent(svDeCard(due = NOW))
         reviewDao.insertFormsCardIfAbsent(formsCard(due = NOW))
-        reviewDao.saveReview(svDeCard(due = LATER), svDeStreak = 1, log = svDeLog(reviewAt = NOW), unlockedDeSv = null)
-        reviewDao.saveReview(formsCard(due = LATER), svDeStreak = null, log = formsLog(reviewAt = NOW), unlockedDeSv = null)
+        reviewDao.saveReview(svDeCard(due = LATER), passedSvDe = true, log = svDeLog(reviewAt = NOW), unlockedDeSv = null)
+        reviewDao.saveReview(formsCard(due = LATER), passedSvDe = null, log = formsLog(reviewAt = NOW), unlockedDeSv = null)
         poolDao.update(entry.reset(now = RESET))
-        reviewDao.saveReview(svDeCard(due = LATER), svDeStreak = 1, log = svDeLog(reviewAt = LATER), unlockedDeSv = null)
+        reviewDao.saveReview(svDeCard(due = LATER), passedSvDe = true, log = svDeLog(reviewAt = LATER), unlockedDeSv = null)
 
         // When
         val logs = reviewDao.getLogs(VOCABULARY_ID)

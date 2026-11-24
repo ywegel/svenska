@@ -1,7 +1,6 @@
 package de.ywegel.svenska.data.db
 
 import android.annotation.SuppressLint
-import androidx.room.AutoMigration
 import androidx.room.Database
 import androidx.room.RoomDatabase
 import androidx.sqlite.db.SupportSQLiteDatabase

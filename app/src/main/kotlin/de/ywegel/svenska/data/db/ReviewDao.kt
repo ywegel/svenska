@@ -54,13 +54,25 @@ abstract class ReviewDao {
     @Insert
     protected abstract suspend fun insertLog(log: ReviewLog)
 
-    @Query("UPDATE QuizPoolEntry SET svDeStreak = :streak WHERE vocabularyId = :vocabularyId")
-    protected abstract suspend fun updateSvDeStreak(vocabularyId: Int, streak: Int)
+    // Counted in SQL, so that several reviews of a word in one session build on each other
+    @Query(
+        """
+        UPDATE QuizPoolEntry SET svDeStreak = CASE WHEN :passed THEN svDeStreak + 1 ELSE 0 END
+        WHERE vocabularyId = :vocabularyId
+        """,
+    )
+    protected abstract suspend fun updateSvDeStreak(vocabularyId: Int, passed: Boolean)
 
+    /**
+     * Saves a review of [card] in one transaction.
+     *
+     * @param passedSvDe Whether an SV_DE review passed, `null` for the other facets, which keep the streak.
+     * @param unlockedDeSv A newly unlocked DE_SV card. An existing DE_SV card keeps its progress.
+     */
     @Transaction
     open suspend fun saveReview(
         card: FacetCard,
-        svDeStreak: Int?,
+        passedSvDe: Boolean?,
         log: ReviewLog,
         unlockedDeSv: TranslationFacetCard?,
     ) {
@@ -69,7 +81,7 @@ abstract class ReviewDao {
             is TranslationFacetCard -> updateTranslationCard(card)
         }
         insertLog(log)
-        svDeStreak?.let { updateSvDeStreak(log.vocabularyId, it) }
+        passedSvDe?.let { updateSvDeStreak(log.vocabularyId, it) }
         unlockedDeSv?.let { insertTranslationCardIfAbsent(it) }
     }
 }

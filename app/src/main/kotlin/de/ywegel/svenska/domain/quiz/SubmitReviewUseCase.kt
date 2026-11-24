@@ -1,44 +1,46 @@
 package de.ywegel.svenska.domain.quiz
 
 import de.ywegel.svenska.data.QuizCardRepository
-import de.ywegel.svenska.data.db.quiz.FacetCard
-import de.ywegel.svenska.data.db.quiz.QuizPoolEntry
-import de.ywegel.svenska.data.impl.quiz.toFsrsCard
-import de.ywegel.svenska.data.impl.quiz.toFsrsColumns
-import de.ywegel.svenska.data.impl.quiz.toReviewLog
+import de.ywegel.svenska.data.model.Vocabulary
 import de.ywegel.svenska.data.model.quiz.QuizFacet
+import kotlinx.datetime.TimeZone
 import one.felsen.fsrskt.fsrs6.FsrsRating
 import one.felsen.fsrskt.fsrs6.FsrsScheduler
+import one.felsen.fsrskt.helper.DateTimeHelper.startOfNextDay
 import javax.inject.Inject
 import kotlin.time.Duration
 import kotlin.time.Instant
 
+/**
+ * Reviews a facet of a vocabulary with its final [FsrsRating] and saves the result. A passing SV_DE review raises the
+ * streak and unlocks DE_SV, due at the start of the next quiz day. A locked or deleted card is not reviewed.
+ */
 class SubmitReviewUseCase @Inject constructor(
     private val quizCardRepository: QuizCardRepository,
     private val fsrsScheduler: FsrsScheduler,
+    private val timeZone: TimeZone,
 ) {
     suspend operator fun invoke(
-        facetCard: FacetCard,
-        poolEntry: QuizPoolEntry,
+        vocabulary: Vocabulary,
+        facet: QuizFacet,
         rating: FsrsRating,
         rawAnswer: String,
         reviewAt: Instant,
         reviewDuration: Duration,
     ) {
-        val (reviewedCard, fsrsLog) = fsrsScheduler.review(
-            facetCard.fsrs.toFsrsCard(),
-            rating,
-            reviewAt,
-            reviewDuration,
+        val reviewAtMillis = Instant.fromEpochMilliseconds(reviewAt.toEpochMilliseconds())
+        val card = quizCardRepository.getCard(vocabulary, facet) ?: return
+        val (reviewedCard, log) = fsrsScheduler.review(card, rating, reviewAtMillis, reviewDuration)
+
+        val isSvDe = facet == QuizFacet.SV_DE
+        quizCardRepository.saveReview(
+            vocabulary = vocabulary,
+            facet = facet,
+            card = reviewedCard,
+            log = log,
+            rawAnswer = rawAnswer,
+            passedSvDe = rating.isPassing.takeIf { isSvDe },
+            unlockDeSvDue = reviewAtMillis.startOfNextDay(DAY_CUTOFF_HOUR, timeZone).takeIf { isSvDe && rating.isPassing },
         )
-        val log = fsrsLog.toReviewLog(facetCard, poolEntry.vocabularyId, rawAnswer)
-
-        val updated = facetCard.withFsrs(reviewedCard.toFsrsColumns())
-
-        val isSvDe = facetCard.facet == QuizFacet.SV_DE
-        val svDeStreak = if (isSvDe) nextSvDeStreak(poolEntry.svDeStreak, rating) else null
-        val unlockedDeSv = if (isSvDe && rating.isPassing) newDeSvCard(poolEntry.vocabularyId, reviewAt) else null
-
-        quizCardRepository.saveReview(card = updated, svDeStreak, log, unlockedDeSv)
     }
 }
