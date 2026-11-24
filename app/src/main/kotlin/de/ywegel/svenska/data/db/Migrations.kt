@@ -152,10 +152,54 @@ val MIGRATION_4_5 = object : Migration(4, 5) {
 }
 
 /**
+ * Adds the quiz tables: pool entries, the FSRS cards per facet and the review logs. Existing words start outside the
+ * quiz pool, so all new tables start empty.
+ *
+ * The SQL is copied from the exported schema `6.json` and must not be changed afterwards.
+ */
+@Suppress("detekt:MagicNumber")
+val MIGRATION_5_6 = object : Migration(5, 6) {
+    override fun migrate(db: SupportSQLiteDatabase) {
+        db.execSQL(
+            "CREATE TABLE IF NOT EXISTS `QuizPoolEntry` (`vocabularyId` INTEGER NOT NULL, " +
+                "`queuedAt` INTEGER NOT NULL, `introducedAt` INTEGER, `isPaused` INTEGER NOT NULL, " +
+                "`svDeStreak` INTEGER NOT NULL, `resetAt` INTEGER, PRIMARY KEY(`vocabularyId`), " +
+                "FOREIGN KEY(`vocabularyId`) REFERENCES `Vocabulary`(`id`) ON UPDATE NO ACTION ON DELETE CASCADE )",
+        )
+        db.execSQL(
+            "CREATE TABLE IF NOT EXISTS `TranslationFacetCard` (`vocabularyId` INTEGER NOT NULL, " +
+                "`direction` TEXT NOT NULL, `phase` TEXT NOT NULL, `step` INTEGER, `stability` REAL, " +
+                "`difficulty` REAL, `due` INTEGER NOT NULL, `lastReview` INTEGER, " +
+                "PRIMARY KEY(`vocabularyId`, `direction`), FOREIGN KEY(`vocabularyId`) " +
+                "REFERENCES `Vocabulary`(`id`) ON UPDATE NO ACTION ON DELETE CASCADE )",
+        )
+        db.execSQL(
+            "CREATE INDEX IF NOT EXISTS `index_TranslationFacetCard_due` ON `TranslationFacetCard` (`due`)",
+        )
+        db.execSQL(
+            "CREATE TABLE IF NOT EXISTS `FormsFacetCard` (`formsKey` TEXT NOT NULL, `introducedAt` INTEGER NOT NULL, " +
+                "`phase` TEXT NOT NULL, `step` INTEGER, `stability` REAL, `difficulty` REAL, " +
+                "`due` INTEGER NOT NULL, `lastReview` INTEGER, PRIMARY KEY(`formsKey`))",
+        )
+        db.execSQL("CREATE INDEX IF NOT EXISTS `index_FormsFacetCard_due` ON `FormsFacetCard` (`due`)")
+        db.execSQL(
+            "CREATE TABLE IF NOT EXISTS `ReviewLog` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, " +
+                "`vocabularyId` INTEGER NOT NULL, `facet` TEXT NOT NULL, `formsKey` TEXT, `rating` INTEGER NOT NULL, " +
+                "`rawAnswer` TEXT NOT NULL, `reviewAt` INTEGER NOT NULL, `durationMillis` INTEGER, " +
+                "FOREIGN KEY(`vocabularyId`) REFERENCES `Vocabulary`(`id`) ON UPDATE NO ACTION ON DELETE CASCADE )",
+        )
+        db.execSQL(
+            "CREATE INDEX IF NOT EXISTS `index_ReviewLog_vocabularyId_facet` ON `ReviewLog` (`vocabularyId`, `facet`)",
+        )
+        db.execSQL("CREATE INDEX IF NOT EXISTS `index_ReviewLog_formsKey` ON `ReviewLog` (`formsKey`)")
+    }
+}
+
+/**
  * Every migration in order. The database builder and the full chain migration test both use this list, so a new
  * migration only has to be added here.
  */
-val ALL_MIGRATIONS = arrayOf(MIGRATION_1_2, MIGRATION_2_3, MIGRATION_3_4, MIGRATION_4_5)
+val ALL_MIGRATIONS = arrayOf(MIGRATION_1_2, MIGRATION_2_3, MIGRATION_3_4, MIGRATION_4_5, MIGRATION_5_6)
 
 /**
  * Frozen snapshot of the dash replacement in `WordExtractor.normalizeSpecialCharacters` (formerly
