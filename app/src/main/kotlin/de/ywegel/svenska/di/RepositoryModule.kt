@@ -7,12 +7,16 @@ import dagger.hilt.components.SingletonComponent
 import de.ywegel.svenska.data.ContainerRepository
 import de.ywegel.svenska.data.FavoritesAndPronunciationsRepository
 import de.ywegel.svenska.data.FileRepository
+import de.ywegel.svenska.data.QuizCardRepository
+import de.ywegel.svenska.data.QuizPoolRepository
 import de.ywegel.svenska.data.QuizRepository
 import de.ywegel.svenska.data.SearchRepository
 import de.ywegel.svenska.data.VocabularyRepository
 import de.ywegel.svenska.data.impl.ContainerRepositoryImpl
 import de.ywegel.svenska.data.impl.FavoritesAndPronunciationsRepositoryImpl
 import de.ywegel.svenska.data.impl.FileRepositoryImpl
+import de.ywegel.svenska.data.impl.QuizCardRepositoryImpl
+import de.ywegel.svenska.data.impl.QuizPoolRepositoryImpl
 import de.ywegel.svenska.data.impl.QuizRepositoryImpl
 import de.ywegel.svenska.data.impl.SearchRepositoryImpl
 import de.ywegel.svenska.data.impl.VocabularyRepositoryImpl
@@ -42,6 +46,14 @@ abstract class RepositoryModule {
     @Singleton
     @Binds
     abstract fun bindQuizRepository(repository: QuizRepositoryImpl): QuizRepository
+
+    @Singleton
+    @Binds
+    abstract fun bindQuizPoolRepository(repository: QuizPoolRepositoryImpl): QuizPoolRepository
+
+    @Singleton
+    @Binds
+    abstract fun bindQuizCardRepository(repository: QuizCardRepositoryImpl): QuizCardRepository
 
     @Singleton
     @Binds
