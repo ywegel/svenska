@@ -58,4 +58,15 @@ data class QuizPoolEntry(
             introducedAt == null -> QuizPoolStatus.QUEUED
             else -> QuizPoolStatus.ACTIVE
         }
+
+    fun introduce(now: Long): QuizPoolEntry {
+        check(poolStatus == QuizPoolStatus.QUEUED) { "Only a queued word can be introduced, but was $this." }
+        return copy(introducedAt = now)
+    }
+
+    fun pause(): QuizPoolEntry = copy(isPaused = true)   // init catches a queued word
+
+    fun resume(): QuizPoolEntry = copy(isPaused = false)
+
+    fun reset(now: Long): QuizPoolEntry = copy(svDeStreak = 0, resetAt = now)
 }
