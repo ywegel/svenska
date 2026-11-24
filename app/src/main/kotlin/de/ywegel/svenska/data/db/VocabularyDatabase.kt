@@ -32,6 +32,10 @@ abstract class VocabularyDatabase : RoomDatabase() {
 
     abstract fun quiz(): QuizDao
 
+    abstract fun quizPool(): QuizPoolDao
+
+    abstract fun quizCard(): QuizCardDao
+
     class Callback @Inject constructor(
         private val vocabularyRepositoryProvider: Provider<VocabularyRepository>,
         private val containerRepositoryProvider: Provider<ContainerRepository>,
