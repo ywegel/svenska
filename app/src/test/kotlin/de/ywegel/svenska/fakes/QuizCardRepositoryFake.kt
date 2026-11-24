@@ -3,9 +3,9 @@ package de.ywegel.svenska.fakes
 import de.ywegel.svenska.data.QuizCardRepository
 import de.ywegel.svenska.data.model.Vocabulary
 import de.ywegel.svenska.data.model.quiz.QuizFacet
+import de.ywegel.svenska.data.model.quiz.SvDeOutcome
 import one.felsen.fsrskt.fsrs6.FsrsCard
 import one.felsen.fsrskt.fsrs6.FsrsReviewLog
-import kotlin.time.Instant
 
 /**
  * Holds the unlocked cards by vocabulary id and facet, and records every saved review in [savedReviews].
@@ -25,11 +25,10 @@ class QuizCardRepositoryFake(
         card: FsrsCard,
         log: FsrsReviewLog,
         rawAnswer: String,
-        passedSvDe: Boolean?,
-        unlockDeSvDue: Instant?,
+        svDe: SvDeOutcome?,
     ) {
         cards[vocabulary.id to facet] = card
-        savedReviews += SavedReview(vocabulary.id, facet, card, log, rawAnswer, passedSvDe, unlockDeSvDue)
+        savedReviews += SavedReview(vocabulary.id, facet, card, log, rawAnswer, svDe)
     }
 
     data class SavedReview(
@@ -38,7 +37,6 @@ class QuizCardRepositoryFake(
         val card: FsrsCard,
         val log: FsrsReviewLog,
         val rawAnswer: String,
-        val passedSvDe: Boolean?,
-        val unlockDeSvDue: Instant?,
+        val svDe: SvDeOutcome?,
     )
 }

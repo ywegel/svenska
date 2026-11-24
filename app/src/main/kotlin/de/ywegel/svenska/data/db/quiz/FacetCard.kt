@@ -67,7 +67,21 @@ data class FsrsColumns(
     val difficulty: Double?,
     val due: Long,
     val lastReview: Long?,
-)
+) {
+    companion object {
+        /**
+         * The columns of a newly created card, due at [due].
+         */
+        fun newCard(due: Long) = FsrsColumns(
+            phase = CardPhase.LEARNING,
+            step = 0,
+            stability = null,
+            difficulty = null,
+            due = due,
+            lastReview = null,
+        )
+    }
+}
 
 /**
  * The card of one translation direction of a vocabulary row.

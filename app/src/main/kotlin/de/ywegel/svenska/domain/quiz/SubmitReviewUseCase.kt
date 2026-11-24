@@ -3,6 +3,7 @@ package de.ywegel.svenska.domain.quiz
 import de.ywegel.svenska.data.QuizCardRepository
 import de.ywegel.svenska.data.model.Vocabulary
 import de.ywegel.svenska.data.model.quiz.QuizFacet
+import de.ywegel.svenska.data.model.quiz.SvDeOutcome
 import kotlinx.datetime.TimeZone
 import one.felsen.fsrskt.fsrs6.FsrsRating
 import one.felsen.fsrskt.fsrs6.FsrsScheduler
@@ -31,15 +32,19 @@ class SubmitReviewUseCase @Inject constructor(
         val card = quizCardRepository.getCard(vocabulary, facet) ?: return
         val (reviewedCard, log) = fsrsScheduler.review(card, rating, reviewAt, reviewDuration)
 
-        val isSvDe = facet == QuizFacet.SV_DE
         quizCardRepository.saveReview(
-            vocabulary = vocabulary,
-            facet = facet,
-            card = reviewedCard,
-            log = log,
-            rawAnswer = rawAnswer,
-            passedSvDe = rating.isPassing.takeIf { isSvDe },
-            unlockDeSvDue = reviewAt.startOfNextDay(DAY_CUTOFF_HOUR, timeZone).takeIf { isSvDe && rating.isPassing },
+            vocabulary,
+            facet,
+            reviewedCard,
+            log,
+            rawAnswer,
+            svDeOutcome(facet, rating, reviewAt),
         )
+    }
+
+    private fun svDeOutcome(facet: QuizFacet, rating: FsrsRating, reviewAt: Instant): SvDeOutcome? = when {
+        facet != QuizFacet.SV_DE -> null
+        rating.isPassing -> SvDeOutcome.Passed(deSvDue = reviewAt.startOfNextDay(DAY_CUTOFF_HOUR, timeZone))
+        else -> SvDeOutcome.Failed
     }
 }

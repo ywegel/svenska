@@ -11,6 +11,7 @@ import de.ywegel.svenska.data.db.quiz.QuizTranslationDirection
 import de.ywegel.svenska.data.db.quiz.ReviewLog
 import de.ywegel.svenska.data.db.quiz.TranslationFacetCard
 import de.ywegel.svenska.data.model.quiz.QuizFacet
+import de.ywegel.svenska.data.model.quiz.SvDeOutcome
 import de.ywegel.svenska.data.model.vocabulary
 import kotlinx.coroutines.test.runTest
 import org.junit.After
@@ -18,8 +19,10 @@ import org.junit.Before
 import org.junit.Test
 import strikt.api.expectThat
 import strikt.assertions.containsExactly
+import strikt.assertions.isEmpty
 import strikt.assertions.isEqualTo
 import strikt.assertions.isNull
+import kotlin.time.Instant
 
 class ReviewDaoTest : RobolectricTest() {
     private lateinit var db: VocabularyDatabase
@@ -49,12 +52,26 @@ class ReviewDaoTest : RobolectricTest() {
         val reviewed = svDeCard(due = LATER)
 
         // When
-        reviewDao.saveReview(reviewed, passedSvDe = true, log = svDeLog(), unlockedDeSv = null)
+        reviewDao.saveReview(reviewed, log = svDeLog(), svDe = PASSED)
 
         // Then
         expectThat(reviewDao.getTranslationCard(VOCABULARY_ID, QuizTranslationDirection.SV_DE)).isEqualTo(reviewed)
         expectThat(reviewDao.getLogs(VOCABULARY_ID).map { it.rating }).containsExactly(GOOD)
         expectThat(poolDao.get(VOCABULARY_ID)?.svDeStreak).isEqualTo(2)
+    }
+
+    @Test
+    fun `A failed SV_DE review resets the streak and unlocks nothing`() = runTest {
+        // Given
+        poolDao.insert(activeEntry(svDeStreak = 2))
+        reviewDao.insertTranslationCardIfAbsent(svDeCard(due = NOW))
+
+        // When
+        reviewDao.saveReview(svDeCard(due = LATER), log = svDeLog(), svDe = SvDeOutcome.Failed)
+
+        // Then
+        expectThat(poolDao.get(VOCABULARY_ID)?.svDeStreak).isEqualTo(0)
+        expectThat(reviewDao.getTranslationCard(VOCABULARY_ID, QuizTranslationDirection.DE_SV)).isNull()
     }
 
     @Test
@@ -64,7 +81,7 @@ class ReviewDaoTest : RobolectricTest() {
         reviewDao.insertFormsCardIfAbsent(formsCard(due = NOW))
 
         // When
-        reviewDao.saveReview(formsCard(due = LATER), passedSvDe = null, log = formsLog(), unlockedDeSv = null)
+        reviewDao.saveReview(formsCard(due = LATER), log = formsLog(), svDe = null)
 
         // Then
         expectThat(reviewDao.getFormsCard(FORMS_KEY)?.fsrs?.due).isEqualTo(LATER)
@@ -80,22 +97,23 @@ class ReviewDaoTest : RobolectricTest() {
         reviewDao.insertTranslationCardIfAbsent(svDeCard(due = NOW))
 
         // When
-        reviewDao.saveReview(svDeCard(due = LATER), passedSvDe = true, log = svDeLog(), unlockedDeSv = null)
+        reviewDao.saveReview(svDeCard(due = LATER), log = svDeLog(), svDe = PASSED)
 
         // Then
         expectThat(poolDao.get(VOCABULARY_ID)?.isPaused).isEqualTo(true)
     }
 
     @Test
-    fun `Saving a review of a deleted card does not create it again`() = runTest {
+    fun `Saving a review of a deleted card drops the review`() = runTest {
         // Given
         poolDao.insert(activeEntry())
 
         // When
-        reviewDao.saveReview(deSvCard(due = LATER), passedSvDe = null, log = deSvLog(), unlockedDeSv = null)
+        reviewDao.saveReview(deSvCard(due = LATER), log = deSvLog(), svDe = null)
 
         // Then
         expectThat(reviewDao.getTranslationCard(VOCABULARY_ID, QuizTranslationDirection.DE_SV)).isNull()
+        expectThat(reviewDao.getLogs(VOCABULARY_ID)).isEmpty()
     }
 
     @Test
@@ -106,7 +124,7 @@ class ReviewDaoTest : RobolectricTest() {
         val unlocked = deSvCard(due = TOMORROW)
 
         // When
-        reviewDao.saveReview(svDeCard(due = LATER), passedSvDe = true, log = svDeLog(), unlockedDeSv = unlocked)
+        reviewDao.saveReview(svDeCard(due = LATER), log = svDeLog(), svDe = PASSED)
 
         // Then
         expectThat(reviewDao.getTranslationCard(VOCABULARY_ID, QuizTranslationDirection.DE_SV)).isEqualTo(unlocked)
@@ -123,9 +141,8 @@ class ReviewDaoTest : RobolectricTest() {
         // When
         reviewDao.saveReview(
             svDeCard(due = LATER),
-            passedSvDe = true,
             log = svDeLog(),
-            unlockedDeSv = deSvCard(due = TOMORROW),
+            svDe = PASSED,
         )
 
         // Then
@@ -137,8 +154,8 @@ class ReviewDaoTest : RobolectricTest() {
         // Given
         poolDao.insert(activeEntry())
         reviewDao.insertTranslationCardIfAbsent(svDeCard(due = NOW))
-        reviewDao.saveReview(svDeCard(due = LATER), passedSvDe = true, log = svDeLog(reviewAt = NOW), unlockedDeSv = null)
-        reviewDao.saveReview(svDeCard(due = LATER), passedSvDe = true, log = svDeLog(reviewAt = LATER), unlockedDeSv = null)
+        reviewDao.saveReview(svDeCard(due = LATER), log = svDeLog(reviewAt = NOW), svDe = PASSED)
+        reviewDao.saveReview(svDeCard(due = LATER), log = svDeLog(reviewAt = LATER), svDe = PASSED)
 
         // When
         val logs = reviewDao.getLogs(VOCABULARY_ID)
@@ -148,23 +165,34 @@ class ReviewDaoTest : RobolectricTest() {
     }
 
     @Test
-    fun `A reset drops the translation logs before it, but keeps the forms logs`() = runTest {
+    fun `Forms logs are not part of the logs of a row`() = runTest {
         // Given
-        val entry = activeEntry()
-        poolDao.insert(entry)
-        reviewDao.insertTranslationCardIfAbsent(svDeCard(due = NOW))
+        poolDao.insert(activeEntry())
         reviewDao.insertFormsCardIfAbsent(formsCard(due = NOW))
-        reviewDao.saveReview(svDeCard(due = LATER), passedSvDe = true, log = svDeLog(reviewAt = NOW), unlockedDeSv = null)
-        reviewDao.saveReview(formsCard(due = LATER), passedSvDe = null, log = formsLog(reviewAt = NOW), unlockedDeSv = null)
-        poolDao.update(entry.reset(now = RESET))
-        reviewDao.saveReview(svDeCard(due = LATER), passedSvDe = true, log = svDeLog(reviewAt = LATER), unlockedDeSv = null)
+        reviewDao.saveReview(formsCard(due = LATER), log = formsLog(), svDe = null)
 
         // When
         val logs = reviewDao.getLogs(VOCABULARY_ID)
 
         // Then
-        expectThat(logs.map { it.facet to it.reviewAt })
-            .containsExactly(QuizFacet.FORMS to NOW, QuizFacet.SV_DE to LATER)
+        expectThat(logs).isEmpty()
+    }
+
+    @Test
+    fun `A reset drops the logs before it`() = runTest {
+        // Given
+        val entry = activeEntry()
+        poolDao.insert(entry)
+        reviewDao.insertTranslationCardIfAbsent(svDeCard(due = NOW))
+        reviewDao.saveReview(svDeCard(due = LATER), log = svDeLog(reviewAt = NOW), svDe = PASSED)
+        poolDao.update(entry.reset(now = RESET))
+        reviewDao.saveReview(svDeCard(due = LATER), log = svDeLog(reviewAt = LATER), svDe = PASSED)
+
+        // When
+        val logs = reviewDao.getLogs(VOCABULARY_ID)
+
+        // Then
+        expectThat(logs.map { it.reviewAt }).containsExactly(LATER)
     }
 
     private fun activeEntry(svDeStreak: Int = 0) =
@@ -209,5 +237,6 @@ class ReviewDaoTest : RobolectricTest() {
         const val RESET = 1_500L
         const val LATER = 2_000L
         const val TOMORROW = 90_000_000L
+        val PASSED = SvDeOutcome.Passed(deSvDue = Instant.fromEpochMilliseconds(TOMORROW))
     }
 }

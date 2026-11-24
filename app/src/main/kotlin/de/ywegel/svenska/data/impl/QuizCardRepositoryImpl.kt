@@ -3,19 +3,17 @@ package de.ywegel.svenska.data.impl
 import de.ywegel.svenska.data.QuizCardRepository
 import de.ywegel.svenska.data.db.ReviewDao
 import de.ywegel.svenska.data.db.quiz.FacetCard
-import de.ywegel.svenska.data.db.quiz.QuizTranslationDirection
-import de.ywegel.svenska.data.db.quiz.TranslationFacetCard
 import de.ywegel.svenska.data.db.quiz.toTranslationDirection
 import de.ywegel.svenska.data.impl.quiz.toFsrsCard
 import de.ywegel.svenska.data.impl.quiz.toFsrsColumns
 import de.ywegel.svenska.data.impl.quiz.toReviewLog
 import de.ywegel.svenska.data.model.Vocabulary
 import de.ywegel.svenska.data.model.quiz.QuizFacet
+import de.ywegel.svenska.data.model.quiz.SvDeOutcome
 import de.ywegel.svenska.data.model.quiz.formsKey
 import one.felsen.fsrskt.fsrs6.FsrsCard
 import one.felsen.fsrskt.fsrs6.FsrsReviewLog
 import javax.inject.Inject
-import kotlin.time.Instant
 
 class QuizCardRepositoryImpl @Inject constructor(
     private val reviewDao: ReviewDao,
@@ -30,17 +28,13 @@ class QuizCardRepositoryImpl @Inject constructor(
         card: FsrsCard,
         log: FsrsReviewLog,
         rawAnswer: String,
-        passedSvDe: Boolean?,
-        unlockDeSvDue: Instant?,
+        svDe: SvDeOutcome?,
     ) {
         val stored = findCard(vocabulary, facet) ?: return
         reviewDao.saveReview(
             card = stored.withFsrs(card.toFsrsColumns()),
-            passedSvDe = passedSvDe,
             log = log.toReviewLog(stored, vocabulary.id, rawAnswer),
-            unlockedDeSv = unlockDeSvDue?.let {
-                TranslationFacetCard(vocabulary.id, QuizTranslationDirection.DE_SV, FsrsCard(due = it).toFsrsColumns())
-            },
+            svDe = svDe,
         )
     }
 

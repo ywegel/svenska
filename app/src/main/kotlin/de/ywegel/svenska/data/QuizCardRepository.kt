@@ -2,9 +2,9 @@ package de.ywegel.svenska.data
 
 import de.ywegel.svenska.data.model.Vocabulary
 import de.ywegel.svenska.data.model.quiz.QuizFacet
+import de.ywegel.svenska.data.model.quiz.SvDeOutcome
 import one.felsen.fsrskt.fsrs6.FsrsCard
 import one.felsen.fsrskt.fsrs6.FsrsReviewLog
-import kotlin.time.Instant
 
 interface QuizCardRepository {
     /**
@@ -13,12 +13,10 @@ interface QuizCardRepository {
     suspend fun getCard(vocabulary: Vocabulary, facet: QuizFacet): FsrsCard?
 
     /**
-     * Saves a review in one transaction: the reviewed [card], its [log], the SV_DE streak and a newly unlocked DE_SV
-     * card. Does nothing if the card no longer exists, e.g. after a reset during the session.
+     * Saves a review in one transaction: the reviewed [card], its [log] and the [svDe] outcome. Does nothing if the
+     * card no longer exists, e.g. after a reset during the session.
      *
-     * @param passedSvDe Whether an SV_DE review passed, `null` for the other facets, which keep the streak.
-     * @param unlockDeSvDue When the newly unlocked DE_SV card is due, `null` if nothing is unlocked. An existing DE_SV
-     * card keeps its progress.
+     * @param svDe The streak and unlock of an SV_DE review, `null` for the other facets.
      */
     suspend fun saveReview(
         vocabulary: Vocabulary,
@@ -26,7 +24,6 @@ interface QuizCardRepository {
         card: FsrsCard,
         log: FsrsReviewLog,
         rawAnswer: String,
-        passedSvDe: Boolean?,
-        unlockDeSvDue: Instant?,
+        svDe: SvDeOutcome?,
     )
 }
