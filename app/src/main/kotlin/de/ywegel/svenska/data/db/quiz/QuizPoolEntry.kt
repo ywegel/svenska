@@ -24,7 +24,9 @@ import de.ywegel.svenska.data.model.quiz.QuizTranslationDirection
  * @property formsIntroducedAt When this row introduced the shared [FormsFacetCard] of its forms, in epoch
  * milliseconds, `null` if it didn't. Set when the introduction card of the forms is shown and the forms card is
  * created. If another row with the same forms introduced the card first, it stays `null`, so a shared card counts
- * only once towards the daily limit of new cards. A reset of the row keeps it, as the shared card is not reset.
+ * only once towards the daily limit of new cards. A reset of the row keeps it, as the shared card is not reset. It
+ * only counts new cards, it doesn't lock the row: After an edit of the forms, the row can introduce the card of its new
+ * forms, which sets it again.
  * @property isPaused Whether the word was removed from the pool after its introduction. Its cards are not quizzed, but
  * keep their progress. Only an introduced word can be paused.
  * @property svDeStreak The number of SV_DE reviews in a row with a final rating of GOOD or EASY since [resetAt]. Any

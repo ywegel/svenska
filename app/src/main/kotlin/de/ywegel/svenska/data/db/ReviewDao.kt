@@ -12,9 +12,11 @@ import de.ywegel.svenska.data.db.quiz.FsrsColumns
 import de.ywegel.svenska.data.db.quiz.QuizPoolEntry
 import de.ywegel.svenska.data.db.quiz.ReviewLog
 import de.ywegel.svenska.data.db.quiz.TranslationFacetCard
+import de.ywegel.svenska.data.model.quiz.QuizPoolStatus
 import de.ywegel.svenska.data.model.quiz.QuizTranslationDirection
 import de.ywegel.svenska.data.model.quiz.SvDeOutcome
 
+@Suppress("detekt:TooManyFunctions")
 @Dao
 abstract class ReviewDao {
     @Query("SELECT * FROM TranslationFacetCard WHERE vocabularyId = :vocabularyId AND direction = :direction")
@@ -25,6 +27,23 @@ abstract class ReviewDao {
 
     @Query("SELECT * FROM FormsFacetCard WHERE formsKey = :formsKey")
     abstract suspend fun getFormsCard(formsKey: String): FormsFacetCard?
+
+    /**
+     * The translation cards of all [QuizPoolStatus.ACTIVE] words.
+     */
+    @Query(
+        """
+        SELECT TranslationFacetCard.* FROM TranslationFacetCard
+        JOIN QuizPoolEntry ON QuizPoolEntry.vocabularyId = TranslationFacetCard.vocabularyId
+        WHERE QuizPoolEntry.introducedAt IS NOT NULL AND NOT QuizPoolEntry.isPaused
+        """,
+    )
+    abstract suspend fun getActiveTranslationCards(): List<TranslationFacetCard>
+
+    // All of them, as the forms key of the rows is not stored, so the active ones can't be joined in SQL
+    // TODO(formsKey column): Remove, replaced by joins in getActiveCards and getFormsCandidates
+    @Query("SELECT * FROM FormsFacetCard")
+    abstract suspend fun getAllFormsCards(): List<FormsFacetCard>
 
     /**
      * The translation logs of a row that still count for its cards, oldest first. A reset of the row
@@ -50,6 +69,7 @@ abstract class ReviewDao {
     @Update
     protected abstract suspend fun updateFormsCard(card: FormsFacetCard): Int
 
+    // TODO: Duplicates QuizPoolDao's insert…IfAbsent, move introduce to the session DAO
     @Insert(onConflict = OnConflictStrategy.IGNORE)
     abstract suspend fun insertTranslationCardIfAbsent(card: TranslationFacetCard)
 

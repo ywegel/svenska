@@ -8,6 +8,12 @@ import one.felsen.fsrskt.fsrs6.FsrsReviewLog
 
 interface QuizCardRepository {
     /**
+     * All cards of the active words, due or not. A shared forms card comes once, read for the active row with the
+     * smallest id among those that share it.
+     */
+    suspend fun getActiveCards(): List<QuizCard>
+
+    /**
      * The card of a facet of [vocabulary], `null` while the facet is locked.
      */
     suspend fun getCard(vocabulary: Vocabulary, facet: QuizFacet): QuizCard?

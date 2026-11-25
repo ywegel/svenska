@@ -15,6 +15,8 @@ class QuizCardRepositoryFake(vararg unlockedCards: QuizCard) : QuizCardRepositor
 
     val savedReviews = mutableListOf<SavedReview>()
 
+    override suspend fun getActiveCards(): List<QuizCard> = cards.values.toList()
+
     override suspend fun getCard(vocabulary: Vocabulary, facet: QuizFacet): QuizCard? = cards[vocabulary.id to facet]
 
     override suspend fun saveReview(card: QuizCard, log: FsrsReviewLog, rawAnswer: String, svDe: SvDeOutcome?) {
