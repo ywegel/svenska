@@ -1,6 +1,5 @@
 package de.ywegel.svenska.domain.quiz.session
 
-import de.ywegel.svenska.data.db.quiz.toTranslationDirection
 import de.ywegel.svenska.data.model.Vocabulary
 import de.ywegel.svenska.data.model.quiz.QuizCard
 import de.ywegel.svenska.data.model.quiz.QuizFacet
@@ -48,7 +47,7 @@ class DueCardsTest {
 
         // Then
         expectThat(items).containsExactly(
-            QuizItem(LAMPA, deSv.asTranslation(), forms = forms.fsrs.takeIf { isTakenAlong }),
+            QuizItem.DeSv(LAMPA, withForms = isTakenAlong),
         )
     }
 
@@ -77,8 +76,8 @@ class DueCardsTest {
 
         // Then
         expectThat(items).containsExactly(
-            QuizItem(LAMPA, first.asTranslation(), forms = forms.fsrs),
-            QuizItem(LAMPA_DUPLICATE, duplicate.asTranslation()),
+            QuizItem.DeSv(LAMPA, withForms = true),
+            QuizItem.DeSv(LAMPA_DUPLICATE),
         )
     }
 
@@ -95,7 +94,7 @@ class DueCardsTest {
         val items = planDueCards(listOfNotNull(svDe, deSv), NOW, START_OF_TODAY)
 
         // Then
-        expectThat(svDe.asTranslation() in items.map { it.translation }).isEqualTo(isAsked)
+        expectThat(QuizItem.SvDe(LAMPA) in items).isEqualTo(isAsked)
     }
 
     @Test
@@ -110,9 +109,9 @@ class DueCardsTest {
 
         // Then
         expectThat(items).containsExactly(
-            QuizItem(HUS, deSv.asTranslation()),
-            QuizItem(LAMPA, forms = forms.fsrs),
-            QuizItem(BIL, svDe.asTranslation()),
+            QuizItem.DeSv(HUS),
+            QuizItem.Forms(LAMPA),
+            QuizItem.SvDe(BIL),
         )
     }
 
@@ -137,9 +136,6 @@ class DueCardsTest {
             val lastReview = NOW - FORMS_INTERVAL * elapsedShare
             return card(LAMPA, QuizFacet.FORMS, due = lastReview + FORMS_INTERVAL, lastReview = lastReview)
         }
-
-        private fun QuizCard.asTranslation() =
-            QuizItem.Translation(checkNotNull(facet.toTranslationDirection()), fsrs)
 
         @JvmStatic
         fun singleCards() = QuizFacet.entries.flatMap { facet ->

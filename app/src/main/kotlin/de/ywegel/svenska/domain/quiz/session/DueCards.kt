@@ -1,6 +1,5 @@
 package de.ywegel.svenska.domain.quiz.session
 
-import de.ywegel.svenska.data.db.quiz.QuizTranslationDirection
 import de.ywegel.svenska.data.model.quiz.QuizCard
 import de.ywegel.svenska.data.model.quiz.QuizFacet
 import de.ywegel.svenska.data.model.quiz.formsKey
@@ -27,25 +26,16 @@ fun planDueCards(
         val formsKey = deSv.vocabulary.formsKey
         val forms = formsKey?.let { formsByKey[it] }
             ?.takeIf { it.fsrs.isAlmostDue(now) && askedFormsKeys.add(formsKey) }
-        QuizItem(
-            vocabulary = deSv.vocabulary,
-            translation = QuizItem.Translation(QuizTranslationDirection.DE_SV, deSv.fsrs),
-            forms = forms?.fsrs,
-        )
+        QuizItem.DeSv(vocabulary = deSv.vocabulary, withForms = forms != null)
     }
 
     val formsItems = formsByKey
         .filter { (formsKey, forms) -> forms.isDue(now) && formsKey !in askedFormsKeys }
-        .map { (_, forms) -> QuizItem(vocabulary = forms.vocabulary, forms = forms.fsrs) }
+        .map { (_, forms) -> QuizItem.Forms(vocabulary = forms.vocabulary) }
 
     val svDeItems = byFacet[QuizFacet.SV_DE].orEmpty()
         .filter { it.isDue(now) && deSvByWord[it.vocabulary.id]?.holdsBackSvDe(now, startOfToday) != true }
-        .map {
-            QuizItem(
-                vocabulary = it.vocabulary,
-                translation = QuizItem.Translation(QuizTranslationDirection.SV_DE, it.fsrs),
-            )
-        }
+        .map { QuizItem.SvDe(vocabulary = it.vocabulary) }
 
     return deSvItems + formsItems + svDeItems
 }
