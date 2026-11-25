@@ -18,8 +18,12 @@ import de.ywegel.svenska.data.model.quiz.QuizPoolStatus
  * first out. Words added together, e.g. a whole container, have the same time and are introduced in the order of
  * their [vocabularyId].
  * @property introducedAt When the word was introduced, in epoch milliseconds, `null` while it is queued. Counts towards
- * the daily limit of new cards, together with [FormsFacetCard.introducedAt]. Introducing the word creates its
+ * the daily limit of new cards, together with [formsIntroducedAt]. Introducing the word creates its
  * [QuizTranslationDirection.SV_DE] card. Pausing and resuming keeps it, so a resumed word doesn't count again.
+ * @property formsIntroducedAt When this row introduced the shared [FormsFacetCard] of its forms, in epoch
+ * milliseconds, `null` if it didn't. Set when the introduction card of the forms is shown and the forms card is
+ * created. If another row with the same forms introduced the card first, it stays `null`, so a shared card counts
+ * only once towards the daily limit of new cards. A reset of the row keeps it, as the shared card is not reset.
  * @property isPaused Whether the word was removed from the pool after its introduction. Its cards are not quizzed, but
  * keep their progress. Only an introduced word can be paused.
  * @property svDeStreak The number of SV_DE reviews in a row with a final rating of GOOD or EASY since [resetAt]. Any
@@ -44,12 +48,16 @@ data class QuizPoolEntry(
     @PrimaryKey val vocabularyId: Int,
     val queuedAt: Long,
     val introducedAt: Long? = null,
+    val formsIntroducedAt: Long? = null,
     val isPaused: Boolean = false,
     val svDeStreak: Int = 0,
     val resetAt: Long? = null,
 ) {
     init {
         require(!isPaused || introducedAt != null) { "Only an introduced word can be paused, but was $this." }
+        require(formsIntroducedAt == null || introducedAt != null) {
+            "Only an introduced word can introduce its forms, but was $this."
+        }
     }
 
     val poolStatus: QuizPoolStatus

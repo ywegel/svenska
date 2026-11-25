@@ -1,5 +1,6 @@
 package de.ywegel.svenska.domain.quiz
 
+import de.ywegel.svenska.data.model.quiz.QuizCard
 import de.ywegel.svenska.data.model.quiz.QuizFacet
 import de.ywegel.svenska.data.model.quiz.SvDeOutcome
 import de.ywegel.svenska.data.model.vocabulary
@@ -41,8 +42,8 @@ class SubmitReviewUseCaseTest {
         val saved = repository.savedReviews.single()
         expectThat(saved.rawAnswer).isEqualTo("lamp")
         expectThat(saved.log.rating).isEqualTo(FsrsRating.GOOD)
-        expectThat(saved.card.lastReview).isEqualTo(REVIEW_AT)
-        expectThat(saved.card.due).isGreaterThan(REVIEW_AT)
+        expectThat(saved.card.fsrs.lastReview).isEqualTo(REVIEW_AT)
+        expectThat(saved.card.fsrs.due).isGreaterThan(REVIEW_AT)
     }
 
     @Test
@@ -74,8 +75,14 @@ class SubmitReviewUseCaseTest {
         expectThat(repository.savedReviews.single().svDe).isEqualTo(expected)
     }
 
-    private fun repositoryWithUnlocked(facet: QuizFacet) =
-        QuizCardRepositoryFake((VOCABULARY.id to facet) to FsrsCard(due = REVIEW_AT))
+    private fun repositoryWithUnlocked(facet: QuizFacet) = QuizCardRepositoryFake(
+        QuizCard(
+            vocabularyId = VOCABULARY.id,
+            facet = facet,
+            formsKey = FORMS_KEY.takeIf { facet == QuizFacet.FORMS },
+            fsrs = FsrsCard(due = REVIEW_AT),
+        ),
+    )
 
     private suspend fun submit(
         repository: QuizCardRepositoryFake,
@@ -87,6 +94,7 @@ class SubmitReviewUseCaseTest {
         .invoke(VOCABULARY, facet, rating, rawAnswer, reviewAt, reviewDuration = 5.seconds)
 
     companion object {
+        private const val FORMS_KEY = "lampa|lampan|lampor|lamporna"
         private val VOCABULARY = vocabulary(id = 1)
         private val TIME_ZONE = TimeZone.of("Europe/Stockholm")
         private val REVIEW_AT = LocalDateTime.parse("2026-11-24T18:00").toInstant(TIME_ZONE)

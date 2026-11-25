@@ -5,7 +5,6 @@ import androidx.room.ForeignKey
 import androidx.room.ForeignKey.Companion.CASCADE
 import androidx.room.Index
 import androidx.room.PrimaryKey
-import de.ywegel.svenska.data.impl.quiz.HIGHEST_FSRS_RATING
 import de.ywegel.svenska.data.model.Vocabulary
 import de.ywegel.svenska.data.model.quiz.QuizFacet
 
@@ -56,8 +55,11 @@ data class ReviewLog(
         require((facet == QuizFacet.FORMS) == (formsKey != null)) {
             "formsKey must be set exactly for FORMS, but was $this."
         }
-        require(rating in 1..HIGHEST_FSRS_RATING) {
-            "rating must be between 1 and 4, but was $rating."
+        require(rating in 1..HIGHEST_RATING) {
+            "rating must be between 1 and $HIGHEST_RATING, but was $rating."
         }
     }
 }
+
+// EASY, the highest FSRS rating
+private const val HIGHEST_RATING = 4

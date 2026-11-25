@@ -31,6 +31,12 @@ class QuizPoolEntryTest {
     }
 
     @Test
+    fun `A queued word can not have introduced its forms`() {
+        // When / Then
+        expectThrows<IllegalArgumentException> { queued().copy(formsIntroducedAt = LATER) }
+    }
+
+    @Test
     fun `Introducing a queued word makes it active at that time`() {
         // Given
         val entry = queued()

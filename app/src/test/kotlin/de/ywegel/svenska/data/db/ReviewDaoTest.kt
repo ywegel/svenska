@@ -202,7 +202,7 @@ class ReviewDaoTest : RobolectricTest() {
 
     private fun deSvCard(due: Long) = TranslationFacetCard(VOCABULARY_ID, QuizTranslationDirection.DE_SV, fsrs(due))
 
-    private fun formsCard(due: Long) = FormsFacetCard(FORMS_KEY, fsrs(due), introducedAt = NOW)
+    private fun formsCard(due: Long) = FormsFacetCard(FORMS_KEY, fsrs(due))
 
     private fun fsrs(due: Long) = FsrsColumns(
         phase = CardPhase.LEARNING,

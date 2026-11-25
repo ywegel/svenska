@@ -1,11 +1,15 @@
 package de.ywegel.svenska.data.impl.quiz
 
 import de.ywegel.svenska.data.db.quiz.CardPhase
+import de.ywegel.svenska.data.db.quiz.FacetCard
+import de.ywegel.svenska.data.db.quiz.FormsFacetCard
 import de.ywegel.svenska.data.db.quiz.FsrsColumns
 import de.ywegel.svenska.data.db.quiz.ReviewLog
-import de.ywegel.svenska.data.model.Vocabulary
+import de.ywegel.svenska.data.db.quiz.TranslationFacetCard
+import de.ywegel.svenska.data.db.quiz.toQuizFacet
+import de.ywegel.svenska.data.db.quiz.toTranslationDirection
+import de.ywegel.svenska.data.model.quiz.QuizCard
 import de.ywegel.svenska.data.model.quiz.QuizFacet
-import de.ywegel.svenska.data.model.quiz.formsKey
 import one.felsen.fsrskt.fsrs6.FsrsCard
 import one.felsen.fsrskt.fsrs6.FsrsCardState
 import one.felsen.fsrskt.fsrs6.FsrsRating
@@ -29,8 +33,6 @@ fun FsrsCardState.toCardPhase(): CardPhase = when (this) {
  * FSRS optimizer use as well.
  */
 fun FsrsRating.toStoredRating(): Int = value
-
-const val HIGHEST_FSRS_RATING = 4
 
 /**
  * The rating of a stored value from [toStoredRating].
@@ -63,10 +65,32 @@ fun FsrsCard.toFsrsColumns() = FsrsColumns(
     lastReview = lastReview?.toEpochMilliseconds(),
 )
 
-fun FsrsReviewLog.toReviewLog(vocabulary: Vocabulary, facet: QuizFacet, rawAnswer: String) = ReviewLog(
-    vocabularyId = vocabulary.id,
-    facet = facet,
-    formsKey = vocabulary.formsKey.takeIf { facet == QuizFacet.FORMS },
+fun TranslationFacetCard.toQuizCard() = QuizCard(
+    vocabularyId = vocabularyId,
+    facet = direction.toQuizFacet(),
+    formsKey = null,
+    fsrs = fsrs.toFsrsCard(),
+)
+
+/**
+ * The forms card as read for the row [vocabularyId], one of the rows that share it.
+ */
+fun FormsFacetCard.toQuizCard(vocabularyId: Int) = QuizCard(
+    vocabularyId = vocabularyId,
+    facet = QuizFacet.FORMS,
+    formsKey = formsKey,
+    fsrs = fsrs.toFsrsCard(),
+)
+
+fun QuizCard.toFacetCard(): FacetCard = when (val direction = facet.toTranslationDirection()) {
+    null -> FormsFacetCard(formsKey = checkNotNull(formsKey), fsrs = fsrs.toFsrsColumns())
+    else -> TranslationFacetCard(vocabularyId = vocabularyId, direction = direction, fsrs = fsrs.toFsrsColumns())
+}
+
+fun FsrsReviewLog.toReviewLog(card: QuizCard, rawAnswer: String) = ReviewLog(
+    vocabularyId = card.vocabularyId,
+    facet = card.facet,
+    formsKey = card.formsKey,
     rating = rating.toStoredRating(),
     rawAnswer = rawAnswer,
     reviewAt = reviewAt.toEpochMilliseconds(),

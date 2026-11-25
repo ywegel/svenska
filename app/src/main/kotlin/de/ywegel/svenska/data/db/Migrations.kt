@@ -162,7 +162,8 @@ val MIGRATION_5_6 = object : Migration(5, 6) {
     override fun migrate(db: SupportSQLiteDatabase) {
         db.execSQL(
             "CREATE TABLE IF NOT EXISTS `QuizPoolEntry` (`vocabularyId` INTEGER NOT NULL, " +
-                "`queuedAt` INTEGER NOT NULL, `introducedAt` INTEGER, `isPaused` INTEGER NOT NULL, " +
+                "`queuedAt` INTEGER NOT NULL, `introducedAt` INTEGER, `formsIntroducedAt` INTEGER, " +
+                "`isPaused` INTEGER NOT NULL, " +
                 "`svDeStreak` INTEGER NOT NULL, `resetAt` INTEGER, PRIMARY KEY(`vocabularyId`), " +
                 "FOREIGN KEY(`vocabularyId`) REFERENCES `Vocabulary`(`id`) ON UPDATE NO ACTION ON DELETE CASCADE )",
         )
@@ -177,7 +178,7 @@ val MIGRATION_5_6 = object : Migration(5, 6) {
             "CREATE INDEX IF NOT EXISTS `index_TranslationFacetCard_due` ON `TranslationFacetCard` (`due`)",
         )
         db.execSQL(
-            "CREATE TABLE IF NOT EXISTS `FormsFacetCard` (`formsKey` TEXT NOT NULL, `introducedAt` INTEGER NOT NULL, " +
+            "CREATE TABLE IF NOT EXISTS `FormsFacetCard` (`formsKey` TEXT NOT NULL, " +
                 "`phase` TEXT NOT NULL, `step` INTEGER, `stability` REAL, `difficulty` REAL, " +
                 "`due` INTEGER NOT NULL, `lastReview` INTEGER, PRIMARY KEY(`formsKey`))",
         )

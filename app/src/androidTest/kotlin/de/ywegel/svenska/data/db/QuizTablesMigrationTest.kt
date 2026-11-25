@@ -57,8 +57,9 @@ class QuizTablesMigrationTest {
         // Room turns foreign keys on for its own connections, the raw helper connection does not
         dbV6.execSQL("PRAGMA foreign_keys = ON")
         dbV6.execSQL(
-            "INSERT INTO QuizPoolEntry (vocabularyId, queuedAt, introducedAt, isPaused, svDeStreak, resetAt) " +
-                "VALUES (1, $currentTime, $currentTime, 0, 3, NULL)",
+            "INSERT INTO QuizPoolEntry " +
+                "(vocabularyId, queuedAt, introducedAt, formsIntroducedAt, isPaused, svDeStreak, resetAt) " +
+                "VALUES (1, $currentTime, $currentTime, $currentTime, 0, 3, NULL)",
         )
         dbV6.execSQL(
             "INSERT INTO TranslationFacetCard " +
@@ -66,8 +67,8 @@ class QuizTablesMigrationTest {
                 "VALUES (1, 'SV_DE', 'REVIEW', NULL, 4.5, 5.2, $currentTime, $currentTime)",
         )
         dbV6.execSQL(
-            "INSERT INTO FormsFacetCard (formsKey, introducedAt, phase, step, stability, difficulty, due, lastReview) " +
-                "VALUES ('känna|känner|kände|känt', $currentTime, 'LEARNING', 0, NULL, NULL, $currentTime, NULL)",
+            "INSERT INTO FormsFacetCard (formsKey, phase, step, stability, difficulty, due, lastReview) " +
+                "VALUES ('känna|känner|kände|känt', 'LEARNING', 0, NULL, NULL, $currentTime, NULL)",
         )
         dbV6.execSQL(
             "INSERT INTO ReviewLog (vocabularyId, facet, formsKey, rating, rawAnswer, reviewAt, durationMillis) " +
