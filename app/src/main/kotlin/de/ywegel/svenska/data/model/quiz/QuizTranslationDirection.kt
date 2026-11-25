@@ -1,10 +1,8 @@
-package de.ywegel.svenska.data.db.quiz
-
-import de.ywegel.svenska.data.model.quiz.QuizFacet
+package de.ywegel.svenska.data.model.quiz
 
 /**
- * The facets stored in [TranslationFacetCard]. Only used inside the data layer, so that a forms card can't end up in
- * the translation table. Domain and UI use [QuizFacet] instead.
+ * The translation facets of a word, without [QuizFacet.FORMS]. Used wherever only a translation fits, so that e.g. a
+ * forms card can't end up in the translation card table.
  */
 enum class QuizTranslationDirection { SV_DE, DE_SV }
 
@@ -14,7 +12,7 @@ fun QuizTranslationDirection.toQuizFacet(): QuizFacet = when (this) {
 }
 
 /**
- * The translation direction of this facet, or `null` for [QuizFacet.FORMS], which is stored in [FormsFacetCard].
+ * The translation direction of this facet, or `null` for [QuizFacet.FORMS], which is stored in the forms card table.
  */
 fun QuizFacet.toTranslationDirection(): QuizTranslationDirection? = when (this) {
     QuizFacet.SV_DE -> QuizTranslationDirection.SV_DE

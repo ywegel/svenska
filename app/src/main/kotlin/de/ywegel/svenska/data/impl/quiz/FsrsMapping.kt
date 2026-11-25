@@ -6,10 +6,12 @@ import de.ywegel.svenska.data.db.quiz.FormsFacetCard
 import de.ywegel.svenska.data.db.quiz.FsrsColumns
 import de.ywegel.svenska.data.db.quiz.ReviewLog
 import de.ywegel.svenska.data.db.quiz.TranslationFacetCard
-import de.ywegel.svenska.data.db.quiz.toQuizFacet
-import de.ywegel.svenska.data.db.quiz.toTranslationDirection
+import de.ywegel.svenska.data.model.Vocabulary
 import de.ywegel.svenska.data.model.quiz.QuizCard
 import de.ywegel.svenska.data.model.quiz.QuizFacet
+import de.ywegel.svenska.data.model.quiz.formsKey
+import de.ywegel.svenska.data.model.quiz.toQuizFacet
+import de.ywegel.svenska.data.model.quiz.toTranslationDirection
 import one.felsen.fsrskt.fsrs6.FsrsCard
 import one.felsen.fsrskt.fsrs6.FsrsCardState
 import one.felsen.fsrskt.fsrs6.FsrsRating
@@ -65,32 +67,28 @@ fun FsrsCard.toFsrsColumns() = FsrsColumns(
     lastReview = lastReview?.toEpochMilliseconds(),
 )
 
-fun TranslationFacetCard.toQuizCard() = QuizCard(
-    vocabularyId = vocabularyId,
-    facet = direction.toQuizFacet(),
-    formsKey = null,
-    fsrs = fsrs.toFsrsCard(),
-)
+fun TranslationFacetCard.toQuizCard(vocabulary: Vocabulary): QuizCard {
+    require(vocabulary.id == vocabularyId) { "The card of row $vocabularyId was read for $vocabulary." }
+    return QuizCard(vocabulary = vocabulary, facet = direction.toQuizFacet(), fsrs = fsrs.toFsrsCard())
+}
 
 /**
- * The forms card as read for the row [vocabularyId], one of the rows that share it.
+ * The forms card as read for [vocabulary], one of the rows that share it.
  */
-fun FormsFacetCard.toQuizCard(vocabularyId: Int) = QuizCard(
-    vocabularyId = vocabularyId,
-    facet = QuizFacet.FORMS,
-    formsKey = formsKey,
-    fsrs = fsrs.toFsrsCard(),
-)
+fun FormsFacetCard.toQuizCard(vocabulary: Vocabulary): QuizCard {
+    require(vocabulary.formsKey == formsKey) { "The forms card $formsKey was read for $vocabulary." }
+    return QuizCard(vocabulary = vocabulary, facet = QuizFacet.FORMS, fsrs = fsrs.toFsrsCard())
+}
 
 fun QuizCard.toFacetCard(): FacetCard = when (val direction = facet.toTranslationDirection()) {
-    null -> FormsFacetCard(formsKey = checkNotNull(formsKey), fsrs = fsrs.toFsrsColumns())
-    else -> TranslationFacetCard(vocabularyId = vocabularyId, direction = direction, fsrs = fsrs.toFsrsColumns())
+    null -> FormsFacetCard(formsKey = checkNotNull(vocabulary.formsKey), fsrs = fsrs.toFsrsColumns())
+    else -> TranslationFacetCard(vocabularyId = vocabulary.id, direction = direction, fsrs = fsrs.toFsrsColumns())
 }
 
 fun FsrsReviewLog.toReviewLog(card: QuizCard, rawAnswer: String) = ReviewLog(
-    vocabularyId = card.vocabularyId,
+    vocabularyId = card.vocabulary.id,
     facet = card.facet,
-    formsKey = card.formsKey,
+    formsKey = card.vocabulary.formsKey.takeIf { card.facet == QuizFacet.FORMS },
     rating = rating.toStoredRating(),
     rawAnswer = rawAnswer,
     reviewAt = reviewAt.toEpochMilliseconds(),

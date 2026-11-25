@@ -7,10 +7,10 @@ import de.ywegel.svenska.data.db.quiz.CardPhase
 import de.ywegel.svenska.data.db.quiz.FormsFacetCard
 import de.ywegel.svenska.data.db.quiz.FsrsColumns
 import de.ywegel.svenska.data.db.quiz.QuizPoolEntry
-import de.ywegel.svenska.data.db.quiz.QuizTranslationDirection
 import de.ywegel.svenska.data.db.quiz.ReviewLog
 import de.ywegel.svenska.data.db.quiz.TranslationFacetCard
 import de.ywegel.svenska.data.model.quiz.QuizFacet
+import de.ywegel.svenska.data.model.quiz.QuizTranslationDirection
 import de.ywegel.svenska.data.model.quiz.SvDeOutcome
 import de.ywegel.svenska.data.model.vocabulary
 import kotlinx.coroutines.test.runTest

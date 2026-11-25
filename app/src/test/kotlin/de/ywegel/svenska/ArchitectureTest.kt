@@ -7,7 +7,7 @@ import org.junit.jupiter.api.Test
 
 class ArchitectureTest {
 
-    // Domain and UI address a quiz card as vocabulary + QuizFacet. The card tables, QuizTranslationDirection and the
+    // Domain and UI address a quiz card as vocabulary + QuizFacet or QuizTranslationDirection. The card tables and the
     // mapping to FsrsKt are storage details. Later, as core:database and core:data, Gradle enforces this boundary.
     @Test
     fun `quiz entities and their mapping stay inside the data layer`() {

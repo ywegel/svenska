@@ -9,6 +9,7 @@ import androidx.room.PrimaryKey
 import de.ywegel.svenska.data.model.Vocabulary
 import de.ywegel.svenska.data.model.quiz.QuizFacet
 import de.ywegel.svenska.data.model.quiz.QuizPoolStatus
+import de.ywegel.svenska.data.model.quiz.QuizTranslationDirection
 import de.ywegel.svenska.data.model.quiz.formsKey
 
 /**
