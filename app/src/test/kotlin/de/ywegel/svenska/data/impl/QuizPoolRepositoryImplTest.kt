@@ -6,6 +6,7 @@ import de.ywegel.svenska.RobolectricTest
 import de.ywegel.svenska.data.db.QuizPoolDao
 import de.ywegel.svenska.data.db.VocabularyDatabase
 import de.ywegel.svenska.data.db.quiz.QuizPoolEntry
+import de.ywegel.svenska.data.model.quiz.PoolRemoval
 import de.ywegel.svenska.data.model.vocabulary
 import kotlinx.coroutines.test.runTest
 import org.junit.After
@@ -42,9 +43,10 @@ class QuizPoolRepositoryImplTest : RobolectricTest() {
         dao.insert(entry)
 
         // When
-        repository.removeFromPool(entry)
+        val removal = repository.removeFromPool(VOCABULARY_ID)
 
         // Then
+        expectThat(removal).isEqualTo(PoolRemoval.DELETED)
         expectThat(dao.get(VOCABULARY_ID)).isNull()
     }
 
@@ -55,9 +57,10 @@ class QuizPoolRepositoryImplTest : RobolectricTest() {
         dao.insert(entry)
 
         // When
-        repository.removeFromPool(entry)
+        val removal = repository.removeFromPool(VOCABULARY_ID)
 
         // Then
+        expectThat(removal).isEqualTo(PoolRemoval.PAUSED)
         expectThat(dao.get(VOCABULARY_ID)).isEqualTo(entry.copy(isPaused = true))
     }
 
@@ -68,10 +71,36 @@ class QuizPoolRepositoryImplTest : RobolectricTest() {
         dao.insert(entry)
 
         // When
-        repository.removeFromPool(entry)
+        val removal = repository.removeFromPool(VOCABULARY_ID)
 
         // Then
+        expectThat(removal).isEqualTo(PoolRemoval.UNCHANGED)
         expectThat(dao.get(VOCABULARY_ID)).isEqualTo(entry)
+    }
+
+    @Test
+    fun `Removing a word that is not in the pool changes nothing`() = runTest {
+        // When
+        val removal = repository.removeFromPool(VOCABULARY_ID)
+
+        // Then
+        expectThat(removal).isEqualTo(PoolRemoval.UNCHANGED)
+        expectThat(dao.get(VOCABULARY_ID)).isNull()
+    }
+
+    @Test
+    fun `Removing a word introduced after it was shown as queued pauses it`() = runTest {
+        // Given: the list still shows the word as queued, but a session has introduced it since
+        val shownAsQueued = queued()
+        dao.insert(shownAsQueued)
+        dao.update(shownAsQueued.introduce(now = 2_000L))
+
+        // When
+        val removal = repository.removeFromPool(VOCABULARY_ID)
+
+        // Then
+        expectThat(removal).isEqualTo(PoolRemoval.PAUSED)
+        expectThat(dao.get(VOCABULARY_ID)?.isPaused).isEqualTo(true)
     }
 
     private companion object {
