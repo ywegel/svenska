@@ -11,14 +11,14 @@ import one.felsen.fsrskt.fsrs6.FsrsReviewLog
  * Holds the unlocked cards by vocabulary id and facet, and records every saved review in [savedReviews].
  */
 class QuizCardRepositoryFake(vararg unlockedCards: QuizCard) : QuizCardRepository {
-    private val cards = unlockedCards.associateBy { it.vocabularyId to it.facet }.toMutableMap()
+    private val cards = unlockedCards.associateBy { it.vocabulary.id to it.facet }.toMutableMap()
 
     val savedReviews = mutableListOf<SavedReview>()
 
     override suspend fun getCard(vocabulary: Vocabulary, facet: QuizFacet): QuizCard? = cards[vocabulary.id to facet]
 
     override suspend fun saveReview(card: QuizCard, log: FsrsReviewLog, rawAnswer: String, svDe: SvDeOutcome?) {
-        cards[card.vocabularyId to card.facet] = card
+        cards[card.vocabulary.id to card.facet] = card
         savedReviews += SavedReview(card, log, rawAnswer, svDe)
     }
 

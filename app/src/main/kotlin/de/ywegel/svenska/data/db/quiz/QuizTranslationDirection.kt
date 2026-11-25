@@ -6,6 +6,7 @@ import de.ywegel.svenska.data.model.quiz.QuizFacet
  * The facets stored in [TranslationFacetCard]. Only used inside the data layer, so that a forms card can't end up in
  * the translation table. Domain and UI use [QuizFacet] instead.
  */
+// TODO: Decide if we should move this to data/model/quiz. Could be usefull
 enum class QuizTranslationDirection { SV_DE, DE_SV }
 
 fun QuizTranslationDirection.toQuizFacet(): QuizFacet = when (this) {

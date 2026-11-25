@@ -77,9 +77,8 @@ class SubmitReviewUseCaseTest {
 
     private fun repositoryWithUnlocked(facet: QuizFacet) = QuizCardRepositoryFake(
         QuizCard(
-            vocabularyId = VOCABULARY.id,
+            vocabulary = VOCABULARY,
             facet = facet,
-            formsKey = FORMS_KEY.takeIf { facet == QuizFacet.FORMS },
             fsrs = FsrsCard(due = REVIEW_AT),
         ),
     )
@@ -94,8 +93,7 @@ class SubmitReviewUseCaseTest {
         .invoke(VOCABULARY, facet, rating, rawAnswer, reviewAt, reviewDuration = 5.seconds)
 
     companion object {
-        private const val FORMS_KEY = "lampa|lampan|lampor|lamporna"
-        private val VOCABULARY = vocabulary(id = 1)
+        private val VOCABULARY = vocabulary(id = 1).copy(form1 = "lampan", form2 = "lampor", form3 = "lamporna")
         private val TIME_ZONE = TimeZone.of("Europe/Stockholm")
         private val REVIEW_AT = LocalDateTime.parse("2026-11-24T18:00").toInstant(TIME_ZONE)
         private val NEXT_QUIZ_DAY = LocalDateTime.parse("2026-11-25T04:00").toInstant(TIME_ZONE)

@@ -20,8 +20,8 @@ class QuizCardRepositoryImpl @Inject constructor(
 
     override suspend fun getCard(vocabulary: Vocabulary, facet: QuizFacet): QuizCard? =
         when (val direction = facet.toTranslationDirection()) {
-            null -> vocabulary.formsKey?.let { reviewDao.getFormsCard(it) }?.toQuizCard(vocabulary.id)
-            else -> reviewDao.getTranslationCard(vocabulary.id, direction)?.toQuizCard()
+            null -> vocabulary.formsKey?.let { reviewDao.getFormsCard(it) }?.toQuizCard(vocabulary)
+            else -> reviewDao.getTranslationCard(vocabulary.id, direction)?.toQuizCard(vocabulary)
         }
 
     override suspend fun saveReview(card: QuizCard, log: FsrsReviewLog, rawAnswer: String, svDe: SvDeOutcome?) =
