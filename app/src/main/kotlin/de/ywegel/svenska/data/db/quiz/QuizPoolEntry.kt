@@ -6,6 +6,7 @@ import androidx.room.ForeignKey.Companion.CASCADE
 import androidx.room.PrimaryKey
 import de.ywegel.svenska.data.model.Vocabulary
 import de.ywegel.svenska.data.model.quiz.QuizPoolStatus
+import de.ywegel.svenska.data.model.quiz.QuizTranslationDirection
 
 /**
  * The quiz pool state of one vocabulary row. It holds no FSRS values; those live in the [FacetCard]s of the row.

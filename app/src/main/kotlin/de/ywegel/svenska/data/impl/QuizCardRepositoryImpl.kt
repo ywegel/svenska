@@ -2,7 +2,6 @@ package de.ywegel.svenska.data.impl
 
 import de.ywegel.svenska.data.QuizCardRepository
 import de.ywegel.svenska.data.db.ReviewDao
-import de.ywegel.svenska.data.db.quiz.toTranslationDirection
 import de.ywegel.svenska.data.impl.quiz.toFacetCard
 import de.ywegel.svenska.data.impl.quiz.toQuizCard
 import de.ywegel.svenska.data.impl.quiz.toReviewLog
@@ -11,6 +10,7 @@ import de.ywegel.svenska.data.model.quiz.QuizCard
 import de.ywegel.svenska.data.model.quiz.QuizFacet
 import de.ywegel.svenska.data.model.quiz.SvDeOutcome
 import de.ywegel.svenska.data.model.quiz.formsKey
+import de.ywegel.svenska.data.model.quiz.toTranslationDirection
 import one.felsen.fsrskt.fsrs6.FsrsReviewLog
 import javax.inject.Inject
 

@@ -6,12 +6,12 @@ import de.ywegel.svenska.data.db.quiz.FormsFacetCard
 import de.ywegel.svenska.data.db.quiz.FsrsColumns
 import de.ywegel.svenska.data.db.quiz.ReviewLog
 import de.ywegel.svenska.data.db.quiz.TranslationFacetCard
-import de.ywegel.svenska.data.db.quiz.toQuizFacet
-import de.ywegel.svenska.data.db.quiz.toTranslationDirection
 import de.ywegel.svenska.data.model.Vocabulary
 import de.ywegel.svenska.data.model.quiz.QuizCard
 import de.ywegel.svenska.data.model.quiz.QuizFacet
 import de.ywegel.svenska.data.model.quiz.formsKey
+import de.ywegel.svenska.data.model.quiz.toQuizFacet
+import de.ywegel.svenska.data.model.quiz.toTranslationDirection
 import one.felsen.fsrskt.fsrs6.FsrsCard
 import one.felsen.fsrskt.fsrs6.FsrsCardState
 import one.felsen.fsrskt.fsrs6.FsrsRating

@@ -1,6 +1,6 @@
 package de.ywegel.svenska.domain.quiz
 
-import de.ywegel.svenska.data.db.quiz.QuizTranslationDirection
+import de.ywegel.svenska.data.model.quiz.QuizTranslationDirection
 import de.ywegel.svenska.domain.quiz.compare.AnswerVerdict
 import de.ywegel.svenska.domain.quiz.compare.FormsVerdict
 import one.felsen.fsrskt.fsrs6.FsrsRating
