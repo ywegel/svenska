@@ -19,6 +19,7 @@ interface VocabularyDao {
     @Delete
     suspend fun deleteVocabulary(vocabulary: Vocabulary)
 
+    // TODO(formsKey column): Set the stored forms key here, the only write path, so that it can't go stale
     @Upsert
     suspend fun upsertVocabulary(vocabulary: Vocabulary): Long
 
