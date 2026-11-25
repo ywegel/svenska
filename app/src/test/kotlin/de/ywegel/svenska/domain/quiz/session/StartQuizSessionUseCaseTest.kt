@@ -66,6 +66,20 @@ class StartQuizSessionUseCaseTest {
     }
 
     @Test
+    fun `New words are spread between the due ones`() = runTest {
+        // Given
+        val due = (10..13).map { vocabulary(id = it) }
+        val cards = QuizCardRepositoryFake(*due.map { card(it, QuizFacet.SV_DE, due = NOW) }.toTypedArray())
+        val pool = QuizPoolRepositoryFake(queuedWords = listOf(BIL, KATT))
+
+        // When
+        val items = start(pool, cards)
+
+        // Then
+        expectThat(items.map { it.vocabulary.id }).containsExactly(BIL.id, 10, 11, KATT.id, 12, 13)
+    }
+
+    @Test
     fun `A regular adjective gets no forms card`() = runTest {
         // Given
         val pool = QuizPoolRepositoryFake(formsCandidates = listOf(STOR))

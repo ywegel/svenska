@@ -12,6 +12,7 @@ import kotlinx.datetime.atTime
 import kotlinx.datetime.toInstant
 import one.felsen.fsrskt.helper.DateTimeHelper.toDayNumber
 import javax.inject.Inject
+import kotlin.math.ceil
 import kotlin.time.Instant
 
 // TODO: Make both a setting
@@ -21,7 +22,7 @@ private const val BACKLOG_LIMIT = 100
 /**
  * Plans the items of a new quiz session. First introduces the new cards the daily limit allows, forms cards before
  * queued words, as those words are already known. Then plans the due cards together with the new ones, so a new forms
- * card is asked along with a due DE_SV card of its word.
+ * card is asked along with a due DE_SV card of its word. The new items are spread evenly between the due ones.
  */
 class StartQuizSessionUseCase @Inject constructor(
     private val quizCardRepository: QuizCardRepository,
@@ -52,7 +53,16 @@ class StartQuizSessionUseCase @Inject constructor(
         val wordsToIntroduce = quizPoolRepository.queuedWords(limit = budget - formsToIntroduce.size)
         val introduced = quizPoolRepository.introduce(wordsToIntroduce, formsToIntroduce, now)
 
-        return planDueCards(cards + introduced, now, startOfToday)
+        val newIds = introduced.mapTo(HashSet()) { it.vocabulary.id }
+        val (new, due) = planDueCards(cards + introduced, now, startOfToday).partition { it.vocabulary.id in newIds }
+        return spread(new, due)
+    }
+
+    // New words between the due ones instead of at the end, so they come even in a short session
+    private fun spread(new: List<QuizItem>, due: List<QuizItem>): List<QuizItem> {
+        if (new.isEmpty()) return due
+        val dueChunks = due.chunked(ceil(due.size / new.size.toDouble()).toInt().coerceAtLeast(1))
+        return new.flatMapIndexed { index, item -> listOf(item) + dueChunks.getOrElse(index) { emptyList() } }
     }
 
     private fun Instant.startOfDay(): Instant =
