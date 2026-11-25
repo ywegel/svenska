@@ -30,15 +30,13 @@ class SubmitReviewUseCase @Inject constructor(
         reviewDuration: Duration,
     ) {
         val card = quizCardRepository.getCard(vocabulary, facet) ?: return
-        val (reviewedCard, log) = fsrsScheduler.review(card, rating, reviewAt, reviewDuration)
+        val (reviewed, log) = fsrsScheduler.review(card.fsrs, rating, reviewAt, reviewDuration)
 
         quizCardRepository.saveReview(
-            vocabulary,
-            facet,
-            reviewedCard,
-            log,
-            rawAnswer,
-            svDeOutcome(facet, rating, reviewAt),
+            card = card.copy(fsrs = reviewed),
+            log = log,
+            rawAnswer = rawAnswer,
+            svDe = svDeOutcome(facet, rating, reviewAt),
         )
     }
 

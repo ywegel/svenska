@@ -20,15 +20,11 @@ import de.ywegel.svenska.data.model.quiz.formsKey
  *
  * A facet card exists only once its facet is unlocked. A missing card (missing == not in the database)
  * means the facet is still locked. When a card is created, it starts as a new FSRS card: [CardPhase.LEARNING] at step 0, without
- * stability, difficulty and last review.
+ * stability, difficulty and last review. Both card tables hold only the key and the FSRS state of a card.
+ *
  */
 sealed interface FacetCard {
     val fsrs: FsrsColumns
-
-    fun withFsrs(fsrs: FsrsColumns): FacetCard = when (this) {
-        is TranslationFacetCard -> copy(fsrs = fsrs)
-        is FormsFacetCard -> copy(fsrs = fsrs)
-    }
 }
 
 /**
@@ -123,12 +119,9 @@ data class TranslationFacetCard(
  * uses the old key.
  *
  * @property formsKey The key from [Vocabulary.formsKey].
- * @property introducedAt When the card was created, in epoch milliseconds. A new forms card counts towards the same
- * daily limit of new cards as a newly introduced word ([QuizPoolEntry.introducedAt]).
  */
 @Entity(indices = [Index("due")])
 data class FormsFacetCard(
     @PrimaryKey val formsKey: String,
     @Embedded override val fsrs: FsrsColumns,
-    val introducedAt: Long,
 ) : FacetCard

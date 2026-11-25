@@ -2,7 +2,7 @@
   "formatVersion": 1,
   "database": {
     "version": 6,
-    "identityHash": "57e2d80b807b757b431a52f47ef663ed",
+    "identityHash": "6078d6f38d922d7330a8ce35fb76b8bd",
     "entities": [
       {
         "tableName": "Vocabulary",
@@ -154,7 +154,7 @@
       },
       {
         "tableName": "QuizPoolEntry",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`vocabularyId` INTEGER NOT NULL, `queuedAt` INTEGER NOT NULL, `introducedAt` INTEGER, `isPaused` INTEGER NOT NULL, `svDeStreak` INTEGER NOT NULL, `resetAt` INTEGER, PRIMARY KEY(`vocabularyId`), FOREIGN KEY(`vocabularyId`) REFERENCES `Vocabulary`(`id`) ON UPDATE NO ACTION ON DELETE CASCADE )",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`vocabularyId` INTEGER NOT NULL, `queuedAt` INTEGER NOT NULL, `introducedAt` INTEGER, `formsIntroducedAt` INTEGER, `isPaused` INTEGER NOT NULL, `svDeStreak` INTEGER NOT NULL, `resetAt` INTEGER, PRIMARY KEY(`vocabularyId`), FOREIGN KEY(`vocabularyId`) REFERENCES `Vocabulary`(`id`) ON UPDATE NO ACTION ON DELETE CASCADE )",
         "fields": [
           {
             "fieldPath": "vocabularyId",
@@ -171,6 +171,11 @@
           {
             "fieldPath": "introducedAt",
             "columnName": "introducedAt",
+            "affinity": "INTEGER"
+          },
+          {
+            "fieldPath": "formsIntroducedAt",
+            "columnName": "formsIntroducedAt",
             "affinity": "INTEGER"
           },
           {
@@ -294,18 +299,12 @@
       },
       {
         "tableName": "FormsFacetCard",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`formsKey` TEXT NOT NULL, `introducedAt` INTEGER NOT NULL, `phase` TEXT NOT NULL, `step` INTEGER, `stability` REAL, `difficulty` REAL, `due` INTEGER NOT NULL, `lastReview` INTEGER, PRIMARY KEY(`formsKey`))",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`formsKey` TEXT NOT NULL, `phase` TEXT NOT NULL, `step` INTEGER, `stability` REAL, `difficulty` REAL, `due` INTEGER NOT NULL, `lastReview` INTEGER, PRIMARY KEY(`formsKey`))",
         "fields": [
           {
             "fieldPath": "formsKey",
             "columnName": "formsKey",
             "affinity": "TEXT",
-            "notNull": true
-          },
-          {
-            "fieldPath": "introducedAt",
-            "columnName": "introducedAt",
-            "affinity": "INTEGER",
             "notNull": true
           },
           {
@@ -454,7 +453,7 @@
     ],
     "setupQueries": [
       "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
-      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '57e2d80b807b757b431a52f47ef663ed')"
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '6078d6f38d922d7330a8ce35fb76b8bd')"
     ]
   }
 }
