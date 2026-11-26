@@ -288,7 +288,8 @@ class QuizPoolRepositoryImplTest : RobolectricTest() {
         expectThat(stored(2)).isEqualTo(bil.withoutForms())
     }
 
-    private suspend fun stored(id: Int): Vocabulary = db.vocabulary().getAllVocabulariesSnapshot().single { it.id == id }
+    private suspend fun stored(id: Int): Vocabulary =
+        db.vocabulary().getAllVocabulariesSnapshot().single { it.id == id }
 
     private fun Vocabulary.withoutForms() = copy(form1 = null, form2 = null, form3 = null, formsNeedReview = false)
 

@@ -63,8 +63,8 @@ class QuizPoolRepositoryImpl @Inject constructor(
             )
         }
     }
-}
 
-private fun Vocabulary.toForms(): VocabularyForms {
-    return VocabularyForms(id, form1, form2, form3, formsNeedReview)
+    private fun Vocabulary.toForms(): VocabularyForms {
+        return VocabularyForms(id, form1, form2, form3, formsNeedReview)
+    }
 }

@@ -15,8 +15,8 @@ class QueueToPoolUseCase @Inject constructor(
     suspend operator fun invoke(words: List<Vocabulary>, now: Instant) {
         quizPoolRepository.queueToPool(words.map { it.withBuiltFormsIfMissing() }, now)
     }
-}
 
-private fun Vocabulary.withBuiltFormsIfMissing(): Vocabulary =
-    if (hasForms || wordGroup == WordGroup.Other) this
-    else withForms(FormBuilder.build(word, splitEndings(ending), wordGroup))
+    private fun Vocabulary.withBuiltFormsIfMissing(): Vocabulary =
+        if (hasForms || wordGroup == WordGroup.Other) this
+        else withForms(FormBuilder.build(word, splitEndings(ending), wordGroup))
+}
