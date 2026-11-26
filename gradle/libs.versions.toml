@@ -2,7 +2,7 @@
 app-version-code = "29"
 app-version-name = "2026.11.0"
 
-agp = "9.5.0"
+agp = "9.5.3"
 dagger-hilt = "2.60.1"
 kotlin = "2.4.21"
 core-ktx = "1.15.0"
@@ -109,7 +109,7 @@ detekt = "io.gitlab.arturbosch.detekt:1.23.8"
 room = { id = "androidx.room", version.ref = "room-version" }
 about-libraries = { id = "com.mikepenz.aboutlibraries.plugin", version.ref = "about-libraries" }
 kotlinx-kover = "org.jetbrains.kotlinx.kover:0.9.11"
-sentry-io = "io.sentry.android.gradle:6.25.0"
+sentry-io = "io.sentry.android.gradle:6.27.0"
 roborazzi = { id = "io.github.takahirom.roborazzi", version.ref = "roborazzi-version" }
 
 [bundles]
