@@ -12,6 +12,6 @@ import de.ywegel.svenska.data.model.Vocabulary
 // TODO(formsKey column): Store as an indexed column of Vocabulary, computed only in VocabularyDao's write path. See the rework doc.
 val Vocabulary.formsKey: String?
     get() {
-        if (form1 == null && form2 == null && form3 == null) return null
+        if (!hasForms) return null
         return listOf(word, form1, form2, form3).joinToString("|") { it.orEmpty().trim().lowercase() }
     }

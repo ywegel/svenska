@@ -50,6 +50,9 @@ data class Vocabulary(
 
     val lastEditedDateFormatted: String
         get() = DateFormat.getDateTimeInstance().format(lastEdited)
+
+    val hasForms: Boolean
+        get() = form1 != null || form2 != null || form3 != null
 }
 
 enum class Gender {

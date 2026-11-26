@@ -3,6 +3,7 @@ package de.ywegel.svenska.data.db
 import androidx.room.Dao
 import androidx.room.Delete
 import androidx.room.Query
+import androidx.room.Update
 import androidx.room.Upsert
 import de.ywegel.svenska.data.model.Vocabulary
 import kotlinx.coroutines.flow.Flow
@@ -22,6 +23,9 @@ interface VocabularyDao {
     // TODO(formsKey column): Set the stored forms key here, the only write path, so that it can't go stale
     @Upsert
     suspend fun upsertVocabulary(vocabulary: Vocabulary): Long
+
+    @Update(entity = Vocabulary::class)
+    suspend fun updateForms(forms: List<VocabularyForms>)
 
     @Query("SELECT * FROM vocabulary")
     suspend fun getAllVocabulariesSnapshot(): List<Vocabulary>

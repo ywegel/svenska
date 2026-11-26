@@ -22,6 +22,9 @@ abstract class QuizPoolDao {
     @Insert
     abstract suspend fun insert(entry: QuizPoolEntry)
 
+    @Insert(onConflict = OnConflictStrategy.IGNORE)
+    abstract suspend fun insertIgnoringExisting(entries: List<QuizPoolEntry>)
+
     @Update
     abstract suspend fun update(entry: QuizPoolEntry)
 

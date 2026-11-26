@@ -6,6 +6,7 @@ import de.ywegel.svenska.data.model.Vocabulary
 import de.ywegel.svenska.data.model.WordGroup
 import de.ywegel.svenska.domain.words.formCount
 import de.ywegel.svenska.domain.words.splitEndings
+import de.ywegel.svenska.domain.words.withForms
 import de.ywegel.svenska.ui.addEdit.models.ViewWordGroup
 import de.ywegel.svenska.ui.addEdit.models.ViewWordSubGroup
 
@@ -38,7 +39,7 @@ fun mapUiStateToVocabulary(snapshot: AddEditUiState, initialVocabulary: Vocabula
 
 /** The vocabulary as the list shows it, also while the input is still incomplete. */
 fun AddEditUiState.toPreviewVocabulary(): Vocabulary =
-toVocabulary(formWordGroup, initialVocabulary = null, containerId = 0)
+    toVocabulary(formWordGroup, initialVocabulary = null, containerId = 0)
 
 private fun AddEditUiState.toVocabulary(
     wordGroup: WordGroup,
@@ -57,15 +58,11 @@ private fun AddEditUiState.toVocabulary(
         gender = if (wordGroup is WordGroup.Noun) gender else null,
         wordGroup = wordGroup,
         ending = endingFor(wordGroup),
-        form1 = forms.getOrNull(0)?.takeIf { it.isNotEmpty() },
-        form2 = forms.getOrNull(1)?.takeIf { it.isNotEmpty() },
-        form3 = forms.getOrNull(2)?.takeIf { it.isNotEmpty() },
-        formsNeedReview = wordGroup != WordGroup.Other && showReviewHint,
         notes = notes,
         irregularPronunciation = irregularPronunciation?.takeIf { it.isNotBlank() },
         isFavorite = isFavorite,
         lastEdited = System.currentTimeMillis(),
-    )
+    ).withForms(forms, needsReview = wordGroup != WordGroup.Other && showReviewHint)
 }
 
 /**

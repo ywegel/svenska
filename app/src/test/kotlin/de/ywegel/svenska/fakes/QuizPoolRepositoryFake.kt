@@ -9,7 +9,7 @@ import one.felsen.fsrskt.fsrs6.FsrsCard
 import kotlin.time.Instant
 
 /**
- * Returns the given [formsCandidates] and [queuedWords] and records the calls in [introducedWords],
+ * Returns the given [formsCandidates] and [queuedWords] and records the calls in [queuedToPool], [introducedWords],
  * [introducedForms] and [countedSince]. Introducing returns new cards due at the given time.
  */
 class QuizPoolRepositoryFake(
@@ -17,10 +17,15 @@ class QuizPoolRepositoryFake(
     private val formsCandidates: List<Vocabulary> = emptyList(),
     private val queuedWords: List<Vocabulary> = emptyList(),
 ) : QuizPoolRepository {
+    val queuedToPool = mutableListOf<Vocabulary>()
     val introducedWords = mutableListOf<Vocabulary>()
     val introducedForms = mutableListOf<Vocabulary>()
     var countedSince: Instant? = null
         private set
+
+    override suspend fun queueToPool(words: List<Vocabulary>, now: Instant) {
+        queuedToPool += words
+    }
 
     override suspend fun removeFromPool(vocabularyId: Int): PoolRemoval = PoolRemoval.UNCHANGED
 
