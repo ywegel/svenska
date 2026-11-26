@@ -7,6 +7,13 @@ import kotlin.time.Instant
 
 interface QuizPoolRepository {
     /**
+     * Adds [words] to the quiz pool as queued and saves their forms.
+     * All words get [now] as their queue time, so words added together are introduced in the order of their id. A word
+     * that is already in the pool, also a paused one, keeps its entry.
+     */
+    suspend fun queueToPool(words: List<Vocabulary>, now: Instant)
+
+    /**
      * Removes the word from the quiz pool. A queued word is deleted, as it has no progress yet. An active word is
      * paused and keeps its progress. A paused word or a word that is not in the pool stays as it is.
      */

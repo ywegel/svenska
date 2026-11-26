@@ -1,5 +1,6 @@
 package de.ywegel.svenska.domain.words
 
+import de.ywegel.svenska.data.model.Vocabulary
 import de.ywegel.svenska.data.model.WordGroup
 
 /**
@@ -140,3 +141,13 @@ object FormBuilder {
     private val doubledConsonants = setOf("mm", "nn")
     private val definitePluralEndingsAfterAre = setOf("na", "arna")
 }
+
+/** Puts [forms] into the form slots in order. A missing or empty form leaves its slot `null`. */
+fun Vocabulary.withForms(forms: List<String>, needsReview: Boolean): Vocabulary = copy(
+    form1 = forms.getOrNull(0)?.takeIf { it.isNotEmpty() },
+    form2 = forms.getOrNull(1)?.takeIf { it.isNotEmpty() },
+    form3 = forms.getOrNull(2)?.takeIf { it.isNotEmpty() },
+    formsNeedReview = needsReview,
+)
+
+fun Vocabulary.withForms(built: BuiltForms): Vocabulary = withForms(built.forms, built.needsReview)

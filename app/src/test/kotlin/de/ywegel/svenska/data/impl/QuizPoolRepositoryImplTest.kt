@@ -40,7 +40,7 @@ class QuizPoolRepositoryImplTest : RobolectricTest() {
             .build()
         dao = db.quizPool()
         reviewDao = db.reviewDao()
-        repository = QuizPoolRepositoryImpl(dao, reviewDao)
+        repository = QuizPoolRepositoryImpl(db, dao, db.vocabulary(), reviewDao)
         db.vocabulary().upsertVocabulary(vocabulary(id = VOCABULARY_ID))
     }
 
@@ -228,6 +228,70 @@ class QuizPoolRepositoryImplTest : RobolectricTest() {
         expectThat(reviewDao.getTranslationCard(2, QuizTranslationDirection.SV_DE)?.fsrs?.due).isEqualTo(TODAY)
         expectThat(reviewDao.getFormsCard(checkNotNull(formsWord.formsKey))).isNotNull()
     }
+
+    @Test
+    fun `Queueing saves the forms and queues all words at the same time`() = runTest {
+        // Given
+        val bil = word(id = 2, word = "bil")
+        val hus = word(id = 3, word = "hus").copy(formsNeedReview = true)
+        db.vocabulary().upsertVocabulary(bil.withoutForms())
+        db.vocabulary().upsertVocabulary(hus.withoutForms())
+
+        // When
+        repository.queueToPool(listOf(bil, hus), Instant.fromEpochMilliseconds(TODAY))
+
+        // Then
+        expectThat(stored(2)).isEqualTo(bil)
+        expectThat(stored(3)).isEqualTo(hus)
+        expectThat(dao.get(2)).isEqualTo(QuizPoolEntry(vocabularyId = 2, queuedAt = TODAY))
+        expectThat(dao.get(3)).isEqualTo(QuizPoolEntry(vocabularyId = 3, queuedAt = TODAY))
+    }
+
+    @Test
+    fun `Queueing writes only the forms, so an edit made after loading the word is kept`() = runTest {
+        // Given
+        val loaded = word(id = 2)
+        db.vocabulary().upsertVocabulary(loaded.withoutForms().copy(translation = "edited"))
+
+        // When
+        repository.queueToPool(listOf(loaded), Instant.fromEpochMilliseconds(TODAY))
+
+        // Then
+        expectThat(stored(2)).isEqualTo(loaded.copy(translation = "edited"))
+    }
+
+    @Test
+    fun `Queueing a paused word keeps its entry`() = runTest {
+        // Given
+        val entry = active().copy(vocabularyId = 2, isPaused = true)
+        insert(word(id = 2), entry)
+
+        // When
+        repository.queueToPool(listOf(word(id = 2)), Instant.fromEpochMilliseconds(TODAY))
+
+        // Then
+        expectThat(dao.get(2)).isEqualTo(entry)
+    }
+
+    @Test
+    fun `A failed queueing saves no forms`() = runTest {
+        // Given: the second word was deleted after loading, so its entry breaks the foreign key
+        val bil = word(id = 2, word = "bil")
+        db.vocabulary().upsertVocabulary(bil.withoutForms())
+        val deleted = word(id = 99)
+
+        // When
+        val result = runCatching { repository.queueToPool(listOf(bil, deleted), Instant.fromEpochMilliseconds(TODAY)) }
+
+        // Then
+        expectThat(result.isFailure).isEqualTo(true)
+        expectThat(stored(2)).isEqualTo(bil.withoutForms())
+    }
+
+    private suspend fun stored(id: Int): Vocabulary =
+        db.vocabulary().getAllVocabulariesSnapshot().single { it.id == id }
+
+    private fun Vocabulary.withoutForms() = copy(form1 = null, form2 = null, form3 = null, formsNeedReview = false)
 
     private suspend fun insert(row: Vocabulary, entry: QuizPoolEntry) {
         db.vocabulary().upsertVocabulary(row)
