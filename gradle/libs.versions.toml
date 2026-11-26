@@ -104,7 +104,7 @@ kotlinx-serialization = { id = "org.jetbrains.kotlin.plugin.serialization", vers
 dagger-hilt-android = { id = "com.google.dagger.hilt.android", version.ref = "dagger-hilt" }
 google-ksp = "com.google.devtools.ksp:2.3.14"
 junit5 = "de.mannodermaus.android-junit5:2.0.2"
-ktlint = "org.jlleitschuh.gradle.ktlint:12.2.0"
+ktlint = "org.jlleitschuh.gradle.ktlint:14.2.0"
 detekt = "io.gitlab.arturbosch.detekt:1.23.8"
 room = { id = "androidx.room", version.ref = "room-version" }
 about-libraries = { id = "com.mikepenz.aboutlibraries.plugin", version.ref = "about-libraries" }
