@@ -8,6 +8,7 @@ import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.Arguments
+import org.junit.jupiter.params.provider.Arguments.argumentSet
 import org.junit.jupiter.params.provider.MethodSource
 
 class WordParserTest {
@@ -57,6 +58,22 @@ class WordParserTest {
         assertEquals(expectedPrefix, result.wordPrefix)
         assertEquals(expectedWord, result.word)
         assertEquals(expectedSuffix, result.wordSuffix)
+    }
+
+    @ParameterizedTest
+    @MethodSource("articleReviewCases")
+    fun `should flag forms for review when the article contradicts the endings`(
+        word: String,
+        expectedNeedsReview: Boolean,
+    ) {
+        // Given
+        val parser = WordParserImpl()
+
+        // When
+        val result = parser.parseWord(word, "translation", CONTAINER_ID)
+
+        // Then
+        assertEquals(expectedNeedsReview, result.formsNeedReview)
     }
 
     @Test
@@ -146,6 +163,16 @@ class WordParserTest {
         fun genderEdgeCases(): List<Arguments> = listOf(
             // No definite singular
             Arguments.of("examen (-, examina, examina)", null),
+            argumentSet("article fills in missing gender", "ett examen (-, examina, examina)", Gender.Neutra),
+            argumentSet("endings win over a wrong article", "ett saga (-n, -or, -orna)", Gender.Ultra),
+        )
+
+        @JvmStatic
+        fun articleReviewCases(): List<Arguments> = listOf(
+            Arguments.of("ett saga (-n, -or, -orna)", true),
+            Arguments.of("en fenomen (-et, -, -en)", true),
+            Arguments.of("en saga (-n, -or, -orna)", false),
+            argumentSet("no gender in endings to contradict", "ett examen (-, examina, examina)", false),
         )
 
         @JvmStatic
@@ -155,6 +182,10 @@ class WordParserTest {
             // Other words are not split and keep their bracket
             Arguments.of("i dag (adv.)", "", "i dag (adv.)", ""),
             Arguments.of("tack så mycket (interj.) för hjälpen", "", "tack så mycket (interj.) för hjälpen", ""),
+            // A lone article before a noun is removed
+            Arguments.of("en saga (-n, -or, -orna)", "", "saga", ""),
+            Arguments.of("En lögnare (-n, -, -na)", "", "lögnare", ""),
+            argumentSet("article with more words stays", "en röd bil (-en, -ar, -arna)", "en röd", "bil", ""),
         )
     }
 }

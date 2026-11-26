@@ -129,7 +129,7 @@ object ReferenceWords {
         ett("bekymmer", "-ret - -ren", "bekymret bekymmer bekymren", UNCHANGED_ETT),
         ett(
             "fenomen", "-et - -en", "fenomenet fenomen fenomenen", UNCHANGED_ETT,
-            text = "ett fenomen (-et, -, -en)", prefix = "ett", formsNeedReview = true,
+            text = "ett fenomen (-et, -, -en)", formsNeedReview = true,
         ),
 
         // group 6b: unchanged en-words

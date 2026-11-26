@@ -26,15 +26,22 @@ class WordParserImpl @Inject constructor() : WordParser {
             )
         }
 
+        val genderFromArticle = extractedWord.genderFromArticle.takeIf { wordGroup is WordGroup.Noun }
+        val genderFromEndings = WordGroupMatcher.determineGender(wordGroup, endings)
+        val articleContradictsEndings =
+            genderFromArticle != null && genderFromEndings != null && genderFromArticle != genderFromEndings
+
         return Vocabulary(
             word = extractedWord.baseWord,
             wordPrefix = extractedWord.prefix,
             wordSuffix = extractedWord.suffix,
             translation = translation.orEmpty(),
             wordHighlights = emptyList(),
-            gender = WordGroupMatcher.determineGender(wordGroup, endings),
+            // The endings decide the forms, so their gender wins. The article only fills in when they have none
+            gender = genderFromEndings ?: genderFromArticle,
             wordGroup = wordGroup,
             ending = endings.joinToString(" "),
+            formsNeedReview = articleContradictsEndings,
             containerId = containerId,
         )
     }
