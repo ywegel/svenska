@@ -4,6 +4,8 @@ import androidx.lifecycle.SavedStateHandle
 import app.cash.turbine.test
 import de.ywegel.svenska.data.model.vocabulary
 import de.ywegel.svenska.domain.ToggleVocabularyFavoriteUseCase
+import de.ywegel.svenska.domain.quiz.QueueToPoolUseCase
+import de.ywegel.svenska.domain.quiz.ToggleVocabularyPoolUseCase
 import de.ywegel.svenska.fakes.QuizPoolRepositoryFake
 import de.ywegel.svenska.fakes.VocabularyRepositoryFake
 import de.ywegel.svenska.ui.bonus.favorites.FavoritesAndPronunciationViewModel
@@ -81,6 +83,10 @@ class FavoritesAndPronunciationViewModelTest {
             containerRepository = repository,
             favoritesAndPronunciationsRepository = repository,
             quizPoolRepository = quizPoolRepository,
+            toggleVocabularyPoolUseCase = ToggleVocabularyPoolUseCase(
+                queueToPool = QueueToPoolUseCase(quizPoolRepository),
+                quizPoolRepository = quizPoolRepository,
+            ),
             savedStateHandle = savedStateHandle,
             toggleVocabularyFavoriteUseCase = toggleVocabularyFavoriteUseCase,
         )
@@ -141,6 +147,10 @@ class FavoritesAndPronunciationViewModelTest {
             containerRepository = throwingRepository,
             favoritesAndPronunciationsRepository = throwingRepository,
             quizPoolRepository = quizPoolRepository,
+            toggleVocabularyPoolUseCase = ToggleVocabularyPoolUseCase(
+                queueToPool = QueueToPoolUseCase(quizPoolRepository),
+                quizPoolRepository = quizPoolRepository,
+            ),
             savedStateHandle = savedStateHandle,
             toggleVocabularyFavoriteUseCase = ToggleVocabularyFavoriteUseCase(
                 repository = throwingRepository,

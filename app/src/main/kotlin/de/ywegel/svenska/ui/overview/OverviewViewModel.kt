@@ -10,11 +10,13 @@ import de.ywegel.svenska.data.QuizPoolRepository
 import de.ywegel.svenska.data.VocabularyRepository
 import de.ywegel.svenska.data.model.SortOrder
 import de.ywegel.svenska.data.model.Vocabulary
+import de.ywegel.svenska.data.model.quiz.VocabularyPoolState
 import de.ywegel.svenska.data.model.quiz.VocabularyWithPoolState
 import de.ywegel.svenska.data.preferences.UserPreferencesManager
 import de.ywegel.svenska.data.preferences.keys.AppPreferenceKeys
 import de.ywegel.svenska.data.preferences.keys.OverviewPreferenceKeys
 import de.ywegel.svenska.domain.ToggleVocabularyFavoriteUseCase
+import de.ywegel.svenska.domain.quiz.ToggleVocabularyPoolUseCase
 import de.ywegel.svenska.ui.common.vocabulary.VocabularyListCallbacks
 import de.ywegel.svenska.ui.detail.VocabularyDetailState
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -27,7 +29,10 @@ import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import javax.inject.Inject
+import kotlin.time.Clock
 
+// The constructor lists what Hilt injects
+@Suppress("detekt:LongParameterList")
 @HiltViewModel
 class OverviewViewModel @Inject constructor(
     savedStateHandle: SavedStateHandle,
@@ -35,6 +40,7 @@ class OverviewViewModel @Inject constructor(
     private val containerRepository: ContainerRepository,
     private val quizPoolRepository: QuizPoolRepository,
     private val toggleVocabularyFavoriteUseCase: ToggleVocabularyFavoriteUseCase,
+    private val toggleVocabularyPoolUseCase: ToggleVocabularyPoolUseCase,
     private val userPreferencesManager: UserPreferencesManager,
 ) : ViewModel(), VocabularyListCallbacks {
 
@@ -125,6 +131,12 @@ class OverviewViewModel @Inject constructor(
     override fun toggleFavorite(vocabularyId: Int, isFavorite: Boolean) {
         viewModelScope.launch {
             toggleVocabularyFavoriteUseCase(vocabularyId, isFavorite)
+        }
+    }
+
+    override fun togglePool(vocabulary: Vocabulary, poolState: VocabularyPoolState) {
+        viewModelScope.launch {
+            toggleVocabularyPoolUseCase(vocabulary, poolState, Clock.System.now())
         }
     }
 }

@@ -102,6 +102,12 @@
     <string name="overview_fab_quiz">Quiz</string>
     <string name="overview_fab_add">Add new</string>
 
+    <!-- # Vocabulary list # -->
+    <string name="vocabulary_list_swipe_queue">Add to quiz</string>
+    <string name="vocabulary_list_swipe_resume">Resume in quiz</string>
+    <string name="vocabulary_list_swipe_remove">Remove from quiz</string>
+    <string name="vocabulary_list_swipe_pause">Pause in quiz</string>
+
     <!-- # Search # -->
     <string name="search_search_label">Search</string>
     <string name="search_no_searches">No searches yet</string>
