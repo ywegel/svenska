@@ -40,6 +40,8 @@ import de.ywegel.svenska.R
 import de.ywegel.svenska.data.model.Gender
 import de.ywegel.svenska.data.model.Vocabulary
 import de.ywegel.svenska.data.model.WordGroup
+import de.ywegel.svenska.data.model.quiz.QuizFacet
+import de.ywegel.svenska.data.model.quiz.VocabularyPoolState
 import de.ywegel.svenska.data.model.vocabularies
 import de.ywegel.svenska.data.model.vocabulary
 import de.ywegel.svenska.ui.common.HorizontalSpacerXS
@@ -55,7 +57,7 @@ import de.ywegel.svenska.ui.theme.SvenskaTheme
 fun VocabularyListItem(
     vocabulary: Vocabulary,
     modifier: Modifier = Modifier,
-    poolIndicator: PoolIndicator = PoolIndicator.NotInPool,
+    poolState: VocabularyPoolState = VocabularyPoolState.NotInPool,
     containerColor: Color = SvenskaTheme.colors.surfaceVariant,
     onClick: (Vocabulary) -> Unit = {},
 ) {
@@ -141,26 +143,26 @@ fun VocabularyListItem(
                 )
             }
 
-            PoolStatusSlot(poolIndicator, Modifier.padding(start = Spacings.xs))
+            PoolStatusSlot(poolState, Modifier.padding(start = Spacings.xs))
         }
     }
 }
 
 /** Fixed width, so the endings line up whether a word has a status or not. */
 @Composable
-private fun PoolStatusSlot(indicator: PoolIndicator, modifier: Modifier = Modifier) {
+private fun PoolStatusSlot(poolState: VocabularyPoolState, modifier: Modifier = Modifier) {
     Box(modifier = modifier.width(STATUS_ICON_SIZE), contentAlignment = Alignment.Center) {
-        when (indicator) {
-            PoolIndicator.NotInPool -> Unit
-            PoolIndicator.Queued -> PoolStatusIcon(
+        when (poolState) {
+            VocabularyPoolState.NotInPool -> Unit
+            VocabularyPoolState.Queued -> PoolStatusIcon(
                 icon = Icons.Outlined.Schedule,
                 description = stringResource(R.string.accessibility_vocabulary_pool_queued),
             )
-            PoolIndicator.Paused -> PoolStatusIcon(
+            VocabularyPoolState.Paused -> PoolStatusIcon(
                 icon = Icons.Rounded.Pause,
                 description = stringResource(R.string.accessibility_vocabulary_pool_paused),
             )
-            is PoolIndicator.Active -> FacetDots(indicator.unlockedFacets)
+            is VocabularyPoolState.Active -> FacetDots(poolState.unlocked)
         }
     }
 }
@@ -175,20 +177,24 @@ private fun PoolStatusIcon(icon: ImageVector, description: String) {
     )
 }
 
-/** Vertical, filled from the bottom like a level meter: bottom = SV→DE, middle = DE→SV, top = forms. */
+/** One dot per facet at a fixed place: bottom = SV→DE, middle = DE→SV, top = forms. */
 @Composable
-private fun FacetDots(unlocked: Int) {
-    val description = stringResource(R.string.accessibility_vocabulary_pool_active, unlocked, FACET_COUNT)
+private fun FacetDots(unlocked: Set<QuizFacet>) {
+    val description = stringResource(
+        R.string.accessibility_vocabulary_pool_active,
+        unlocked.size,
+        QuizFacet.entries.size,
+    )
     Column(
         verticalArrangement = Arrangement.spacedBy(3.dp),
         modifier = Modifier.clearAndSetSemantics { contentDescription = description },
     ) {
-        for (level in FACET_COUNT downTo 1) {
+        for (facet in QuizFacet.entries.reversed()) {
             Box(
                 Modifier
                     .size(6.dp)
                     .background(
-                        color = if (level <= unlocked) {
+                        color = if (facet in unlocked) {
                             SvenskaTheme.colors.primary
                         } else {
                             SvenskaTheme.colors.outlineVariant
@@ -200,7 +206,6 @@ private fun FacetDots(unlocked: Int) {
     }
 }
 
-private const val FACET_COUNT = 3
 private val STATUS_ICON_SIZE = 14.dp
 
 @Composable
@@ -320,24 +325,25 @@ private fun PoolStatusPreview() {
     SvenskaTheme {
     val noun = WordGroup.Noun(WordGroup.NounSubgroup.OR)
     val verb = WordGroup.Verb(WordGroup.VerbSubgroup.GROUP_2A)
+    val translations = VocabularyPoolState.Active(setOf(QuizFacet.SV_DE, QuizFacet.DE_SV))
     val rows = listOf(
-        vocabulary(word = "lampa", translation = "Lampe", wordGroup = noun) to PoolIndicator.NotInPool,
-        vocabulary(word = "flicka", translation = "Mädchen", wordGroup = noun) to PoolIndicator.Queued,
+        vocabulary(word = "lampa", translation = "Lampe", wordGroup = noun) to VocabularyPoolState.NotInPool,
+        vocabulary(word = "flicka", translation = "Mädchen", wordGroup = noun) to VocabularyPoolState.Queued,
         vocabulary(word = "känna", translation = "sich fühlen", wordGroup = verb)
-            .copy(wordSuffix = "sig", ending = "er de t") to PoolIndicator.Active(1),
+            .copy(wordSuffix = "sig", ending = "er de t") to VocabularyPoolState.Active(setOf(QuizFacet.SV_DE)),
         vocabulary(word = "dröm", translation = "größter Traum", wordGroup = WordGroup.Noun(WordGroup.NounSubgroup.AR))
-            .copy(wordPrefix = "högsta", ending = "men mar marna") to PoolIndicator.Active(2),
+            .copy(wordPrefix = "högsta", ending = "men mar marna") to translations,
         vocabulary(word = "gata", translation = "Straße", wordGroup = noun)
-            to PoolIndicator.Active(unlockedFacets = FACET_COUNT),
+            to VocabularyPoolState.Active(QuizFacet.entries.toSet()),
         vocabulary(word = "klass", translation = "Klasse", wordGroup = WordGroup.Noun(WordGroup.NounSubgroup.SPECIAL))
-            .copy(ending = "en er arna", formsNeedReview = true) to PoolIndicator.Active(2),
-        vocabulary(word = "kyrka", translation = "Kirche", wordGroup = noun) to PoolIndicator.Paused,
+            .copy(ending = "en er arna", formsNeedReview = true) to translations,
+        vocabulary(word = "kyrka", translation = "Kirche", wordGroup = noun) to VocabularyPoolState.Paused,
     )
 
         Surface {
             Column(modifier = Modifier.padding(Spacings.xs), verticalArrangement = Arrangement.spacedBy(Spacings.xs)) {
-                rows.forEach { (vocabulary, indicator) ->
-                    VocabularyListItem(vocabulary = vocabulary, poolIndicator = indicator)
+                rows.forEach { (vocabulary, poolState) ->
+                    VocabularyListItem(vocabulary = vocabulary, poolState = poolState)
                 }
             }
         }
