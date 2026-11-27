@@ -37,7 +37,13 @@ class QuizPoolRepositoryFake(
             list.map { VocabularyWithPoolState(it, poolStates[it.id] ?: VocabularyPoolState.NotInPool) }
         }
 
-    override suspend fun removeFromPool(vocabularyId: Int): PoolRemoval = PoolRemoval.UNCHANGED
+    override suspend fun removeFromPool(vocabularyId: Int): PoolRemoval {
+        TODO("Currently not used in tests")
+    }
+
+    override suspend fun resumeInPool(vocabularyId: Int) {
+        TODO("Currently not used in tests")
+    }
 
     override suspend fun countIntroducedSince(since: Instant): Int {
         countedSince = since

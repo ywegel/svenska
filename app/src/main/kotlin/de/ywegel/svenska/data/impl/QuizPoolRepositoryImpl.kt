@@ -14,6 +14,7 @@ import de.ywegel.svenska.data.model.Vocabulary
 import de.ywegel.svenska.data.model.quiz.PoolRemoval
 import de.ywegel.svenska.data.model.quiz.QuizCard
 import de.ywegel.svenska.data.model.quiz.QuizFacet
+import de.ywegel.svenska.data.model.quiz.QuizPoolStatus
 import de.ywegel.svenska.data.model.quiz.QuizTranslationDirection
 import de.ywegel.svenska.data.model.quiz.VocabularyPoolState
 import de.ywegel.svenska.data.model.quiz.VocabularyWithPoolState
@@ -57,7 +58,29 @@ class QuizPoolRepositoryImpl @Inject constructor(
             }
         }
 
-    override suspend fun removeFromPool(vocabularyId: Int): PoolRemoval = quizDao.removeFromPool(vocabularyId)
+    override suspend fun removeFromPool(vocabularyId: Int): PoolRemoval = database.withTransaction {
+        val entry = quizDao.get(vocabularyId) ?: return@withTransaction PoolRemoval.UNCHANGED
+        when (entry.poolStatus) {
+            QuizPoolStatus.QUEUED -> {
+                quizDao.delete(entry)
+                PoolRemoval.DELETED
+            }
+
+            QuizPoolStatus.ACTIVE -> {
+                quizDao.update(entry.pause())
+                PoolRemoval.PAUSED
+            }
+
+            QuizPoolStatus.PAUSED -> PoolRemoval.UNCHANGED
+        }
+    }
+
+    override suspend fun resumeInPool(vocabularyId: Int) {
+        database.withTransaction {
+            val entry = quizDao.get(vocabularyId)
+            if (entry?.poolStatus == QuizPoolStatus.PAUSED) quizDao.update(entry.resume())
+        }
+    }
 
     override suspend fun countIntroducedSince(since: Instant): Int =
         quizDao.countIntroducedSince(since.toEpochMilliseconds())

@@ -27,6 +27,8 @@ interface QuizPoolRepository {
      */
     suspend fun removeFromPool(vocabularyId: Int): PoolRemoval
 
+    suspend fun resumeInPool(vocabularyId: Int)
+
     /**
      * The words and forms cards introduced since [since]. Both count towards the same daily limit of new cards.
      */

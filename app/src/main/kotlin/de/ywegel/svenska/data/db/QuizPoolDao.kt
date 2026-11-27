@@ -12,7 +12,6 @@ import de.ywegel.svenska.data.db.quiz.FsrsColumns
 import de.ywegel.svenska.data.db.quiz.QuizPoolEntry
 import de.ywegel.svenska.data.db.quiz.TranslationFacetCard
 import de.ywegel.svenska.data.model.Vocabulary
-import de.ywegel.svenska.data.model.quiz.PoolRemoval
 import de.ywegel.svenska.data.model.quiz.QuizPoolStatus
 import de.ywegel.svenska.data.model.quiz.QuizTranslationDirection
 import kotlinx.coroutines.flow.Flow
@@ -37,25 +36,6 @@ abstract class QuizPoolDao {
 
     @Query("SELECT * FROM QuizPoolEntry")
     abstract fun observeAll(): Flow<List<QuizPoolEntry>>
-
-    // Reads and writes in one transaction, so that the decision is made on the current state of the row.
-    @Transaction
-    open suspend fun removeFromPool(vocabularyId: Int): PoolRemoval {
-        val entry = get(vocabularyId) ?: return PoolRemoval.UNCHANGED
-        return when (entry.poolStatus) {
-            QuizPoolStatus.QUEUED -> {
-                delete(entry)
-                PoolRemoval.DELETED
-            }
-
-            QuizPoolStatus.ACTIVE -> {
-                update(entry.pause())
-                PoolRemoval.PAUSED
-            }
-
-            QuizPoolStatus.PAUSED -> PoolRemoval.UNCHANGED
-        }
-    }
 
     /**
      * The rows of all [QuizPoolStatus.ACTIVE] words.
