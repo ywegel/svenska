@@ -9,6 +9,8 @@ import de.ywegel.svenska.data.QuizPoolRepository
 import de.ywegel.svenska.data.model.vocabulary
 import de.ywegel.svenska.data.preferences.UserPreferencesManager
 import de.ywegel.svenska.domain.ToggleVocabularyFavoriteUseCase
+import de.ywegel.svenska.domain.quiz.QueueToPoolUseCase
+import de.ywegel.svenska.domain.quiz.ToggleVocabularyPoolUseCase
 import de.ywegel.svenska.fakes.QuizPoolRepositoryFake
 import de.ywegel.svenska.fakes.UserPreferencesManagerFake
 import de.ywegel.svenska.fakes.VocabularyRepositoryFake
@@ -118,6 +120,10 @@ class OverviewViewModelDetailScreenTest {
             vocabularyRepository = vocabularyRepository,
             containerRepository = containerRepository,
             quizPoolRepository = quizPoolRepository,
+            toggleVocabularyPoolUseCase = ToggleVocabularyPoolUseCase(
+                queueToPool = QueueToPoolUseCase(quizPoolRepository),
+                quizPoolRepository = quizPoolRepository,
+            ),
             userPreferencesManager = userPreferencesManager,
             toggleVocabularyFavoriteUseCase = ToggleVocabularyFavoriteUseCase(vocabularyRepository, testDispatcher),
         )
