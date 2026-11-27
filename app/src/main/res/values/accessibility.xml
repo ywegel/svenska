@@ -8,6 +8,10 @@
     <!-- # Overview # -->
     <string name="accessibility_overview_fab_quiz">Start Quiz</string>
     <string name="accessibility_overview_fab_add_new">Add new vocabulary</string>
+    <string name="accessibility_vocabulary_forms_need_review">Forms need review</string>
+    <string name="accessibility_vocabulary_pool_queued">Waiting in the quiz pool</string>
+    <string name="accessibility_vocabulary_pool_paused">Paused in the quiz pool</string>
+    <string name="accessibility_vocabulary_pool_active">Learning, %1$d of %2$d parts unlocked</string>
 
     <!-- # AddEdit # -->
     <string name="accessibility_addEdit_navigate_word_group_info_screen">Navigate to WordGroups screen</string>
