@@ -15,6 +15,7 @@ import de.ywegel.svenska.data.db.quiz.TranslationFacetCard
 import de.ywegel.svenska.data.model.quiz.QuizPoolStatus
 import de.ywegel.svenska.data.model.quiz.QuizTranslationDirection
 import de.ywegel.svenska.data.model.quiz.SvDeOutcome
+import kotlinx.coroutines.flow.Flow
 
 @Suppress("detekt:TooManyFunctions")
 @Dao
@@ -122,4 +123,11 @@ abstract class ReviewDao {
             }
         }
     }
+
+    @Query("SELECT vocabularyId FROM TranslationFacetCard WHERE direction = :direction")
+    abstract fun observeVocabularyIdsWithCard(direction: QuizTranslationDirection): Flow<List<Int>>
+
+    // TODO(formsKey column): Remove, withPoolStates then checks for the forms card with EXISTS on Vocabulary.formsKey
+    @Query("SELECT formsKey FROM FormsFacetCard")
+    abstract fun observeFormsKeys(): Flow<List<String>>
 }
