@@ -42,7 +42,8 @@ import com.ramcosta.composedestinations.generated.destinations.WordGroupsScreenD
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
 import de.ywegel.svenska.R
 import de.ywegel.svenska.data.model.Vocabulary
-import de.ywegel.svenska.data.model.vocabularies
+import de.ywegel.svenska.data.model.quiz.VocabularyWithPoolState
+import de.ywegel.svenska.data.model.vocabulariesWithPoolState
 import de.ywegel.svenska.navigation.BonusGraph
 import de.ywegel.svenska.ui.common.IconButton
 import de.ywegel.svenska.ui.common.TopAppTextBar
@@ -166,7 +167,7 @@ private fun ErrorState(message: String, padding: PaddingValues) {
 
 @Composable
 private fun SuccessState(
-    items: List<Vocabulary>,
+    items: List<VocabularyWithPoolState>,
     detailViewState: VocabularyDetailState,
     screenType: BonusScreen,
     showExplanation: Boolean,
@@ -257,7 +258,7 @@ private fun ErrorStatePreview() {
 private fun SuccessStatePreview() {
     SvenskaTheme {
         FavoritesAndPronunciationScreen(
-            uiState = FavoritesUiState.Success(vocabularies()),
+            uiState = FavoritesUiState.Success(vocabulariesWithPoolState()),
             screenType = BonusScreen.Favorites,
             navigateUp = {},
             vocabularyListCallbacks = VocabularyListCallbacksFake,
@@ -272,7 +273,7 @@ private fun SuccessStatePreview() {
 private fun SuccessStateWithExplanationPreview() {
     SvenskaTheme {
         FavoritesAndPronunciationScreen(
-            uiState = FavoritesUiState.Success(vocabularies()),
+            uiState = FavoritesUiState.Success(vocabulariesWithPoolState()),
             screenType = BonusScreen.Favorites,
             initialShowExplanation = true,
             navigateUp = {},

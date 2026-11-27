@@ -42,13 +42,14 @@ class QuizPoolRepositoryImpl @Inject constructor(
     override fun withPoolStates(vocabularies: Flow<List<Vocabulary>>): Flow<List<VocabularyWithPoolState>> =
         combine(
             vocabularies,
-            quizDao.observeAll().map { entries -> entries.associateBy { it.vocabularyId } }.distinctUntilChanged(),
+            quizDao.observeAll().map { entries -> entries.associate { it.vocabularyId to it.poolStatus } }
+                .distinctUntilChanged(),
             reviewDao.observeVocabularyIdsWithCard(QuizTranslationDirection.DE_SV).distinctSets(),
             reviewDao.observeFormsKeys().distinctSets(),
-        ) { vocabularyList, entriesById, deSvIds, formsKeys ->
+        ) { vocabularyList, statusById, deSvIds, formsKeys ->
             vocabularyList.map { vocabulary ->
                 val poolState = VocabularyPoolState.of(
-                    status = entriesById[vocabulary.id]?.poolStatus,
+                    status = statusById[vocabulary.id],
                     hasDeSvCard = vocabulary.id in deSvIds,
                     hasFormsCard = vocabulary.formsKey in formsKeys,
                 )

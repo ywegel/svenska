@@ -62,7 +62,7 @@ class VocabularyRepositoryFake(
             vocabularyFlow.map { item ->
                 item.filter {
                     it.word.lowercase().contains(query.lowercase()) &&
-                        (containerId == null || it.containerId == containerId)
+                            (containerId == null || it.containerId == containerId)
                 }
             }
         } else {
@@ -78,7 +78,7 @@ class VocabularyRepositoryFake(
     override suspend fun upsertVocabulary(vocabulary: Vocabulary): Long {
         this.vocabulary.remove(vocabulary)
         this.vocabulary.add(vocabulary)
-        vocabularyFlow.emit(this.vocabulary)
+        vocabularyFlow.emit(this.vocabulary.toList())
         return vocabulary.id.toLong()
     }
 
@@ -92,12 +92,12 @@ class VocabularyRepositoryFake(
         return if (container.id == 0) {
             val newId = (containers.maxOfOrNull { it.id } ?: 0) + 1
             containers.add(container.copy(id = newId))
-            containersFlow.emit(containers)
+            containersFlow.emit(containers.toList())
             newId.toLong()
         } else {
             containers.removeIf { it.id == container.id }
             containers.add(container)
-            containersFlow.emit(containers)
+            containersFlow.emit(containers.toList())
             container.id.toLong()
         }
     }
@@ -105,16 +105,20 @@ class VocabularyRepositoryFake(
     override suspend fun deleteContainerWithAllVocabulary(container: VocabularyContainer) {
         vocabulary.removeAll { it.containerId == container.id }
         containers.remove(container)
-        vocabularyFlow.emit(vocabulary)
-        containersFlow.emit(containers)
+        vocabularyFlow.emit(vocabulary.toList())
+        containersFlow.emit(containers.toList())
     }
 
-    override suspend fun getFavorites(containerId: Int?): List<Vocabulary> {
-        return vocabulary.filter { it.isFavorite }
+    override fun getFavorites(containerId: Int?): Flow<List<Vocabulary>> {
+        return vocabularyFlow.map { list ->
+            list.filter { it.isFavorite && (containerId == null || it.containerId == containerId) }
+        }
     }
 
-    override suspend fun getPronunciations(containerId: Int?): List<Vocabulary> {
-        return vocabulary.filter { it.irregularPronunciation != null }
+    override fun getPronunciations(containerId: Int?): Flow<List<Vocabulary>> {
+        return vocabularyFlow.map { list ->
+            list.filter { it.irregularPronunciation != null && (containerId == null || it.containerId == containerId) }
+        }
     }
 
     override suspend fun getAllVocabulariesSnapshot(containerId: Int?): List<Vocabulary> {
@@ -129,6 +133,7 @@ class VocabularyRepositoryFake(
             val new = old.copy(isFavorite = isFavorite)
             vocabulary.add(new)
         }
+        vocabularyFlow.emit(vocabulary.toList())
     }
 
     override suspend fun getAllVocabulariesWithEndings(containerId: Int?): List<Vocabulary> {

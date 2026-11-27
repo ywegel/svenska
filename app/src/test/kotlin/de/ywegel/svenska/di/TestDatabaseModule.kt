@@ -8,6 +8,8 @@ import dagger.hilt.components.SingletonComponent
 import dagger.hilt.testing.TestInstallIn
 import de.ywegel.svenska.data.db.ContainerDao
 import de.ywegel.svenska.data.db.QuizDao
+import de.ywegel.svenska.data.db.QuizPoolDao
+import de.ywegel.svenska.data.db.ReviewDao
 import de.ywegel.svenska.data.db.SearchDao
 import de.ywegel.svenska.data.db.VocabularyDao
 import de.ywegel.svenska.data.db.VocabularyDatabase
@@ -38,4 +40,12 @@ object TestDatabaseModule {
     @Singleton
     @Provides
     fun provideQuizDao(db: VocabularyDatabase): QuizDao = db.quiz()
+
+    @Singleton
+    @Provides
+    fun provideQuizPoolDao(db: VocabularyDatabase): QuizPoolDao = db.quizPool()
+
+    @Singleton
+    @Provides
+    fun provideReviewDao(db: VocabularyDatabase): ReviewDao = db.reviewDao()
 }

@@ -33,7 +33,7 @@ class VocabularyPoolStateTest {
         fun poolStateCases() = streamOf(
             Arguments.of(null, false, false, VocabularyPoolState.NotInPool),
             argumentSet("not in pool, shared forms card", null, false, true, VocabularyPoolState.NotInPool),
-            argumentSet("queued, no shared forms card", QuizPoolStatus.QUEUED, false, false, VocabularyPoolState.Queued),
+            argumentSet("queued, no cards", QuizPoolStatus.QUEUED, false, false, VocabularyPoolState.Queued),
             argumentSet("queued, shared forms card", QuizPoolStatus.QUEUED, false, true, VocabularyPoolState.Queued),
             argumentSet("paused with all its cards", QuizPoolStatus.PAUSED, true, true, VocabularyPoolState.Paused),
             Arguments.of(QuizPoolStatus.ACTIVE, false, false, active(SV_DE)),

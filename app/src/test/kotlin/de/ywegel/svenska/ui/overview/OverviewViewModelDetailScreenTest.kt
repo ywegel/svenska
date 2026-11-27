@@ -5,14 +5,15 @@ package de.ywegel.svenska.ui.overview
 import androidx.lifecycle.SavedStateHandle
 import app.cash.turbine.test
 import de.ywegel.svenska.data.ContainerRepository
+import de.ywegel.svenska.data.QuizPoolRepository
 import de.ywegel.svenska.data.model.vocabulary
 import de.ywegel.svenska.data.preferences.UserPreferencesManager
 import de.ywegel.svenska.domain.ToggleVocabularyFavoriteUseCase
+import de.ywegel.svenska.fakes.QuizPoolRepositoryFake
 import de.ywegel.svenska.fakes.UserPreferencesManagerFake
 import de.ywegel.svenska.fakes.VocabularyRepositoryFake
 import de.ywegel.svenska.ui.detail.VocabularyDetailState
 import io.mockk.clearAllMocks
-import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.StandardTestDispatcher
@@ -105,19 +106,19 @@ class OverviewViewModelDetailScreenTest {
     private fun setupViewModel(
         vocabularyRepository: VocabularyRepositoryFake = VocabularyRepositoryFake(),
         containerRepository: ContainerRepository = vocabularyRepository,
+        quizPoolRepository: QuizPoolRepository = QuizPoolRepositoryFake(),
         savedState: SavedStateHandle = SavedStateHandle(
             initialState = mapOf(
                 "containerId" to 1,
             ),
-        ),
-        dispatcher: CoroutineDispatcher = testDispatcher,
+        )
     ): OverviewViewModel {
         return OverviewViewModel(
             savedStateHandle = savedState,
             vocabularyRepository = vocabularyRepository,
             containerRepository = containerRepository,
+            quizPoolRepository = quizPoolRepository,
             userPreferencesManager = userPreferencesManager,
-            ioDispatcher = dispatcher,
             toggleVocabularyFavoriteUseCase = ToggleVocabularyFavoriteUseCase(vocabularyRepository, testDispatcher),
         )
     }

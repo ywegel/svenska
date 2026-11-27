@@ -6,22 +6,21 @@ import androidx.lifecycle.viewModelScope
 import com.ramcosta.composedestinations.generated.navArgs
 import dagger.hilt.android.lifecycle.HiltViewModel
 import de.ywegel.svenska.data.ContainerRepository
+import de.ywegel.svenska.data.QuizPoolRepository
 import de.ywegel.svenska.data.VocabularyRepository
 import de.ywegel.svenska.data.model.SortOrder
 import de.ywegel.svenska.data.model.Vocabulary
+import de.ywegel.svenska.data.model.quiz.VocabularyWithPoolState
 import de.ywegel.svenska.data.preferences.UserPreferencesManager
 import de.ywegel.svenska.data.preferences.keys.AppPreferenceKeys
 import de.ywegel.svenska.data.preferences.keys.OverviewPreferenceKeys
-import de.ywegel.svenska.di.IoDispatcher
 import de.ywegel.svenska.domain.ToggleVocabularyFavoriteUseCase
 import de.ywegel.svenska.ui.common.vocabulary.VocabularyListCallbacks
 import de.ywegel.svenska.ui.detail.VocabularyDetailState
-import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.onStart
@@ -34,9 +33,9 @@ class OverviewViewModel @Inject constructor(
     savedStateHandle: SavedStateHandle,
     private val vocabularyRepository: VocabularyRepository,
     private val containerRepository: ContainerRepository,
+    private val quizPoolRepository: QuizPoolRepository,
     private val toggleVocabularyFavoriteUseCase: ToggleVocabularyFavoriteUseCase,
     private val userPreferencesManager: UserPreferencesManager,
-    @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
 ) : ViewModel(), VocabularyListCallbacks {
 
     val containerId: Int = savedStateHandle.navArgs<OverviewNavArgs>().containerId
@@ -61,53 +60,19 @@ class OverviewViewModel @Inject constructor(
         _uiState.update { it.copy(containerName = name) }
     }
 
-//    @OptIn(ExperimentalCoroutinesApi::class)
-//    private fun observeVocabularyState() = viewModelScope.launch(ioDispatcher) {
-//        combine(
-//            userPreferencesFlow,
-//            _searchQuery,
-//        ) { preferences, query ->
-//            Pair(preferences, query)
-//        }
-//            .onStart {
-//                _uiState.update {
-//                    it.copy(vocabulary = emptyList(), isLoading = true)
-//                }
-//            }
-//            .flatMapLatest { (preferences, searchQuery) ->
-//                repository.getVocabulariesByContainer(
-//                    query = searchQuery,
-//                    containerId = containerId,
-//                    sortOrder = preferences.sortOrder,
-//                    reverse = preferences.revert
-//                )
-//            }
-//            .collectLatest { emergencies ->
-//                _uiState.update {
-//                    it.copy(vocabulary = emergencies, isLoading = false)
-//                }
-//            }
-//    }
-
     @OptIn(ExperimentalCoroutinesApi::class)
-    private fun observeVocabularyState() = viewModelScope.launch(ioDispatcher) {
-        sortSettings
-            .onStart {
-                _uiState.update {
-                    it.copy(vocabulary = emptyList(), isLoading = true)
-                }
-            }
-            .flatMapLatest { (sortOrder, revert) ->
-                vocabularyRepository.getVocabularies(
-                    containerId = containerId,
-                    sortOrder = sortOrder,
-                    reverse = revert,
-                )
-            }
-            .collectLatest { emergencies ->
-                _uiState.update {
-                    it.copy(vocabulary = emergencies, isLoading = false)
-                }
+    private fun observeVocabularyState() = viewModelScope.launch {
+        val vocabularies = sortSettings.flatMapLatest { (sortOrder, revert) ->
+            vocabularyRepository.getVocabularies(
+                containerId = containerId,
+                sortOrder = sortOrder,
+                reverse = revert,
+            ).onStart { _uiState.update { it.copy(isLoading = true) } }
+        }
+
+        quizPoolRepository.withPoolStates(vocabularies)
+            .collect { items ->
+                _uiState.update { it.copy(items = items, isLoading = false) }
             }
     }
 
@@ -165,7 +130,7 @@ class OverviewViewModel @Inject constructor(
 }
 
 data class OverviewUiState(
-    val vocabulary: List<Vocabulary> = emptyList(),
+    val items: List<VocabularyWithPoolState> = emptyList(),
     val containerName: String = "...",
     val isLoading: Boolean = true,
     val sortOrder: SortOrder = SortOrder.default,

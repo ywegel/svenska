@@ -43,6 +43,7 @@ import de.ywegel.svenska.data.model.WordGroup
 import de.ywegel.svenska.data.model.quiz.QuizFacet
 import de.ywegel.svenska.data.model.quiz.VocabularyPoolState
 import de.ywegel.svenska.data.model.vocabularies
+import de.ywegel.svenska.data.model.vocabulariesWithPoolState
 import de.ywegel.svenska.data.model.vocabulary
 import de.ywegel.svenska.ui.common.HorizontalSpacerXS
 import de.ywegel.svenska.ui.common.vocabulary.abbreviation
@@ -323,26 +324,9 @@ private fun PrefixAndSuffixPreview() {
 @Composable
 private fun PoolStatusPreview() {
     SvenskaTheme {
-    val noun = WordGroup.Noun(WordGroup.NounSubgroup.OR)
-    val verb = WordGroup.Verb(WordGroup.VerbSubgroup.GROUP_2A)
-    val translations = VocabularyPoolState.Active(setOf(QuizFacet.SV_DE, QuizFacet.DE_SV))
-    val rows = listOf(
-        vocabulary(word = "lampa", translation = "Lampe", wordGroup = noun) to VocabularyPoolState.NotInPool,
-        vocabulary(word = "flicka", translation = "Mädchen", wordGroup = noun) to VocabularyPoolState.Queued,
-        vocabulary(word = "känna", translation = "sich fühlen", wordGroup = verb)
-            .copy(wordSuffix = "sig", ending = "er de t") to VocabularyPoolState.Active(setOf(QuizFacet.SV_DE)),
-        vocabulary(word = "dröm", translation = "größter Traum", wordGroup = WordGroup.Noun(WordGroup.NounSubgroup.AR))
-            .copy(wordPrefix = "högsta", ending = "men mar marna") to translations,
-        vocabulary(word = "gata", translation = "Straße", wordGroup = noun)
-            to VocabularyPoolState.Active(QuizFacet.entries.toSet()),
-        vocabulary(word = "klass", translation = "Klasse", wordGroup = WordGroup.Noun(WordGroup.NounSubgroup.SPECIAL))
-            .copy(ending = "en er arna", formsNeedReview = true) to translations,
-        vocabulary(word = "kyrka", translation = "Kirche", wordGroup = noun) to VocabularyPoolState.Paused,
-    )
-
         Surface {
             Column(modifier = Modifier.padding(Spacings.xs), verticalArrangement = Arrangement.spacedBy(Spacings.xs)) {
-                rows.forEach { (vocabulary, poolState) ->
+                vocabulariesWithPoolState().forEach { (vocabulary, poolState) ->
                     VocabularyListItem(vocabulary = vocabulary, poolState = poolState)
                 }
             }

@@ -6,6 +6,7 @@ import androidx.lifecycle.viewModelScope
 import com.ramcosta.composedestinations.generated.navArgs
 import dagger.hilt.android.lifecycle.HiltViewModel
 import de.ywegel.svenska.data.ContainerRepository
+import de.ywegel.svenska.data.QuizPoolRepository
 import de.ywegel.svenska.data.SearchRepository
 import de.ywegel.svenska.data.model.Vocabulary
 import de.ywegel.svenska.data.preferences.UserPreferencesManager
@@ -13,12 +14,12 @@ import de.ywegel.svenska.data.preferences.keys.SearchPreferenceKeys
 import de.ywegel.svenska.data.preferences.keys.addLastSearchedItem
 import de.ywegel.svenska.di.IoDispatcher
 import de.ywegel.svenska.domain.ToggleVocabularyFavoriteUseCase
+import de.ywegel.svenska.ui.common.WhileUiSubscribed
 import de.ywegel.svenska.ui.common.vocabulary.VocabularyListCallbacks
 import de.ywegel.svenska.ui.detail.VocabularyDetailState
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.stateIn
@@ -32,6 +33,7 @@ class SearchViewModel @Inject constructor(
     private val toggleVocabularyFavoriteUseCase: ToggleVocabularyFavoriteUseCase,
     private val containerRepository: ContainerRepository,
     private val searchRepository: SearchRepository,
+    private val quizPoolRepository: QuizPoolRepository,
     private val userPreferencesManager: UserPreferencesManager,
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
 ) : ViewModel(), VocabularyListCallbacks {
@@ -45,14 +47,11 @@ class SearchViewModel @Inject constructor(
     val searchQuery = _searchQuery.asStateFlow()
 
     @OptIn(ExperimentalCoroutinesApi::class)
-    val vocabularyFlow = _searchQuery.flatMapLatest {
-        searchRepository.searchVocabularies(
-            query = it,
-            containerId = containerId,
-        )
-    }.stateIn(
+    val vocabularyWithPoolStatesFlow = quizPoolRepository.withPoolStates(
+        _searchQuery.flatMapLatest { searchRepository.searchVocabularies(query = it, containerId = containerId) },
+    ).stateIn(
         scope = viewModelScope,
-        started = SharingStarted.Eagerly,
+        started = WhileUiSubscribed,
         initialValue = emptyList(),
     )
 
@@ -90,13 +89,13 @@ class SearchViewModel @Inject constructor(
         if (showContainerInformation) {
             viewModelScope.launch {
                 val container = containerRepository.getContainerById(vocabulary.containerId)
-                _uiState.update {
-                    it.copy(
-                        detailViewState = VocabularyDetailState.Visible(
-                            selectedVocabulary = vocabulary,
-                            selectedVocabularyContainer = container,
-                        ),
-                    )
+                _uiState.update { state ->
+                    val detail = state.detailViewState
+                    if (detail is VocabularyDetailState.Visible && detail.selectedVocabulary.id == vocabulary.id) {
+                        state.copy(detailViewState = detail.copy(selectedVocabularyContainer = container))
+                    } else {
+                        state
+                    }
                 }
             }
         }
