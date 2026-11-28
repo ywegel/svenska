@@ -1,5 +1,6 @@
 package de.ywegel.svenska.domain.wordImporter
 
+import de.ywegel.svenska.data.model.Gender
 import de.ywegel.svenska.domain.words.WordGroupMatcher
 import de.ywegel.svenska.domain.words.splitPhrase
 
@@ -8,6 +9,7 @@ data class ExtractedWord(
     val baseWord: String,
     val endings: List<String>,
     val suffix: String,
+    val genderFromArticle: Gender? = null,
 )
 
 object WordExtractor {
@@ -26,7 +28,7 @@ object WordExtractor {
     private class EndingsBracket(val indices: IntRange, val endings: List<String>)
 
     /**
-     * Splits "prefix baseWord (ending1, ending2, ending3) suffix" into its parts. Prefix and suffix can have any
+     * Splits "[en/ett] prefix baseWord (ending1, ending2, ending3) suffix" into its parts. Prefix and suffix can have any
      * number of words. The base word is the last word before the endings, except for verbs, where it is the first word.
      * Without an endings bracket, the whole input is the base word.
      */
@@ -42,13 +44,27 @@ object WordExtractor {
         val textAfterWords = explanations + input.substring(endingsBracket.indices.last + 1)
 
         val phrase = splitPhrase(wordsBeforeEndings, isVerb = WordGroupMatcher.isVerb(endings))
+        val (prefix, genderFromArticle) = splitOffArticle(phrase.prefix)
         return ExtractedWord(
-            prefix = phrase.prefix,
+            prefix = prefix,
             baseWord = phrase.word,
             endings = endings,
             suffix = (phrase.suffix + textAfterWords).trim(),
+            genderFromArticle = genderFromArticle,
         )
     }
+
+    /**
+     * Nouns could be written with their article: ett fenomen (-et, -, -en). The article is no part of the word, the app
+     * stores it seperately as the [de.ywegel.svenska.data.model.Vocabulary.gender]. It only counts when it is the whole
+     * prefix, otherwise it belongs to a phrase: en röd bil (-en, -ar, -arna).
+     */
+    private fun splitOffArticle(prefix: String): Pair<String, Gender?> {
+        val gender = articleGenders[prefix.lowercase()] ?: return prefix to null
+        return "" to gender
+    }
+
+    private val articleGenders = mapOf("en" to Gender.Ultra, "ett" to Gender.Neutra)
 
     /**
      * Endings always belong to a word before them, so brackets at the start are ignored.

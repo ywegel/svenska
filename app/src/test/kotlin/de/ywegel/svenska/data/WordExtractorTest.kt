@@ -1,8 +1,10 @@
 package de.ywegel.svenska.data
 
+import de.ywegel.svenska.data.model.Gender
 import de.ywegel.svenska.domain.wordImporter.ExtractedWord
 import de.ywegel.svenska.domain.wordImporter.WordExtractor.extractWord
 import de.ywegel.svenska.domain.wordImporter.WordExtractor.normalizeSpecialCharacters
+import de.ywegel.svenska.testdata.ReferenceWord
 import de.ywegel.svenska.testdata.ReferenceWords
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
@@ -15,9 +17,24 @@ import java.util.stream.Stream
 
 class WordExtractorTest {
     @ParameterizedTest
-    @MethodSource("referenceWords", "provideExtractWordTestCases")
+    @MethodSource("provideExtractWordTestCases")
     fun testExtractWord(input: String, expected: ExtractedWord) {
         expectThat(extractWord(input)).isEqualTo(expected)
+    }
+
+    @ParameterizedTest
+    @MethodSource("referenceWords")
+    fun `should split reference words into their saved parts`(reference: ReferenceWord) {
+        // When
+        val result = extractWord(reference.text)
+
+        // Then
+        expectThat(result) {
+            get { prefix }.isEqualTo(reference.prefix)
+            get { baseWord }.isEqualTo(reference.word)
+            get { endings }.isEqualTo(reference.endings)
+            get { suffix }.isEqualTo(reference.suffix)
+        }
     }
 
     @Nested
@@ -146,9 +163,7 @@ class WordExtractorTest {
 
     companion object {
         @JvmStatic
-        fun referenceWords() = ReferenceWords.all.map {
-            Arguments.of(it.text, ExtractedWord(it.prefix, it.word, it.endings, it.suffix))
-        }
+        fun referenceWords() = ReferenceWords.all
 
         @JvmStatic
         fun provideExtractWordTestCases(): Stream<Arguments> {
@@ -157,6 +172,11 @@ class WordExtractorTest {
                 Arguments.of(
                     "en  hel  del bil (-en, -ar, -arna) i  stan",
                     word("bil", "-en", "-ar", "-arna", prefix = "en  hel  del", suffix = "i  stan"),
+                ),
+                // A lone article is split off
+                Arguments.of(
+                    "En saga (-n, -or, -orna)",
+                    word("saga", "-n", "-or", "-orna", genderFromArticle = Gender.Ultra),
                 ),
                 // Bracket without a word directly before it is part of the prefix
                 Arguments.of("(en) bil (-en, -ar, -arna)", word("bil", "-en", "-ar", "-arna", prefix = "(en)")),
@@ -198,7 +218,18 @@ class WordExtractorTest {
             )
         }
 
-        private fun word(baseWord: String, vararg endings: String, prefix: String = "", suffix: String = "") =
-            ExtractedWord(prefix = prefix, baseWord = baseWord, endings = endings.toList(), suffix = suffix)
+        private fun word(
+            baseWord: String,
+            vararg endings: String,
+            prefix: String = "",
+            suffix: String = "",
+            genderFromArticle: Gender? = null,
+        ) = ExtractedWord(
+            prefix = prefix,
+            baseWord = baseWord,
+            endings = endings.toList(),
+            suffix = suffix,
+            genderFromArticle = genderFromArticle,
+        )
     }
 }
