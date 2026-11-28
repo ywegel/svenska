@@ -13,6 +13,8 @@ import de.ywegel.svenska.data.model.Vocabulary
 import de.ywegel.svenska.data.preferences.keys.SearchPreferenceKeys
 import de.ywegel.svenska.data.preferences.keys.addLastSearchedItem
 import de.ywegel.svenska.domain.ToggleVocabularyFavoriteUseCase
+import de.ywegel.svenska.domain.quiz.QueueToPoolUseCase
+import de.ywegel.svenska.domain.quiz.ToggleVocabularyPoolUseCase
 import de.ywegel.svenska.fakes.QuizPoolRepositoryFake
 import de.ywegel.svenska.fakes.UserPreferencesManagerFake
 import de.ywegel.svenska.fakes.VocabularyRepositoryFake
@@ -29,7 +31,6 @@ import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import strikt.api.expectThat
 import strikt.assertions.containsExactly
-import strikt.assertions.hasSize
 import strikt.assertions.isEmpty
 import strikt.assertions.isEqualTo
 
@@ -53,6 +54,10 @@ class SearchViewModelTest {
             containerRepository = fakeRepo,
             searchRepository = fakeRepo,
             quizPoolRepository = fakeQuizPoolRepo,
+            toggleVocabularyPoolUseCase = ToggleVocabularyPoolUseCase(
+                queueToPool = QueueToPoolUseCase(fakeQuizPoolRepo),
+                quizPoolRepository = fakeQuizPoolRepo,
+            ),
             userPreferencesManager = fakePrefs,
             ioDispatcher = testDispatcher,
             toggleVocabularyFavoriteUseCase = ToggleVocabularyFavoriteUseCase(

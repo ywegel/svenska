@@ -9,8 +9,10 @@ import de.ywegel.svenska.data.ContainerRepository
 import de.ywegel.svenska.data.FavoritesAndPronunciationsRepository
 import de.ywegel.svenska.data.QuizPoolRepository
 import de.ywegel.svenska.data.model.Vocabulary
+import de.ywegel.svenska.data.model.quiz.VocabularyPoolState
 import de.ywegel.svenska.data.model.quiz.VocabularyWithPoolState
 import de.ywegel.svenska.domain.ToggleVocabularyFavoriteUseCase
+import de.ywegel.svenska.domain.quiz.ToggleVocabularyPoolUseCase
 import de.ywegel.svenska.ui.common.WhileUiSubscribed
 import de.ywegel.svenska.ui.common.vocabulary.VocabularyListCallbacks
 import de.ywegel.svenska.ui.container.BonusScreen
@@ -24,12 +26,14 @@ import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import javax.inject.Inject
+import kotlin.time.Clock
 
 @HiltViewModel
 class FavoritesAndPronunciationViewModel @Inject constructor(
     private val containerRepository: ContainerRepository,
     favoritesAndPronunciationsRepository: FavoritesAndPronunciationsRepository,
     private val toggleVocabularyFavoriteUseCase: ToggleVocabularyFavoriteUseCase,
+    private val toggleVocabularyPoolUseCase: ToggleVocabularyPoolUseCase,
     quizPoolRepository: QuizPoolRepository,
     savedStateHandle: SavedStateHandle,
 ) : ViewModel(), VocabularyListCallbacks {
@@ -83,6 +87,12 @@ class FavoritesAndPronunciationViewModel @Inject constructor(
     override fun toggleFavorite(vocabularyId: Int, isFavorite: Boolean) {
         viewModelScope.launch {
             toggleVocabularyFavoriteUseCase(vocabularyId, isFavorite)
+        }
+    }
+
+    override fun togglePool(vocabulary: Vocabulary, poolState: VocabularyPoolState) {
+        viewModelScope.launch {
+            toggleVocabularyPoolUseCase(vocabulary, poolState, Clock.System.now())
         }
     }
 }

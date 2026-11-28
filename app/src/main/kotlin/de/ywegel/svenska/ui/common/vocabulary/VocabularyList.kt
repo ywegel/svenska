@@ -50,17 +50,22 @@ fun VocabularyList(
             items = vocabularies,
             key = { it.vocabulary.id },
         ) { vocab ->
-            VocabularyListItem(
-                vocabulary = vocab.vocabulary,
-                modifier = Modifier.animateItem(),
+            PoolToggleSwipeBox(
                 poolState = vocab.poolState,
-                onClick = {
-                    vocabularyListCallbacks.onVocabularyClick(
-                        vocabulary = it,
-                        showContainerInformation = showContainerInformation,
-                    )
-                },
-            )
+                onTogglePool = { vocabularyListCallbacks.togglePool(vocab.vocabulary, vocab.poolState) },
+                modifier = Modifier.animateItem(),
+            ) {
+                VocabularyListItem(
+                    vocabulary = vocab.vocabulary,
+                    poolState = vocab.poolState,
+                    onClick = {
+                        vocabularyListCallbacks.onVocabularyClick(
+                            vocabulary = it,
+                            showContainerInformation = showContainerInformation,
+                        )
+                    },
+                )
+            }
         }
         footerItems?.invoke(this)
     }
