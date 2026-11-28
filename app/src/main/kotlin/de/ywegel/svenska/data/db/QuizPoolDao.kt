@@ -15,6 +15,7 @@ import de.ywegel.svenska.data.model.Vocabulary
 import de.ywegel.svenska.data.model.quiz.PoolRemoval
 import de.ywegel.svenska.data.model.quiz.QuizPoolStatus
 import de.ywegel.svenska.data.model.quiz.QuizTranslationDirection
+import kotlinx.coroutines.flow.Flow
 
 @Suppress("detekt:TooManyFunctions", "detekt:MaxLineLength")
 @Dao
@@ -33,6 +34,9 @@ abstract class QuizPoolDao {
 
     @Query("SELECT * FROM QuizPoolEntry WHERE vocabularyId = :vocabularyId")
     abstract suspend fun get(vocabularyId: Int): QuizPoolEntry?
+
+    @Query("SELECT * FROM QuizPoolEntry")
+    abstract fun observeAll(): Flow<List<QuizPoolEntry>>
 
     // Reads and writes in one transaction, so that the decision is made on the current state of the row.
     @Transaction

@@ -61,16 +61,16 @@ interface VocabularyDao {
     fun getVocabulariesByTranslationDESC(containerId: Int): Flow<List<Vocabulary>>
 
     @Query("SELECT * FROM vocabulary WHERE isFavorite IS 1 AND containerId = :containerId ORDER BY word ASC")
-    fun getFavoritesByContainerId(containerId: Int): List<Vocabulary>
+    fun getFavoritesByContainerId(containerId: Int): Flow<List<Vocabulary>>
 
     @Query("SELECT * FROM vocabulary WHERE isFavorite IS 1 ORDER BY word ASC")
-    fun getAllFavorites(): List<Vocabulary>
+    fun getAllFavorites(): Flow<List<Vocabulary>>
 
     @Query("SELECT * FROM vocabulary WHERE irregularPronunciation IS NOT NULL AND containerId = :containerId ORDER BY word ASC")
-    fun getPronunciationsByContainerId(containerId: Int): List<Vocabulary>
+    fun getPronunciationsByContainerId(containerId: Int): Flow<List<Vocabulary>>
 
     @Query("SELECT * FROM vocabulary WHERE irregularPronunciation IS NOT NULL ORDER BY word ASC")
-    fun getAllPronunciations(): List<Vocabulary>
+    fun getAllPronunciations(): Flow<List<Vocabulary>>
 
     @Query("SELECT * FROM vocabulary WHERE ending IS NOT NULL AND TRIM(ending, '') != ''")
     suspend fun getAllVocabulariesWithEndings(): List<Vocabulary>

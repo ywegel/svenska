@@ -36,6 +36,17 @@
 
     <issue
         id="PluralsCandidate"
+        message="Formatting %d followed by words (&quot;parts&quot;): This should probably be a plural rather than a string"
+        errorLine1="    &lt;string name=&quot;accessibility_vocabulary_pool_active&quot;>Learning, %1$d of %2$d parts unlocked&lt;/string>"
+        errorLine2="    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values/accessibility.xml"
+            line="14"
+            column="5"/>
+    </issue>
+
+    <issue
+        id="PluralsCandidate"
         message="Formatting %d followed by words (&quot;out&quot;): This should probably be a plural rather than a string"
         errorLine1="    &lt;string name=&quot;quiz_finished_correct_answers_label&quot;>%1$d out of %2$d correct&lt;/string>"
         errorLine2="    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">

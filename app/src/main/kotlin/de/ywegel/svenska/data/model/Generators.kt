@@ -8,6 +8,9 @@
 package de.ywegel.svenska.data.model
 
 import androidx.annotation.VisibleForTesting
+import de.ywegel.svenska.data.model.quiz.QuizFacet
+import de.ywegel.svenska.data.model.quiz.VocabularyPoolState
+import de.ywegel.svenska.data.model.quiz.VocabularyWithPoolState
 
 object GeneratorConstants {
     @VisibleForTesting
@@ -110,6 +113,49 @@ fun vocabularies(containerId: Int = 1): List<Vocabulary> = listOf(
         id = 6,
     ),
 )
+
+/**
+ * One row per possible [VocabularyPoolState], each on a word it can occur on. Active words have SV_DE from their
+ * introduction on, so these are all combinations of the facets: SV_DE alone, + DE_SV, + FORMS (after a reset, which
+ * deletes DE_SV but keeps the shared forms card) and all three. Additionally a word with `formsNeedReview` and a phrase
+ * without forms. The ids are distinct, as lists use them as keys.
+ */
+@VisibleForTesting
+fun vocabulariesWithPoolState(containerId: Int = 1): List<VocabularyWithPoolState> {
+    val orNoun = WordGroup.Noun(WordGroup.NounSubgroup.OR)
+    val arNoun = WordGroup.Noun(WordGroup.NounSubgroup.AR)
+    val specialNoun = WordGroup.Noun(WordGroup.NounSubgroup.SPECIAL)
+    val verb = WordGroup.Verb(WordGroup.VerbSubgroup.GROUP_2A)
+    val translations = VocabularyPoolState.Active(setOf(QuizFacet.SV_DE, QuizFacet.DE_SV))
+
+    return listOf(
+        vocabulary(id = 1, word = "lampa", translation = "lamp", wordGroup = orNoun)
+            to VocabularyPoolState.NotInPool,
+        vocabulary(id = 2, word = "flicka", translation = "girl", wordGroup = orNoun)
+            to VocabularyPoolState.Queued,
+        vocabulary(id = 3, word = "känna", translation = "feel", wordGroup = verb)
+            .copy(wordSuffix = "sig", gender = null, ending = "er de t")
+            to VocabularyPoolState.Active(setOf(QuizFacet.SV_DE)),
+        vocabulary(id = 4, word = "dröm", translation = "biggest dream", wordGroup = arNoun)
+            .copy(wordPrefix = "högsta", ending = "men mar marna")
+            to translations,
+        vocabulary(id = 5, word = "bil", translation = "car", wordGroup = arNoun)
+            .copy(ending = "en ar arna")
+            to VocabularyPoolState.Active(setOf(QuizFacet.SV_DE, QuizFacet.FORMS)),
+        vocabulary(id = 6, word = "gata", translation = "street", wordGroup = orNoun)
+            to VocabularyPoolState.Active(QuizFacet.entries.toSet()),
+        vocabulary(id = 7, word = "klass", translation = "class", wordGroup = specialNoun)
+            .copy(ending = "en er arna", formsNeedReview = true)
+            to translations,
+        vocabulary(id = 8, word = "tack så mycket", translation = "thank you very much", wordGroup = WordGroup.Other)
+            .copy(gender = null, ending = "")
+            to translations,
+        vocabulary(id = 9, word = "kyrka", translation = "church", wordGroup = orNoun)
+            to VocabularyPoolState.Paused,
+    ).map { (vocabulary, poolState) ->
+        VocabularyWithPoolState(vocabulary.copy(containerId = containerId), poolState)
+    }
+}
 
 @VisibleForTesting
 fun container(id: Int = 1): VocabularyContainer = VocabularyContainer(id, "Swedish vocabulary")

@@ -2,6 +2,8 @@ package de.ywegel.svenska.data.impl
 
 import androidx.room.Room
 import androidx.test.core.app.ApplicationProvider
+import app.cash.turbine.ReceiveTurbine
+import app.cash.turbine.test
 import de.ywegel.svenska.RobolectricTest
 import de.ywegel.svenska.data.db.QuizPoolDao
 import de.ywegel.svenska.data.db.ReviewDao
@@ -9,12 +11,16 @@ import de.ywegel.svenska.data.db.VocabularyDatabase
 import de.ywegel.svenska.data.db.quiz.FormsFacetCard
 import de.ywegel.svenska.data.db.quiz.FsrsColumns
 import de.ywegel.svenska.data.db.quiz.QuizPoolEntry
+import de.ywegel.svenska.data.db.quiz.TranslationFacetCard
 import de.ywegel.svenska.data.model.Vocabulary
 import de.ywegel.svenska.data.model.quiz.PoolRemoval
 import de.ywegel.svenska.data.model.quiz.QuizFacet
 import de.ywegel.svenska.data.model.quiz.QuizTranslationDirection
+import de.ywegel.svenska.data.model.quiz.VocabularyPoolState
+import de.ywegel.svenska.data.model.quiz.VocabularyWithPoolState
 import de.ywegel.svenska.data.model.quiz.formsKey
 import de.ywegel.svenska.data.model.vocabulary
+import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.runTest
 import org.junit.After
 import org.junit.Before
@@ -287,6 +293,44 @@ class QuizPoolRepositoryImplTest : RobolectricTest() {
         expectThat(result.isFailure).isEqualTo(true)
         expectThat(stored(2)).isEqualTo(bil.withoutForms())
     }
+
+    @Test
+    fun `withPoolStates emits if only pool or facets change`() = runTest {
+        // Given
+        val row = word(id = 2)
+        db.vocabulary().upsertVocabulary(row)
+
+        repository.withPoolStates(flowOf(listOf(row))).test {
+            expectThat(awaitPoolState()).isEqualTo(VocabularyPoolState.NotInPool)
+
+            // When
+            dao.insert(queued().copy(vocabularyId = 2))
+            // Then
+            expectThat(awaitPoolState()).isEqualTo(VocabularyPoolState.Queued)
+
+            // When
+            dao.update(active().copy(vocabularyId = 2))
+            // Then
+            expectThat(awaitPoolState()).isEqualTo(VocabularyPoolState.Active(setOf(QuizFacet.SV_DE)))
+
+            // When
+            reviewDao.insertTranslationCardIfAbsent(
+                TranslationFacetCard(2, QuizTranslationDirection.DE_SV, FsrsColumns.newCard(due = TODAY)),
+            )
+            // Then
+            expectThat(awaitPoolState()).isEqualTo(VocabularyPoolState.Active(setOf(QuizFacet.SV_DE, QuizFacet.DE_SV)))
+
+            // When
+            reviewDao.insertFormsCardIfAbsent(
+                FormsFacetCard(checkNotNull(row.formsKey), FsrsColumns.newCard(due = TODAY)),
+            )
+            // Then
+            expectThat(awaitPoolState()).isEqualTo(VocabularyPoolState.Active(QuizFacet.entries.toSet()))
+        }
+    }
+
+    private suspend fun ReceiveTurbine<List<VocabularyWithPoolState>>.awaitPoolState(): VocabularyPoolState =
+        awaitItem().single().poolState
 
     private suspend fun stored(id: Int): Vocabulary =
         db.vocabulary().getAllVocabulariesSnapshot().single { it.id == id }

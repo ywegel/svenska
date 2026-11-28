@@ -22,6 +22,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.test.StandardTestDispatcher
 import kotlinx.coroutines.test.TestDispatcher
 import kotlinx.coroutines.test.advanceUntilIdle
@@ -458,8 +459,8 @@ class BaseQuizViewModelTest {
 
                 // Verify repository state
                 val favorites = repository.getFavorites(null)
-                expectThat(favorites).hasSize(1)
-                expectThat(favorites.first().id).isEqualTo(nonFavoriteVocabulary.id)
+                expectThat(favorites.first()).hasSize(1)
+                expectThat(favorites.first().first().id).isEqualTo(nonFavoriteVocabulary.id)
             }
 
         @Test
@@ -476,7 +477,7 @@ class BaseQuizViewModelTest {
                 val strategy = QuizStrategyFake(isValid = true, question)
 
                 // Sanity check: We should only have 3 vocabularies in the repository, and one of them is a favorite
-                expectThat(repositoryFake.getFavorites(null).size).isEqualTo(1)
+                expectThat(repositoryFake.getFavorites(null).first().size).isEqualTo(1)
                 expectThat(repositoryFake.getAllVocabulariesSnapshot(null).size).isEqualTo(3)
 
                 viewModel = TestViewModel(
@@ -515,11 +516,11 @@ class BaseQuizViewModelTest {
                 val allVocabularies = repositoryFake.getAllVocabulariesSnapshot(null)
                 val nonFavorites = allVocabularies.filter { !it.isFavorite }
 
-                expectThat(favorites.size).isEqualTo(2)
+                expectThat(favorites.first().size).isEqualTo(2)
                 expectThat(nonFavorites.size).isEqualTo(1)
                 expectThat(allVocabularies)
                     .hasSize(3)
-                    .containsExactlyInAnyOrder(favorites + nonFavorites)
+                    .containsExactlyInAnyOrder(favorites.first() + nonFavorites)
             }
     }
 

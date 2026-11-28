@@ -5,6 +5,10 @@ import de.ywegel.svenska.data.model.Vocabulary
 import de.ywegel.svenska.data.model.quiz.PoolRemoval
 import de.ywegel.svenska.data.model.quiz.QuizCard
 import de.ywegel.svenska.data.model.quiz.QuizFacet
+import de.ywegel.svenska.data.model.quiz.VocabularyPoolState
+import de.ywegel.svenska.data.model.quiz.VocabularyWithPoolState
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.map
 import one.felsen.fsrskt.fsrs6.FsrsCard
 import kotlin.time.Instant
 
@@ -16,6 +20,7 @@ class QuizPoolRepositoryFake(
     private val introducedToday: Int = 0,
     private val formsCandidates: List<Vocabulary> = emptyList(),
     private val queuedWords: List<Vocabulary> = emptyList(),
+    private val poolStates: Map<Int, VocabularyPoolState> = emptyMap(),
 ) : QuizPoolRepository {
     val queuedToPool = mutableListOf<Vocabulary>()
     val introducedWords = mutableListOf<Vocabulary>()
@@ -26,6 +31,11 @@ class QuizPoolRepositoryFake(
     override suspend fun queueToPool(words: List<Vocabulary>, now: Instant) {
         queuedToPool += words
     }
+
+    override fun withPoolStates(vocabularies: Flow<List<Vocabulary>>): Flow<List<VocabularyWithPoolState>> =
+        vocabularies.map { list ->
+            list.map { VocabularyWithPoolState(it, poolStates[it.id] ?: VocabularyPoolState.NotInPool) }
+        }
 
     override suspend fun removeFromPool(vocabularyId: Int): PoolRemoval = PoolRemoval.UNCHANGED
 

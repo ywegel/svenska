@@ -58,7 +58,8 @@ import com.ramcosta.composedestinations.generated.destinations.WordGroupsScreenD
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
 import de.ywegel.svenska.R
 import de.ywegel.svenska.data.model.Vocabulary
-import de.ywegel.svenska.data.model.vocabularies
+import de.ywegel.svenska.data.model.quiz.VocabularyWithPoolState
+import de.ywegel.svenska.data.model.vocabulariesWithPoolState
 import de.ywegel.svenska.navigation.SvenskaGraph
 import de.ywegel.svenska.navigation.transitions.LateralTransition
 import de.ywegel.svenska.ui.common.HorizontalSpacerM
@@ -81,11 +82,12 @@ fun SearchScreen(navigator: DestinationsNavigator) {
     val viewModel = hiltViewModel<SearchViewModel>()
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val searchQuery by viewModel.searchQuery.collectAsStateWithLifecycle()
-    val vocabulary by viewModel.vocabularyFlow.collectAsStateWithLifecycle(initialValue = emptyList())
+    val vocabularyWithPoolStates
+            by viewModel.vocabularyWithPoolStatesFlow.collectAsStateWithLifecycle(initialValue = emptyList())
 
     SearchScreen(
         uiState = uiState,
-        vocabulary = vocabulary,
+        vocabularyWithPoolStates = vocabularyWithPoolStates,
         currentSearchQuery = searchQuery,
         onSearchChanged = viewModel::updateSearchQuery,
         onSearch = viewModel::onSearch,
@@ -110,7 +112,7 @@ fun SearchScreen(navigator: DestinationsNavigator) {
 @Composable
 private fun SearchScreen(
     uiState: SearchUiState,
-    vocabulary: List<Vocabulary>,
+    vocabularyWithPoolStates: List<VocabularyWithPoolState>,
     currentSearchQuery: String,
     onSearchChanged: (String) -> Unit,
     onSearch: (String) -> Unit,
@@ -137,7 +139,7 @@ private fun SearchScreen(
     ) { contentPadding ->
         ItemList(
             outerPadding = contentPadding,
-            vocabulary = vocabulary,
+            vocabularyWithPoolStates = vocabularyWithPoolStates,
             uiState = uiState,
             searchQuery = currentSearchQuery,
             navigateToEdit = navigateToEdit,
@@ -161,7 +163,7 @@ private fun SearchScreen(
 @Composable
 private fun ItemList(
     outerPadding: PaddingValues,
-    vocabulary: List<Vocabulary>,
+    vocabularyWithPoolStates: List<VocabularyWithPoolState>,
     uiState: SearchUiState,
     searchQuery: String,
     vocabularyListCallbacks: VocabularyListCallbacks,
@@ -180,7 +182,7 @@ private fun ItemList(
         val outerPadding = rememberColumnScaffoldInsets(outerPadding, Spacings.xs)
 
         VocabularyList(
-            vocabularies = vocabulary,
+            vocabularies = vocabularyWithPoolStates,
             showContainerInformation = true,
             vocabularyDetailState = uiState.detailViewState,
             headerItems = {
@@ -392,7 +394,7 @@ private fun SearchScreenPreviewEmpty() {
             uiState = SearchUiState(
                 lastSearchedItems = listOf("abc", "def", "ghi"),
             ),
-            vocabulary = emptyList(),
+            vocabularyWithPoolStates = emptyList(),
             currentSearchQuery = "",
             onSearchChanged = {},
             onSearch = {},
@@ -411,7 +413,7 @@ private fun SearchScreenPreviewFilled() {
     SvenskaTheme {
         SearchScreen(
             uiState = SearchUiState(),
-            vocabulary = emptyList(),
+            vocabularyWithPoolStates = emptyList(),
             currentSearchQuery = "abc",
             onSearchChanged = {},
             onSearch = {},
@@ -430,7 +432,7 @@ private fun SearchScreenPreviewFilledAndItemsAvailable() {
     SvenskaTheme {
         SearchScreen(
             uiState = SearchUiState(),
-            vocabulary = vocabularies(),
+            vocabularyWithPoolStates = vocabulariesWithPoolState(),
             currentSearchQuery = "abc",
             onSearchChanged = {},
             onSearch = {},

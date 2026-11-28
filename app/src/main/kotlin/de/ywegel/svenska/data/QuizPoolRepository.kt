@@ -3,6 +3,8 @@ package de.ywegel.svenska.data
 import de.ywegel.svenska.data.model.Vocabulary
 import de.ywegel.svenska.data.model.quiz.PoolRemoval
 import de.ywegel.svenska.data.model.quiz.QuizCard
+import de.ywegel.svenska.data.model.quiz.VocabularyWithPoolState
+import kotlinx.coroutines.flow.Flow
 import kotlin.time.Instant
 
 interface QuizPoolRepository {
@@ -12,6 +14,12 @@ interface QuizPoolRepository {
      * that is already in the pool, also a paused one, keeps its entry.
      */
     suspend fun queueToPool(words: List<Vocabulary>, now: Instant)
+
+    /**
+     * Returns all [vocabularies] bundled with their corresponding [de.ywegel.svenska.data.model.quiz.VocabularyPoolState].
+     * The Flow emits if [vocabularies], the pool or the FacetCards change. The order of [vocabularies] is kept.
+     */
+    fun withPoolStates(vocabularies: Flow<List<Vocabulary>>): Flow<List<VocabularyWithPoolState>>
 
     /**
      * Removes the word from the quiz pool. A queued word is deleted, as it has no progress yet. An active word is

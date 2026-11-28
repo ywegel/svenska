@@ -14,7 +14,14 @@ import de.ywegel.svenska.data.model.Vocabulary
 import de.ywegel.svenska.data.model.quiz.PoolRemoval
 import de.ywegel.svenska.data.model.quiz.QuizCard
 import de.ywegel.svenska.data.model.quiz.QuizFacet
+import de.ywegel.svenska.data.model.quiz.QuizTranslationDirection
+import de.ywegel.svenska.data.model.quiz.VocabularyPoolState
+import de.ywegel.svenska.data.model.quiz.VocabularyWithPoolState
 import de.ywegel.svenska.data.model.quiz.formsKey
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.map
 import javax.inject.Inject
 import kotlin.time.Instant
 
@@ -31,6 +38,24 @@ class QuizPoolRepositoryImpl @Inject constructor(
             quizDao.insertIgnoringExisting(words.map { QuizPoolEntry(it.id, now.toEpochMilliseconds()) })
         }
     }
+
+    override fun withPoolStates(vocabularies: Flow<List<Vocabulary>>): Flow<List<VocabularyWithPoolState>> =
+        combine(
+            vocabularies,
+            quizDao.observeAll().map { entries -> entries.associate { it.vocabularyId to it.poolStatus } }
+                .distinctUntilChanged(),
+            reviewDao.observeVocabularyIdsWithCard(QuizTranslationDirection.DE_SV).distinctSets(),
+            reviewDao.observeFormsKeys().distinctSets(),
+        ) { vocabularyList, statusById, deSvIds, formsKeys ->
+            vocabularyList.map { vocabulary ->
+                val poolState = VocabularyPoolState.of(
+                    status = statusById[vocabulary.id],
+                    hasDeSvCard = vocabulary.id in deSvIds,
+                    hasFormsCard = vocabulary.formsKey in formsKeys,
+                )
+                VocabularyWithPoolState(vocabulary, poolState)
+            }
+        }
 
     override suspend fun removeFromPool(vocabularyId: Int): PoolRemoval = quizDao.removeFromPool(vocabularyId)
 
@@ -67,4 +92,6 @@ class QuizPoolRepositoryImpl @Inject constructor(
     private fun Vocabulary.toForms(): VocabularyForms {
         return VocabularyForms(id, form1, form2, form3, formsNeedReview)
     }
+
+    private fun <T> Flow<List<T>>.distinctSets(): Flow<Set<T>> = map { it.toHashSet() }.distinctUntilChanged()
 }

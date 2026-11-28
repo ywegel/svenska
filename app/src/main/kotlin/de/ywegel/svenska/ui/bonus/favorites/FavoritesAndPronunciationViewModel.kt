@@ -7,15 +7,20 @@ import com.ramcosta.composedestinations.generated.navArgs
 import dagger.hilt.android.lifecycle.HiltViewModel
 import de.ywegel.svenska.data.ContainerRepository
 import de.ywegel.svenska.data.FavoritesAndPronunciationsRepository
+import de.ywegel.svenska.data.QuizPoolRepository
 import de.ywegel.svenska.data.model.Vocabulary
-import de.ywegel.svenska.di.IoDispatcher
+import de.ywegel.svenska.data.model.quiz.VocabularyWithPoolState
 import de.ywegel.svenska.domain.ToggleVocabularyFavoriteUseCase
+import de.ywegel.svenska.ui.common.WhileUiSubscribed
 import de.ywegel.svenska.ui.common.vocabulary.VocabularyListCallbacks
 import de.ywegel.svenska.ui.container.BonusScreen
 import de.ywegel.svenska.ui.detail.VocabularyDetailState
-import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.catch
+import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -23,68 +28,56 @@ import javax.inject.Inject
 @HiltViewModel
 class FavoritesAndPronunciationViewModel @Inject constructor(
     private val containerRepository: ContainerRepository,
-    private val favoritesAndPronunciationsRepository: FavoritesAndPronunciationsRepository,
+    favoritesAndPronunciationsRepository: FavoritesAndPronunciationsRepository,
     private val toggleVocabularyFavoriteUseCase: ToggleVocabularyFavoriteUseCase,
+    quizPoolRepository: QuizPoolRepository,
     savedStateHandle: SavedStateHandle,
-    @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
 ) : ViewModel(), VocabularyListCallbacks {
 
     val navArgs = savedStateHandle.navArgs<FavoritesAndPronunciationScreenNavArgs>()
 
-    private val _uiState = MutableStateFlow<FavoritesUiState>(FavoritesUiState.Loading)
-    val uiState = _uiState.asStateFlow()
 
-    init {
-        viewModelScope.launch(ioDispatcher) {
-            _uiState.value = FavoritesUiState.Loading
-            val result = when (navArgs.screenType) {
-                BonusScreen.Favorites -> runCatching { favoritesAndPronunciationsRepository.getFavorites(null) }
-                BonusScreen.SpecialPronunciation -> runCatching {
-                    favoritesAndPronunciationsRepository.getPronunciations(null)
-                }
+    private val detailState = MutableStateFlow<VocabularyDetailState>(VocabularyDetailState.Hidden)
 
-                else -> Result.failure(
-                    // This can't happen, as you can only navigate to FavoritesAndPronunciationScreen for Favorites or Pronunciation
-                    IllegalStateException("This screen type is not supported"),
-                )
-            }
-
-            result
-                .onSuccess { _uiState.value = FavoritesUiState.Success(it) }
-                .onFailure { _uiState.value = FavoritesUiState.Error(it.message ?: "Unknown error") }
-        }
+    private val vocabularies = when (navArgs.screenType) {
+        BonusScreen.Favorites -> favoritesAndPronunciationsRepository.getFavorites(null)
+        BonusScreen.SpecialPronunciation -> favoritesAndPronunciationsRepository.getPronunciations(null)
+        else -> flow { error("This screen type is not supported") }
     }
 
-    override fun onVocabularyClick(vocabulary: Vocabulary, showContainerInformation: Boolean) {
-        _uiState.updateIfSuccessState {
-            it.copy(
-                detailViewState = VocabularyDetailState.Visible(
-                    selectedVocabulary = vocabulary,
-                    selectedVocabularyContainer = null,
-                ),
-            )
+    val uiState: StateFlow<FavoritesUiState> =
+        combine(quizPoolRepository.withPoolStates(vocabularies), detailState) { items, detail ->
+            FavoritesUiState.Success(items, detail)
         }
+            .catch<FavoritesUiState> { emit(FavoritesUiState.Error(it.message ?: "Unknown error")) }
+            .stateIn(
+                scope = viewModelScope,
+                started = WhileUiSubscribed,
+                initialValue = FavoritesUiState.Loading,
+            )
+
+    override fun onVocabularyClick(vocabulary: Vocabulary, showContainerInformation: Boolean) {
+        detailState.value = VocabularyDetailState.Visible(
+            selectedVocabulary = vocabulary,
+            selectedVocabularyContainer = null,
+        )
+
         if (showContainerInformation) {
             viewModelScope.launch {
                 val container = containerRepository.getContainerById(vocabulary.containerId)
-                _uiState.updateIfSuccessState {
-                    it.copy(
-                        detailViewState = VocabularyDetailState.Visible(
-                            selectedVocabulary = vocabulary,
-                            selectedVocabularyContainer = container,
-                        ),
-                    )
+                detailState.update { current ->
+                    if (current is VocabularyDetailState.Visible && current.selectedVocabulary.id == vocabulary.id) {
+                        current.copy(selectedVocabularyContainer = container)
+                    } else {
+                        current
+                    }
                 }
             }
         }
     }
 
     override fun onDismissVocabularyDetail() {
-        _uiState.updateIfSuccessState {
-            it.copy(
-                detailViewState = VocabularyDetailState.Hidden,
-            )
-        }
+        detailState.value = VocabularyDetailState.Hidden
     }
 
     override fun toggleFavorite(vocabularyId: Int, isFavorite: Boolean) {
@@ -92,24 +85,12 @@ class FavoritesAndPronunciationViewModel @Inject constructor(
             toggleVocabularyFavoriteUseCase(vocabularyId, isFavorite)
         }
     }
-
-    private fun MutableStateFlow<FavoritesUiState>.updateIfSuccessState(
-        block: (FavoritesUiState.Success) -> FavoritesUiState,
-    ) {
-        this.update {
-            if (it is FavoritesUiState.Success) {
-                block(it)
-            } else {
-                it
-            }
-        }
-    }
 }
 
 sealed class FavoritesUiState {
-    object Loading : FavoritesUiState()
+    data object Loading : FavoritesUiState()
     data class Success(
-        val items: List<Vocabulary>,
+        val items: List<VocabularyWithPoolState>,
         val detailViewState: VocabularyDetailState = VocabularyDetailState.Hidden,
     ) : FavoritesUiState()
 

@@ -13,6 +13,7 @@ import de.ywegel.svenska.data.model.Vocabulary
 import de.ywegel.svenska.data.preferences.keys.SearchPreferenceKeys
 import de.ywegel.svenska.data.preferences.keys.addLastSearchedItem
 import de.ywegel.svenska.domain.ToggleVocabularyFavoriteUseCase
+import de.ywegel.svenska.fakes.QuizPoolRepositoryFake
 import de.ywegel.svenska.fakes.UserPreferencesManagerFake
 import de.ywegel.svenska.fakes.VocabularyRepositoryFake
 import de.ywegel.svenska.ui.search.SearchViewModel
@@ -29,6 +30,7 @@ import org.junit.jupiter.api.Test
 import strikt.api.expectThat
 import strikt.assertions.containsExactly
 import strikt.assertions.hasSize
+import strikt.assertions.isEmpty
 import strikt.assertions.isEqualTo
 
 @OptIn(ExperimentalCoroutinesApi::class)
@@ -36,6 +38,7 @@ class SearchViewModelTest {
 
     private lateinit var viewModel: SearchViewModel
     private lateinit var fakeRepo: VocabularyRepositoryFake
+    private lateinit var fakeQuizPoolRepo: QuizPoolRepositoryFake
     private lateinit var fakePrefs: UserPreferencesManagerFake
     private val testDispatcher = StandardTestDispatcher()
 
@@ -44,10 +47,12 @@ class SearchViewModelTest {
         Dispatchers.setMain(testDispatcher)
         fakeRepo = VocabularyRepositoryFake()
         fakePrefs = UserPreferencesManagerFake()
+        fakeQuizPoolRepo = QuizPoolRepositoryFake()
         viewModel = SearchViewModel(
             savedStateHandle = SavedStateHandle(),
             containerRepository = fakeRepo,
             searchRepository = fakeRepo,
+            quizPoolRepository = fakeQuizPoolRepo,
             userPreferencesManager = fakePrefs,
             ioDispatcher = testDispatcher,
             toggleVocabularyFavoriteUseCase = ToggleVocabularyFavoriteUseCase(
@@ -127,13 +132,13 @@ class SearchViewModelTest {
         advanceUntilIdle()
 
         // Then
-        viewModel.vocabularyFlow.test {
+        viewModel.vocabularyWithPoolStatesFlow.test {
+            expectThat(awaitItem()).isEmpty()
+
+            viewModel.updateSearchQuery("hund")
+
             val result = awaitItem()
-
-            expectThat(result).hasSize(1)
-            expectThat(result.first().word).isEqualTo("hund")
-
-            cancelAndIgnoreRemainingEvents()
+            expectThat(result.single().vocabulary.word).isEqualTo("hund")
         }
     }
 

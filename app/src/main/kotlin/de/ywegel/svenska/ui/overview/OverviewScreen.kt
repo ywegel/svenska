@@ -2,6 +2,7 @@
 
 package de.ywegel.svenska.ui.overview
 
+import androidx.annotation.VisibleForTesting
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.EnterTransition
 import androidx.compose.animation.core.tween
@@ -35,7 +36,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.tooling.preview.PreviewLightDark
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.ramcosta.composedestinations.annotation.Destination
@@ -49,7 +50,7 @@ import com.ramcosta.composedestinations.generated.destinations.WordGroupsScreenD
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
 import de.ywegel.svenska.R
 import de.ywegel.svenska.data.model.Vocabulary
-import de.ywegel.svenska.data.model.vocabularies
+import de.ywegel.svenska.data.model.vocabulariesWithPoolState
 import de.ywegel.svenska.navigation.SvenskaGraph
 import de.ywegel.svenska.ui.common.HorizontalSpacerS
 import de.ywegel.svenska.ui.common.IconButton
@@ -62,6 +63,7 @@ import de.ywegel.svenska.ui.theme.Spacings
 import de.ywegel.svenska.ui.theme.SvenskaIcons
 import de.ywegel.svenska.ui.theme.SvenskaTheme
 import kotlinx.coroutines.delay
+import kotlin.time.Duration.Companion.milliseconds
 
 @Destination<SvenskaGraph>(navArgs = OverviewNavArgs::class)
 @Composable
@@ -137,15 +139,15 @@ private fun OverviewScreen(
                 contentPadding = contentPadding,
                 modifier = Modifier.nestedScroll(scrollBehavior.nestedScrollConnection),
             ) {
-                items(uiState.vocabulary, key = { it.id }) { item ->
-                    VocabularyItemCompact(item) {
+                items(uiState.items, key = { it.vocabulary.id }) { item ->
+                    VocabularyItemCompact(item.vocabulary) {
                         vocabularyListCallbacks.onVocabularyClick(vocabulary = it, showContainerInformation = false)
                     }
                 }
             }
         } else {
             VocabularyList(
-                vocabularies = uiState.vocabulary,
+                vocabularies = uiState.items,
                 showContainerInformation = false,
                 vocabularyDetailState = uiState.detailViewState,
                 scrollBehavior = scrollBehavior,
@@ -190,7 +192,7 @@ private fun AnimatedFabWithText(onClick: () -> Unit, text: String, icon: ImageVe
 
     LaunchedEffect(Unit) {
         // TODO: Maybe, instead of a timer, make the text disappear on scroll
-        delay(OVERVIEW_FAB_DISAPPEARING_ANIMATION_DELAY)
+        delay(OVERVIEW_FAB_DISAPPEARING_ANIMATION_DELAY.milliseconds)
         isExpanded = false
     }
 
@@ -223,12 +225,16 @@ private fun AnimatedFabWithText(onClick: () -> Unit, text: String, icon: ImageVe
 private const val OVERVIEW_FAB_DISAPPEARING_ANIMATION_DELAY = 4000L
 private const val ANIMATION_DURATION_MS = 800
 
-@Preview
+@VisibleForTesting
+@PreviewLightDark
 @Composable
 private fun OverviewPreview() {
     SvenskaTheme {
         OverviewScreen(
-            uiState = OverviewUiState(vocabulary = vocabularies(), containerName = "Test container"),
+            uiState = OverviewUiState(
+                items = vocabulariesWithPoolState(),
+                containerName = "Test container",
+            ),
             navigateToAdd = {},
             onQuizClick = {},
             navigateToEdit = {},

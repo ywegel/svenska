@@ -2,6 +2,7 @@ package de.ywegel.svenska.data.db
 
 import androidx.room.Room
 import androidx.test.core.app.ApplicationProvider
+import app.cash.turbine.test
 import de.ywegel.svenska.RobolectricTest
 import de.ywegel.svenska.data.db.quiz.CardPhase
 import de.ywegel.svenska.data.db.quiz.FormsFacetCard
@@ -195,6 +196,22 @@ class ReviewDaoTest : RobolectricTest() {
         expectThat(logs.map { it.reviewAt }).containsExactly(LATER)
     }
 
+    @Test
+    fun `observeVocabularyIdsWithCard returns only rows with a card of that direction`() = runTest {
+        // Given
+        db.vocabulary().upsertVocabulary(vocabulary(id = OTHER_VOCABULARY_ID))
+        reviewDao.insertTranslationCardIfAbsent(svDeCard(due = NOW))
+        reviewDao.insertTranslationCardIfAbsent(
+            TranslationFacetCard(OTHER_VOCABULARY_ID, QuizTranslationDirection.DE_SV, fsrs(due = NOW)),
+        )
+
+        // When
+        reviewDao.observeVocabularyIdsWithCard(QuizTranslationDirection.DE_SV).test {
+            // Then
+            expectThat(awaitItem()).containsExactly(OTHER_VOCABULARY_ID)
+        }
+    }
+
     private fun activeEntry(svDeStreak: Int = 0) =
         QuizPoolEntry(vocabularyId = VOCABULARY_ID, queuedAt = NOW, introducedAt = NOW, svDeStreak = svDeStreak)
 
@@ -231,6 +248,7 @@ class ReviewDaoTest : RobolectricTest() {
 
     private companion object {
         const val VOCABULARY_ID = 1
+        const val OTHER_VOCABULARY_ID = 2
         const val FORMS_KEY = "lampa|lampan|lampor|lamporna"
         const val GOOD = 3
         const val NOW = 1_000L

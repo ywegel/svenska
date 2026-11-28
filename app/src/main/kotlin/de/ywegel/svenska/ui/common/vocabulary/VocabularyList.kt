@@ -13,6 +13,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import de.ywegel.svenska.data.model.Vocabulary
+import de.ywegel.svenska.data.model.quiz.VocabularyWithPoolState
 import de.ywegel.svenska.ui.detail.VocabularyDetailScreen
 import de.ywegel.svenska.ui.detail.VocabularyDetailState
 import de.ywegel.svenska.ui.overview.VocabularyListItem
@@ -21,7 +22,7 @@ import de.ywegel.svenska.ui.theme.Spacings
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun VocabularyList(
-    vocabularies: List<Vocabulary>,
+    vocabularies: List<VocabularyWithPoolState>,
     showContainerInformation: Boolean,
     scrollBehavior: TopAppBarScrollBehavior?,
     contentPadding: PaddingValues,
@@ -47,11 +48,12 @@ fun VocabularyList(
         headerItems?.invoke(this)
         items(
             items = vocabularies,
-            key = { it.id },
+            key = { it.vocabulary.id },
         ) { vocab ->
             VocabularyListItem(
-                vocabulary = vocab,
+                vocabulary = vocab.vocabulary,
                 modifier = Modifier.animateItem(),
+                poolState = vocab.poolState,
                 onClick = {
                     vocabularyListCallbacks.onVocabularyClick(
                         vocabulary = it,
