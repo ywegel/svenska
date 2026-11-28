@@ -13,8 +13,8 @@ import one.felsen.fsrskt.fsrs6.FsrsCard
 import kotlin.time.Instant
 
 /**
- * Returns the given [formsCandidates] and [queuedWords] and records the calls in [queuedToPool], [introducedWords],
- * [introducedForms] and [countedSince]. Introducing returns new cards due at the given time.
+ * Returns the given [formsCandidates] and [queuedWords] and records the calls in [queuedToPool], [removedFromPool],
+ * [resumedInPool], [introducedWords], [introducedForms] and [countedSince]. Introducing returns new cards due at the given time.
  */
 class QuizPoolRepositoryFake(
     private val introducedToday: Int = 0,
@@ -23,6 +23,8 @@ class QuizPoolRepositoryFake(
     private val poolStates: Map<Int, VocabularyPoolState> = emptyMap(),
 ) : QuizPoolRepository {
     val queuedToPool = mutableListOf<Vocabulary>()
+    val removedFromPool = mutableListOf<Int>()
+    val resumedInPool = mutableListOf<Int>()
     val introducedWords = mutableListOf<Vocabulary>()
     val introducedForms = mutableListOf<Vocabulary>()
     var countedSince: Instant? = null
@@ -37,7 +39,14 @@ class QuizPoolRepositoryFake(
             list.map { VocabularyWithPoolState(it, poolStates[it.id] ?: VocabularyPoolState.NotInPool) }
         }
 
-    override suspend fun removeFromPool(vocabularyId: Int): PoolRemoval = PoolRemoval.UNCHANGED
+    override suspend fun removeFromPool(vocabularyId: Int): PoolRemoval {
+        removedFromPool += vocabularyId
+        return PoolRemoval.UNCHANGED
+    }
+
+    override suspend fun resumeInPool(vocabularyId: Int) {
+        resumedInPool += vocabularyId
+    }
 
     override suspend fun countIntroducedSince(since: Instant): Int {
         countedSince = since
